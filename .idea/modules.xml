@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/HulmirScreep.iml" filepath="$PROJECT_DIR$/.idea/HulmirScreep.iml" />
+      <module fileurl="file://$PROJECT_DIR$/ScreepsAutocomplete-master/ScreepsAutocomplete-master.iml" filepath="$PROJECT_DIR$/ScreepsAutocomplete-master/ScreepsAutocomplete-master.iml" />
     </modules>
   </component>
 </project>
