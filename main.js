@@ -12,16 +12,18 @@ module.exports.loop = function () {
     let modCounter = 0;
     for (let roomCount in Game.rooms) {
         let room = Game.rooms[roomCount];
-        if (Game.time % 100 == modCounter) {
+        if (Game.time % 20 === modCounter) {
             if(room.controller.my){
                 CreateJobs.run(room);
             }else{
                 CreateFrontierJobs.run(room);
             }
         }
-        modCounter = modCounter + 1;
+        modCounter = (modCounter + 1) % 20;
     }
-    AssignOpenJobs.run();
+    if (Game.time % 3 === 0){
+        AssignOpenJobs.run();
+    }
     DoClosedJobs.run();
     Links.run();
     Terminals.run();
