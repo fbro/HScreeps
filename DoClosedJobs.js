@@ -1,4 +1,4 @@
-let DoClosedJobs = {
+const DoClosedJobs = {
     run: function() {
         // TODO
     }

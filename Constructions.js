@@ -1,4 +1,4 @@
-let Constructions = {
+const Constructions = {
     run: function() {
         // TODO
     }

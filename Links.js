@@ -1,4 +1,4 @@
-let Links = {
+const Links = {
     run: function() {
         // TODO
     }

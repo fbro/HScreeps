@@ -1,167 +1,71 @@
 const CreateJobs = {
-    run: function (room) {
+    run: function(room) {
         let newJobsCounter = 0;
+        let existingOpenJobsCounter = 0;
 
         // new jobs
-        const activeSources = room.find(FIND_SOURCES_ACTIVE).map(function (p) {
-            return p.id;
-        });
+        const activeSources                 = room.find(FIND_SOURCES_ACTIVE).map(function (p) { return {'name' : 'activeSources', 'id': p.id, 'creeps': []}; });
+        const droppedResources              = room.find(FIND_DROPPED_RESOURCES, {filter: (drop) => {return (drop.amount > 50);}}).map(function (p) { return {'name' : 'droppedResources', 'id': p.id, 'creeps': []}; });
+        const spawnsAndExtensionsNeedEnergy = room.find(FIND_MY_STRUCTURES, {filter: (structure) => {return ((structure.structureType === STRUCTURE_SPAWN || structure.structureType === STRUCTURE_EXTENSION) && structure.energy < structure.energyCapacity);}}).map(function (p) { return {'name' : 'spawnsAndExtensionsNeedEnergy', 'id': p.id, 'creeps': []}; });
+        const towersNeedEnergy              = room.find(FIND_MY_STRUCTURES, {filter: (tower) => {return (tower.structureType === STRUCTURE_TOWER && tower.energy < tower.energyCapacity);}}).map(function (p) { return {'name' : 'towersNeedEnergy', 'id': p.id, 'creeps': []}; });
+        const fullLinks                     = room.find(FIND_MY_STRUCTURES, {filter: (link) => {return (link.structureType === STRUCTURE_LINK && link.energy > 700);}}).map(function (p) { return {'name' : 'fullLinks', 'id': p.id, 'creeps': []}; });
+        const fullContainers                = room.find(FIND_STRUCTURES, {filter: (container) => {return (container.structureType === STRUCTURE_CONTAINER && _.sum(container.store) > 700);}}).map(function (p) { return {'name' : 'fullContainers', 'id': p.id, 'creeps': []}; });
+        const ownedControllers              = room.find(FIND_STRUCTURES, {filter: (controller) => {return (controller.structureType === STRUCTURE_CONTROLLER);}}).map(function (p) { return {'name' : 'ownedControllers', 'id': p.id, 'creeps': []}; });
+        const damagedStructures             = room.find(FIND_STRUCTURES, {filter: (structure) => {return (structure.hits < structure.hitsMax);}}).map(function (p) { return {'name' : 'damagedStructures', 'id': p.id, 'creeps': []}; });
+        const constructions                 = room.find(FIND_CONSTRUCTION_SITES).map(function (p) { return {'name' : 'constructions', 'id': p.id, 'creeps': []}; });
+        const activeExtractors              = room.find(FIND_MY_STRUCTURES, {filter: (extractor) => {return (extractor.structureType === STRUCTURE_EXTRACTOR && extractor.isActive());}}).map(function (p) { return {'name' : 'activeExtractors', 'id': p.id, 'creeps': []}; });
 
-        const droppedResources = room.find(FIND_DROPPED_RESOURCES, {
-            filter: (drop) => {
-                return (drop.amount > 50);
-            }
-        }).map(function (p) {
-            return p.id;
-        });
-        const spawnsAndExtensionsNeedEnergy = room.find(FIND_MY_STRUCTURES, {
-            filter: (structure) => {
-                return ((structure.structureType == STRUCTURE_SPAWN || structure.structureType == STRUCTURE_EXTENSION) && structure.energy < structure.energyCapacity);
-            }
-        }).map(function (p) {
-            return p.id;
-        });
-        const towersNeedEnergy = room.find(FIND_MY_STRUCTURES, {
-            filter: (tower) => {
-                return (tower.structureType == STRUCTURE_TOWER && tower.energy < tower.energyCapacity);
-            }
-        }).map(function (p) {
-            return p.id;
-        });
-        const fullLinks = room.find(FIND_MY_STRUCTURES, {
-            filter: (link) => {
-                return (link.structureType == STRUCTURE_LINK && link.energy < link.energyCapacity);
-            }
-        }).map(function (p) {
-            return p.id;
-        });
-        const fullContainers = room.find(FIND_STRUCTURES, {
-            filter: (container) => {
-                return (container.structureType == STRUCTURE_CONTAINER && _.sum(container.store) > 0);
-            }
-        }).map(function (p) {
-            return p.id;
-        });
+        let newJobs = [];
+        newJobs.push(...activeSources);
+        newJobs.push(...droppedResources);
+        newJobs.push(...spawnsAndExtensionsNeedEnergy);
+        newJobs.push(...towersNeedEnergy);
+        newJobs.push(...fullLinks);
+        newJobs.push(...fullContainers);
+        newJobs.push(...ownedControllers);
+        newJobs.push(...damagedStructures);
+        newJobs.push(...constructions);
+        newJobs.push(...activeExtractors);
 
-        const ownedControllers = room.find(FIND_STRUCTURES, {
-            filter: (controller) => {
-                return (controller.structureType == STRUCTURE_CONTROLLER);
-            }
-        }).map(function (p) {
-            return p.id;
-        });
+        const closedJobs = Memory.closedJobs;
+        const openJobs = Memory.openJobs;
 
-        const damagedStructures = room.find(FIND_STRUCTURES, {
-            filter: (structure) => {
-                return (structure.hits < structure.hitsMax);
-            }
-        }).map(function (p) {
-            return p.id;
-        });
-        const constructions = room.find(FIND_CONSTRUCTION_SITES);
+        let newOpenJobs = [];
+        // loop through all new jobs
+        for(const newJobCount in newJobs){
+            const newJob = newJobs[newJobCount];
+            let isClosedJobFound = false;
+            let foundExistingOpenJob = undefined;
 
-        const activeExtractors = room.find(FIND_MY_STRUCTURES, {
-            filter: (extractor) => {
-                return (extractor.structureType == STRUCTURE_EXTRACTOR && extractor.isActive());
-            }
-        }).map(function (p) {
-            return p.id;
-        });
-
-        const hostileCreeps = room.find(FIND_HOSTILE_CREEPS, {
-            filter: (creep) => {
-                return (creep.owner.username != "Invader");
-            }
-        }).map(function (p) {
-            return p.id;
-        });
-
-        // load all arrays from memory
-        const memClosedJobsActiveSources = Memory.ClosedJobsActiveSources;
-        const memClosedJobsDroppedResources = Memory.ClosedJobsDroppedResources;
-        const memClosedJobsSpawnsAndExtensionsNeedEnergy = Memory.ClosedJobsSpawnsAndExtensionsNeedEnergy;
-        const memClosedJobsTowersNeedEnergy = Memory.ClosedJobsTowersNeedEnergy;
-        const memClosedJobsFullLinks = Memory.ClosedJobsFullLinks;
-        const memClosedJobsFullContainers = Memory.ClosedJobsFullContainers;
-        const memClosedJobsOwnedControllers = Memory.ClosedJobsOwnedControllers;
-        const memClosedJobsDamagedStructures = Memory.ClosedJobsDamagedStructures;
-        const memClosedJobsConstructions = Memory.ClosedJobsConstructions;
-        const memClosedJobsActiveExtractors = Memory.ClosedJobsActiveExtractors;
-        const memClosedJobsHostileCreeps = Memory.ClosedJobsHostileCreeps;
-
-        const memOpenJobsActiveSources = Memory.OpenJobsActiveSources;
-        const memOpenJobsDroppedResources = Memory.OpenJobsDroppedResources;
-        const memOpenJobsSpawnsAndExtensionsNeedEnergy = Memory.OpenJobsSpawnsAndExtensionsNeedEnergy;
-        const memOpenJobsTowersNeedEnergy = Memory.OpenJobsTowersNeedEnergy;
-        const memOpenJobsFullLinks = Memory.OpenJobsFullLinks;
-        const memOpenJobsFullContainers = Memory.OpenJobsFullContainers;
-        const memOpenJobsOwnedControllers = Memory.OpenJobsOwnedControllers;
-        const memOpenJobsDamagedStructures = Memory.OpenJobsDamagedStructures;
-        const memOpenJobsConstructions = Memory.OpenJobsConstructions;
-        const memOpenJobsActiveExtractors = Memory.OpenJobsActiveExtractors;
-        const memOpenJobsHostileCreeps = Memory.OpenJobsHostileCreeps;
-
-        Memory.OpenJobsActiveSources = CheckForNewJobs(activeSources, memClosedJobsActiveSources, memOpenJobsActiveSources);
-        Memory.OpenJobsDroppedResources = CheckForNewJobs(droppedResources, memClosedJobsDroppedResources, memOpenJobsDroppedResources);
-        Memory.OpenJobsSpawnsAndExtensionsNeedEnergy = CheckForNewJobs(spawnsAndExtensionsNeedEnergy, memClosedJobsSpawnsAndExtensionsNeedEnergy, memOpenJobsSpawnsAndExtensionsNeedEnergy);
-        Memory.OpenJobsTowersNeedEnergy = CheckForNewJobs(towersNeedEnergy, memClosedJobsTowersNeedEnergy, memOpenJobsTowersNeedEnergy);
-        Memory.OpenJobsFullLinks = CheckForNewJobs(fullLinks, memClosedJobsFullLinks, memOpenJobsFullLinks);
-        Memory.OpenJobsFullContainers = CheckForNewJobs(fullContainers, memClosedJobsFullContainers, memOpenJobsFullContainers);
-        Memory.OpenJobsOwnedControllers = CheckForNewJobs(ownedControllers, memClosedJobsOwnedControllers, memOpenJobsOwnedControllers);
-        Memory.OpenJobsDamagedStructures = CheckForNewJobs(damagedStructures, memClosedJobsDamagedStructures, memOpenJobsDamagedStructures);
-        Memory.OpenJobsConstructions = CheckForNewJobs(constructions, memClosedJobsConstructions, memOpenJobsConstructions);
-        Memory.OpenJobsActiveExtractors = CheckForNewJobs(activeExtractors, memClosedJobsActiveExtractors, memOpenJobsActiveExtractors);
-        Memory.OpenJobsHostileCreeps = CheckForNewJobs(hostileCreeps, memClosedJobsHostileCreeps, memOpenJobsHostileCreeps);
-
-        console.log("CreateJobs " + room.name + ", " + newJobsCounter);
-
-        function CheckForNewJobs(newJobIDs, closedJobs, openJobs) {
-            if (newJobIDs === undefined) {
-                newJobIDs = [];
-            }
-            if (closedJobs === undefined) {
-                closedJobs = [];
-            }
-            if (openJobs === undefined) {
-                openJobs = [];
-            }
-            let newOpenJobs = [];
-            // loop through all new jobs
-            for (const newJobIDCount in newJobIDs) {
-                const newJobID = newJobIDs[newJobIDCount]; // const newJob = Game.getObjectById(newJobID);
-                let isClosedJobFound = false;
-                let foundExistingOpenJob = undefined;
-
-                for (const closedJobsCount in closedJobs) {
-                    const closedJob = closedJobs[closedJobsCount];
-                    if (closedJob !== undefined && closedJob.id === newJobID) {
-                        isClosedJobFound = true;
-                        break;
-                    }
+            for(const closedJobsCount in closedJobs){ // first look through the closed jobs
+                const closedJob = closedJobs[closedJobsCount];
+                if(closedJob !== undefined && closedJob.id === newJob){
+                    isClosedJobFound = true;
+                    break;
                 }
-                if (!isClosedJobFound) {
-                    for (const openJobsCount in openJobs) {
-                        const openJob = openJobs[openJobsCount];
-                        if (openJob !== undefined) {
-                            if (openJob.id === newJobID) {
-                                foundExistingOpenJob = openJob;
-                                break;
-                            }
+            }
+            if(!isClosedJobFound){
+                for(const openJobsCount in openJobs){ // if not in closed jobs then look in open jobs
+                    const openJob = openJobs[openJobsCount];
+                    if(openJob !== undefined){
+                        if(openJob.id === newJob){
+                            foundExistingOpenJob = openJob;
+                            break;
                         }
                     }
                 }
-
-                if (foundExistingOpenJob !== undefined) {
-                    newOpenJobs.push(foundExistingOpenJob);
-                } else if (!isClosedJobFound) {
-                    let newJobOBJ = {};
-                    newJobOBJ.id = newJobID;
-                    newOpenJobs.push(newJobOBJ);
-                    newJobsCounter++;
-                }
             }
-            return newOpenJobs;
+
+            if(foundExistingOpenJob !== undefined){
+                newOpenJobs.push(foundExistingOpenJob); // existing open jobs are re-saved in the memory
+                existingOpenJobsCounter++;
+            }else if(!isClosedJobFound){ // new job found - now it is created
+                newOpenJobs.push(newJob);
+                newJobsCounter++;
+            }
         }
+        Memory.OpenJobs =  newOpenJobs;
+        console.log("CreateJobs " + room.name + ", new: " + newJobsCounter + ", existing: " + existingOpenJobsCounter);
     }
 };
 module.exports = CreateJobs;

@@ -1,4 +1,4 @@
-let Towers = {
+const Towers = {
     run: function() {
         // TODO
     }

@@ -1,4 +1,4 @@
-let Terminals = {
+const Terminals = {
     run: function() {
         // TODO
     }
