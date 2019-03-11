@@ -2,6 +2,7 @@ let Towers = require('Towers');
 let CreateJobs = require('CreateJobs');
 let CreateFrontierJobs = require('CreateFrontierJobs');
 let AssignOpenJobs = require('AssignOpenJobs');
+let SpawnCreeps = require('SpawnCreeps');
 let DoClosedJobs = require('DoClosedJobs');
 let Links = require('Links');
 let Terminals = require('Terminals');
@@ -24,6 +25,7 @@ module.exports.loop = function () {
     if (Game.time % 3 === 0) {
         AssignOpenJobs.run();
     }
+    SpawnCreeps.run();
     DoClosedJobs.run();
     Links.run();
     Terminals.run();

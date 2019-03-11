@@ -1,5 +1,11 @@
 const AssignOpenJobs = {
     run: function() {
+
+        const JOB_ACCEPTABLE_POSITION_WEIGHT = 200; // the acceptable range-weight for allowing a job to be assigned to a creep
+        const JOB_WEIGHT_MOD = 100; // modifier for how pronounced the range part should be
+        const JOB_WEIGHT_MULTIPLIER_INTER_ROOM = 1; // multiplier for how pronounced the inter room range part should be
+        const ALLOWED_COMPATIBILITY = 6; // do not assign the job to a creep that is not compatible
+
         /*creep types:
         * [T] transporter   no work
         * [H] harvester     only one carry
@@ -37,24 +43,24 @@ const AssignOpenJobs = {
             let bestCreep = null;
             let bestOpenJob = null;
             let bestOpenJobPlacement = 0;
-            let bestWeight = 6;
+            let bestWeight = ALLOWED_COMPATIBILITY;
             let bestPositionWeight = Number.MAX_SAFE_INTEGER;
-            for (const creepName in idleCreeps) { // loop through all idle creeps
-                const creep = Game.creeps[creepName];
-                for(let i = 0; i < openJobs.length - 1; i++){ // loop through all open jobs
-                    const openJob = openJobs[i];
+            for(let i = 0; i < openJobs.length - 1; i++){ // loop through all open jobs
+                const openJob = openJobs[i];
+                const openJobOBJ = Game.getObjectById(openJob.id);
+                for (const creepName in idleCreeps) { // loop through all idle creeps
+                    const creep = Game.creeps[creepName];
                     let weight = CreepOnJobPoints(creep.name.substring(0, 1), openJob.name);
                     if(weight > 0){ // is applicable
                         if(bestWeight > weight){ // best creep for the job (for now) is found
-                            const jobObj = Game.getObjectById(openJob.id);
                             let positionWeight = 0;
-                            if(jobObj.pos.roomName === creep.pos.roomName){ // in same room
-                                positionWeight += -100;
-                                positionWeight += Math.sqrt(Math.pow(jobObj.pos.x - creep.pos.x, 2) + Math.pow(jobObj.pos.y - creep.pos.y, 2)); // in room range
+                            if(openJobOBJ.pos.roomName === creep.pos.roomName){ // in same room
+                                positionWeight += -JOB_WEIGHT_MOD;
+                                positionWeight += Math.sqrt(Math.pow(openJobOBJ.pos.x - creep.pos.x, 2) + Math.pow(openJobOBJ.pos.y - creep.pos.y, 2)) * JOB_WEIGHT_MULTIPLIER_INTER_ROOM; // in room range
                             }else{ // Get the linear distance (in rooms) between two rooms
-                                positionWeight = 100 * Game.map.getRoomLinearDistance(jobObj.pos.roomName, creep.pos.roomName);
+                                positionWeight = JOB_WEIGHT_MOD * Game.map.getRoomLinearDistance(openJobOBJ.pos.roomName, creep.pos.roomName);
                             }
-                            if(bestPositionWeight > positionWeight && (positionWeight < 200 || openJob.name.startsWith("Remote"))){ // best creep range (for now) is found
+                            if(bestPositionWeight > positionWeight && (positionWeight < JOB_ACCEPTABLE_POSITION_WEIGHT || openJob.name.startsWith("Remote"))){ // best creep range (for now) is found
                                 bestCreep = creep;
                                 bestOpenJob = openJob;
                                 bestOpenJobPlacement = i;

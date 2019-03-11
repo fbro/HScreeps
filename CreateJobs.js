@@ -14,6 +14,7 @@ const CreateJobs = {
         const damagedStructures             = room.find(FIND_STRUCTURES, {filter: (structure) => {return (structure.hits < structure.hitsMax);}}).map(function (p) { return {'name' : 'damagedStructures', 'id': p.id, 'creeps': []}; });
         const constructions                 = room.find(FIND_CONSTRUCTION_SITES).map(function (p) { return {'name' : 'constructions', 'id': p.id, 'creeps': []}; });
         const activeExtractors              = room.find(FIND_MY_STRUCTURES, {filter: (extractor) => {return (extractor.structureType === STRUCTURE_EXTRACTOR && extractor.isActive());}}).map(function (p) { return {'name' : 'activeExtractors', 'id': p.id, 'creeps': []}; });
+        // TODO there are other jobs to create - remote jobs, protector jobs
 
         let newJobs = [];
         newJobs.push(...activeSources);
