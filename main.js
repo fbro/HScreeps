@@ -2,22 +2,33 @@ let Towers = require('Towers');
 let CreateJobs = require('CreateJobs');
 let CreateFrontierJobs = require('CreateFrontierJobs');
 let AssignOpenJobs = require('AssignOpenJobs');
-let SpawnCreeps = require('SpawnCreeps');
 let DoClosedJobs = require('DoClosedJobs');
 let Links = require('Links');
 let Terminals = require('Terminals');
 let Constructions = require('Constructions');
 
 module.exports.loop = function () {
-    Towers.run();
+    if (Memory.openJobs === undefined) {
+        Memory.openJobs = [];
+    }
+    if (Memory.closedJobs === undefined) {
+        Memory.closedJobs = [];
+    }
+    if (Memory.links === undefined) {
+        Memory.links = [];
+    }
+
+    Towers.run(); // TODO
     let modCounter = 0;
     for (let roomCount in Game.rooms) {
-        let room = Game.rooms[roomCount];
         if (Game.time % 20 === modCounter) {
+            let room = Game.rooms[roomCount];
             if (room.controller.my) {
-                CreateJobs.run(room);
+                CreateJobs.run(room); // TODO protector jobs
+                Links.run(room);
+                //Terminals.run(room);
             } else {
-                CreateFrontierJobs.run(room);
+                CreateFrontierJobs.run(room); // TODO
             }
         }
         modCounter = (modCounter + 1) % 20;
@@ -25,9 +36,7 @@ module.exports.loop = function () {
     if (Game.time % 3 === 0) {
         AssignOpenJobs.run();
     }
-    SpawnCreeps.run();
-    DoClosedJobs.run();
-    Links.run();
-    Terminals.run();
-    Constructions.run();
+    DoClosedJobs.run(); // TODO on the road actions
+
+    Constructions.run(); // TODO
 };

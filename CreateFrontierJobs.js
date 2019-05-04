@@ -1,4 +1,4 @@
-const CreateFrontierJobs = {
+let CreateFrontierJobs = {
     run: function(room) {
         // TODO
     }
