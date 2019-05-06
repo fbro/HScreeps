@@ -40,9 +40,9 @@ const CreateJobs = {
             return {'name': 'TowersNeedEnergy', 'id': p.id, 'creeps': []};
         });
 
-        const fullLinks = room.find(FIND_MY_STRUCTURES, {
+        const fullLinks = room.find(FIND_MY_STRUCTURES, { // only find the links that are adjacent to storage
             filter: (link) => {
-                return (link.structureType === STRUCTURE_LINK && link.energy >= 750);
+                return (link.structureType === STRUCTURE_LINK && link.energy >= 600 && link.room.storage.pos.inRangeTo(link, 1));
             }
         }).map(function (p) {
             return {'name': 'FullLinks', 'id': p.id, 'creeps': []};

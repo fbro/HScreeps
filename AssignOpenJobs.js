@@ -205,11 +205,11 @@ const AssignOpenJobs = {
                 case "SpawnsAndExtensionsNeedEnergy":
                 case "TowersNeedEnergy":
                 case "FullLinks":
-                case "FullContainers": if(transporterCount < 4){isAtCreepRoof = false;} break;
+                case "FullContainers": if(transporterCount < 3){isAtCreepRoof = false;} break;
                 // builder
                 case "OwnedControllers":
                 case "DamagedStructures":
-                case "Constructions": if(builderCount < 5){isAtCreepRoof = false;} break;
+                case "Constructions": if(builderCount < 4){isAtCreepRoof = false;} break;
                 // extractor
                 case "ActiveMinerals": if(extractorCount < 0){isAtCreepRoof = false;} break;
                 default:
