@@ -1,4 +1,6 @@
 harvesters and mineral harvester should TRY to place itself over a container
 transporters should have a task to supply containers near the controller
 terminal needs to be able to sell resources
-transporters should empty storagelink and builders should empty controllerlink
+
+fullContainer job should end when it is really low
+

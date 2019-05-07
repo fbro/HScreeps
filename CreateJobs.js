@@ -42,7 +42,7 @@ const CreateJobs = {
 
         const fullLinks = room.find(FIND_MY_STRUCTURES, { // only find the links that are adjacent to storage
             filter: (link) => {
-                return (link.structureType === STRUCTURE_LINK && link.energy >= 600 && link.room.storage.pos.inRangeTo(link, 1));
+                return (link.structureType === STRUCTURE_LINK && link.energy >= 500 && link.room.storage.pos.inRangeTo(link, 1));
             }
         }).map(function (p) {
             return {'name': 'FullLinks', 'id': p.id, 'creeps': []};
@@ -50,7 +50,7 @@ const CreateJobs = {
 
         const fullContainers = room.find(FIND_STRUCTURES, {
             filter: (container) => {
-                return (container.structureType === STRUCTURE_CONTAINER && _.sum(container.store) > 700);
+                return (container.structureType === STRUCTURE_CONTAINER && _.sum(container.store) > 1700);
             }
         }).map(function (p) {
             return {'name': 'FullContainers', 'id': p.id, 'creeps': []};

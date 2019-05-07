@@ -8,8 +8,10 @@ const DoClosedJobs = {
                 const closedJobOBJ = Game.getObjectById(jobs[i].id);
                 if(closedJobOBJ === null){
 
-                    for (const creepName in jobs[i].creeps) {
+                    for (const creepNum in jobs[i].creeps) {
+                        let creepName = jobs[i].creeps[creepNum];
                         let creep = Game.creeps[creepName];
+
                         if (creep !== undefined) {
                             console.log("DoClosedJob, job: " + creep.memory.jobName + " is not found, removing job from creep " + creepName);
                             creep.memory.jobName = 'idle';
@@ -18,7 +20,7 @@ const DoClosedJobs = {
                         }
                     }
                     let spliceResult = jobs.splice(i, 1); // remove empty closedJob index
-                    console.log("DoClosedJob, job not found: " + JSON.stringify(spliceResult));
+                    console.log("DoClosedJob, job object disappeared: " + JSON.stringify(spliceResult));
                     i--;
                 }else{
                     let moveToOpenJobs = false;
@@ -164,7 +166,7 @@ const DoClosedJobs = {
                             if(actionResult === ERR_NOT_IN_RANGE){
                                 creep.moveTo(closedJobOBJ);
                                 jobStatus = 1;
-                            }else if(actionResult === ERR_NOT_ENOUGH_RESOURCES || actionResult === ERR_INVALID_TARGET){
+                            }else if(actionResult === ERR_NOT_ENOUGH_RESOURCES || actionResult === ERR_INVALID_TARGET && sumCreepCarry === 0){ // TODO fix this - sumCreepCarry === 0
                                 jobStatus = 2;
                             }
                         }
@@ -179,14 +181,7 @@ const DoClosedJobs = {
                 case "DamagedStructures":
                 case "Constructions":
                     if (creep.carry[RESOURCE_ENERGY] === 0) { // go get some energy!
-                        if(creep.memory.job2Id !== undefined){
-                            closedJob2OBJ = Game.getObjectById(creep.memory.job2Id);
-                        }else{
-                            closedJob2OBJ = ClosestEnergyFullStoreInRoom(creep);
-                            if(closedJob2OBJ !== undefined){
-                                creep.memory.job2Id = closedJob2OBJ.id;
-                            }
-                        }
+                        closedJob2OBJ = ClosestEnergyFullStoreInRoom(creep);
                         actionResult = CreepAct(creep, closedJobName, 1, closedJob2OBJ);
                         if(actionResult === ERR_NOT_IN_RANGE){
                             creep.moveTo(closedJob2OBJ);
@@ -212,7 +207,6 @@ const DoClosedJobs = {
         }
 
         // used by creep-transporters to see which store in the room where the creep is is most full of energy
-        // TODO remake with closeness in mind - and fix the dropped energy problem - add links also
         function ClosestEnergyFullStoreInRoom(creep){
             let bestEnergyLocation;
             let bestRange = Number.MAX_SAFE_INTEGER;

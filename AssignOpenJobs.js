@@ -264,8 +264,9 @@ const AssignOpenJobs = {
                 case "OwnedControllers":
                     switch (RCL) {
                         case 1: case 2: numOfCreeps = 1; break;
-                        case 3: case 4: case 5: case 8: numOfCreeps = 2; break;
+                        case 3: case 4: case 5: numOfCreeps = 2; break;
                         case 6: case 7: numOfCreeps = 3; break;
+                        case 8: numOfCreeps = 1; break;
                     } break;
                 case "DamagedStructures": numOfCreeps = 1; break;
                 case "Constructions": numOfCreeps = 1; break;
