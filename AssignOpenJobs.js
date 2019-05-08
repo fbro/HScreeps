@@ -40,7 +40,6 @@ const AssignOpenJobs = {
         let isAllAssigned = false; // loop until all openJobs or idleCreeps is empty or not applicable
         while (!isAllAssigned) {
             let idleCreeps = _(Game.creeps).filter({memory: {jobName: 'idle'}}).value();
-            console.log("idle creeps: " + idleCreeps.length);
             if(idleCreeps.length === 0){
                 break; // no need to enter algorithm if there are no idle creeps
             }
@@ -92,6 +91,7 @@ const AssignOpenJobs = {
                     Memory.openJobs.splice(bestOpenJobPlacement, 1);
                     Memory.closedJobs.push(bestOpenJob);
                 }
+                bestCreep.say("new💼" + bestOpenJobOBJ.pos.x + "," + bestOpenJobOBJ.pos.y);
                 console.log("AssignOpenJobs, job: " + bestOpenJob.name + " (" + bestOpenJobOBJ.pos.x + ", " + bestOpenJobOBJ.pos.y + ", " + bestOpenJobOBJ.pos.roomName + "), assigned to creep: " + bestCreep.name);
             }
             else { // done
@@ -205,11 +205,11 @@ const AssignOpenJobs = {
                 case "SpawnsAndExtensionsNeedEnergy":
                 case "TowersNeedEnergy":
                 case "FullLinks":
-                case "FullContainers": if(transporterCount < 3){isAtCreepRoof = false;} break;
+                case "FullContainers": if(transporterCount < 2){isAtCreepRoof = false;} break;
                 // builder
                 case "OwnedControllers":
                 case "DamagedStructures":
-                case "Constructions": if(builderCount < 4){isAtCreepRoof = false;} break;
+                case "Constructions": if(builderCount < 3){isAtCreepRoof = false;} break;
                 // extractor
                 case "ActiveMinerals": if(extractorCount < 0){isAtCreepRoof = false;} break;
                 default:
@@ -228,12 +228,12 @@ const AssignOpenJobs = {
                 case "ActiveSources": val = 200; break;
                 // transporter
                 case "DroppedResources": val = 0; break;
-                case "SpawnsAndExtensionsNeedEnergy": val = 100; break;
-                case "TowersNeedEnergy": val = 100; break;
+                case "SpawnsAndExtensionsNeedEnergy": val = 500; break;
+                case "TowersNeedEnergy": val = 50; break;
                 case "FullLinks": val = 20; break;
                 case "FullContainers": val = 10; break;
                 // builder
-                case "OwnedControllers": val = 100; break;
+                case "OwnedControllers": val = 200; break;
                 case "DamagedStructures": val = 100; break;
                 case "Constructions": val = 10; break;
                 // extractor
@@ -367,15 +367,15 @@ const AssignOpenJobs = {
                 case "FullContainers":
                     switch (true) {
                         case (energyAvailable >= 1350): // energyCapacityAvailable: 12900
-                            body = [CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];break;
-                        case (energyAvailable >= 1200): // energyCapacityAvailable: 5600
-                            body = [CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];break;
-                        case (energyAvailable >= 1050): // energyCapacityAvailable: 2300
                             body = [CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];break;
-                        case (energyAvailable >= 900): // energyCapacityAvailable: 1800
+                        case (energyAvailable >= 1200): // energyCapacityAvailable: 5600
                             body = [CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];break;
-                        case (energyAvailable >= 600): // energyCapacityAvailable: 1300
+                        case (energyAvailable >= 1050): // energyCapacityAvailable: 2300
+                            body = [CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE];break;
+                        case (energyAvailable >= 900): // energyCapacityAvailable: 1800
                             body = [CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE];break;
+                        case (energyAvailable >= 600): // energyCapacityAvailable: 1300
+                            body = [CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE];break;
                         case (energyAvailable >= 300): // energyCapacityAvailable: 550
                             body = [CARRY, CARRY, CARRY, CARRY, MOVE, MOVE];break;
                         case (energyAvailable >= 150): // energyCapacityAvailable: 300
@@ -390,13 +390,13 @@ const AssignOpenJobs = {
                         case (energyAvailable >= 2200): // energyCapacityAvailable: 12900
                             body = [WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];break;
                         case (energyAvailable >= 2000): // energyCapacityAvailable: 5600
-                            body = [WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];break;
-                        case (energyAvailable >= 1800): // energyCapacityAvailable: 2300
-                            body = [WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];break;
-                        case (energyAvailable >= 1400): // energyCapacityAvailable: 1800
                             body = [WORK, WORK, WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];break;
+                        case (energyAvailable >= 1800): // energyCapacityAvailable: 2300
+                            body = [WORK, WORK, WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];break;
+                        case (energyAvailable >= 1400): // energyCapacityAvailable: 1800
+                            body = [WORK, WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];break;
                         case (energyAvailable >= 1000): // energyCapacityAvailable: 1300
-                            body = [WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE];break;
+                            body = [WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE];break;
                         case (energyAvailable >= 400): // energyCapacityAvailable: 550
                             body = [WORK, WORK, CARRY, CARRY, MOVE, MOVE];break;
                         case (energyAvailable >= 200): // energyCapacityAvailable: 300

@@ -71,8 +71,8 @@ const CreateJobs = {
                     &&
                     (
                         (
-                            structure.structureType === STRUCTURE_RAMPART && (RCL < 8 && structure.hits < 1000 || RCL === 8 && structure.hits < 10000) ||
-                            structure.structureType === STRUCTURE_WALL && (RCL < 8 && structure.hits < 1000 || RCL === 8 && structure.hits < 10000) ||
+                            structure.structureType === STRUCTURE_RAMPART && (RCL < 8 && structure.hits < 1000 || RCL === 8 && structure.hits < 100000) ||
+                            structure.structureType === STRUCTURE_WALL && (RCL < 8 && structure.hits < 1000 || RCL === 8 && structure.hits < 100000) ||
                             structure.structureType === STRUCTURE_ROAD && structure.hits < structure.hitsMax / 2
                         )
                         ||

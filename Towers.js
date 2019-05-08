@@ -36,8 +36,8 @@ const Towers = {
                     if(damagedCreeps.length > 0){
                         tower.heal(damagedCreeps[0]);
                     }
-                    else if(tower.energy > 500){
-                        const closestDamagedStructure = tower.pos.findClosestByRange(FIND_STRUCTURES, {filter: (structure) => (structure.hits < structure.hitsMax/2 && structure.structureType != STRUCTURE_WALL && structure.structureType != STRUCTURE_RAMPART) || (structure.structureType == STRUCTURE_RAMPART && structure.hits < 1000000) || (structure.structureType == STRUCTURE_WALL && structure.hits < 1000000)});
+                    else if(tower.energy > 700){
+                        const closestDamagedStructure = tower.pos.findClosestByRange(FIND_STRUCTURES, {filter: (structure) => (structure.hits < structure.hitsMax/2 && structure.structureType != STRUCTURE_WALL && structure.structureType != STRUCTURE_RAMPART) || (structure.structureType == STRUCTURE_RAMPART && structure.hits < 1000) || (structure.structureType == STRUCTURE_WALL && structure.hits < 1000)});
                         if(closestDamagedStructure) {
                             tower.repair(closestDamagedStructure);
                         }

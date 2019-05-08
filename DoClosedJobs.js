@@ -17,6 +17,7 @@ const DoClosedJobs = {
                             creep.memory.jobName = 'idle';
                             creep.memory.jobId = undefined;
                             creep.memory.job2Id = undefined;
+                            creep.say("job🌀 gone");
                         }
                     }
                     let spliceResult = jobs.splice(i, 1); // remove empty closedJob index
@@ -56,6 +57,7 @@ const DoClosedJobs = {
                             }
                         }
                         if(jobStatus === 2){ // 2 means tried to act but job is done
+                            creep.say("job✔" + closedJobOBJ.pos.x + "," + closedJobOBJ.pos.y);
                             let spliceResult = jobs.splice(i, 1); // delete the closed job
                             console.log("DoClosedJob, " + creep.memory.jobName + " is done, removing job and setting creep job to idle, splice: " + JSON.stringify(spliceResult));
                             creep.memory.jobName = 'idle';
@@ -85,6 +87,7 @@ const DoClosedJobs = {
                 let obj = Game.getObjectById(creep.memory.jobId);
                 if(obj === null){
                     console.log("ERROR!! " + creep.memory.jobName + " is undefined in Memory on creep: " + creepName);
+                    creep.say("ERROR!!!!!");
                     creep.memory.jobName = 'idle';
                     creep.memory.jobId = undefined;
                 }
@@ -98,7 +101,6 @@ const DoClosedJobs = {
         function CreepActions(creep, closedJobName, closedJobOBJ){
             let actionResult = -5;
             let jobStatus = 0;
-            let closedJob2OBJ;
             switch (closedJobName) {
                 case "ActiveSources":
                 case "ActiveMinerals":
@@ -139,7 +141,7 @@ const DoClosedJobs = {
                         actionResult = creep.harvest(closedJobOBJ);
                     }
                     if(actionResult === ERR_NOT_IN_RANGE){
-                        creep.moveTo(closedJobOBJ);
+                        creep.moveTo(closedJobOBJ, {visualizePathStyle:{fill: 'transparent',stroke: '#ffe100',lineStyle: 'undefined',strokeWidth: .15,opacity: .5}});
                         jobStatus = 1;
                     }else if(actionResult === ERR_NOT_ENOUGH_RESOURCES){
                         jobStatus = 2;
@@ -158,15 +160,16 @@ const DoClosedJobs = {
                             || closedJobName === "FullContainers" && _.sum(closedJobName.store) === 0)) {
                             actionResult = CreepAct(creep, closedJobName, 1, creep.room.storage);
                             if(actionResult === ERR_NOT_IN_RANGE){
-                                creep.moveTo(creep.room.storage);
+                                creep.moveTo(creep.room.storage, {visualizePathStyle:{fill: 'transparent',stroke: '#0000ff',lineStyle: 'dotted',strokeWidth: .15,opacity: .1}});
                                 jobStatus = 1;
                             }
                         } else {
                             actionResult = CreepAct(creep, closedJobName, 2, closedJobOBJ);
                             if(actionResult === ERR_NOT_IN_RANGE){
-                                creep.moveTo(closedJobOBJ);
+                                creep.moveTo(closedJobOBJ, {visualizePathStyle:{fill: 'transparent',stroke: '#0000ff',lineStyle: 'dashed',strokeWidth: .15,opacity: .1}});
                                 jobStatus = 1;
-                            }else if(actionResult === ERR_NOT_ENOUGH_RESOURCES || actionResult === ERR_INVALID_TARGET && sumCreepCarry === 0){ // TODO fix this - sumCreepCarry === 0
+                            }
+                            if((actionResult === ERR_NOT_ENOUGH_RESOURCES || actionResult === ERR_INVALID_TARGET) && sumCreepCarry === 0){
                                 jobStatus = 2;
                             }
                         }
@@ -181,20 +184,29 @@ const DoClosedJobs = {
                 case "DamagedStructures":
                 case "Constructions":
                     if (creep.carry[RESOURCE_ENERGY] === 0) { // go get some energy!
-                        closedJob2OBJ = ClosestEnergyFullStoreInRoom(creep);
-                        actionResult = CreepAct(creep, closedJobName, 1, closedJob2OBJ);
+                        const energyTargetID = creep.memory.energyTarget;
+                        let energyTarget;
+                        if(energyTargetID === undefined){
+                            energyTarget = ClosestEnergyFullStoreInRoom(creep);
+                            creep.memory.energyTarget = energyTarget.id; // save so that the function only runs once
+                        }else{
+                            energyTarget = Game.getObjectById(energyTargetID);
+                        }
+                        actionResult = CreepAct(creep, closedJobName, 1, energyTarget);
                         if(actionResult === ERR_NOT_IN_RANGE){
-                            creep.moveTo(closedJob2OBJ);
+                            creep.moveTo(energyTarget, {visualizePathStyle:{fill: 'transparent',stroke: '#ffe100',lineStyle: 'dotted',strokeWidth: .15,opacity: .1}});
                             jobStatus = 1;
                         }
                     } else { // go build/repair/upgrade/transfer
                         actionResult = CreepAct(creep, closedJobName, 2, closedJobOBJ);
                         if(actionResult === ERR_NOT_IN_RANGE){
-                            creep.moveTo(closedJobOBJ);
+                            creep.moveTo(closedJobOBJ, {visualizePathStyle:{fill: 'transparent',stroke: '#00ff00',lineStyle: 'dashed',strokeWidth: .15,opacity: .1}});
                             jobStatus = 1;
                         }else if(actionResult === ERR_FULL || actionResult === ERR_INVALID_TARGET
-                            || closedJobName === "DamagedStructures" && closedJobOBJ.hits === closedJobOBJ.hitsMax ){
+                            || (closedJobName === "DamagedStructures" || closedJobName === "Constructions") && (closedJobOBJ.hits === closedJobOBJ.hitsMax || closedJobOBJ.hits >= 100000)){
                             jobStatus = 2;
+                        }else if(creep.memory.energyTarget !== undefined){ // reset to enable check for a new energy target
+                            creep.memory.energyTarget = undefined;
                         }
                     }
                     break;
@@ -208,9 +220,9 @@ const DoClosedJobs = {
 
         // used by creep-transporters to see which store in the room where the creep is is most full of energy
         function ClosestEnergyFullStoreInRoom(creep){
-            let bestEnergyLocation;
+            let bestEnergyLocation = creep.room.storage;
             let bestRange = Number.MAX_SAFE_INTEGER;
-            const energyLocations = [];
+            const energyCandidates = [];
 
             const droppedEnergy = creep.room.find(FIND_DROPPED_RESOURCES, {
                 filter: (drop) => {
@@ -219,16 +231,16 @@ const DoClosedJobs = {
             }).map(function (p) {
                 return {'name': 'droppedEnergy', 'id': p.id, 'pos': p.pos, 'energy': p.amount};
             });
-            energyLocations.push(...droppedEnergy);
+            energyCandidates.push(...droppedEnergy);
 
-            const containers = creep.room.find(FIND_MY_STRUCTURES, {
+            const containers = creep.room.find(FIND_STRUCTURES, {
                 filter: (structure) => {
                     return ((structure.structureType === STRUCTURE_CONTAINER || structure.structureType === STRUCTURE_STORAGE) && structure.store[RESOURCE_ENERGY] >= 100);
                 }
             }).map(function (p) {
                 return {'name': 'containers', 'id': p.id, 'pos': p.pos, 'energy': p.store[RESOURCE_ENERGY]};
             });
-            energyLocations.push(...containers);
+            energyCandidates.push(...containers);
 
             const links = creep.room.find(FIND_MY_STRUCTURES, {
                 filter: (link) => {
@@ -237,15 +249,15 @@ const DoClosedJobs = {
             }).map(function (p) {
                 return {'name': 'links', 'id': p.id, 'pos': p.pos, 'energy': p.energy};
             });
-            energyLocations.push(...links);
-
-            for(let i = 0; i < energyLocations.length; i++){
-                const energyLocation = energyLocations[i];
-                const range = creep.pos.getRangeTo(energyLocation.pos);
+            energyCandidates.push(...links);
+            for(let i = 0; i < energyCandidates.length; i++){
+                const energyCandidate = energyCandidates[i];
+                const range = creep.pos.getRangeTo(energyCandidate.pos);
                 if(bestRange > range){
-                    bestEnergyLocation = energyLocation;
+                    bestEnergyLocation = energyCandidate;
                     bestRange = range;}
             }
+            creep.say("get⚡" + bestEnergyLocation.pos.x + "," + bestEnergyLocation.pos.y);
             return Game.getObjectById(bestEnergyLocation.id);
         }
 
