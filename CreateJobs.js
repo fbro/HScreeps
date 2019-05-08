@@ -13,6 +13,7 @@ const CreateJobs = {
 
         // new jobs
         const activeSources = room.find(FIND_SOURCES_ACTIVE).map(function (p) {
+            new RoomVisual(p.room.name).text("⚡💼", p.pos.x, p.pos.y);
             return {'name': 'ActiveSources', 'id': p.id, 'creeps': []};
         });
 
@@ -21,6 +22,7 @@ const CreateJobs = {
                 return (drop.amount > 50);
             }
         }).map(function (p) {
+            new RoomVisual(p.room.name).text("💰💼", p.pos.x, p.pos.y);
             return {'name': 'DroppedResources', 'id': p.id, 'creeps': []};
         });
 
@@ -29,6 +31,7 @@ const CreateJobs = {
                 return ((structure.structureType === STRUCTURE_SPAWN || structure.structureType === STRUCTURE_EXTENSION) && structure.energy < structure.energyCapacity);
             }
         }).map(function (p) {
+            new RoomVisual(p.room.name).text("⚡💼", p.pos.x, p.pos.y);
             return {'name': 'SpawnsAndExtensionsNeedEnergy', 'id': p.id, 'creeps': []};
         });
 
@@ -37,6 +40,7 @@ const CreateJobs = {
                 return (tower.structureType === STRUCTURE_TOWER && tower.energy < tower.energyCapacity);
             }
         }).map(function (p) {
+            new RoomVisual(p.room.name).text("🏰⚡💼", p.pos.x, p.pos.y);
             return {'name': 'TowersNeedEnergy', 'id': p.id, 'creeps': []};
         });
 
@@ -45,6 +49,7 @@ const CreateJobs = {
                 return (link.structureType === STRUCTURE_LINK && link.energy >= 500 && link.room.storage.pos.inRangeTo(link, 1));
             }
         }).map(function (p) {
+            new RoomVisual(p.room.name).text("⚡💼", p.pos.x, p.pos.y);
             return {'name': 'FullLinks', 'id': p.id, 'creeps': []};
         });
 
@@ -53,6 +58,7 @@ const CreateJobs = {
                 return (container.structureType === STRUCTURE_CONTAINER && _.sum(container.store) > 1700);
             }
         }).map(function (p) {
+            new RoomVisual(p.room.name).text("⚡💼", p.pos.x, p.pos.y);
             return {'name': 'FullContainers', 'id': p.id, 'creeps': []};
         });
 
@@ -61,6 +67,7 @@ const CreateJobs = {
                 return (controller.structureType === STRUCTURE_CONTROLLER);
             }
         }).map(function (p) {
+            new RoomVisual(p.room.name).text("🔩💼", p.pos.x, p.pos.y);
             return {'name': 'OwnedControllers', 'id': p.id, 'creeps': []};
         });
 
@@ -85,10 +92,12 @@ const CreateJobs = {
                 );
             }
         }).map(function (p) {
+            new RoomVisual(p.room.name).text("🛠💼", p.pos.x, p.pos.y);
             return {'name': 'DamagedStructures', 'id': p.id, 'creeps': []};
         });
 
         const constructions = room.find(FIND_CONSTRUCTION_SITES).map(function (p) {
+            new RoomVisual(p.room.name).text("🏗💼", p.pos.x, p.pos.y);
             return {'name': 'Constructions', 'id': p.id, 'creeps': []};
         });
 
