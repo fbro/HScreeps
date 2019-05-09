@@ -1,5 +1,9 @@
 const DoClosedJobs = {
     run: function() {
+        // constants
+        const MAX_HITS_TO_MAINTAIN = 200000; // when repair and build, walls and ramparts have high hits - only maintain up to this
+        const MIN_VALID_ENERGY_AMOUNT = 100; // when searching for stored energy in links, containers, storage, dropped energy, ignore below this number
+
         DoJobArray(Memory.closedJobs, false);
         DoJobArray(Memory.openJobs, true);
 
@@ -17,7 +21,7 @@ const DoClosedJobs = {
                             creep.memory.jobName = 'idle';
                             creep.memory.jobId = undefined;
                             creep.memory.job2Id = undefined;
-                            creep.say("job🌀 gone");
+                            creep.say("job🌀 gone"); // most common job object to disappear is the DroppedResources job
                         }
                     }
                     let spliceResult = jobs.splice(i, 1); // remove empty closedJob index
@@ -36,7 +40,6 @@ const DoClosedJobs = {
                         if(creep.spawning){
                             continue;
                         }
-                        //console.log("CreepActions: " + JSON.stringify(creep) + ", name: " + jobs[i].name + ", OBJ: " + JSON.stringify(closedJobOBJ));
                         // return values:
                         // 0: acted and job not done
                         // 1: moved and did not act
@@ -129,7 +132,7 @@ const DoClosedJobs = {
                                 }
                             }
                         }
-                        if(creep.carry[RESOURCE_ENERGY] > 0 && closestLink !== null && closestLink.energy < 800){
+                        if(creep.carry[RESOURCE_ENERGY] > 0 && closestLink !== null && closestLink.energy < closestLink.energyCapacity){
                             actionResult = creep.transfer(closestLink, RESOURCE_ENERGY); // first try to add to a link
                         }else{
                             for (const resourceType in creep.carry) { // drop everything
@@ -203,7 +206,7 @@ const DoClosedJobs = {
                             creep.moveTo(closedJobOBJ, {visualizePathStyle:{fill: 'transparent',stroke: '#00ff00',lineStyle: 'dashed',strokeWidth: .15,opacity: .1}});
                             jobStatus = 1;
                         }else if(actionResult === ERR_FULL || actionResult === ERR_INVALID_TARGET
-                            || (closedJobName === "DamagedStructures" || closedJobName === "Constructions") && (closedJobOBJ.hits === closedJobOBJ.hitsMax || closedJobOBJ.hits >= 100000)){
+                            || (closedJobName === "DamagedStructures" || closedJobName === "Constructions") && (closedJobOBJ.hits === closedJobOBJ.hitsMax || closedJobOBJ.hits >= MAX_HITS_TO_MAINTAIN)){
                             jobStatus = 2;
                         }else if(creep.memory.energyTarget !== undefined){ // reset to enable check for a new energy target
                             creep.memory.energyTarget = undefined;
@@ -226,7 +229,7 @@ const DoClosedJobs = {
 
             const droppedEnergy = creep.room.find(FIND_DROPPED_RESOURCES, {
                 filter: (drop) => {
-                    return (drop.resourceType === RESOURCE_ENERGY && drop.amount >= 100);
+                    return (drop.resourceType === RESOURCE_ENERGY && drop.amount >= MIN_VALID_ENERGY_AMOUNT);
                 }
             }).map(function (p) {
                 return {'name': 'droppedEnergy', 'id': p.id, 'pos': p.pos, 'energy': p.amount};
@@ -235,7 +238,7 @@ const DoClosedJobs = {
 
             const containers = creep.room.find(FIND_STRUCTURES, {
                 filter: (structure) => {
-                    return ((structure.structureType === STRUCTURE_CONTAINER || structure.structureType === STRUCTURE_STORAGE) && structure.store[RESOURCE_ENERGY] >= 100);
+                    return ((structure.structureType === STRUCTURE_CONTAINER || structure.structureType === STRUCTURE_STORAGE) && structure.store[RESOURCE_ENERGY] >= MIN_VALID_ENERGY_AMOUNT);
                 }
             }).map(function (p) {
                 return {'name': 'containers', 'id': p.id, 'pos': p.pos, 'energy': p.store[RESOURCE_ENERGY]};
@@ -244,7 +247,7 @@ const DoClosedJobs = {
 
             const links = creep.room.find(FIND_MY_STRUCTURES, {
                 filter: (link) => {
-                    return ((link.structureType === STRUCTURE_LINK) && link.energy >= 100);
+                    return ((link.structureType === STRUCTURE_LINK) && link.energy >= MIN_VALID_ENERGY_AMOUNT);
                 }
             }).map(function (p) {
                 return {'name': 'links', 'id': p.id, 'pos': p.pos, 'energy': p.energy};

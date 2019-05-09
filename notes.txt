@@ -2,5 +2,12 @@ harvesters and mineral harvester should TRY to place itself over a container
 transporters should have a task to supply containers near the controller
 terminal needs to be able to sell resources
 
-fullContainer job should end when it is really low
+---------------------
+algorithm problem: forever transporter jobs that blocks spawns in getting energy
+if transporter is filling shooting tower - then it will go on forever and spawns wont get energy!!!
+if container is being filled forever på harvester and transporter got fullContainer job - then it will try and empty forever!
+also if container was a droppedResource
 
+------------------------
+continuously remember:
+All special constants should be available at the top of each class!

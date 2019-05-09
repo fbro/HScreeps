@@ -13,7 +13,7 @@ const CreateJobs = {
 
         // new jobs
         const activeSources = room.find(FIND_SOURCES_ACTIVE).map(function (p) {
-            new RoomVisual(p.room.name).text("⚡💼", p.pos.x, p.pos.y);
+            new RoomVisual(p.room.name).text("🏭💼", p.pos.x, p.pos.y);
             return {'name': 'ActiveSources', 'id': p.id, 'creeps': []};
         });
 
@@ -31,7 +31,7 @@ const CreateJobs = {
                 return ((structure.structureType === STRUCTURE_SPAWN || structure.structureType === STRUCTURE_EXTENSION) && structure.energy < structure.energyCapacity);
             }
         }).map(function (p) {
-            new RoomVisual(p.room.name).text("⚡💼", p.pos.x, p.pos.y);
+            new RoomVisual(p.room.name).text("👾💼", p.pos.x, p.pos.y);
             return {'name': 'SpawnsAndExtensionsNeedEnergy', 'id': p.id, 'creeps': []};
         });
 
@@ -109,6 +109,7 @@ const CreateJobs = {
         const activeMinerals = [];
         if(activeExtractors.length > 0){
             activeMinerals.push(...activeExtractors[0].pos.findInRange(FIND_MINERALS, 0).map(function (p) {
+                new RoomVisual(p.room.name).text("💎💼", p.pos.x, p.pos.y);
                 return {'name': 'ActiveMinerals', 'id': p.id, 'creeps': []};
             }));
         }

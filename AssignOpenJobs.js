@@ -107,9 +107,7 @@ const AssignOpenJobs = {
         let doneSpawning = false;
         const availableSpawns = _(Game.spawns).filter(spawn => spawn.spawning === null && spawn.room.energyAvailable >= 150).value();
         while (!doneSpawning) {
-            //console.log("AssignOpenJobs, availableSpawns.length " + availableSpawns.length);
             if(availableSpawns.length === 0){
-                //console.log("AssignOpenJobs, no available spawns");
                 break; // no need to enter algorithm if there are no available spawns
             }
             let bestSpawn = undefined;
@@ -128,10 +126,8 @@ const AssignOpenJobs = {
                     i--;
                     continue;
                 }else if(AtCreepRoof(openJob.name, openJobOBJ)){
-                    //console.log("AssignOpenJobs, decline from AtCreepRoof: " + openJob.name + ", " + JSON.stringify(openJobOBJ));
                     continue;
                 }
-                //console.log(JSON.stringify(openJob) + ", and object: " + JSON.stringify(openJobOBJ));
                 for (let e = 0; e < availableSpawns.length; e++){
                     const spawn = availableSpawns[e];
                     let weight = - spawn.room.energyAvailable;
