@@ -155,7 +155,6 @@ const AssignOpenJobs = {
                     console.log("AssignOpenJobs, spawningCreep failed, job: " + bestOpenJob.name + " (" + bestOpenJobOBJ.pos.x + ", " + bestOpenJobOBJ.pos.y + ", " + bestOpenJobOBJ.pos.roomName + "), from spawn: " + bestSpawn.name);
                     break;
                 } else {
-                    console.log("AssignOpenJobs, bestOpenJob.creeps.push: " + spawningCreep.name);
                     bestOpenJob.creeps.push(spawningCreep.name);
                     if (bestOpenJob.creeps.length >= NumberOfCreepsOnJob(bestOpenJobOBJ.room.controller.level, bestOpenJob.name)) {
                         // considering RCL this job should not employ more creeps

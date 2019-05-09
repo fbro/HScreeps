@@ -31,7 +31,7 @@ const CreateJobs = {
                 return ((structure.structureType === STRUCTURE_SPAWN || structure.structureType === STRUCTURE_EXTENSION) && structure.energy < structure.energyCapacity);
             }
         }).map(function (p) {
-            new RoomVisual(p.room.name).text("👾💼", p.pos.x, p.pos.y);
+            new RoomVisual(p.room.name).text("⚡💼", p.pos.x, p.pos.y);
             return {'name': 'SpawnsAndExtensionsNeedEnergy', 'id': p.id, 'creeps': []};
         });
 

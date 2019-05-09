@@ -26,7 +26,7 @@ module.exports.loop = function () {
             if (room.controller.my) {
                 CreateJobs.run(room); // TODO protector jobs
                 Links.run(room);
-                //Terminals.run(room);
+                Terminals.run(room);
             } else {
                 CreateFrontierJobs.run(room); // TODO
             }

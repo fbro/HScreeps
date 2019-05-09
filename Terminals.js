@@ -10,8 +10,8 @@ const Terminals = {
         for (const resourceType in room.terminal.store) {
             if (resourceType !== RESOURCE_ENERGY && room.terminal.store[resourceType] >= MIN_RESOURCE_AMOUNT) {
                 orders.push(...Game.market.getAllOrders(order => order.resourceType === resourceType
-                    && order.type === ORDER_SELL
-                    && Game.market.calcTransactionCost(MIN_RESOURCE_AMOUNT, room.room.name, order.roomName) <= MAX_TRANSFER_ENERGY_COST
+                    && order.type === ORDER_BUY
+                    && Game.market.calcTransactionCost(MIN_RESOURCE_AMOUNT, room.name, order.roomName) <= MAX_TRANSFER_ENERGY_COST
                     && order.price > MIN_PRICE));
             }
         }
@@ -22,6 +22,10 @@ const Terminals = {
                 const dealResult = Game.market.deal(order.id, order.amount, room.name);
                 if(dealResult === 0){
                     console.log("Terminals, deal success " + order.resourceType + ", " + order.amount + ", room: " + order.roomName);
+                    if(Memory.sellOrders === undefined){
+                        Memory.sellOrders = [];
+                    }
+                    Memory.sellOrders.push(order);
                 }else{
                     console.log("Terminals, ERROR deal failed " + order.resourceType + ", " + order.amount + ", room: " + order.roomName);
                 }
