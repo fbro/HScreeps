@@ -1,6 +1,5 @@
 harvesters and mineral harvester should TRY to place itself over a container
 transporters should have a task to supply containers near the controller
-terminal needs to be able to sell resources
 
 ---------------------
 algorithm problem: forever transporter jobs that blocks spawns in getting energy

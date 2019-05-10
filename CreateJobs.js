@@ -121,10 +121,18 @@ const CreateJobs = {
 
         new RoomVisual(room.name).text("🔩💼", room.controller.pos.x, room.controller.pos.y);
         newJobs.push({'name': 'OwnedControllers', 'id': room.controller.id, 'creeps': []});
-        if(room.terminal !== undefined && room.terminal.energy < 50000){
+        if(room.terminal !== undefined && room.terminal.store[RESOURCE_ENERGY] < 50000){
             new RoomVisual(room.name).text("⚡💼", room.terminal.pos.x, room.terminal.pos.y);
             newJobs.push({'name': 'TerminalsNeedEnergy', 'id': room.terminal.id, 'creeps': []})
         }
+        //for (const resourceType in room.storage.store) {
+        //    if(room.storage !== undefined && room.storage.store[resourceType] > 0){
+        //        new RoomVisual(room.name).text("💎💼", room.storage.pos.x, room.storage.pos.y);
+        //        newJobs.push({'name': 'StorageHasMinerals', 'id': room.storage.id, 'creeps': []});
+        //        break;
+        //    }
+        //}
+
 
         const closedJobs = Memory.closedJobs;
         const openJobs = Memory.openJobs;

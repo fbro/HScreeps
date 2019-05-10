@@ -21,7 +21,7 @@ const DoClosedJobs = {
                             console.log("DoClosedJob, job: " + creep.memory.jobName + " is not found, removing job from creep " + creepName);
                             creep.memory.jobName = 'idle';
                             creep.memory.jobId = undefined;
-                            creep.memory.job2Id = undefined;
+                            creep.memory.energyTarget = undefined;
                             creep.say("job🌀 gone"); // most common job object to disappear is the DroppedResources job
                         }
                     }
@@ -66,7 +66,7 @@ const DoClosedJobs = {
                             console.log("DoClosedJob, " + creep.memory.jobName + " is done, removing job and setting creep job to idle, splice: " + JSON.stringify(spliceResult));
                             creep.memory.jobName = 'idle';
                             creep.memory.jobId = undefined;
-                            if(creep.memory.job2Id !== undefined){creep.memory.job2Id = undefined;}
+                            if(creep.memory.energyTarget !== undefined){creep.memory.energyTarget = undefined;}
                             i--;
                             break; // break - if there where other creeps in this job then they should just be ignored because the job is done
                         }
@@ -159,9 +159,9 @@ const DoClosedJobs = {
                         let sumCreepCarry = _.sum(creep.carry);
                         if (sumCreepCarry > 0
                             && (sumCreepCarry === creep.carryCapacity
-                            || closedJobName === "DroppedResources" && closedJobName.amount === 0
-                            || closedJobName === "FullLinks" && closedJobName.energy === 0
-                            || closedJobName === "FullContainers" && _.sum(closedJobName.store) === 0)) {
+                            || (closedJobName === "DroppedResources" && closedJobOBJ.amount === 0)
+                            || (closedJobName === "FullLinks" && closedJobOBJ.energy === 0)
+                            || (closedJobName === "FullContainers" && _.sum(closedJobOBJ.store) === 0))) {
                             actionResult = CreepAct(creep, closedJobName, 1, creep.room.storage);
                             if(actionResult === ERR_NOT_IN_RANGE){
                                 creep.moveTo(creep.room.storage, {visualizePathStyle:{fill: 'transparent',stroke: '#0000ff',lineStyle: 'dotted',strokeWidth: .15,opacity: .1}});
@@ -178,7 +178,7 @@ const DoClosedJobs = {
                             }
                         }
                     }else{
-                        console.log("DoClosedJob, ERROR no storage in room: " + creep.room.name + ", but creep " + creep.name + " is there!");
+                        console.log("DoClosedJob, ERROR! no storage in room: " + creep.room.name + ", but creep " + creep.name + " is there!");
                     }
                     break;
 

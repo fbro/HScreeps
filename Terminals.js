@@ -1,6 +1,5 @@
 const Terminals = {
     run: function(room) {
-        // TODO
 
         // try to sell stuff
         const MIN_RESOURCE_AMOUNT = 1000;
