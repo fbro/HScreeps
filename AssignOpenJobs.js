@@ -203,6 +203,7 @@ const AssignOpenJobs = {
                 case "FullLinks":
                 case "FullContainers":
                 case "TerminalsNeedEnergy":
+                case "StorageHasMinerals":
                     if(transporterCount < 2){isAtCreepRoof = false;} break;
                 // builder
                 case "OwnedControllers":
@@ -211,7 +212,7 @@ const AssignOpenJobs = {
                     if(builderCount < 3){isAtCreepRoof = false;} break;
                 // extractor
                 case "ActiveMinerals":
-                    if(extractorCount < 0){isAtCreepRoof = false;} break;
+                    if(extractorCount < 1){isAtCreepRoof = false;} break;
                 default:
                     console.log("AssignOpenJobs, ERROR! AtCreepRoof jobName not found: " + jobName);
             }
@@ -230,9 +231,10 @@ const AssignOpenJobs = {
                 case "DroppedResources": val = 10; break;
                 case "SpawnsAndExtensionsNeedEnergy": val = 500; break;
                 case "TowersNeedEnergy": val = 50; break;
-                case "FullLinks": val = 20; break;
+                case "FullLinks": val = 30; break;
                 case "FullContainers": val = 10; break;
                 case "TerminalsNeedEnergy": val = 1; break;
+                case "StorageHasMinerals": val = 0; break;
                 // builder
                 case "OwnedControllers": val = 200; break;
                 case "DamagedStructures": val = 100; break;
@@ -263,6 +265,7 @@ const AssignOpenJobs = {
                 case "FullLinks": numOfCreeps = 1; break;
                 case "FullContainers": numOfCreeps = 1; break;
                 case "TerminalsNeedEnergy": numOfCreeps = 1; break;
+                case "StorageHasMinerals": numOfCreeps = 1; break;
                 case "OwnedControllers":
                     switch (RCL) {
                         case 1: case 2: numOfCreeps = 1; break;
@@ -292,6 +295,7 @@ const AssignOpenJobs = {
                         case "FullLinks": val = 3; break;
                         case "FullContainers": val = 4; break;
                         case "TerminalsNeedEnergy": val = 4; break;
+                        case "StorageHasMinerals": val = 4; break;
                         default: val = -1;
                     } break;
                 case "H": // harvester
@@ -303,6 +307,7 @@ const AssignOpenJobs = {
                         case "FullLinks": val = 9; break;
                         case "FullContainers": val = 9; break;
                         case "TerminalsNeedEnergy": val = 9; break;
+                        case "StorageHasMinerals": val = 9; break;
                         case "OwnedControllers": val = 8; break;
                         case "DamagedStructures": val = 6; break;
                         case "Constructions": val = 7; break;
@@ -318,6 +323,7 @@ const AssignOpenJobs = {
                         case "FullLinks": val = 9; break;
                         case "FullContainers": val = 9; break;
                         case "TerminalsNeedEnergy": val = 9; break;
+                        case "StorageHasMinerals": val = 9; break;
                         case "OwnedControllers": val = 1; break;
                         case "DamagedStructures": val = 2; break;
                         case "Constructions": val = 3; break;
@@ -333,6 +339,7 @@ const AssignOpenJobs = {
                         case "FullLinks": val = 9; break;
                         case "FullContainers": val = 9; break;
                         case "TerminalsNeedEnergy": val = 9; break;
+                        case "StorageHasMinerals": val = 9; break;
                         case "OwnedControllers": val = 8; break;
                         case "DamagedStructures": val = 7; break;
                         case "Constructions": val = 7; break;
@@ -371,6 +378,8 @@ const AssignOpenJobs = {
                 case "TowersNeedEnergy":
                 case "FullLinks":
                 case "FullContainers":
+                case "TerminalsNeedEnergy":
+                case "StorageHasMinerals":
                     switch (true) {
                         case (energyAvailable >= 1350): // energyCapacityAvailable: 12900
                             body = [CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];break;

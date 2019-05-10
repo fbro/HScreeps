@@ -181,7 +181,35 @@ const DoClosedJobs = {
                         console.log("DoClosedJob, ERROR! no storage in room: " + creep.room.name + ", but creep " + creep.name + " is there!");
                     }
                     break;
-
+                case "StorageHasMinerals":
+                    if(creep.room.terminal !== undefined){
+                        if(_.sum(creep.room.terminal.store) === creep.room.terminal.storeCapacity){
+                            console.log("DoClosedJob, Terminal full in " + creep.room.name);
+                        }else{
+                            let sumCreepCarry = _.sum(creep.carry);
+                            if (sumCreepCarry > 0
+                                && (sumCreepCarry === creep.carryCapacity
+                                    || (closedJobName === "StorageHasMinerals" && (_.sum(closedJobOBJ.store) - closedJobOBJ.store[RESOURCE_ENERGY]) === 0))) {
+                                actionResult = CreepAct(creep, closedJobName, 1, creep.room.terminal);
+                                if(actionResult === ERR_NOT_IN_RANGE){
+                                    creep.moveTo(creep.room.terminal, {visualizePathStyle:{fill: 'transparent',stroke: '#0000ff',lineStyle: 'dotted',strokeWidth: .15,opacity: .1}});
+                                    jobStatus = 1;
+                                }
+                            } else {
+                                actionResult = CreepAct(creep, closedJobName, 2, closedJobOBJ);
+                                if(actionResult === ERR_NOT_IN_RANGE){
+                                    creep.moveTo(closedJobOBJ, {visualizePathStyle:{fill: 'transparent',stroke: '#0000ff',lineStyle: 'dashed',strokeWidth: .15,opacity: .1}});
+                                    jobStatus = 1;
+                                }
+                                if((actionResult === ERR_NOT_ENOUGH_RESOURCES || actionResult === ERR_INVALID_TARGET) && sumCreepCarry === 0){
+                                    jobStatus = 2;
+                                }
+                            }
+                        }
+                    }else{
+                        console.log("DoClosedJob, ERROR! no terminal in room: " + creep.room.name + ", but creep " + creep.name + " is there!");
+                    }
+                    break;
                 case "SpawnsAndExtensionsNeedEnergy":
                 case "TowersNeedEnergy":
                 case "TerminalsNeedEnergy":
@@ -275,6 +303,7 @@ const DoClosedJobs = {
             switch (true) {
                 case closedJobName === "DroppedResources" && actId === 1:
                 case closedJobName === "FullContainers" && actId === 1:
+                case closedJobName === "StorageHasMinerals" && actId === 1:
                     for(const resourceType in creep.carry) {
                         actionResult = creep.transfer(closedJobOBJ, resourceType);
                     }
@@ -303,6 +332,13 @@ const DoClosedJobs = {
                 case closedJobName === "FullContainers" && actId === 2:
                     for (const resourceType in closedJobOBJ.store) {
                         actionResult = creep.withdraw(closedJobOBJ, resourceType);
+                    }
+                    break;
+                case closedJobName === "StorageHasMinerals" && actId === 2:
+                    for (const resourceType in closedJobOBJ.store) {
+                        if(resourceType !== RESOURCE_ENERGY){
+                            actionResult = creep.withdraw(closedJobOBJ, resourceType);
+                        }
                     }
                     break;
                 case closedJobName === "OwnedControllers" && actId === 2:
