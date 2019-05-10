@@ -11,3 +11,8 @@ also if container was a droppedResource
 ------------------------
 continuously remember:
 All special constants should be available at the top of each class!
+
+
+
+
+Handle creep death more smooth in the existing setup.
