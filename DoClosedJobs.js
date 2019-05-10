@@ -185,6 +185,7 @@ const DoClosedJobs = {
                     if(creep.room.terminal !== undefined){
                         if(_.sum(creep.room.terminal.store) === creep.room.terminal.storeCapacity){
                             console.log("DoClosedJob, Terminal full in " + creep.room.name);
+                            jobStatus = 2;
                         }else{
                             let sumCreepCarry = _.sum(creep.carry);
                             if (sumCreepCarry > 0
@@ -236,9 +237,9 @@ const DoClosedJobs = {
                             creep.moveTo(closedJobOBJ, {visualizePathStyle:{fill: 'transparent',stroke: '#00ff00',lineStyle: 'dashed',strokeWidth: .15,opacity: .1}});
                             jobStatus = 1;
                         }else if(actionResult === ERR_FULL || actionResult === ERR_INVALID_TARGET
-                            || (closedJobName === "DamagedStructures" || closedJobName === "Constructions") && (closedJobOBJ.hits === closedJobOBJ.hitsMax || closedJobOBJ.hits >= MAX_HITS_TO_MAINTAIN)
-                            || closedJobName === "TerminalsNeedEnergy" && closedJobOBJ.store[RESOURCE_ENERGY] >= MAX_ENERGY_TERMINAL
-                            || closedJobName === "TowersNeedEnergy" && closedJobOBJ.energy >= 980){
+                            || (closedJobName === "DamagedStructures" && (closedJobOBJ.hits === closedJobOBJ.hitsMax || closedJobOBJ.hits >= MAX_HITS_TO_MAINTAIN))
+                            || (closedJobName === "TerminalsNeedEnergy" && closedJobOBJ.store[RESOURCE_ENERGY] >= MAX_ENERGY_TERMINAL)
+                            || (closedJobName === "TowersNeedEnergy" && closedJobOBJ.energy >= 980)){
                             jobStatus = 2;
                         }else if(creep.memory.energyTarget !== undefined){ // reset to enable check for a new energy target
                             creep.memory.energyTarget = undefined;
