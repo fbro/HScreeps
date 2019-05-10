@@ -23,7 +23,7 @@ module.exports.loop = function () {
     for (let roomCount in Game.rooms) {
         if (Game.time % 20 === modCounter) {
             let room = Game.rooms[roomCount];
-            if (room.controller.my) {
+            if (room.controller !== undefined && room.controller.my) {
                 CreateJobs.run(room); // TODO protector jobs
                 Links.run(room);
                 Terminals.run(room);

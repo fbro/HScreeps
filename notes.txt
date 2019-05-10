@@ -4,7 +4,7 @@ transporters should have a task to supply containers near the controller
 ---------------------
 algorithm problem: forever transporter jobs that blocks spawns in getting energy
 if transporter is filling shooting tower - then it will go on forever and spawns wont get energy!!!
-if container is being filled forever på harvester and transporter got fullContainer job - then it will try and empty forever!
+if container is being filled forever på harvester and transporter got fullContainer job - then it will try and empty forever! - cannot release carry if there are more than one kind being carried
 also if container was a droppedResource
 
 ------------------------
