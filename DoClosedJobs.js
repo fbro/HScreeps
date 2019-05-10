@@ -3,6 +3,7 @@ const DoClosedJobs = {
         // constants
         const MAX_HITS_TO_MAINTAIN = 200000; // when repair and build, walls and ramparts have high hits - only maintain up to this
         const MIN_VALID_ENERGY_AMOUNT = 100; // when searching for stored energy in links, containers, storage, dropped energy, ignore below this number
+        const MAX_ENERGY_TERMINAL = 100000; // end TerminalsNeedEnergy job when terminal has more than MAX_ENERGY_TERMINAL energy
 
         DoJobArray(Memory.closedJobs, false);
         DoJobArray(Memory.openJobs, true);
@@ -183,6 +184,7 @@ const DoClosedJobs = {
 
                 case "SpawnsAndExtensionsNeedEnergy":
                 case "TowersNeedEnergy":
+                case "TerminalsNeedEnergy":
                 case "OwnedControllers":
                 case "DamagedStructures":
                 case "Constructions":
@@ -206,7 +208,9 @@ const DoClosedJobs = {
                             creep.moveTo(closedJobOBJ, {visualizePathStyle:{fill: 'transparent',stroke: '#00ff00',lineStyle: 'dashed',strokeWidth: .15,opacity: .1}});
                             jobStatus = 1;
                         }else if(actionResult === ERR_FULL || actionResult === ERR_INVALID_TARGET
-                            || (closedJobName === "DamagedStructures" || closedJobName === "Constructions") && (closedJobOBJ.hits === closedJobOBJ.hitsMax || closedJobOBJ.hits >= MAX_HITS_TO_MAINTAIN)){
+                            || (closedJobName === "DamagedStructures" || closedJobName === "Constructions") && (closedJobOBJ.hits === closedJobOBJ.hitsMax || closedJobOBJ.hits >= MAX_HITS_TO_MAINTAIN)
+                            || closedJobName === "TerminalsNeedEnergy" && closedJobOBJ.store[RESOURCE_ENERGY] >= MAX_ENERGY_TERMINAL
+                            || closedJobName === "TowersNeedEnergy" && closedJobOBJ.energy >= 980){
                             jobStatus = 2;
                         }else if(creep.memory.energyTarget !== undefined){ // reset to enable check for a new energy target
                             creep.memory.energyTarget = undefined;
@@ -215,7 +219,7 @@ const DoClosedJobs = {
                     break;
 
                 default:
-                    console.log("DoClosedJob, ERROR ended in default in CreepActions! closedJobName: " + closedJobName + ", creepName: " + creep.name);
+                    console.log("DoClosedJob, ERROR! ended in default in CreepActions! closedJobName: " + closedJobName + ", creepName: " + creep.name);
                     jobStatus = 0;
             }
             return jobStatus;
@@ -281,11 +285,13 @@ const DoClosedJobs = {
                 case closedJobName === "FullLinks" && actId === 1:
                 case closedJobName === "SpawnsAndExtensionsNeedEnergy" && actId === 2:
                 case closedJobName === "TowersNeedEnergy" && actId === 2:
+                case closedJobName === "TerminalsNeedEnergy" && actId === 2:
                     actionResult = creep.transfer(closedJobOBJ, RESOURCE_ENERGY);
                     break;
                 case closedJobName === "FullLinks" && actId === 2:
                 case closedJobName === "SpawnsAndExtensionsNeedEnergy" && actId === 1:
                 case closedJobName === "TowersNeedEnergy" && actId === 1:
+                case closedJobName === "TerminalsNeedEnergy" && actId === 1:
                 case closedJobName === "OwnedControllers" && actId === 1:
                 case closedJobName === "Constructions" && actId === 1:
                 case closedJobName === "DamagedStructures" && actId === 1:
@@ -309,7 +315,7 @@ const DoClosedJobs = {
                     actionResult = creep.repair(closedJobOBJ);
                     break;
                 default:
-                    console.log("DoClosedJob, ERROR ended in default in CreepAct! closedJobName: " + closedJobName + ", actId: " + actId + ", creepName: " + creep.name);
+                    console.log("DoClosedJob, ERROR! ended in default in CreepAct! closedJobName: " + closedJobName + ", actId: " + actId + ", creepName: " + creep.name);
                     actionResult = -5;
             }
             return actionResult;

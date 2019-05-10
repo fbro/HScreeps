@@ -194,21 +194,26 @@ const AssignOpenJobs = {
             }
             switch (jobName) {
                 // harvester
-                case "ActiveSources": if(harvesterCount < 2){isAtCreepRoof = false;} break;
+                case "ActiveSources":
+                    if(harvesterCount < 2){isAtCreepRoof = false;} break;
                 // transporter
                 case "DroppedResources":
                 case "SpawnsAndExtensionsNeedEnergy":
                 case "TowersNeedEnergy":
                 case "FullLinks":
-                case "FullContainers": if(transporterCount < 2){isAtCreepRoof = false;} break;
+                case "FullContainers":
+                case "TerminalsNeedEnergy":
+                    if(transporterCount < 2){isAtCreepRoof = false;} break;
                 // builder
                 case "OwnedControllers":
                 case "DamagedStructures":
-                case "Constructions": if(builderCount < 3){isAtCreepRoof = false;} break;
+                case "Constructions":
+                    if(builderCount < 3){isAtCreepRoof = false;} break;
                 // extractor
-                case "ActiveMinerals": if(extractorCount < 0){isAtCreepRoof = false;} break;
+                case "ActiveMinerals":
+                    if(extractorCount < 0){isAtCreepRoof = false;} break;
                 default:
-                    console.log("AssignOpenJobs, AtCreepRoof jobName not found: " + jobName);
+                    console.log("AssignOpenJobs, ERROR! AtCreepRoof jobName not found: " + jobName);
             }
             return isAtCreepRoof;
         }
@@ -222,11 +227,12 @@ const AssignOpenJobs = {
                 // harvester
                 case "ActiveSources": val = 200; break;
                 // transporter
-                case "DroppedResources": val = 0; break;
+                case "DroppedResources": val = 10; break;
                 case "SpawnsAndExtensionsNeedEnergy": val = 500; break;
                 case "TowersNeedEnergy": val = 50; break;
                 case "FullLinks": val = 20; break;
                 case "FullContainers": val = 10; break;
+                case "TerminalsNeedEnergy": val = 1; break;
                 // builder
                 case "OwnedControllers": val = 200; break;
                 case "DamagedStructures": val = 100; break;
@@ -234,7 +240,7 @@ const AssignOpenJobs = {
                 // extractor
                 case "ActiveMinerals": val = 1; break;
                 default:
-                    console.log("AssignOpenJobs, JobImportance jobName not found: " + jobName);
+                    console.log("AssignOpenJobs, ERROR! JobImportance jobName not found: " + jobName);
             }
             return val;
         }
@@ -256,6 +262,7 @@ const AssignOpenJobs = {
                 case "TowersNeedEnergy": numOfCreeps = 1; break;
                 case "FullLinks": numOfCreeps = 1; break;
                 case "FullContainers": numOfCreeps = 1; break;
+                case "TerminalsNeedEnergy": numOfCreeps = 1; break;
                 case "OwnedControllers":
                     switch (RCL) {
                         case 1: case 2: numOfCreeps = 1; break;
@@ -267,7 +274,7 @@ const AssignOpenJobs = {
                 case "Constructions": numOfCreeps = 1; break;
                 case "ActiveMinerals": numOfCreeps = 1; break;
                 default:
-                    console.log("AssignOpenJobs, NumberOfCreepsOnJob jobName not found: " + jobName);
+                    console.log("AssignOpenJobs, ERROR! NumberOfCreepsOnJob jobName not found: " + jobName);
             } return numOfCreeps;
         }
 
@@ -284,6 +291,7 @@ const AssignOpenJobs = {
                         case "TowersNeedEnergy": val = 2; break;
                         case "FullLinks": val = 3; break;
                         case "FullContainers": val = 4; break;
+                        case "TerminalsNeedEnergy": val = 4; break;
                         default: val = -1;
                     } break;
                 case "H": // harvester
@@ -294,6 +302,7 @@ const AssignOpenJobs = {
                         case "TowersNeedEnergy": val = 6; break;
                         case "FullLinks": val = 9; break;
                         case "FullContainers": val = 9; break;
+                        case "TerminalsNeedEnergy": val = 9; break;
                         case "OwnedControllers": val = 8; break;
                         case "DamagedStructures": val = 6; break;
                         case "Constructions": val = 7; break;
@@ -308,6 +317,7 @@ const AssignOpenJobs = {
                         case "TowersNeedEnergy": val = 6; break;
                         case "FullLinks": val = 9; break;
                         case "FullContainers": val = 9; break;
+                        case "TerminalsNeedEnergy": val = 9; break;
                         case "OwnedControllers": val = 1; break;
                         case "DamagedStructures": val = 2; break;
                         case "Constructions": val = 3; break;
@@ -322,6 +332,7 @@ const AssignOpenJobs = {
                         case "TowersNeedEnergy": val = 6; break;
                         case "FullLinks": val = 9; break;
                         case "FullContainers": val = 9; break;
+                        case "TerminalsNeedEnergy": val = 9; break;
                         case "OwnedControllers": val = 8; break;
                         case "DamagedStructures": val = 7; break;
                         case "Constructions": val = 7; break;
@@ -330,7 +341,7 @@ const AssignOpenJobs = {
                     } break;
                 default:
                     val = -1;
-                    console.log("AssignOpenJobs, CreepOnJobPoints jobName or creepInitial not found: " + jobName + ", " + creepInitial);
+                    console.log("AssignOpenJobs, ERROR! CreepOnJobPoints jobName or creepInitial not found: " + jobName + ", " + creepInitial);
             } return val;
         }
 

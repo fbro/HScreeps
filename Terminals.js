@@ -18,17 +18,19 @@ const Terminals = {
         for(const orderCount in orders){
             const order = orders[orderCount];
             const transferEnergyRealCost = Game.market.calcTransactionCost(order.amount, room.name, order.roomName);
-            if(transferEnergyRealCost < room.terminal.store[RESOURCE_ENERGY]){
+            if(transferEnergyRealCost <= room.terminal.store[RESOURCE_ENERGY]){
                 const dealResult = Game.market.deal(order.id, order.amount, room.name);
                 if(dealResult === 0){
                     console.log("Terminals, deal success " + order.resourceType + ", " + order.amount + ", room: " + order.roomName);
-                    if(Memory.sellOrders === undefined){
-                        Memory.sellOrders = [];
+                    if(Memory.buyOrdersHistory === undefined){
+                        Memory.buyOrdersHistory = [];
                     }
-                    Memory.sellOrders.push(order);
+                    Memory.buyOrdersHistory.push({order: order, 'energyUsed': transferEnergyRealCost, 'fromRoom': room.name});
                 }else{
                     console.log("Terminals, ERROR deal failed " + order.resourceType + ", " + order.amount + ", room: " + order.roomName);
                 }
+            }else{
+                console.log("terminal, not enough energy " + room.name + ", transfer cost: " + transferEnergyRealCost + ", terminal energy: " + room.terminal.store[RESOURCE_ENERGY]);
             }
         }
     }

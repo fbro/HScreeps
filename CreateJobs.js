@@ -37,7 +37,7 @@ const CreateJobs = {
 
         const towersNeedEnergy = room.find(FIND_MY_STRUCTURES, {
             filter: (tower) => {
-                return (tower.structureType === STRUCTURE_TOWER && tower.energy < tower.energyCapacity);
+                return (tower.structureType === STRUCTURE_TOWER && tower.energy + 100 < tower.energyCapacity);
             }
         }).map(function (p) {
             new RoomVisual(p.room.name).text("🏰⚡💼", p.pos.x, p.pos.y);
@@ -60,15 +60,6 @@ const CreateJobs = {
         }).map(function (p) {
             new RoomVisual(p.room.name).text("⚡💼", p.pos.x, p.pos.y);
             return {'name': 'FullContainers', 'id': p.id, 'creeps': []};
-        });
-
-        const ownedControllers = room.find(FIND_STRUCTURES, {
-            filter: (controller) => {
-                return (controller.structureType === STRUCTURE_CONTROLLER);
-            }
-        }).map(function (p) {
-            new RoomVisual(p.room.name).text("🔩💼", p.pos.x, p.pos.y);
-            return {'name': 'OwnedControllers', 'id': p.id, 'creeps': []};
         });
 
         const damagedStructures = room.find(FIND_STRUCTURES, {
@@ -113,6 +104,8 @@ const CreateJobs = {
                 return {'name': 'ActiveMinerals', 'id': p.id, 'creeps': []};
             }));
         }
+
+
         // TODO there are other jobs to create - protector jobs
 
         let newJobs = [];
@@ -122,10 +115,16 @@ const CreateJobs = {
         newJobs.push(...towersNeedEnergy);
         newJobs.push(...fullLinks);
         newJobs.push(...fullContainers);
-        newJobs.push(...ownedControllers);
         newJobs.push(...damagedStructures);
         newJobs.push(...constructions);
         newJobs.push(...activeMinerals);
+
+        new RoomVisual(room.name).text("🔩💼", room.controller.pos.x, room.controller.pos.y);
+        newJobs.push({'name': 'OwnedControllers', 'id': room.controller.id, 'creeps': []});
+        if(room.terminal !== undefined && room.terminal.energy < 50000){
+            new RoomVisual(room.name).text("⚡💼", room.terminal.pos.x, room.terminal.pos.y);
+            newJobs.push({'name': 'TerminalsNeedEnergy', 'id': room.terminal.id, 'creeps': []})
+        }
 
         const closedJobs = Memory.closedJobs;
         const openJobs = Memory.openJobs;
