@@ -184,7 +184,7 @@ const DoClosedJobs = {
                 case "StorageHasMinerals":
                     if(creep.room.terminal !== undefined){
                         if(_.sum(creep.room.terminal.store) === creep.room.terminal.storeCapacity){
-                            console.log("DoClosedJob, Terminal full in " + creep.room.name);
+                            console.log("DoClosedJob, Terminal full in " + creep.room.name + " ending job " + closedJobName);
                             jobStatus = 2;
                         }else{
                             let sumCreepCarry = _.sum(creep.carry);

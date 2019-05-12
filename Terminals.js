@@ -4,14 +4,27 @@ const Terminals = {
         // try to sell stuff
         const MIN_RESOURCE_AMOUNT = 1000;
         const MAX_TRANSFER_ENERGY_COST = 500;
-        const MIN_PRICE = 0.08;
+        const MIN_PRICE_E = 0.01;
+        const MIN_PRICE_U = 0.06;
+        const MIN_PRICE_GO = 0.3;
+        const MIN_PRICE_UH = 0.3;
+        const MIN_PRICE_KO = 0.3;
+        const MIN_PRICE_LO = 0.3;
+        const MIN_PRICE_ZH = 0.3;
         const orders = [];
         for (const resourceType in room.terminal.store) {
-            if (resourceType !== RESOURCE_ENERGY && room.terminal.store[resourceType] >= MIN_RESOURCE_AMOUNT) {
+            if (room.terminal.store[resourceType] > 0) {
                 orders.push(...Game.market.getAllOrders(order => order.resourceType === resourceType
                     && order.type === ORDER_BUY
                     && Game.market.calcTransactionCost(MIN_RESOURCE_AMOUNT, room.name, order.roomName) <= MAX_TRANSFER_ENERGY_COST
-                    && order.price > MIN_PRICE));
+                    && ((order.price >= MIN_PRICE_U && resourceType === RESOURCE_UTRIUM)
+                    || (order.price >= MIN_PRICE_GO && resourceType === RESOURCE_GHODIUM_OXIDE)
+                    || (order.price >= MIN_PRICE_UH && resourceType === RESOURCE_UTRIUM_HYDRIDE)
+                    || (order.price >= MIN_PRICE_KO && resourceType === RESOURCE_KEANIUM_OXIDE)
+                    || (order.price >= MIN_PRICE_LO && resourceType === RESOURCE_LEMERGIUM_OXIDE)
+                    || (order.price >= MIN_PRICE_ZH && resourceType === RESOURCE_ZYNTHIUM_HYDRIDE)
+                    || (order.price >= MIN_PRICE_E && resourceType === RESOURCE_ENERGY)
+                    )));
             }
         }
         for(const orderCount in orders){

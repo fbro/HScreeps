@@ -15,3 +15,4 @@ All special constants should be available at the top of each class!
 
 
 Handle creep death more smooth in the existing setup.
+reorganize all creeps to have a file of its own - or jobs?.. hm...

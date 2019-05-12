@@ -99,7 +99,7 @@ const CreateJobs = {
         });
         const activeMinerals = [];
         if(activeExtractors.length > 0){
-            activeMinerals.push(...activeExtractors[0].pos.findInRange(FIND_MINERALS, 0).map(function (p) {
+            activeMinerals.push(...activeExtractors[0].pos.findInRange(FIND_MINERALS, 0, {filter: (mineral) => { return (mineral.amount > 0); }}).map(function (p) {
                 new RoomVisual(p.room.name).text("💎💼", p.pos.x, p.pos.y);
                 return {'name': 'ActiveMinerals', 'id': p.id, 'creeps': []};
             }));
@@ -121,16 +121,17 @@ const CreateJobs = {
 
         new RoomVisual(room.name).text("🔩💼", room.controller.pos.x, room.controller.pos.y);
         newJobs.push({'name': 'OwnedControllers', 'id': room.controller.id, 'creeps': []});
-        if(room.terminal !== undefined && room.terminal.store[RESOURCE_ENERGY] < 50000){
-            new RoomVisual(room.name).text("⚡💼", room.terminal.pos.x, room.terminal.pos.y);
-            newJobs.push({'name': 'TerminalsNeedEnergy', 'id': room.terminal.id, 'creeps': []})
-        }
         if(room.storage !== undefined && room.terminal !== undefined && _.sum(room.terminal.store) < room.terminal.storeCapacity){
-            for (const resourceType in room.storage.store) {
-                if(room.storage.store[resourceType] > 0){
-                    new RoomVisual(room.name).text("💎💼", room.storage.pos.x, room.storage.pos.y);
-                    newJobs.push({'name': 'StorageHasMinerals', 'id': room.storage.id, 'creeps': []});
-                    break;
+            if(room.terminal.store[RESOURCE_ENERGY] < 50000){
+                new RoomVisual(room.name).text("⚡💼", room.terminal.pos.x, room.terminal.pos.y);
+                newJobs.push({'name': 'TerminalsNeedEnergy', 'id': room.terminal.id, 'creeps': []})
+            }else{
+                for (const resourceType in room.storage.store) {
+                    if(room.storage.store[resourceType] > 0){
+                        new RoomVisual(room.name).text("💎💼", room.storage.pos.x, room.storage.pos.y);
+                        newJobs.push({'name': 'StorageHasMinerals', 'id': room.storage.id, 'creeps': []});
+                        break;
+                    }
                 }
             }
         }
