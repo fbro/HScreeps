@@ -17,7 +17,6 @@ module.exports.loop = function () {
     if (Memory.links === undefined) {
         Memory.links = [];
     }
-
     Towers.run();
     let modCounter = 0;
     for (let roomCount in Game.rooms) {
@@ -37,13 +36,5 @@ module.exports.loop = function () {
         AssignOpenJobs.run();
     }
     DoClosedJobs.run();
-
     Constructions.run(); // TODO
-
-    /*for(const name in Memory.creeps) {
-        if(!Game.creeps[name]) {
-            delete Memory.creeps[name];
-            console.log('Clearing non-existing creep memory:', name);
-        }
-    }*/
 };

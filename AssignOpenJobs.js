@@ -198,7 +198,7 @@ const AssignOpenJobs = {
                 case "OwnedControllers":
                 case "DamagedStructures":
                 case "Constructions":
-                    if(builderCount < 3){isAtCreepRoof = false;} break;
+                    if(builderCount < 2){isAtCreepRoof = false;} break;
                 // extractor
                 case "ActiveMinerals":
                     if(extractorCount < 1){isAtCreepRoof = false;} break;
@@ -225,7 +225,7 @@ const AssignOpenJobs = {
                 case "TerminalsNeedEnergy": val = 1; break;
                 case "StorageHasMinerals": val = 0; break;
                 // builder
-                case "OwnedControllers": val = 200; break;
+                case "OwnedControllers": val = 400; break;
                 case "DamagedStructures": val = 100; break;
                 case "Constructions": val = 10; break;
                 // extractor
