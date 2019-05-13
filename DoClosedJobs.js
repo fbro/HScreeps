@@ -81,23 +81,23 @@ const DoClosedJobs = {
             }
         }
 
-
+        // unhandled cleanup
         // TODO remove - is only there for testing - when a job is removed manually or by errors then there may be creeps that jobName != idle fix that
         for (const creepName in Memory.creeps){
-            let creep = Memory.creeps[creepName];
-            if(creep.memory.jobName === 'idle'){
-                if(!Game.creeps[name]) {
-                    delete Memory.creeps[name];
-                    console.log('idle creep is gone, Clearing non-existing creep memory:', name);
+            let creepMemory = Memory.creeps[creepName];
+            if(creepMemory.jobName === 'idle'){
+                if(!Game.creeps[creepName]) {
+                    delete Memory.creeps[creepName];
+                    console.log('idle creep is gone, Clearing non-existing creep memory:', creepName);
                 }
                 continue;
             }else{
-                let obj = Game.getObjectById(creep.memory.jobId);
+                let obj = Game.getObjectById(creepMemory.jobId);
                 if(obj === null){
-                    console.log("ERROR!! " + creep.memory.jobName + " is undefined in Memory on creep: " + creepName);
-                    creep.say("ERROR!!!!!");
-                    creep.memory.jobName = 'idle';
-                    creep.memory.jobId = undefined;
+                    console.log("ERROR!! " + creepMemory.jobName + " is undefined in Memory on creep: " + creepName);
+                    Game.creeps[creepName].say("ERROR!!!!!");
+                    creepMemory.jobName = 'idle';
+                    creepMemory.jobId = undefined;
                 }
             }
         }
@@ -198,6 +198,7 @@ const DoClosedJobs = {
                         jobStatus = 2;
                     }
                     break;
+
                 case "SpawnsAndExtensionsNeedEnergy": // these jobs take energy and places it somewhere where it is needed
                 case "TowersNeedEnergy":
                 case "TerminalsNeedEnergy":

@@ -18,13 +18,13 @@ module.exports.loop = function () {
         Memory.links = [];
     }
 
-    Towers.run(); // TODO
+    Towers.run();
     let modCounter = 0;
     for (let roomCount in Game.rooms) {
         if (Game.time % 20 === modCounter) {
             let room = Game.rooms[roomCount];
             if (room.controller !== undefined && room.controller.my) {
-                CreateJobs.run(room); // TODO protector jobs
+                CreateJobs.run(room);
                 Links.run(room);
                 Terminals.run(room);
             } else {
@@ -36,7 +36,7 @@ module.exports.loop = function () {
     if (Game.time % 3 === 0) {
         AssignOpenJobs.run();
     }
-    DoClosedJobs.run(); // TODO on the road actions
+    DoClosedJobs.run();
 
     Constructions.run(); // TODO
 
