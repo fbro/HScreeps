@@ -163,19 +163,27 @@ const DoClosedJobs = {
                     if(creep.room.storage !== undefined && (closedJobName !== "StorageHasMinerals" || (creep.room.terminal !== undefined && _.sum(creep.room.terminal.store) < creep.room.terminal.storeCapacity))){
                         let sumCreepCarry = _.sum(creep.carry);
                         if (sumCreepCarry > 0
-                            && (sumCreepCarry === creep.carryCapacity
+                            && (creep.memory.resourceDestination !== undefined
+                            || (sumCreepCarry === creep.carryCapacity
                             || (closedJobName === "DroppedResources" && closedJobOBJ.amount === 0)
                             || (closedJobName === "FullLinks" && closedJobOBJ.energy === 0)
                             || (closedJobName === "FullContainers" && _.sum(closedJobOBJ.store) === 0)
-                            || (closedJobName === "StorageHasMinerals" && (_.sum(closedJobOBJ.store) - closedJobOBJ.store[RESOURCE_ENERGY]) === 0))) {
+                            || (closedJobName === "StorageHasMinerals" && (_.sum(closedJobOBJ.store) - closedJobOBJ.store[RESOURCE_ENERGY]) === 0)))) {
                             let resourceDestOBJ; // resource destination object - where do we want to place the stuff
-                            if(closedJobName === "StorageHasMinerals"){resourceDestOBJ = creep.room.terminal;}else{resourceDestOBJ = creep.room.storage;} // mainly in storage!...
+                            if(closedJobName === "StorageHasMinerals"){
+                                creep.memory.resourceDestination = creep.room.terminal.id;
+                                resourceDestOBJ = creep.room.terminal;
+                            }else{ // mainly in storage!...
+                                creep.memory.resourceDestination = creep.room.storage.id;
+                                resourceDestOBJ = creep.room.storage;
+                            }
                             actionResult = CreepAct(creep, closedJobName, 1, resourceDestOBJ);
                             if(actionResult === ERR_NOT_IN_RANGE){
                                 creep.moveTo(resourceDestOBJ, {visualizePathStyle:{fill: 'transparent',stroke: '#0000ff',lineStyle: 'dotted',strokeWidth: .15,opacity: .1}});
                                 jobStatus = 1;
                             }
                         } else {
+                            if(creep.memory.resourceDestination !== undefined){creep.memory.resourceDestination = undefined;} // reset
                             actionResult = CreepAct(creep, closedJobName, 2, closedJobOBJ); // obtaining the stuff that should be moved around
                             if(actionResult === ERR_NOT_IN_RANGE){
                                 creep.moveTo(closedJobOBJ, {visualizePathStyle:{fill: 'transparent',stroke: '#0000ff',lineStyle: 'dashed',strokeWidth: .15,opacity: .1}});
@@ -209,6 +217,8 @@ const DoClosedJobs = {
                         if(actionResult === ERR_NOT_IN_RANGE){
                             creep.moveTo(energyTarget, {visualizePathStyle:{fill: 'transparent',stroke: '#ffe100',lineStyle: 'dotted',strokeWidth: .15,opacity: .1}});
                             jobStatus = 1;
+                        }else if(actionResult ===  ERR_NOT_ENOUGH_RESOURCES){
+                            jobStatus = 2; // drop job if there are no energy available - it will be recreated later
                         }
                     } else { // go build/repair/upgrade/transfer
                         actionResult = CreepAct(creep, closedJobName, 2, closedJobOBJ);

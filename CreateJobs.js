@@ -114,10 +114,10 @@ const CreateJobs = {
         new RoomVisual(room.name).text("🔩💼", room.controller.pos.x, room.controller.pos.y);
         newJobs.push({'name': 'OwnedControllers', 'id': room.controller.id, 'creeps': []});
         if(room.storage !== undefined && room.terminal !== undefined && _.sum(room.terminal.store) < room.terminal.storeCapacity){
-            if(room.terminal.store[RESOURCE_ENERGY] < 50000){
+            if(room.terminal.store[RESOURCE_ENERGY] < 50000 && room.storage.store[RESOURCE_ENERGY] >= 50000){
                 new RoomVisual(room.name).text("⚡💼", room.terminal.pos.x, room.terminal.pos.y);
                 newJobs.push({'name': 'TerminalsNeedEnergy', 'id': room.terminal.id, 'creeps': []})
-            }else{
+            }else if(room.terminal.store[RESOURCE_ENERGY] >= 50000){
                 for (const resourceType in room.storage.store) {
                     if(room.storage.store[resourceType] > 0){
                         new RoomVisual(room.name).text("💎💼", room.storage.pos.x, room.storage.pos.y);
