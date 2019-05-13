@@ -5,7 +5,7 @@ const AssignOpenJobs = {
         const JOB_ACCEPTABLE_POSITION_WEIGHT = 200; // the acceptable range-weight for allowing a job to be assigned to a creep
         const JOB_WEIGHT_MOD = 100; // modifier for how pronounced the range part should be
         const JOB_WEIGHT_MULTIPLIER_INTER_ROOM = 1; // multiplier for how pronounced the inter room range part should be
-        const ALLOWED_COMPATIBILITY = 6; // do not assign the job to a creep that is not compatible
+        const ALLOWED_COMPATIBILITY = 9; // do not assign the job to a creep that is not compatible
 
         /*creep types:
         * [T] transporter   no work
@@ -19,17 +19,6 @@ const AssignOpenJobs = {
         * [C] claimer
         * [R] rangedHarvester
         *
-        *     T  H  B  E
-        * AS  -  1  7  6  ActiveSources
-        * DR  5  6  6  7  DroppedResources
-        * SE  1  8  8  8  SpawnsAndExtensionsNeedEnergy
-        * TE  2  6  6  6  TowersNeedEnergy
-        * FL  3  9  9  9  FullLinks
-        * FC  4  9  9  9  FullContainers
-        * OC  -  8  1  8  OwnedControllers
-        * DS  -  6  2  7  DamagedStructures
-        * CO  -  7  3  7  Constructions
-        * AE  -  6  7  1  ActiveExtractors
         * TODO not in first version
         * HC  -  -  -  -  HostileCreeps
         * --  -  -  -  -  RemoteControllersToClaim
@@ -39,7 +28,7 @@ const AssignOpenJobs = {
         */
         let isAllAssigned = false; // loop until all openJobs or idleCreeps is empty or not applicable
         while (!isAllAssigned) {
-            let idleCreeps = _(Game.creeps).filter({memory: {jobName: 'idle'}}).value();
+            let idleCreeps = _(Game.creeps).filter({memory: {jobName: 'idle'}}).value(); // new search each time because a creep may have been assigned
             if(idleCreeps.length === 0){
                 break; // no need to enter algorithm if there are no idle creeps
             }
@@ -320,10 +309,10 @@ const AssignOpenJobs = {
                         case "DroppedResources": val = 6; break;
                         case "SpawnsAndExtensionsNeedEnergy": val = 8; break;
                         case "TowersNeedEnergy": val = 6; break;
-                        case "FullLinks": val = 9; break;
-                        case "FullContainers": val = 9; break;
-                        case "TerminalsNeedEnergy": val = 9; break;
-                        case "StorageHasMinerals": val = 9; break;
+                        case "FullLinks": val = 8; break;
+                        case "FullContainers": val = 8; break;
+                        case "TerminalsNeedEnergy": val = 8; break;
+                        case "StorageHasMinerals": val = 8; break;
                         case "OwnedControllers": val = 1; break;
                         case "DamagedStructures": val = 2; break;
                         case "Constructions": val = 3; break;

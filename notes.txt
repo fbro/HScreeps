@@ -1,11 +1,11 @@
-harvesters and mineral harvester should TRY to place itself over a container
+harvesters and mineral harvester should TRY to place itself over a container SOL: JUST PLACE WALLS
 transporters should have a task to supply containers near the controller
 
 ---------------------
 algorithm problem: forever transporter jobs that blocks spawns in getting energy
 if transporter is filling shooting tower - then it will go on forever and spawns wont get energy!!!
 if container is being filled forever på harvester and transporter got fullContainer job - then it will try and empty forever! - cannot release carry if there are more than one kind being carried
-also if container was a droppedResource
+also if container was a droppedResource being filled up continuously
 
 ------------------------
 continuously remember:
@@ -13,6 +13,4 @@ All special constants should be available at the top of each class!
 
 
 
-
-Handle creep death more smooth in the existing setup.
-reorganize all creeps to have a file of its own - or jobs?.. hm...
+reorganize all creeps to have a file of its own - or jobs?.. hm... maybe.... hm... definitely each job... but how smart is that?

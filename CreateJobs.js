@@ -3,14 +3,6 @@ const CreateJobs = {
         let newJobsCounter = 0;
         let existingOpenJobsCounter = 0;
         const RCL = room.controller.level;
-
-        for(const name in Memory.creeps) {
-            if(!Game.creeps[name]) {
-                delete Memory.creeps[name];
-                console.log('Clearing non-existing creep memory:', name);
-            }
-        }
-
         // new jobs
         const activeSources = room.find(FIND_SOURCES_ACTIVE).map(function (p) {
             new RoomVisual(p.room.name).text("🏭💼", p.pos.x, p.pos.y);

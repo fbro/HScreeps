@@ -39,4 +39,11 @@ module.exports.loop = function () {
     DoClosedJobs.run(); // TODO on the road actions
 
     Constructions.run(); // TODO
+
+    /*for(const name in Memory.creeps) {
+        if(!Game.creeps[name]) {
+            delete Memory.creeps[name];
+            console.log('Clearing non-existing creep memory:', name);
+        }
+    }*/
 };
