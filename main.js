@@ -1,6 +1,6 @@
 let Towers = require('Towers');
 let CreateJobs = require('CreateJobs');
-let CreateFrontierJobs = require('CreateFrontierJobs');
+let CreateFrontierJobs = require('CreateFlagJobs');
 let AssignOpenJobs = require('AssignOpenJobs');
 let DoClosedJobs = require('DoClosedJobs');
 let Links = require('Links');
@@ -27,7 +27,7 @@ module.exports.loop = function () {
                 Links.run(room);
                 Terminals.run(room);
             } else {
-                CreateFrontierJobs.run(room); // TODO
+                //CreateFlagJobs.run(room); // TODO
             }
         }
         modCounter = (modCounter + 1) % 20;

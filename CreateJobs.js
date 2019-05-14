@@ -91,7 +91,7 @@ const CreateJobs = {
         });
         const activeMinerals = [];
         if(activeExtractors.length > 0){
-            activeMinerals.push(...activeExtractors[0].pos.findInRange(FIND_MINERALS, 0, {filter: (mineral) => { return (mineral.amount > 0); }}).map(function (p) {
+            activeMinerals.push(...activeExtractors[0].pos.findInRange(FIND_MINERALS, 0, {filter: (mineral) => { return (mineral.mineralAmount > 0); }}).map(function (p) {
                 new RoomVisual(p.room.name).text("💎💼", p.pos.x, p.pos.y);
                 return {'name': 'ActiveMinerals', 'id': p.id, 'creeps': []};
             }));

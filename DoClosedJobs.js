@@ -208,7 +208,7 @@ const DoClosedJobs = {
                     if (creep.carry[RESOURCE_ENERGY] === 0) { // go get some energy!
                         const energyTargetID = creep.memory.energyTarget;
                         let energyTarget;
-                        if(energyTargetID === undefined){
+                        if(energyTargetID === undefined || energyTargetID === null){
                             energyTarget = ClosestEnergyFullStoreInRoom(creep);
                             creep.memory.energyTarget = energyTarget.id; // save so that the function only runs once
                         }else{
