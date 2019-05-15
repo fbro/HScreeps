@@ -1,6 +1,6 @@
 let Towers = require('Towers');
 let CreateJobs = require('CreateJobs');
-let CreateFrontierJobs = require('CreateFlagJobs');
+let CreateFlagJobs = require('CreateFlagJobs');
 let AssignOpenJobs = require('AssignOpenJobs');
 let DoClosedJobs = require('DoClosedJobs');
 let Links = require('Links');
@@ -26,14 +26,15 @@ module.exports.loop = function () {
                 CreateJobs.run(room);
                 Links.run(room);
                 Terminals.run(room);
-            } else {
-                //CreateFlagJobs.run(room); // TODO
             }
         }
         modCounter = (modCounter + 1) % 20;
     }
     if (Game.time % 3 === 0) {
         AssignOpenJobs.run();
+    }
+    if (Game.time % 100 === 0) {
+        CreateFlagJobs.run();
     }
     DoClosedJobs.run();
     Constructions.run(); // TODO

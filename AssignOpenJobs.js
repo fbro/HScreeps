@@ -40,14 +40,15 @@ const AssignOpenJobs = {
             let bestPositionWeight = Number.MAX_SAFE_INTEGER;
             for (let i = 0; i < Memory.openJobs.length; i++) { // loop through all open jobs
                 const openJob = Memory.openJobs[i];
-                const openJobOBJ = Game.getObjectById(openJob.id);
+                let openJobOBJ;
+                if(openJob.flagName){openJobOBJ = Game.flags[openJob.flagName];}else{openJobOBJ = Game.getObjectById(openJob.id);}
                 if(openJobOBJ === null || openJobOBJ === undefined){
                     console.log("AssignOpenJobs, " + JSON.stringify(openJob) + " is undefined, removing job");
                     Memory.openJobs.splice(i, 1);
                     i--;
                     continue;
                 }
-                for (let e = 0; e < idleCreeps.length; e++) {// const creepName in idleCreeps) { // loop through all idle creeps
+                for (let e = 0; e < idleCreeps.length; e++) { // loop through all idle creeps
                     const creep = idleCreeps[e];
                     let weight = CreepOnJobPoints(creep.name.substring(0, 1), openJob.name);
                     if (weight > 0) { // is applicable
@@ -59,7 +60,7 @@ const AssignOpenJobs = {
                             } else { // Get the linear distance (in rooms) between two rooms
                                 positionWeight = JOB_WEIGHT_MOD * Game.map.getRoomLinearDistance(openJobOBJ.pos.roomName, creep.pos.roomName);
                             }
-                            if (bestPositionWeight > positionWeight && (positionWeight < JOB_ACCEPTABLE_POSITION_WEIGHT || openJob.name.startsWith("Remote"))) { // best creep range (for now) is found
+                            if (bestPositionWeight > positionWeight && (positionWeight < JOB_ACCEPTABLE_POSITION_WEIGHT || openJob.flagName)) { // best creep range (for now) is found
                                 bestCreep = creep;
                                 bestOpenJob = openJob;
                                 bestOpenJobPlacement = i;
@@ -73,7 +74,7 @@ const AssignOpenJobs = {
             }
             if (bestCreep !== undefined && bestCreep !== null) { // best creep for the job is now assigned
                 bestCreep.memory.jobName = bestOpenJob.name;
-                bestCreep.memory.jobId = bestOpenJob.id;
+                if(bestOpenJob.flagName){bestCreep.memory.flagName = bestOpenJob.flagName}else{bestCreep.memory.jobId = bestOpenJob.id;}
                 bestOpenJob.creeps.push(bestCreep.name);
                 if (bestOpenJob.creeps.length >= NumberOfCreepsOnJob(bestOpenJobOBJ.room.controller.level, bestOpenJob.name)) {
                     // considering RCL this job should not employ more creeps
@@ -108,7 +109,8 @@ const AssignOpenJobs = {
 
             for (let i = 0; i < Memory.openJobs.length; i++) { // loop through all open jobs
                 const openJob = Memory.openJobs[i];
-                const openJobOBJ = Game.getObjectById(openJob.id);
+                let openJobOBJ;
+                if(openJob.flagName){openJobOBJ = Game.flags[openJob.flagName];}else{openJobOBJ = Game.getObjectById(openJob.id);}
                 if(openJobOBJ === null || openJobOBJ === undefined){
                     console.log("AssignOpenJobs, " + JSON.stringify(openJob) + " is not found, removing job");
                     Memory.openJobs.splice(i, 1);
@@ -127,7 +129,7 @@ const AssignOpenJobs = {
                         weight += RANGE_WEIGHT_MOD * Game.map.getRoomLinearDistance(openJobOBJ.pos.roomName, spawn.pos.roomName);
                     }
                     weight += -JobImportance(openJob.name); // prioritize jobs
-                    if (bestWeight > weight && weight <= SPAWN_ACCEPTABLE_WEIGHT) {
+                    if (bestWeight > weight && (weight <= SPAWN_ACCEPTABLE_WEIGHT|| openJob.flagName)) {
                         bestSpawn = spawn;
                         bestOpenJob = openJob;
                         bestOpenJobPlacement = i;
@@ -145,6 +147,8 @@ const AssignOpenJobs = {
                     break;
                 } else {
                     bestOpenJob.creeps.push(spawningCreep.name);
+                    spawningCreep.memory.jobName = bestOpenJob.name;
+                    if(bestOpenJob.flagName){spawningCreep.memory.flagName = bestOpenJob.flagName}else{spawningCreep.memory.jobId = bestOpenJob.id;}
                     if (bestOpenJob.creeps.length >= NumberOfCreepsOnJob(bestOpenJobOBJ.room.controller.level, bestOpenJob.name)) {
                         // considering RCL this job should not employ more creeps
                         Memory.openJobs.splice(bestOpenJobPlacement, 1);
@@ -167,6 +171,7 @@ const AssignOpenJobs = {
             let transporterCount = 0;
             let builderCount = 0;
             let extractorCount = 0;
+            let scoutCount = 0;
             for (const creepName in Game.creeps) {
                 let creep = Game.creeps[creepName];
                 if(creep.room.name === openJobOBJ.room.name){
@@ -178,6 +183,8 @@ const AssignOpenJobs = {
                         builderCount++;
                     }else if(creepName.startsWith("E")){
                         extractorCount++;
+                    }else if(creepName.startsWith("S")){
+                        scoutCount++;
                     }
                 }
             }
@@ -202,6 +209,9 @@ const AssignOpenJobs = {
                 // extractor
                 case "ActiveMinerals":
                     if(extractorCount < 1){isAtCreepRoof = false;} break;
+                // scout
+                case "TagController":
+                    if(scoutCount < 1){isAtCreepRoof = false;} break;
                 default:
                     console.log("AssignOpenJobs, ERROR! AtCreepRoof jobName not found: " + jobName);
             }
@@ -230,6 +240,8 @@ const AssignOpenJobs = {
                 case "Constructions": val = 10; break;
                 // extractor
                 case "ActiveMinerals": val = 1; break;
+                // scout
+                case "TagController": val = 0; break;
                 default:
                     console.log("AssignOpenJobs, ERROR! JobImportance jobName not found: " + jobName);
             }
@@ -265,6 +277,7 @@ const AssignOpenJobs = {
                 case "DamagedStructures": numOfCreeps = 1; break;
                 case "Constructions": numOfCreeps = 1; break;
                 case "ActiveMinerals": numOfCreeps = 1; break;
+                case "TagController": numOfCreeps = 1; break;
                 default:
                     console.log("AssignOpenJobs, ERROR! NumberOfCreepsOnJob jobName not found: " + jobName);
             } return numOfCreeps;
@@ -285,6 +298,8 @@ const AssignOpenJobs = {
                         case "FullContainers": val = 4; break;
                         case "TerminalsNeedEnergy": val = 4; break;
                         case "StorageHasMinerals": val = 4; break;
+
+                        case "TagController": val = 8; break;
                         default: val = -1;
                     } break;
                 case "H": // harvester
@@ -301,6 +316,8 @@ const AssignOpenJobs = {
                         case "DamagedStructures": val = 6; break;
                         case "Constructions": val = 7; break;
                         case "ActiveMinerals": val = 6; break;
+
+                        case "TagController": val = 9; break;
                         default: val = -1;
                     } break;
                 case "B": // builder
@@ -317,6 +334,8 @@ const AssignOpenJobs = {
                         case "DamagedStructures": val = 2; break;
                         case "Constructions": val = 3; break;
                         case "ActiveMinerals": val = 7; break;
+
+                        case "TagController": val = 9; break;
                         default: val = -1;
                     } break;
                 case "E": // extractor
@@ -333,6 +352,13 @@ const AssignOpenJobs = {
                         case "DamagedStructures": val = 7; break;
                         case "Constructions": val = 7; break;
                         case "ActiveMinerals": val = 1; break;
+
+                        case "TagController": val = 9; break;
+                        default: val = -1;
+                    } break;
+                case "S": // scout
+                    switch (jobName) {
+                        case "TagController": val = 1; break;
                         default: val = -1;
                     } break;
                 default:
@@ -425,14 +451,20 @@ const AssignOpenJobs = {
                         case (energyAvailable >= 200): // energyCapacityAvailable: 300
                             body = [WORK, CARRY, MOVE];break;
                     } creepRole = "E"; break;
+
+                // [S] scout
+                case "TagController":
+                    body = [MOVE];
+                    creepRole = "S";
+                    break;
                 default:
                     console.log("AssignOpenJobs, ERROR! SpawnLogic job.name not found: " + job.name);
             }
             if(creepRole !== undefined){
                 const availableName = getAvailableName(creepRole);
-                let spawnResult = spawn.spawnCreep(body, availableName, {memory: {"jobName": job.name, "jobId": job.id}});
+                let spawnResult = spawn.spawnCreep(body, availableName);
                 if(spawnResult !== OK){
-                    console.log("AssignOpenJobs, SpawnLogic error, spawnResult: " + spawnResult + ", availableName: " + availableName + ", jobName: " + job.name + ", jobId: " + job.id);
+                    console.log("AssignOpenJobs, SpawnLogic error, spawnResult: " + spawnResult + ", availableName: " + availableName + ", jobName: " + job.name);
                     return undefined;
                 }else{
                     return Game.creeps[availableName];
@@ -449,18 +481,24 @@ const AssignOpenJobs = {
         function getAvailableName(creepRole) {
             let availableCount = 1;
             while (true) {
-                let isNameTaken = false;
-                for (const creepName in Game.creeps) {
-                    const creep = Game.creeps[creepName];
-                    if (creep.name === (creepRole + availableCount)) {
-                        isNameTaken = true;
-                        break; // name is already taken
-                    }
-                }
-                if (!isNameTaken) {
+                if(Game.creeps[creepRole + availableCount]){
+                    availableCount++;
+                }else{
                     break; // name is free
                 }
-                availableCount++;
+
+                //let isNameTaken = false;
+                //for (const creepName in Game.creeps) {
+                //    const creep = Game.creeps[creepName];
+                //    if (creep.name === (creepRole + availableCount)) {
+                //        isNameTaken = true;
+                //        break; // name is already taken
+                //    }
+                //}
+                //if (!isNameTaken) {
+                //    break; // name is free
+                //}
+                //availableCount++;
             }
             return creepRole + availableCount;
         }
