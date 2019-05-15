@@ -69,6 +69,69 @@ const DoClosedJobs = {
             }
         }
 
+        for(const creepName in Memory.creeps) {
+            const creepMemory = Memory.creeps[creepName];
+            const creep = Game.creeps[creepName];
+            let jobOBJ;
+            if(creepMemory.flagName){
+                jobOBJ = Game.flags[creepMemory.flagName];
+            }else{
+                jobOBJ = Game.getObjectById(creepMemory.jobId);
+            }
+            if(creep){
+                if(jobOBJ){
+                    const jobStatus = CreepActions(creep, creepMemory.jobName, jobOBJ);
+                    // TODO add CARRY "on the road" jobs here - pickup stuff and transfer stuff that are "dead weight"
+                    if(jobStatus > 0 && creep.carry[RESOURCE_ENERGY] > 0 && creep.body.filter(part => (part.type === WORK)).some(x => !!x)){ // creep only moved - try and act
+                        const structureToRepair = creep.pos.findInRange(FIND_STRUCTURES, 2, {filter: (structure) => {
+                                return structure.hits < structure.hitsMax
+                                    && structure.structureType !== STRUCTURE_WALL
+                                    && structure.structureType !== STRUCTURE_RAMPART;
+                            }})[0];
+                        if(structureToRepair !== undefined){
+                            if(creep.repair(structureToRepair) !== 0){
+                                console.log("DoClosedJob, ERROR: " + creep.name + ", could not repair " + JSON.stringify(structureToRepair));
+                            }
+                        }
+                    }
+                    if(jobStatus === 2){ // job is done
+                        UpdateJob(creepName, creepMemory, false, false);
+                    }
+                }else{ // job object is gone
+                    UpdateJob(creepName, creepMemory, true, false);
+                }
+            }else{
+                if(jobOBJ) { // creep is gone
+                    UpdateJob(creepName, creepMemory, false, true);
+                }else{ // creep AND job object is gone
+                    UpdateJob(creepName, creepMemory, true, true);
+                }
+            }
+        }
+
+        // TODO
+        function UpdateJob(creepName, creepMemory, isJobObjectGone, isCreepGone){
+            let foundJob = false;
+            for(let i = 0; i < Memory.closedJobs.length; i++){
+                if(Memory.closedJobs[i].name === creepMemory.jobName && Memory.closedJobs[i].id === creepMemory.jobId && Memory.closedJobs[i].flagName === creepMemory.flagName){
+                    if(isJobObjectGone){ // remove job
+                        Memory.closedJobs.splice(i, 1);
+
+                    }else if(isCreepGone){ // remove creep from job and move closedJob to openJobs
+                        for(let e = 0; e < Memory.closedJobs[i].creeps.length; e++){
+                            if(Memory.closedJobs[i].creeps[e] === creepName){
+                                Memory.closedJobs[i].creeps.splice(e, 1); // remove dead creep
+                                Memory.openJobs.push(Memory.closedJobs.splice(i, 1)); // move closed job to open jobs
+                                break;
+                            }
+                        }
+                    }
+                    break;
+                }
+            }
+
+        }
+
         // unhandled cleanup
         // TODO remove - is only there for testing - when a job is removed manually or by errors then there may be creeps that jobName != idle fix that
         for (const creepName in Memory.creeps){
