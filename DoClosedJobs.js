@@ -6,7 +6,7 @@ const DoClosedJobs = {
         const MAX_ENERGY_TERMINAL = 100000; // end TerminalsNeedEnergy job when terminal has more than MAX_ENERGY_TERMINAL energy
 
         // TODO reverse the loops to just look at all creeps !== idle - also enables idle creep actions and simplifies code!!!! YAAY brilliant
-        DoJobArray(Memory.closedJobs, false);
+        /*DoJobArray(Memory.closedJobs, false);
         DoJobArray(Memory.openJobs, true);
 
         function DoJobArray(jobs, isOpenJobs) {
@@ -67,7 +67,7 @@ const DoClosedJobs = {
                     }
                 }
             }
-        }
+        }*/
 
         for(const creepName in Memory.creeps) {
             const creepMemory = Memory.creeps[creepName];
@@ -95,29 +95,25 @@ const DoClosedJobs = {
                         }
                     }
                     if(jobStatus === 2){ // job is done
-                        UpdateJob(creepName, creepMemory, false, false);
+                        creep.say("job✔" + jobOBJ.pos.x + "," + jobOBJ.pos.y);
+                        UpdateJob(creepName, creepMemory, false);
                     }
                 }else{ // job object is gone
-                    UpdateJob(creepName, creepMemory, true, false);
+                    console.log("DoClosedJob, job object disappeared: " + creepMemory.jobName);
+                    creep.say("job🌀 gone"); // most common job object to disappear is the DroppedResources job
+                    UpdateJob(creepName, creepMemory, false);
                 }
-            }else{
-                if(jobOBJ) { // creep is gone
-                    UpdateJob(creepName, creepMemory, false, true);
-                }else{ // creep AND job object is gone
-                    UpdateJob(creepName, creepMemory, true, true);
-                }
+            }else{ // creep is gone
+                console.log("DoClosedJob, creep " + creepName + " is gone");
+                UpdateJob(creepName, creepMemory, true);
             }
         }
 
-        // TODO
-        function UpdateJob(creepName, creepMemory, isJobObjectGone, isCreepGone){
+        function UpdateJob(creepName, creepMemory, isCreepGone){
             let foundJob = false;
             for(let i = 0; i < Memory.closedJobs.length; i++){
                 if(Memory.closedJobs[i].name === creepMemory.jobName && Memory.closedJobs[i].id === creepMemory.jobId && Memory.closedJobs[i].flagName === creepMemory.flagName){
-                    if(isJobObjectGone){ // remove job
-                        Memory.closedJobs.splice(i, 1);
-
-                    }else if(isCreepGone){ // remove creep from job and move closedJob to openJobs
+                    if(isCreepGone){ // remove creep from job and move closedJob to openJobs
                         for(let e = 0; e < Memory.closedJobs[i].creeps.length; e++){
                             if(Memory.closedJobs[i].creeps[e] === creepName){
                                 Memory.closedJobs[i].creeps.splice(e, 1); // remove dead creep
@@ -125,11 +121,49 @@ const DoClosedJobs = {
                                 break;
                             }
                         }
+                    }else{ // remove job, done or gone
+                        Memory.closedJobs.splice(i, 1);
                     }
+                    foundJob = true;
                     break;
                 }
             }
-
+            if(!foundJob){
+                for(let i = 0; i < Memory.openJobs.length; i++){
+                    if(Memory.openJobs[i].name === creepMemory.jobName && Memory.openJobs[i].id === creepMemory.jobId && Memory.openJobs[i].flagName === creepMemory.flagName){
+                        if(isCreepGone){ // remove creep from job
+                            for(let e = 0; e < Memory.openJobs[i].creeps.length; e++){
+                                if(Memory.openJobs[i].creeps[e] === creepName){
+                                    Memory.openJobs[i].creeps.splice(e, 1); // remove dead creep
+                                    break;
+                                }
+                            }
+                        }else{ // remove job, done or gone
+                            Memory.openJobs.splice(i, 1);
+                        }
+                        foundJob = true;
+                        break;
+                    }
+                }
+            }
+            if(!isCreepGone){
+                const creep = Game.creeps[creepName];
+                creep.memory.jobName = "idle";
+                if(creep.memory.jobId        !== undefined){creep.memory.jobId        = undefined;}
+                if(creep.memory.energyTarget !== undefined){creep.memory.energyTarget = undefined;}
+                if(creep.memory.closestLink  !== undefined){creep.memory.closestLink  = undefined;}
+                if(creep.memory.flagName     !== undefined){
+                    for (let d = 0; d < Memory.flagJobs.length; d++) {
+                        if (Memory.flagJobs[d].flagName === creep.memory.flagName) {
+                            Game.flags[creep.memory.flagName].remove();
+                            let deletedFlagJob = Memory.flagJobs.splice(d, 1);
+                            console.log("DoClosedJob, RemoveJobCreepsIdle, deletedFlagJob, splice: " + JSON.stringify(deletedFlagJob));
+                            break;
+                        }
+                    }
+                    creep.memory.flagName = undefined;
+                }
+            }
         }
 
         // unhandled cleanup
