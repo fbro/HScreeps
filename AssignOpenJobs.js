@@ -52,7 +52,7 @@ const AssignOpenJobs = {
                     const creep = idleCreeps[e];
                     let weight = CreepOnJobPoints(creep.name.substring(0, 1), openJob.name);
                     if (weight > 0) { // is applicable
-                        if (bestWeight > weight) { // best creep for the job (for now) is found
+                        if (weight < bestWeight) { // best creep for the job (for now) is found
                             let positionWeight = 0;
                             if (openJobOBJ.pos.roomName === creep.pos.roomName) { // in same room
                                 positionWeight += -JOB_WEIGHT_MOD;
@@ -60,7 +60,7 @@ const AssignOpenJobs = {
                             } else { // Get the linear distance (in rooms) between two rooms
                                 positionWeight = JOB_WEIGHT_MOD * Game.map.getRoomLinearDistance(openJobOBJ.pos.roomName, creep.pos.roomName);
                             }
-                            if (bestPositionWeight > positionWeight && (positionWeight < JOB_ACCEPTABLE_POSITION_WEIGHT || openJob.flagName)) { // best creep range (for now) is found
+                            if ((weight < bestWeight || (bestWeight === weight && bestPositionWeight > positionWeight)) && (positionWeight < JOB_ACCEPTABLE_POSITION_WEIGHT || openJob.flagName)) { // best creep range (for now) is found
                                 bestCreep = creep;
                                 bestOpenJob = openJob;
                                 bestOpenJobPlacement = i;
@@ -221,7 +221,7 @@ const AssignOpenJobs = {
         /**
          * @return {int}
          */
-        function JobImportance(jobName){
+        function JobImportance(jobName){ // general importance of the job
             let val = 0;
             switch (jobName) {
                 // harvester
@@ -235,7 +235,7 @@ const AssignOpenJobs = {
                 case "TerminalsNeedEnergy": val = 1; break;
                 case "StorageHasMinerals": val = 0; break;
                 // builder
-                case "OwnedControllers": val = 400; break;
+                case "OwnedControllers": val = 800; break;
                 case "DamagedStructures": val = 100; break;
                 case "Constructions": val = 10; break;
                 // extractor
