@@ -6,6 +6,9 @@ monitor creeps stuck in loops
 TODO:
 
 reorganize all creeps to have a file of its own - or jobs?.. hm... maybe.... hm... definitely each job... but how smart is that?
-all idle creeps should move to storage and place all its content in storage
+all **idle** creeps should move to storage and place all its content in storage
 pickup dropped resources on its path if possible
 place its stuff in nearby container if possible
+
+testing scouting and tagging of other rooms
+todo add new flagjov scoutcontroller

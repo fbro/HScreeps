@@ -76,7 +76,11 @@ const AssignOpenJobs = {
                 bestCreep.memory.jobName = bestOpenJob.name;
                 if(bestOpenJob.flagName){bestCreep.memory.flagName = bestOpenJob.flagName}else{bestCreep.memory.jobId = bestOpenJob.id;}
                 bestOpenJob.creeps.push(bestCreep.name);
-                if (bestOpenJob.creeps.length >= NumberOfCreepsOnJob(bestOpenJobOBJ.room.controller.level, bestOpenJob.name)) {
+                let RCL = 0;
+                if(bestOpenJobOBJ.room !== undefined && bestOpenJobOBJ.room.controller !== undefined){
+                    RCL = bestOpenJobOBJ.room.controller.level;
+                }
+                if (bestOpenJob.creeps.length >= NumberOfCreepsOnJob(RCL, bestOpenJob.name)) {
                     // considering RCL this job should not employ more creeps
                     Memory.openJobs.splice(bestOpenJobPlacement, 1);
                     Memory.closedJobs.push(bestOpenJob);
@@ -149,7 +153,11 @@ const AssignOpenJobs = {
                     bestOpenJob.creeps.push(spawningCreep.name);
                     spawningCreep.memory.jobName = bestOpenJob.name;
                     if(bestOpenJob.flagName){spawningCreep.memory.flagName = bestOpenJob.flagName}else{spawningCreep.memory.jobId = bestOpenJob.id;}
-                    if (bestOpenJob.creeps.length >= NumberOfCreepsOnJob(bestOpenJobOBJ.room.controller.level, bestOpenJob.name)) {
+                    let RCL = 0;
+                    if(bestOpenJobOBJ.room !== undefined && bestOpenJobOBJ.room.controller !== undefined){
+                        RCL = bestOpenJobOBJ.room.controller.level;
+                    }
+                    if (bestOpenJob.creeps.length >= NumberOfCreepsOnJob(RCL, bestOpenJob.name)) {
                         // considering RCL this job should not employ more creeps
                         Memory.openJobs.splice(bestOpenJobPlacement, 1);
                         Memory.closedJobs.push(bestOpenJob);
@@ -172,9 +180,10 @@ const AssignOpenJobs = {
             let builderCount = 0;
             let extractorCount = 0;
             let scoutCount = 0;
+            let claimerCount = 0;
             for (const creepName in Game.creeps) {
                 let creep = Game.creeps[creepName];
-                if(creep.room.name === openJobOBJ.room.name){
+                if(creep.room.name === openJobOBJ.pos.roomName){
                     if(creepName.startsWith("H")){
                         harvesterCount++;
                     }else if(creepName.startsWith("T")){
@@ -185,6 +194,8 @@ const AssignOpenJobs = {
                         extractorCount++;
                     }else if(creepName.startsWith("S")){
                         scoutCount++;
+                    }else if(creepName.startsWith("C")){
+                        claimerCount++;
                     }
                 }
             }
@@ -200,6 +211,7 @@ const AssignOpenJobs = {
                 case "FullContainers":
                 case "TerminalsNeedEnergy":
                 case "StorageHasMinerals":
+                case "LabsNeedEnergy":
                     if(transporterCount < 2){isAtCreepRoof = false;} break;
                 // builder
                 case "OwnedControllers":
@@ -211,7 +223,11 @@ const AssignOpenJobs = {
                     if(extractorCount < 1){isAtCreepRoof = false;} break;
                 // scout
                 case "TagController":
+                case "ScoutPos":
                     if(scoutCount < 1){isAtCreepRoof = false;} break;
+                // claimer
+                case "ClaimController":
+                    if(claimerCount < 1){isAtCreepRoof = false;} break;
                 default:
                     console.log("AssignOpenJobs, ERROR! AtCreepRoof jobName not found: " + jobName);
             }
@@ -234,6 +250,7 @@ const AssignOpenJobs = {
                 case "FullContainers": val = 10; break;
                 case "TerminalsNeedEnergy": val = 1; break;
                 case "StorageHasMinerals": val = 0; break;
+                case "LabsNeedEnergy": val = 0; break;
                 // builder
                 case "OwnedControllers": val = 800; break;
                 case "DamagedStructures": val = 100; break;
@@ -242,6 +259,9 @@ const AssignOpenJobs = {
                 case "ActiveMinerals": val = 1; break;
                 // scout
                 case "TagController": val = 0; break;
+                case "ScoutPos": val = 0; break;
+                // claimer
+                case "ClaimController": val = 100; break;
                 default:
                     console.log("AssignOpenJobs, ERROR! JobImportance jobName not found: " + jobName);
             }
@@ -267,6 +287,7 @@ const AssignOpenJobs = {
                 case "FullContainers": numOfCreeps = 1; break;
                 case "TerminalsNeedEnergy": numOfCreeps = 1; break;
                 case "StorageHasMinerals": numOfCreeps = 1; break;
+                case "LabsNeedEnergy": numOfCreeps = 1; break;
                 case "OwnedControllers":
                     switch (RCL) {
                         case 1: case 2: numOfCreeps = 1; break;
@@ -278,6 +299,8 @@ const AssignOpenJobs = {
                 case "Constructions": numOfCreeps = 1; break;
                 case "ActiveMinerals": numOfCreeps = 1; break;
                 case "TagController": numOfCreeps = 1; break;
+                case "ScoutPos": numOfCreeps = 1; break;
+                case "ClaimController": numOfCreeps = 1; break;
                 default:
                     console.log("AssignOpenJobs, ERROR! NumberOfCreepsOnJob jobName not found: " + jobName);
             } return numOfCreeps;
@@ -298,8 +321,10 @@ const AssignOpenJobs = {
                         case "FullContainers": val = 4; break;
                         case "TerminalsNeedEnergy": val = 4; break;
                         case "StorageHasMinerals": val = 4; break;
+                        case "LabsNeedEnergy": val = 4; break;
 
                         case "TagController": val = 8; break;
+                        case "ScoutPos": val = 9; break;
                         default: val = -1;
                     } break;
                 case "H": // harvester
@@ -312,12 +337,14 @@ const AssignOpenJobs = {
                         case "FullContainers": val = 9; break;
                         case "TerminalsNeedEnergy": val = 9; break;
                         case "StorageHasMinerals": val = 9; break;
+                        case "LabsNeedEnergy": val = 9; break;
                         case "OwnedControllers": val = 8; break;
                         case "DamagedStructures": val = 6; break;
                         case "Constructions": val = 7; break;
                         case "ActiveMinerals": val = 6; break;
 
                         case "TagController": val = 9; break;
+                        case "ScoutPos": val = 9; break;
                         default: val = -1;
                     } break;
                 case "B": // builder
@@ -330,12 +357,14 @@ const AssignOpenJobs = {
                         case "FullContainers": val = 8; break;
                         case "TerminalsNeedEnergy": val = 8; break;
                         case "StorageHasMinerals": val = 8; break;
+                        case "LabsNeedEnergy": val = 8; break;
                         case "OwnedControllers": val = 1; break;
                         case "DamagedStructures": val = 2; break;
                         case "Constructions": val = 3; break;
                         case "ActiveMinerals": val = 7; break;
 
                         case "TagController": val = 9; break;
+                        case "ScoutPos": val = 9; break;
                         default: val = -1;
                     } break;
                 case "E": // extractor
@@ -348,17 +377,25 @@ const AssignOpenJobs = {
                         case "FullContainers": val = 9; break;
                         case "TerminalsNeedEnergy": val = 9; break;
                         case "StorageHasMinerals": val = 9; break;
+                        case "LabsNeedEnergy": val = 9; break;
                         case "OwnedControllers": val = 8; break;
                         case "DamagedStructures": val = 7; break;
                         case "Constructions": val = 7; break;
                         case "ActiveMinerals": val = 1; break;
 
                         case "TagController": val = 9; break;
+                        case "ScoutPos": val = 9; break;
                         default: val = -1;
                     } break;
                 case "S": // scout
                     switch (jobName) {
                         case "TagController": val = 1; break;
+                        case "ScoutPos": val = 2; break;
+                        default: val = -1;
+                    } break;
+                case "C": // claimer
+                    switch (jobName) {
+                        case "ClaimController": val = 1; break;
                         default: val = -1;
                     } break;
                 default:
@@ -395,6 +432,7 @@ const AssignOpenJobs = {
                 case "FullContainers":
                 case "TerminalsNeedEnergy":
                 case "StorageHasMinerals":
+                case "LabsNeedEnergy":
                     switch (true) {
                         case (energyAvailable >= 1350): // energyCapacityAvailable: 12900
                             body = [CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];break;
@@ -454,8 +492,15 @@ const AssignOpenJobs = {
 
                 // [S] scout
                 case "TagController":
+                case "ScoutPos":
                     body = [MOVE];
                     creepRole = "S";
+                    break;
+
+                // [C] claimer
+                case "ClaimController":
+                    body = [MOVE];
+                    creepRole = "C";
                     break;
                 default:
                     console.log("AssignOpenJobs, ERROR! SpawnLogic job.name not found: " + job.name);
@@ -486,19 +531,6 @@ const AssignOpenJobs = {
                 }else{
                     break; // name is free
                 }
-
-                //let isNameTaken = false;
-                //for (const creepName in Game.creeps) {
-                //    const creep = Game.creeps[creepName];
-                //    if (creep.name === (creepRole + availableCount)) {
-                //        isNameTaken = true;
-                //        break; // name is already taken
-                //    }
-                //}
-                //if (!isNameTaken) {
-                //    break; // name is free
-                //}
-                //availableCount++;
             }
             return creepRole + availableCount;
         }

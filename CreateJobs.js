@@ -97,6 +97,15 @@ const CreateJobs = {
             }));
         }
 
+        const labsNeedEnergy = room.find(FIND_MY_STRUCTURES, {
+            filter: (lab) => {
+                return (lab.structureType === STRUCTURE_LAB && lab.energy < lab.energyCapacity);
+            }
+        }).map(function (p) {
+            new RoomVisual(p.room.name).text("⚡💼", p.pos.x, p.pos.y);
+            return {'name': 'LabsNeedEnergy', 'id': p.id, 'creeps': []};
+        });
+
 
         // TODO there are other jobs to create - protector jobs
 
@@ -110,6 +119,7 @@ const CreateJobs = {
         newJobs.push(...damagedStructures);
         newJobs.push(...constructions);
         newJobs.push(...activeMinerals);
+        newJobs.push(...labsNeedEnergy);
 
         new RoomVisual(room.name).text("🔩💼", room.controller.pos.x, room.controller.pos.y);
         newJobs.push({'name': 'OwnedControllers', 'id': room.controller.id, 'creeps': []});
