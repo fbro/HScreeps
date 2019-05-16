@@ -237,13 +237,14 @@ const DoClosedJobs = {
                     break;
                 case "TagController":
                 case "ScoutPos":
+                case "ClaimController":
                     if(closedJobOBJ.room !== undefined){
                         actionResult = CreepAct(creep, closedJobName, 2, closedJobOBJ);
                     }
                     if(closedJobOBJ.room === undefined || actionResult === ERR_NOT_IN_RANGE) {
                         creep.moveTo(closedJobOBJ.pos, {visualizePathStyle:{fill: 'transparent',stroke: '#fd00ff',lineStyle: 'dashed',strokeWidth: .15,opacity: .5}});
                         jobStatus = 1;
-                    }else if(closedJobName === "TagController"){
+                    }else if(closedJobName !== "ScoutPos"){
                         jobStatus = 2;
                     }
                     break;
@@ -363,6 +364,9 @@ const DoClosedJobs = {
                     }else{
                         actionResult = creep.moveTo(closedJobOBJ.pos);
                     }
+                    break;
+                case closedJobName === "ClaimController" && actId === 2:
+                    actionResult = creep.claimController(closedJobOBJ.room.controller);
                     break;
                 default:
                     console.log("DoClosedJob, ERROR! ended in default in CreepAct! closedJobName: " + closedJobName + ", actId: " + actId + ", creepName: " + creep.name);

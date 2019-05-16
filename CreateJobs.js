@@ -169,14 +169,15 @@ const CreateJobs = {
             }
 
             if (foundExistingOpenJob !== undefined) {
-                newOpenJobs.push(foundExistingOpenJob); // existing open jobs are re-saved in the memory
+                //newOpenJobs.push(foundExistingOpenJob); // existing open jobs are re-saved in the memory
                 existingOpenJobsCounter++;
-            } else if (!isClosedJobFound) { // new job found - now it is created
-                newOpenJobs.push(newJob);
+            } else
+            if (!isClosedJobFound) { // new job found - now it is created
+                Memory.openJobs.push(newJob);
                 newJobsCounter++;
             }
         }
-        Memory.openJobs = newOpenJobs;
+        //Memory.openJobs = newOpenJobs;
         console.log("CreateJobs " + room.name + ", new: " + newJobsCounter + ", existing: " + existingOpenJobsCounter);
     }
 };

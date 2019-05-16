@@ -25,7 +25,9 @@ module.exports.loop = function () {
             if (room.controller !== undefined && room.controller.my) {
                 CreateJobs.run(room);
                 Links.run(room);
-                Terminals.run(room);
+                if(room.terminal !== undefined){
+                    Terminals.run(room);
+                }
             }
         }
         modCounter = (modCounter + 1) % 20;

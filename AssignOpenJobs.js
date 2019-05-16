@@ -276,7 +276,7 @@ const AssignOpenJobs = {
             switch (jobName) {
                 case "ActiveSources":
                     switch (RCL) {
-                        case 1: case 2: numOfCreeps = 3; break;
+                        case 1: case 2: numOfCreeps = 1; break;
                         case 3: case 4: case 5: numOfCreeps = 2; break;
                         case 6: case 7: case 8: numOfCreeps = 1; break;
                     } break;
@@ -292,7 +292,7 @@ const AssignOpenJobs = {
                     switch (RCL) {
                         case 1: case 2: numOfCreeps = 1; break;
                         case 3: case 4: case 5: numOfCreeps = 2; break;
-                        case 6: case 7: numOfCreeps = 3; break;
+                        case 6: case 7: numOfCreeps = 2; break;
                         case 8: numOfCreeps = 1; break;
                     } break;
                 case "DamagedStructures": numOfCreeps = 1; break;
@@ -499,7 +499,7 @@ const AssignOpenJobs = {
 
                 // [C] claimer
                 case "ClaimController":
-                    body = [MOVE];
+                    body = [MOVE, MOVE, CLAIM];
                     creepRole = "C";
                     break;
                 default:

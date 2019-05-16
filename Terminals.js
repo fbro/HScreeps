@@ -1,6 +1,5 @@
 const Terminals = {
     run: function(room) {
-
         // try to sell stuff
         const MIN_RESOURCE_AMOUNT = 1000;
         const MAX_TRANSFER_ENERGY_COST = 500;
