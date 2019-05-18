@@ -99,7 +99,7 @@ const AssignOpenJobs = {
         const RANGE_WEIGHT_MULTIPLIER_INTER_ROOM = 5; // multiplier for how pronounced the inter room range part should be
 
         let doneSpawning = false;
-        const availableSpawns = _(Game.spawns).filter(spawn => spawn.spawning === null && spawn.room.energyAvailable >= 150).value();
+        const availableSpawns = _(Game.spawns).filter(spawn => spawn.spawning === null && spawn.room.energyAvailable >= 200).value();
         while (!doneSpawning) {
             if(availableSpawns.length === 0){
                 break; // no need to enter algorithm if there are no available spawns
@@ -143,7 +143,7 @@ const AssignOpenJobs = {
                     }
                 }
             }
-            if (bestSpawn !== undefined && bestSpawn !== null) { // best spawn found - spawning creep
+            if (bestSpawn) { // best spawn found - spawning creep
                 const spawningCreep = SpawnLogic(bestSpawn, bestOpenJob, bestSpawn.room.energyAvailable); // spawn
                 console.log("AssignOpenJobs, energy available: " + bestSpawn.room.energyAvailable + ", spawningCreep: " + JSON.stringify(spawningCreep) + ", bestSpawn: " + JSON.stringify(bestSpawn) + ", bestOpenJob: " + JSON.stringify(bestOpenJob));
                 if (spawningCreep === undefined || spawningCreep === null) {
@@ -277,7 +277,7 @@ const AssignOpenJobs = {
                 case "ActiveSources":
                     switch (RCL) {
                         case 1: case 2: numOfCreeps = 1; break;
-                        case 3: case 4: case 5: numOfCreeps = 2; break;
+                        case 3: case 4: case 5: numOfCreeps = 1; break;
                         case 6: case 7: case 8: numOfCreeps = 1; break;
                     } break;
                 case "DroppedResources": numOfCreeps = 1; break;

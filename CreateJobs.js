@@ -142,7 +142,6 @@ const CreateJobs = {
         const closedJobs = Memory.closedJobs;
         const openJobs = Memory.openJobs;
 
-        let newOpenJobs = [];
         // loop through all new jobs
         for (const newJobCount in newJobs) {
             const newJob = newJobs[newJobCount];
@@ -169,7 +168,6 @@ const CreateJobs = {
             }
 
             if (foundExistingOpenJob !== undefined) {
-                //newOpenJobs.push(foundExistingOpenJob); // existing open jobs are re-saved in the memory
                 existingOpenJobsCounter++;
             } else
             if (!isClosedJobFound) { // new job found - now it is created
@@ -177,7 +175,6 @@ const CreateJobs = {
                 newJobsCounter++;
             }
         }
-        //Memory.openJobs = newOpenJobs;
         console.log("CreateJobs " + room.name + ", new: " + newJobsCounter + ", existing: " + existingOpenJobsCounter);
     }
 };

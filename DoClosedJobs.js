@@ -2,7 +2,7 @@ const DoClosedJobs = {
     run: function() {
         // constants
         const MAX_HITS_TO_MAINTAIN = 200000; // when repair and build, walls and ramparts have high hits - only maintain up to this
-        const MIN_VALID_ENERGY_AMOUNT = 100; // when searching for stored energy in links, containers, storage, dropped energy, ignore below this number
+        const MIN_VALID_ENERGY_AMOUNT = 10; // when searching for stored energy in links, containers, storage, dropped energy, ignore below this number
         const MAX_ENERGY_TERMINAL = 100000; // end TerminalsNeedEnergy job when terminal has more than MAX_ENERGY_TERMINAL energy
 
         for(const creepName in Memory.creeps) {
@@ -258,6 +258,16 @@ const DoClosedJobs = {
         // used by creep-transporters to see which store in the room where the creep is is most full of energy
         function ClosestEnergyFullStoreInRoom(creep){
             let bestEnergyLocation = creep.room.storage;
+            if(bestEnergyLocation === undefined){
+                let roomWithStorageLinearDistance = Number.MAX_SAFE_INTEGER;
+                for (let roomCount in Game.rooms) {
+                    const room = Game.rooms[roomCount];
+                    if(bestEnergyLocation === undefined && room.storage !== undefined || Game.map.getRoomLinearDistance(room.name, creep.pos.roomName) < roomWithStorageLinearDistance){
+                        bestEnergyLocation = room.storage;
+                        roomWithStorageLinearDistance = Game.map.getRoomLinearDistance(room.name, creep.pos.roomName);
+                    }
+                }
+            }
             let bestRange = Number.MAX_SAFE_INTEGER;
             const energyCandidates = [];
 

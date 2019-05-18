@@ -6,8 +6,6 @@
       <change beforePath="$PROJECT_DIR$/AssignOpenJobs.js" beforeDir="false" afterPath="$PROJECT_DIR$/AssignOpenJobs.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/CreateJobs.js" beforeDir="false" afterPath="$PROJECT_DIR$/CreateJobs.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/DoClosedJobs.js" beforeDir="false" afterPath="$PROJECT_DIR$/DoClosedJobs.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Terminals.js" beforeDir="false" afterPath="$PROJECT_DIR$/Terminals.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.js" beforeDir="false" afterPath="$PROJECT_DIR$/main.js" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -34,8 +32,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/main.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="425">
-              <caret line="25" column="37" lean-forward="true" selection-start-line="25" selection-start-column="37" selection-end-line="25" selection-end-column="37" />
+            <state relative-caret-position="391">
+              <caret line="23" column="20" selection-start-line="23" selection-start-column="20" selection-end-line="23" selection-end-column="20" />
             </state>
           </provider>
         </entry>
@@ -52,8 +50,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/CreateJobs.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="615">
-              <caret line="179" column="10" selection-start-line="179" selection-start-column="10" selection-end-line="179" selection-end-column="10" />
+            <state relative-caret-position="513">
+              <caret line="168" lean-forward="true" selection-start-line="168" selection-end-line="168" />
             </state>
           </provider>
         </entry>
@@ -61,11 +59,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/DoClosedJobs.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="717">
-              <caret line="236" column="26" lean-forward="true" selection-start-line="236" selection-start-column="26" selection-end-line="236" selection-end-column="26" />
-              <folding>
-                <element signature="e#16249#18292#0" />
-              </folding>
+            <state relative-caret-position="153">
+              <caret line="252" column="34" lean-forward="true" selection-start-line="252" selection-start-column="34" selection-end-line="252" selection-end-column="34" />
             </state>
           </provider>
         </entry>
@@ -73,8 +68,13 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/AssignOpenJobs.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="408">
-              <caret line="51" column="33" selection-start-line="51" selection-start-column="33" selection-end-line="51" selection-end-column="33" />
+            <state relative-caret-position="426">
+              <caret line="176" column="37" lean-forward="true" selection-start-line="176" selection-start-column="37" selection-end-line="176" selection-end-column="37" />
+              <folding>
+                <element signature="e#16776#21693#0" />
+                <element signature="e#21804#29484#0" />
+                <element signature="e#29583#29901#0" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -102,6 +102,7 @@
       <find>say</find>
       <find>AssignOpenJobs, bestOpenJob.creeps.push</find>
       <find>job2Id</find>
+      <find>MIN_VALID_ENERGY_AMOUNT</find>
     </findStrings>
     <replaceStrings>
       <replace>const</replace>
@@ -121,9 +122,9 @@
         <option value="$PROJECT_DIR$/QuickCommands.js" />
         <option value="$PROJECT_DIR$/CreateFrontierJobs.js" />
         <option value="$PROJECT_DIR$/CreateFlagJobs.js" />
-        <option value="$PROJECT_DIR$/DoClosedJobs.js" />
         <option value="$PROJECT_DIR$/Terminals.js" />
         <option value="$PROJECT_DIR$/main.js" />
+        <option value="$PROJECT_DIR$/DoClosedJobs.js" />
         <option value="$PROJECT_DIR$/CreateJobs.js" />
         <option value="$PROJECT_DIR$/AssignOpenJobs.js" />
       </list>
@@ -146,8 +147,6 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="PackagesPane" />
-      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -159,12 +158,14 @@
           <select />
         </subPane>
       </pane>
+      <pane id="PackagesPane" />
+      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
-    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1558041769152" />
+    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1558201035331" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
@@ -203,6 +204,7 @@
       <workItem from="1557777766182" duration="8143000" />
       <workItem from="1557867032883" duration="8941000" />
       <workItem from="1558030607787" duration="9011000" />
+      <workItem from="1558091135771" duration="7074000" />
     </task>
     <task id="LOCAL-00001" summary="HScreeps works with all the basics">
       <created>1556998844921</created>
@@ -313,7 +315,7 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="107905000" />
+    <option name="totallyTimeSpent" value="114979000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -328,7 +330,7 @@
     <frame x="-8" y="-8" width="1936" height="1096" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.09328358" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.09434968" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Designer" order="2" />
       <window_info id="Image Layers" order="3" />
@@ -476,32 +478,34 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/main.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="425">
-          <caret line="25" column="37" lean-forward="true" selection-start-line="25" selection-start-column="37" selection-end-line="25" selection-end-column="37" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/CreateJobs.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="615">
-          <caret line="179" column="10" selection-start-line="179" selection-start-column="10" selection-end-line="179" selection-end-column="10" />
+        <state relative-caret-position="391">
+          <caret line="23" column="20" selection-start-line="23" selection-start-column="20" selection-end-line="23" selection-end-column="20" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/DoClosedJobs.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="717">
-          <caret line="236" column="26" lean-forward="true" selection-start-line="236" selection-start-column="26" selection-end-line="236" selection-end-column="26" />
-          <folding>
-            <element signature="e#16249#18292#0" />
-          </folding>
+        <state relative-caret-position="153">
+          <caret line="252" column="34" lean-forward="true" selection-start-line="252" selection-start-column="34" selection-end-line="252" selection-end-column="34" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/CreateJobs.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="513">
+          <caret line="168" lean-forward="true" selection-start-line="168" selection-end-line="168" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/AssignOpenJobs.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="408">
-          <caret line="51" column="33" selection-start-line="51" selection-start-column="33" selection-end-line="51" selection-end-column="33" />
+        <state relative-caret-position="426">
+          <caret line="176" column="37" lean-forward="true" selection-start-line="176" selection-start-column="37" selection-end-line="176" selection-end-column="37" />
+          <folding>
+            <element signature="e#16776#21693#0" />
+            <element signature="e#21804#29484#0" />
+            <element signature="e#29583#29901#0" />
+          </folding>
         </state>
       </provider>
     </entry>
