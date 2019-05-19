@@ -32,7 +32,7 @@ const DoClosedJobs = {
                         }
                     }
                     if(jobStatus === 2){ // job is done
-                        console.log("DoClosedJob, jobs done: " + creepMemory.jobName);
+                        console.log("DoClosedJob, job done: " + creepMemory.jobName + ", room: " + jobOBJ.pos.roomName);
                         creep.say("job✔" + jobOBJ.pos.x + "," + jobOBJ.pos.y);
                         UpdateJob(creepName, creepMemory, false);
                     }
@@ -258,16 +258,6 @@ const DoClosedJobs = {
         // used by creep-transporters to see which store in the room where the creep is is most full of energy
         function ClosestEnergyFullStoreInRoom(creep){
             let bestEnergyLocation = creep.room.storage;
-            if(bestEnergyLocation === undefined){
-                let roomWithStorageLinearDistance = Number.MAX_SAFE_INTEGER;
-                for (let roomCount in Game.rooms) {
-                    const room = Game.rooms[roomCount];
-                    if(bestEnergyLocation === undefined && room.storage !== undefined || Game.map.getRoomLinearDistance(room.name, creep.pos.roomName) < roomWithStorageLinearDistance){
-                        bestEnergyLocation = room.storage;
-                        roomWithStorageLinearDistance = Game.map.getRoomLinearDistance(room.name, creep.pos.roomName);
-                    }
-                }
-            }
             let bestRange = Number.MAX_SAFE_INTEGER;
             const energyCandidates = [];
 
@@ -303,6 +293,17 @@ const DoClosedJobs = {
                 if(bestRange > range){
                     bestEnergyLocation = energyCandidate;
                     bestRange = range;}
+            }
+            if(bestEnergyLocation === undefined){
+                let roomWithStorageLinearDistance = Number.MAX_SAFE_INTEGER;
+                for (let roomCount in Game.rooms) {
+                    const room = Game.rooms[roomCount];
+                    if(bestEnergyLocation === undefined && room.storage !== undefined || room.storage !== undefined &&  Game.map.getRoomLinearDistance(room.name, creep.pos.roomName) < roomWithStorageLinearDistance){
+                        bestEnergyLocation = room.storage;
+                        roomWithStorageLinearDistance = Game.map.getRoomLinearDistance(room.name, creep.pos.roomName);
+                        console.log("found alternate storage " + bestEnergyLocation.pos.roomName);
+                    }
+                }
             }
             creep.say("get⚡" + bestEnergyLocation.pos.x + "," + bestEnergyLocation.pos.y);
             return Game.getObjectById(bestEnergyLocation.id);

@@ -174,35 +174,14 @@ const AssignOpenJobs = {
          * @return {boolean}
          */
         function AtCreepRoof(jobName, openJobOBJ){
-            let isAtCreepRoof = true;
-            let harvesterCount = 0;
-            let transporterCount = 0;
-            let builderCount = 0;
-            let extractorCount = 0;
-            let scoutCount = 0;
-            let claimerCount = 0;
-            for (const creepName in Game.creeps) {
-                let creep = Game.creeps[creepName];
-                if(creep.room.name === openJobOBJ.pos.roomName){
-                    if(creepName.startsWith("H")){
-                        harvesterCount++;
-                    }else if(creepName.startsWith("T")){
-                        transporterCount++;
-                    }else if(creepName.startsWith("B")){
-                        builderCount++;
-                    }else if(creepName.startsWith("E")){
-                        extractorCount++;
-                    }else if(creepName.startsWith("S")){
-                        scoutCount++;
-                    }else if(creepName.startsWith("C")){
-                        claimerCount++;
-                    }
-                }
-            }
+            let creepInitials = "X";
+            let maxCreepAtRoof = 0;
             switch (jobName) {
                 // harvester
                 case "ActiveSources":
-                    if(harvesterCount < 2){isAtCreepRoof = false;} break;
+                    creepInitials = "H";
+                    maxCreepAtRoof = 2;
+                    break;
                 // transporter
                 case "DroppedResources":
                 case "SpawnsAndExtensionsNeedEnergy":
@@ -212,24 +191,50 @@ const AssignOpenJobs = {
                 case "TerminalsNeedEnergy":
                 case "StorageHasMinerals":
                 case "LabsNeedEnergy":
-                    if(transporterCount < 2){isAtCreepRoof = false;} break;
+                    creepInitials = "T";
+                    maxCreepAtRoof = 2;
+                    break;
                 // builder
                 case "OwnedControllers":
                 case "DamagedStructures":
                 case "Constructions":
-                    if(builderCount < 2){isAtCreepRoof = false;} break;
+                    creepInitials = "B";
+                    maxCreepAtRoof = 2;
+                    break;
                 // extractor
                 case "ActiveMinerals":
-                    if(extractorCount < 1){isAtCreepRoof = false;} break;
+                    creepInitials = "E";
+                    maxCreepAtRoof = 1;
+                    break;
                 // scout
                 case "TagController":
                 case "ScoutPos":
-                    if(scoutCount < 1){isAtCreepRoof = false;} break;
+                    creepInitials = "S";
+                    maxCreepAtRoof = 1;
+                    break;
                 // claimer
                 case "ClaimController":
-                    if(claimerCount < 1){isAtCreepRoof = false;} break;
+                    creepInitials = "C";
+                    maxCreepAtRoof = 1;
+                    break;
                 default:
                     console.log("AssignOpenJobs, ERROR! AtCreepRoof jobName not found: " + jobName);
+            }
+            let creepCount = 0;
+            for (const creepName in Game.creeps) {
+                let creep = Game.creeps[creepName];
+                if(creep.memory.jobName === "idle" && creep.name.startsWith(creepInitials)){
+                    creepCount++;
+                }else if(creep.memory.jobName === jobName){
+                    const job = Game.getObjectById(creep.memory.jobId);
+                    if(job !== undefined && job.pos.roomName === openJobOBJ.pos.roomName){
+                        creepCount++;
+                    }
+                }
+            }
+            let isAtCreepRoof = true;
+            if(creepCount < maxCreepAtRoof){
+                isAtCreepRoof = false;
             }
             return isAtCreepRoof;
         }
