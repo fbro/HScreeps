@@ -2,7 +2,7 @@ const AssignOpenJobs = {
     run: function () {
 
         /* --------------- Assign jobs algorithm --------------- */
-        const JOB_ACCEPTABLE_POSITION_WEIGHT = 200; // the acceptable range-weight for allowing a job to be assigned to a creep
+        const JOB_ACCEPTABLE_POSITION_WEIGHT = 150; // the acceptable range-weight for allowing a job to be assigned to a creep
         const JOB_WEIGHT_MOD = 100; // modifier for how pronounced the range part should be
         const JOB_WEIGHT_MULTIPLIER_INTER_ROOM = 1; // multiplier for how pronounced the inter room range part should be
         const ALLOWED_COMPATIBILITY = 9; // do not assign the job to a creep that is not compatible
@@ -227,7 +227,7 @@ const AssignOpenJobs = {
                     creepCount++;
                 }else if(creep.memory.jobName === jobName){
                     const job = Game.getObjectById(creep.memory.jobId);
-                    if(job !== undefined && job.pos.roomName === openJobOBJ.pos.roomName){
+                    if(job !== undefined && openJobOBJ !== undefined && job.pos.roomName === openJobOBJ.pos.roomName){
                         creepCount++;
                     }
                 }
