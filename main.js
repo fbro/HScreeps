@@ -37,7 +37,8 @@ module.exports.loop = function () {
     }
     if (Game.time % 100 === 0) {
         CreateFlagJobs.run();
+        Constructions.run(); // TODO
     }
     DoClosedJobs.run();
-    Constructions.run(); // TODO
+
 };

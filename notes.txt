@@ -6,7 +6,9 @@ monitor creeps stuck in loops
 TODO:
 
 
-all **idle** creeps should move to storage and place all its content in storage
+
 pickup dropped resources on its path if possible
 place its stuff in nearby container if possible
 
+all **idle** creeps should move to storage and place all its content in storage
+    recycle creeps if there are many idle!
