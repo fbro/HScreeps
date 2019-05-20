@@ -35,7 +35,7 @@ module.exports.loop = function () {
     if (Game.time % 3 === 0) {
         AssignOpenJobs.run();
     }
-    if (Game.time % 100 === 0) {
+    if (Game.time % 2 === 0) {
         CreateFlagJobs.run();
         Constructions.run(); // TODO
     }

@@ -94,6 +94,7 @@ const DoClosedJobs = {
                 if(creepMemory.jobId        !== undefined){creepMemory.jobId        = undefined;}
                 if(creepMemory.energyTarget !== undefined){creepMemory.energyTarget = undefined;}
                 if(creepMemory.closestLink  !== undefined){creepMemory.closestLink  = undefined;}
+                if(creepMemory.storage      !== undefined){creepMemory.storage      = undefined;}
                 if(creepMemory.flagName     !== undefined){
                     if(Game.flags[creepMemory.flagName]){Game.flags[creepMemory.flagName].remove();}
                     creepMemory.flagName     = undefined;
@@ -160,8 +161,16 @@ const DoClosedJobs = {
                 case "FullLinks":
                 case "FullContainers":
                 case "StorageHasMinerals":
-                    let bestEnergyLocation = creep.room.storage;
-                    if(bestEnergyLocation === undefined){
+                    let bestEnergyLocation;
+                    if(creep.memory.storage){
+                        bestEnergyLocation = Game.getObjectById(creep.memory.storage);
+                    }else{
+                        bestEnergyLocation = creep.room.storage;
+                        if(bestEnergyLocation){
+                            creep.memory.storage = bestEnergyLocation.id;
+                        }
+                    }
+                    if(!bestEnergyLocation){
                         let roomWithStorageLinearDistance = Number.MAX_SAFE_INTEGER;
                         for (let roomCount in Game.rooms) {
                             const room = Game.rooms[roomCount];
@@ -169,8 +178,10 @@ const DoClosedJobs = {
                                 bestEnergyLocation = room.storage;
                                 roomWithStorageLinearDistance = Game.map.getRoomLinearDistance(room.name, creep.pos.roomName);
                                 console.log("found alternate storage " + bestEnergyLocation.pos.roomName);
-                                // TODO save this in creep memory
                             }
+                        }
+                        if(bestEnergyLocation !== undefined){
+                            creep.memory.storage = bestEnergyLocation.id;
                         }
                     }
                     if(bestEnergyLocation !== undefined && (closedJobName !== "StorageHasMinerals" || (creep.room.terminal !== undefined && _.sum(creep.room.terminal.store) < creep.room.terminal.storeCapacity))){
@@ -203,6 +214,7 @@ const DoClosedJobs = {
                                 jobStatus = 1;
                             }
                             if((actionResult === ERR_NOT_ENOUGH_RESOURCES || actionResult === ERR_INVALID_TARGET) && sumCreepCarry === 0){
+                                creep.memory.storage = undefined;
                                 jobStatus = 2;
                             }
                         }
@@ -222,11 +234,12 @@ const DoClosedJobs = {
                     if (creep.carry[RESOURCE_ENERGY] === 0) { // go get some energy!
                         const energyTargetID = creep.memory.energyTarget;
                         let energyTarget;
-                        if(energyTargetID === undefined || energyTargetID === null){
+                        if(energyTargetID){
+                            energyTarget = Game.getObjectById(energyTargetID);
+                        }
+                        if(!energyTargetID || !energyTarget){
                             energyTarget = ClosestEnergyFullStoreInRoom(creep);
                             creep.memory.energyTarget = energyTarget.id; // save so that the function only runs once
-                        }else{
-                            energyTarget = Game.getObjectById(energyTargetID);
                         }
                         actionResult = CreepAct(creep, closedJobName, 1, energyTarget); // get energy
                         if(actionResult === ERR_NOT_IN_RANGE){
