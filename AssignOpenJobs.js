@@ -542,7 +542,7 @@ const AssignOpenJobs = {
                 case "GuardPos":
                     switch (true) { // TODO optimize
                         case (energyAvailable >= 2200): // energyCapacityAvailable: 12900
-                            body = [TOUGH, TOUGH, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK];break;
+                            body = [TOUGH, TOUGH, TOUGH, TOUGH, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK];break;
                         case (energyAvailable >= 2050): // energyCapacityAvailable: 5600
                             body = [TOUGH, TOUGH, MOVE, MOVE, MOVE, MOVE, MOVE, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK];break;
                         case (energyAvailable >= 1800): // energyCapacityAvailable: 2300
