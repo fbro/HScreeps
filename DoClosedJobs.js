@@ -91,11 +91,12 @@ const DoClosedJobs = {
             }
             if(!isCreepGone){ // if creep is not gone but it is just the job that is done then cleanup the creep memory
                 creepMemory.jobName = "idle";
-                if(creepMemory.jobId        !== undefined){creepMemory.jobId        = undefined;}
-                if(creepMemory.energyTarget !== undefined){creepMemory.energyTarget = undefined;}
-                if(creepMemory.closestLink  !== undefined){creepMemory.closestLink  = undefined;}
-                if(creepMemory.storage      !== undefined){creepMemory.storage      = undefined;}
-                if(creepMemory.flagName     !== undefined){
+                if(creepMemory.jobId               !== undefined){creepMemory.jobId               = undefined;}
+                if(creepMemory.energyTarget        !== undefined){creepMemory.energyTarget        = undefined;}
+                if(creepMemory.closestLink         !== undefined){creepMemory.closestLink         = undefined;}
+                if(creepMemory.storage             !== undefined){creepMemory.storage             = undefined;}
+                if(creepMemory.resourceDestination !== undefined){creepMemory.resourceDestination = undefined;}
+                if(creepMemory.flagName            !== undefined){
                     if(Game.flags[creepMemory.flagName]){Game.flags[creepMemory.flagName].remove();}
                     creepMemory.flagName     = undefined;
                 }
@@ -108,7 +109,7 @@ const DoClosedJobs = {
          * @return {int}
          */
         function CreepActions(creep, closedJobName, closedJobOBJ){
-            let actionResult = -5;
+            let actionResult = ERR_NOT_FOUND;
             let jobStatus = 0;
             switch (closedJobName) {
                 case "ActiveSources": // these jobs extract resources
@@ -170,14 +171,14 @@ const DoClosedJobs = {
                             creep.memory.storage = bestEnergyLocation.id;
                         }
                     }
-                    if(!bestEnergyLocation){
+                    if(!bestEnergyLocation){ // search for storage in other rooms
                         let roomWithStorageLinearDistance = Number.MAX_SAFE_INTEGER;
                         for (let roomCount in Game.rooms) {
                             const room = Game.rooms[roomCount];
                             if(bestEnergyLocation === undefined && room.storage !== undefined || room.storage !== undefined &&  Game.map.getRoomLinearDistance(room.name, creep.pos.roomName) < roomWithStorageLinearDistance){
                                 bestEnergyLocation = room.storage;
                                 roomWithStorageLinearDistance = Game.map.getRoomLinearDistance(room.name, creep.pos.roomName);
-                                console.log("found alternate storage " + bestEnergyLocation.pos.roomName);
+                                console.log(creep.name + " found alternate storage in room " + bestEnergyLocation.pos.roomName);
                             }
                         }
                         if(bestEnergyLocation !== undefined){
@@ -219,7 +220,7 @@ const DoClosedJobs = {
                             }
                         }
                     }else{
-                        console.log("DoClosedJob, no storage in room: " + creep.room.name + " or terminal full/undefined, creep " + creep.name);
+                        console.log("DoClosedJob, no storage found or terminal full/undefined, creep " + creep.name);
                         jobStatus = 2;
                     }
                     break;
@@ -268,14 +269,30 @@ const DoClosedJobs = {
                 case "TagController":
                 case "ScoutPos":
                 case "ClaimController":
-                    if(closedJobOBJ.room !== undefined){
-                        actionResult = CreepAct(creep, closedJobName, 2, closedJobOBJ);
+                case "GuardPos":
+                    let isAttackingHostile = false;
+                    if(closedJobName === "GuardPos" && closedJobOBJ.pos.roomName === creep.pos.roomName){
+                        const targets = creep.room.find(FIND_HOSTILE_CREEPS);
+                        if(targets.length > 0){
+                            creep.say("ATTACK!", true);
+                            console.log("DoClosedJobs, " + creep.name + " is attacking " + targets[0].name + " in room " + creep.pos.roomName);
+                            actionResult = creep.attack(targets[0]);
+                            if(actionResult === ERR_NOT_IN_RANGE) {
+                                creep.moveTo(targets[0].pos, {visualizePathStyle:{fill: 'transparent',stroke: '#ff0000',lineStyle: 'dashed',strokeWidth: .15,opacity: .5}});
+                                jobStatus = 1;
+                            }
+                            isAttackingHostile = true;
+                        }
                     }
-                    if(closedJobOBJ.room === undefined || actionResult === ERR_NOT_IN_RANGE) {
-                        creep.moveTo(closedJobOBJ.pos, {visualizePathStyle:{fill: 'transparent',stroke: '#fd00ff',lineStyle: 'dashed',strokeWidth: .15,opacity: .5}});
-                        jobStatus = 1;
-                    }else if(closedJobName !== "ScoutPos"){
-                        jobStatus = 2;
+
+                    if(!isAttackingHostile){
+                        actionResult = CreepAct(creep, closedJobName, 2, closedJobOBJ);
+                        if(actionResult === ERR_NOT_IN_RANGE) {
+                            creep.moveTo(closedJobOBJ.pos, {visualizePathStyle:{fill: 'transparent',stroke: '#fd00ff',lineStyle: 'dashed',strokeWidth: .15,opacity: .5}});
+                            jobStatus = 1;
+                        }else if(closedJobName === "TagController" && closedJobName === "ClaimController") {
+                            jobStatus = 2;
+                        }
                     }
                     break;
                 default:
@@ -331,7 +348,7 @@ const DoClosedJobs = {
                     if(bestEnergyLocation === undefined && room.storage !== undefined || room.storage !== undefined &&  Game.map.getRoomLinearDistance(room.name, creep.pos.roomName) < roomWithStorageLinearDistance){
                         bestEnergyLocation = room.storage;
                         roomWithStorageLinearDistance = Game.map.getRoomLinearDistance(room.name, creep.pos.roomName);
-                        console.log("found alternate storage " + bestEnergyLocation.pos.roomName);
+                        console.log(creep.name + " found alternate storage in room " + bestEnergyLocation.pos.roomName);
                     }
                 }
             }
@@ -345,6 +362,7 @@ const DoClosedJobs = {
             // act: 2 - main action to complete the job
             switch (true) {
                 case closedJobName === "DroppedResources" && actId === 1:
+                case closedJobName === "FullLinks" && actId === 1:
                 case closedJobName === "FullContainers" && actId === 1:
                 case closedJobName === "StorageHasMinerals" && actId === 1:
                     for(const resourceType in creep.carry) {
@@ -354,7 +372,6 @@ const DoClosedJobs = {
                 case closedJobName === "DroppedResources" && actId === 2:
                     actionResult = creep.pickup(closedJobOBJ);
                     break;
-                case closedJobName === "FullLinks" && actId === 1:
                 case closedJobName === "SpawnsAndExtensionsNeedEnergy" && actId === 2:
                 case closedJobName === "TowersNeedEnergy" && actId === 2:
                 case closedJobName === "TerminalsNeedEnergy" && actId === 2:
@@ -396,19 +413,22 @@ const DoClosedJobs = {
                     actionResult = creep.repair(closedJobOBJ);
                     break;
                 case closedJobName === "TagController" && actId === 2:
-                    actionResult = creep.signController(closedJobOBJ.room.controller, closedJobOBJ.name);
+                    if(closedJobOBJ.room !== undefined){
+                        actionResult = creep.signController(closedJobOBJ.room.controller, closedJobOBJ.name);
+                    }else{actionResult = ERR_NOT_IN_RANGE;}
                     break;
                 case closedJobName === "ScoutPos" && actId === 2:
-                    if(creep.pos.x === closedJobOBJ.pos.x && creep.pos.y === closedJobOBJ.pos.y && creep.pos.roomName === closedJobOBJ.pos.roomName){
+                case closedJobName === "GuardPos" && actId === 2:
+                    if(creep.pos.roomName === closedJobOBJ.pos.roomName && creep.pos.x === closedJobOBJ.pos.x && creep.pos.y === closedJobOBJ.pos.y){
                         creep.say(closedJobOBJ.name, true);
                         actionResult = 0;
-                    }else{
-                        actionResult = creep.moveTo(closedJobOBJ.pos);
-                    }
+                    }else{actionResult = ERR_NOT_IN_RANGE;}
                     break;
                 case closedJobName === "ClaimController" && actId === 2:
                     creep.say("clm " + closedJobOBJ.pos.roomName, true);
-                    actionResult = creep.claimController(closedJobOBJ.room.controller);
+                    if(closedJobOBJ.room !== undefined){
+                        actionResult = creep.claimController(closedJobOBJ.room.controller);
+                    }else{actionResult = ERR_NOT_IN_RANGE;}
                     break;
                 default:
                     console.log("DoClosedJob, ERROR! ended in default in CreepAct! closedJobName: " + closedJobName + ", actId: " + actId + ", creepName: " + creep.name);

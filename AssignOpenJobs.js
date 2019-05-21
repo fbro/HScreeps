@@ -225,6 +225,11 @@ const AssignOpenJobs = {
                     creepInitials = "C";
                     maxCreepAtRoof = 1;
                     break;
+                // warrior
+                case "GuardPos":
+                    creepInitials = "W";
+                    maxCreepAtRoof = 1;
+                    break;
                 default:
                     console.log("AssignOpenJobs, ERROR! AtCreepRoof jobName not found: " + jobName);
             }
@@ -284,6 +289,8 @@ const AssignOpenJobs = {
                 case "ScoutPos": val = 0; break;
                 // claimer
                 case "ClaimController": val = 100; break;
+                // warrior
+                case "GuardPos": val = 10; break;
                 default:
                     console.log("AssignOpenJobs, ERROR! JobImportance jobName not found: " + jobName);
             }
@@ -312,7 +319,7 @@ const AssignOpenJobs = {
                 case "LabsNeedEnergy": numOfCreeps = 1; break;
                 case "OwnedControllers":
                     switch (RCL) {
-                        case 1: case 2: numOfCreeps = 1; break;
+                        case 1: case 2: numOfCreeps = 2; break;
                         case 3: case 4: case 5: numOfCreeps = 2; break;
                         case 6: case 7: numOfCreeps = 2; break;
                         case 8: numOfCreeps = 1; break;
@@ -323,6 +330,7 @@ const AssignOpenJobs = {
                 case "TagController": numOfCreeps = 1; break;
                 case "ScoutPos": numOfCreeps = 1; break;
                 case "ClaimController": numOfCreeps = 1; break;
+                case "GuardPos": numOfCreeps = 1; break;
                 default:
                     console.log("AssignOpenJobs, ERROR! NumberOfCreepsOnJob jobName not found: " + jobName);
             } return numOfCreeps;
@@ -420,6 +428,11 @@ const AssignOpenJobs = {
                         case "ClaimController": val = 1; break;
                         default: val = -1;
                     } break;
+                case "W": // warrior
+                    switch (jobName) {
+                        case "GuardPos": val = 2; break;
+                        default: val = -1;
+                    } break;
                 default:
                     val = -1;
                     console.log("AssignOpenJobs, ERROR! CreepOnJobPoints jobName or creepInitial not found: " + jobName + ", " + creepInitial);
@@ -515,15 +528,34 @@ const AssignOpenJobs = {
                 // [S] scout
                 case "TagController":
                 case "ScoutPos":
-                    body = [MOVE];
+                    body = [TOUGH, MOVE];
                     creepRole = "S";
                     break;
 
                 // [C] claimer
                 case "ClaimController":
-                    body = [MOVE, MOVE, CLAIM];
+                    body = [TOUGH, MOVE, MOVE, CLAIM];
                     creepRole = "C";
                     break;
+
+                // [W] warrior
+                case "GuardPos":
+                    switch (true) { // TODO optimize
+                        case (energyAvailable >= 2200): // energyCapacityAvailable: 12900
+                            body = [TOUGH, TOUGH, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK];break;
+                        case (energyAvailable >= 2050): // energyCapacityAvailable: 5600
+                            body = [TOUGH, TOUGH, MOVE, MOVE, MOVE, MOVE, MOVE, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK];break;
+                        case (energyAvailable >= 1800): // energyCapacityAvailable: 2300
+                            body = [TOUGH, TOUGH, MOVE, MOVE, MOVE, MOVE, MOVE, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK];break;
+                        case (energyAvailable >= 1300): // energyCapacityAvailable: 1800
+                            body = [TOUGH, TOUGH, MOVE, MOVE, MOVE, MOVE, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK];break;
+                        case (energyAvailable >= 800): // energyCapacityAvailable: 1300
+                            body = [TOUGH, TOUGH, MOVE, MOVE, MOVE, MOVE, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK];break;
+                        case (energyAvailable >= 300): // energyCapacityAvailable: 550
+                            body = [TOUGH, TOUGH, MOVE, MOVE, ATTACK, ATTACK];break;
+                        case (energyAvailable >= 200): // energyCapacityAvailable: 300
+                            body = [TOUGH, TOUGH, MOVE, MOVE, ATTACK];break;
+                    } creepRole = "W"; break;
                 default:
                     console.log("AssignOpenJobs, ERROR! SpawnLogic job.name not found: " + job.name);
             }

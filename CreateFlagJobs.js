@@ -5,10 +5,12 @@ const CreateFlagJobs = {
             let jobName;
             if(flag.color === COLOR_ORANGE && flag.secondaryColor === COLOR_ORANGE){ // scout tag
                 jobName = "TagController";
-            }else if(flag.color === COLOR_ORANGE && flag.secondaryColor === COLOR_YELLOW){ // scout tag
+            }else if(flag.color === COLOR_ORANGE && flag.secondaryColor === COLOR_YELLOW){ // scout at pos
                 jobName = "ScoutPos";
-            }else if(flag.color === COLOR_GREEN && flag.secondaryColor === COLOR_GREEN){ // claimer tag
+            }else if(flag.color === COLOR_GREEN && flag.secondaryColor === COLOR_GREEN){ // claimer claim
                 jobName = "ClaimController";
+            }else if(flag.color === COLOR_ORANGE && flag.secondaryColor === COLOR_RED){ // warrior at pos
+                jobName = "GuardPos";
             }
 
             if (jobName) { // flag found with appropriate colors
