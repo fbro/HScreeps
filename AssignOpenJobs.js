@@ -173,7 +173,7 @@ const AssignOpenJobs = {
         /**
          * @return {boolean}
          */
-        function AtCreepRoof(jobName, openJobOBJ, checkingIdleCreeps){
+        function AtCreepRoof(jobName, openJobOBJ, isAssigningIdleCreep){
             let creepInitials = "X";
             let maxCreepAtRoof = 0;
             switch (jobName) {
@@ -192,7 +192,7 @@ const AssignOpenJobs = {
                 case "StorageHasMinerals":
                 case "LabsNeedEnergy":
                     creepInitials = "T";
-                    if(checkingIdleCreeps){
+                    if(isAssigningIdleCreep){
                         maxCreepAtRoof = 3;
                     }else{
                         maxCreepAtRoof = 2;
@@ -203,10 +203,10 @@ const AssignOpenJobs = {
                 case "DamagedStructures":
                 case "Constructions":
                     creepInitials = "B";
-                    if(checkingIdleCreeps){
-                        maxCreepAtRoof = 3;
+                    if(isAssigningIdleCreep){
+                        maxCreepAtRoof = 4;
                     }else{
-                        maxCreepAtRoof = 2;
+                        maxCreepAtRoof = 3;
                     }
                     break;
                 // extractor
@@ -222,6 +222,7 @@ const AssignOpenJobs = {
                     break;
                 // claimer
                 case "ClaimController":
+                case "ReserveController":
                     creepInitials = "C";
                     maxCreepAtRoof = 1;
                     break;
@@ -238,7 +239,7 @@ const AssignOpenJobs = {
                 let creep = Game.creeps[creepName];
                 if(creep.name.startsWith(creepInitials)){
                     if(creep.memory.jobName === "idle"){
-                        if(!checkingIdleCreeps){
+                        if(!isAssigningIdleCreep){
                             creepCount++;
                         }
                     }else {
@@ -289,6 +290,7 @@ const AssignOpenJobs = {
                 case "ScoutPos": val = 0; break;
                 // claimer
                 case "ClaimController": val = 100; break;
+                case "ReserveController": val = 10; break;
                 // warrior
                 case "GuardPos": val = 10; break;
                 default:
@@ -330,6 +332,7 @@ const AssignOpenJobs = {
                 case "TagController": numOfCreeps = 1; break;
                 case "ScoutPos": numOfCreeps = 1; break;
                 case "ClaimController": numOfCreeps = 1; break;
+                case "ReserveController": numOfCreeps = 1; break;
                 case "GuardPos": numOfCreeps = 1; break;
                 default:
                     console.log("AssignOpenJobs, ERROR! NumberOfCreepsOnJob jobName not found: " + jobName);
@@ -426,6 +429,7 @@ const AssignOpenJobs = {
                 case "C": // claimer
                     switch (jobName) {
                         case "ClaimController": val = 1; break;
+                        case "ReserveController": val = 2; break;
                         default: val = -1;
                     } break;
                 case "W": // warrior
@@ -537,6 +541,23 @@ const AssignOpenJobs = {
                     body = [TOUGH, MOVE, MOVE, CLAIM];
                     creepRole = "C";
                     break;
+                case "ReserveController":
+                    switch (true) { // TODO optimize
+                        case (energyAvailable >= 3250): // energyCapacityAvailable: 12900
+                            body = [MOVE, MOVE, MOVE, MOVE, MOVE, CLAIM, CLAIM, CLAIM, CLAIM, CLAIM];break;
+                        case (energyAvailable >= 2050): // energyCapacityAvailable: 5600
+                            body = [MOVE, MOVE, MOVE, CLAIM, CLAIM, CLAIM];break;
+                        case (energyAvailable >= 1800): // energyCapacityAvailable: 2300
+                            body = [MOVE, MOVE, CLAIM, CLAIM];break;
+                        case (energyAvailable >= 1300): // energyCapacityAvailable: 1800
+                            body = [MOVE, MOVE, CLAIM, CLAIM];break;
+                        case (energyAvailable >= 800): // energyCapacityAvailable: 1300
+                            body = [MOVE, CLAIM];break;
+                        case (energyAvailable >= 300): // energyCapacityAvailable: 550
+                            body = [];break;
+                        case (energyAvailable >= 200): // energyCapacityAvailable: 300
+                            body = [];break;
+                    } creepRole = "C"; break;
 
                 // [W] warrior
                 case "GuardPos":

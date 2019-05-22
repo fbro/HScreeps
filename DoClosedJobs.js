@@ -269,6 +269,7 @@ const DoClosedJobs = {
                 case "TagController":
                 case "ScoutPos":
                 case "ClaimController":
+                case "ReserveController":
                 case "GuardPos":
                     let isAttackingHostile = false;
                     if(closedJobName === "GuardPos" && closedJobOBJ.pos.roomName === creep.pos.roomName){
@@ -428,6 +429,12 @@ const DoClosedJobs = {
                     creep.say("clm " + closedJobOBJ.pos.roomName, true);
                     if(closedJobOBJ.room !== undefined){
                         actionResult = creep.claimController(closedJobOBJ.room.controller);
+                    }else{actionResult = ERR_NOT_IN_RANGE;}
+                    break;
+                case closedJobName === "ReserveController" && actId === 2:
+                    creep.say("res " + closedJobOBJ.pos.roomName, true);
+                    if(closedJobOBJ.room !== undefined){
+                        actionResult = creep.reserveController(closedJobOBJ.room.controller);
                     }else{actionResult = ERR_NOT_IN_RANGE;}
                     break;
                 default:

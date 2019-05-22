@@ -5,10 +5,9 @@ monitor creeps stuck in loops
 
 TODO:
 
-
-
 pickup dropped resources on its path if possible
 place its stuff in nearby container if possible
+and if bypassing an empty spawn/extension and you carry energy
 
 all **idle** creeps should move to storage and place all its content in storage
     recycle creeps if there are many idle!

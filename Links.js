@@ -14,7 +14,7 @@ const Links = {
                     break;
                 }
             }
-            if(linkAtController === undefined && linkAtStorage === undefined && harvesterLinks.length === 0){ // room links not in memory, try and find them
+            if(!linkAtController && !linkAtStorage && harvesterLinks.length === 0){ // room links not in memory, try and find them
                 const links = room.find(FIND_MY_STRUCTURES, {
                     filter: (link) => {
                         return (link.structureType === STRUCTURE_LINK);}});
@@ -32,9 +32,11 @@ const Links = {
                 for(let i = 0; i < harvesterLinks.length; i++){
                     harvesterLinkIDs.push(harvesterLinks[i].id);
                 }
-                const linksInRoom = {'room': room.name, 'linkAtController': linkAtController.id, 'linkAtStorage': linkAtStorage.id, 'harvesterLinks': harvesterLinkIDs};
-                console.log("Links added to memory: " + JSON.stringify(linksInRoom));
-                Memory.links.push(linksInRoom);
+                if(linkAtController && linkAtStorage && harvesterLinks.length === 0 && harvesterLinks.length > 0){
+                    const linksInRoom = {'room': room.name, 'linkAtController': linkAtController.id, 'linkAtStorage': linkAtStorage.id, 'harvesterLinks': harvesterLinkIDs};
+                    console.log("Links added to memory: " + JSON.stringify(linksInRoom));
+                    Memory.links.push(linksInRoom);
+                }
             }
 
             //console.log("linkAtController " + JSON.stringify(linkAtController));

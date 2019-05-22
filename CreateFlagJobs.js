@@ -9,6 +9,8 @@ const CreateFlagJobs = {
                 jobName = "ScoutPos";
             }else if(flag.color === COLOR_GREEN && flag.secondaryColor === COLOR_GREEN){ // claimer claim
                 jobName = "ClaimController";
+            }else if(flag.color === COLOR_GREEN && flag.secondaryColor === COLOR_YELLOW){ // claimer reserve
+                jobName = "ReserveController";
             }else if(flag.color === COLOR_ORANGE && flag.secondaryColor === COLOR_RED){ // warrior at pos
                 jobName = "GuardPos";
             }
