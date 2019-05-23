@@ -3,8 +3,53 @@
   <component name="ChangeListManager">
     <list default="true" id="7b6f36cb-4298-4902-b6a2-ea3816b3b82c" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/AssignOpenJobs.js" beforeDir="false" afterPath="$PROJECT_DIR$/AssignOpenJobs.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.js" beforeDir="false" afterPath="$PROJECT_DIR$/main.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DoClosedJobs.js" beforeDir="false" afterPath="$PROJECT_DIR$/DoClosedJobs.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ScreepsAutocomplete-master/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ScreepsAutocomplete-master/Config/SublimeCodeIntel.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ScreepsAutocomplete-master/ConstructionSite.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ScreepsAutocomplete-master/Creep.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ScreepsAutocomplete-master/Flag.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ScreepsAutocomplete-master/Game.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ScreepsAutocomplete-master/Global/Constants.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ScreepsAutocomplete-master/Memory.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ScreepsAutocomplete-master/Mineral.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ScreepsAutocomplete-master/Nuke.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ScreepsAutocomplete-master/Order.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ScreepsAutocomplete-master/OwnedStructure.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ScreepsAutocomplete-master/PathFinder.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ScreepsAutocomplete-master/PowerCreep.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ScreepsAutocomplete-master/RawMemory.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ScreepsAutocomplete-master/Readme.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ScreepsAutocomplete-master/Resource.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ScreepsAutocomplete-master/Room.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ScreepsAutocomplete-master/RoomObject.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ScreepsAutocomplete-master/RoomPosition.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ScreepsAutocomplete-master/RoomVisual.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ScreepsAutocomplete-master/ScreepsAutocomplete-master.iml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ScreepsAutocomplete-master/Source.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ScreepsAutocomplete-master/Structure.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ScreepsAutocomplete-master/Structures/StructureContainer.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ScreepsAutocomplete-master/Structures/StructureController.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ScreepsAutocomplete-master/Structures/StructureExtension.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ScreepsAutocomplete-master/Structures/StructureExtractor.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ScreepsAutocomplete-master/Structures/StructureKeeperLair.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ScreepsAutocomplete-master/Structures/StructureLab.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ScreepsAutocomplete-master/Structures/StructureLink.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ScreepsAutocomplete-master/Structures/StructureNuker.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ScreepsAutocomplete-master/Structures/StructureObserver.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ScreepsAutocomplete-master/Structures/StructurePortal.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ScreepsAutocomplete-master/Structures/StructurePowerBank.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ScreepsAutocomplete-master/Structures/StructurePowerSpawn.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ScreepsAutocomplete-master/Structures/StructureRampart.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ScreepsAutocomplete-master/Structures/StructureRoad.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ScreepsAutocomplete-master/Structures/StructureSpawn.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ScreepsAutocomplete-master/Structures/StructureStorage.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ScreepsAutocomplete-master/Structures/StructureTerminal.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ScreepsAutocomplete-master/Structures/StructureTower.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ScreepsAutocomplete-master/Structures/StructureWall.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ScreepsAutocomplete-master/TODO.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ScreepsAutocomplete-master/Tombstone.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ScreepsAutocomplete-master/package.json" beforeDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -55,13 +100,13 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/DoClosedJobs.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-3550">
-              <caret line="96" column="97" lean-forward="true" selection-start-line="96" selection-start-column="97" selection-end-line="96" selection-end-column="97" />
+            <state relative-caret-position="567">
+              <caret line="90" column="42" selection-start-line="90" selection-start-column="42" selection-end-line="90" selection-end-column="42" />
               <folding>
-                <element signature="e#20523#24992#0" />
+                <element signature="e#22472#27575#0" />
               </folding>
             </state>
           </provider>
@@ -70,8 +115,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/AssignOpenJobs.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="2423">
-              <caret line="380" column="38" lean-forward="true" selection-start-line="380" selection-start-column="38" selection-end-line="380" selection-end-column="38" />
+            <state relative-caret-position="-2847">
+              <caret line="262" column="9" lean-forward="true" selection-start-line="262" selection-start-column="9" selection-end-line="262" selection-end-column="9" />
               <folding>
                 <element signature="e#29583#29901#0" />
               </folding>
@@ -83,16 +128,16 @@
         <entry file="file://$PROJECT_DIR$/CreateFlagJobs.js">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="221">
-              <caret line="13" column="13" lean-forward="true" selection-start-line="13" selection-start-column="13" selection-end-line="13" selection-end-column="13" />
+              <caret line="15" column="13" lean-forward="true" selection-start-line="15" selection-start-column="13" selection-end-line="15" selection-end-column="13" />
             </state>
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/notes.txt">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="238">
-              <caret line="14" lean-forward="true" selection-start-line="14" selection-end-line="14" />
+            <state relative-caret-position="221">
+              <caret line="13" lean-forward="true" selection-start-line="13" selection-end-line="13" />
             </state>
           </provider>
         </entry>
@@ -100,8 +145,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/QuickCommands.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state>
-              <caret selection-end-column="95" />
+            <state relative-caret-position="51">
+              <caret line="3" selection-start-line="3" selection-end-line="4" selection-end-column="45" />
             </state>
           </provider>
         </entry>
@@ -158,9 +203,9 @@
         <option value="$PROJECT_DIR$/CreateJobs.js" />
         <option value="$PROJECT_DIR$/notes.txt" />
         <option value="$PROJECT_DIR$/QuickCommands.js" />
-        <option value="$PROJECT_DIR$/DoClosedJobs.js" />
         <option value="$PROJECT_DIR$/main.js" />
         <option value="$PROJECT_DIR$/AssignOpenJobs.js" />
+        <option value="$PROJECT_DIR$/DoClosedJobs.js" />
       </list>
     </option>
   </component>
@@ -199,7 +244,7 @@
   <component name="PropertiesComponent">
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
-    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1558467021101" />
+    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1558642688538" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
@@ -238,7 +283,7 @@
       <workItem from="1557777766182" duration="8143000" />
       <workItem from="1557867032883" duration="8941000" />
       <workItem from="1558030607787" duration="9011000" />
-      <workItem from="1558091135771" duration="27241000" />
+      <workItem from="1558091135771" duration="33722000" />
     </task>
     <task id="LOCAL-00001" summary="HScreeps works with all the basics">
       <created>1556998844921</created>
@@ -373,11 +418,18 @@
       <option name="project" value="LOCAL" />
       <updated>1558387838296</updated>
     </task>
-    <option name="localTasksCounter" value="20" />
+    <task id="LOCAL-00020" summary="small fixes">
+      <created>1558467928086</created>
+      <option name="number" value="00020" />
+      <option name="presentableId" value="LOCAL-00020" />
+      <option name="project" value="LOCAL" />
+      <updated>1558467928086</updated>
+    </task>
+    <option name="localTasksCounter" value="21" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="135146000" />
+    <option name="totallyTimeSpent" value="141627000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -525,23 +577,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/QuickCommands.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state>
-          <caret selection-end-column="95" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/DoClosedJobs.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-3550">
-          <caret line="96" column="97" lean-forward="true" selection-start-line="96" selection-start-column="97" selection-end-line="96" selection-end-column="97" />
-          <folding>
-            <element signature="e#20523#24992#0" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/main.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="207">
@@ -552,14 +587,14 @@
     <entry file="file://$PROJECT_DIR$/CreateFlagJobs.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="221">
-          <caret line="13" column="13" lean-forward="true" selection-start-line="13" selection-start-column="13" selection-end-line="13" selection-end-column="13" />
+          <caret line="15" column="13" lean-forward="true" selection-start-line="15" selection-start-column="13" selection-end-line="15" selection-end-column="13" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/AssignOpenJobs.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2423">
-          <caret line="380" column="38" lean-forward="true" selection-start-line="380" selection-start-column="38" selection-end-line="380" selection-end-column="38" />
+        <state relative-caret-position="-2847">
+          <caret line="262" column="9" lean-forward="true" selection-start-line="262" selection-start-column="9" selection-end-line="262" selection-end-column="9" />
           <folding>
             <element signature="e#29583#29901#0" />
           </folding>
@@ -568,8 +603,25 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/notes.txt">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="238">
-          <caret line="14" lean-forward="true" selection-start-line="14" selection-end-line="14" />
+        <state relative-caret-position="221">
+          <caret line="13" lean-forward="true" selection-start-line="13" selection-end-line="13" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/QuickCommands.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="51">
+          <caret line="3" selection-start-line="3" selection-end-line="4" selection-end-column="45" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/DoClosedJobs.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="567">
+          <caret line="90" column="42" selection-start-line="90" selection-start-column="42" selection-end-line="90" selection-end-column="42" />
+          <folding>
+            <element signature="e#22472#27575#0" />
+          </folding>
         </state>
       </provider>
     </entry>

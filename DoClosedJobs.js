@@ -54,54 +54,61 @@ const DoClosedJobs = {
         // end job or remove creep on job, if closed job move to open jobs
         function UpdateJob(creepName, creepMemory, isCreepGone){
             let foundJob = false;
-            for(let i = 0; i < Memory.closedJobs.length; i++){ // search in closed jobs
+            for(let i = 0; i < Memory.closedJobs.length; i++){
                 if(Memory.closedJobs[i].name === creepMemory.jobName && Memory.closedJobs[i].id === creepMemory.jobId && Memory.closedJobs[i].flagName === creepMemory.flagName){
-                    if(isCreepGone){ // remove creep from job and move closedJob to openJobs
-                        for(let e = 0; e < Memory.closedJobs[i].creeps.length; e++){
+                    foundJob = true;
+                    for(let e = 0; e < Memory.closedJobs[i].creeps.length; e++){
+                        if(isCreepGone) { // remove creep from job
                             if(Memory.closedJobs[i].creeps[e] === creepName){
                                 Memory.closedJobs[i].creeps.splice(e, 1); // remove dead creep
                                 Memory.openJobs.push(Memory.closedJobs.splice(i, 1)[0]); // move closed job to open jobs
                                 break;
                             }
+                        }else{ // remove job, done or gone
+                            unassignCreep(Memory.creeps[Memory.closedJobs[i].creeps[e]]);
                         }
-                    }else{ // remove job, done or gone
-                        Memory.closedJobs.splice(i, 1);
                     }
-                    foundJob = true;
+                    if(!isCreepGone){
+                        Memory.closedJobs.splice(i, 1)
+                    }
                     break;
                 }
             }
             if(!foundJob){ // then search in open jobs
                 for(let i = 0; i < Memory.openJobs.length; i++){
                     if(Memory.openJobs[i].name === creepMemory.jobName && Memory.openJobs[i].id === creepMemory.jobId && Memory.openJobs[i].flagName === creepMemory.flagName){
-                        if(isCreepGone){ // remove creep from job
-                            for(let e = 0; e < Memory.openJobs[i].creeps.length; e++){
+                        for(let e = 0; e < Memory.openJobs[i].creeps.length; e++){
+                            if(isCreepGone) { // remove creep from job
                                 if(Memory.openJobs[i].creeps[e] === creepName){
                                     Memory.openJobs[i].creeps.splice(e, 1); // remove dead creep
                                     break;
                                 }
+                            }else{ // remove job, done or gone
+                                    unassignCreep(Memory.creeps[Memory.openJobs[i].creeps[e]]);
                             }
-                        }else{ // remove job, done or gone
-                            Memory.openJobs.splice(i, 1);
                         }
-                        foundJob = true;
+                        if(!isCreepGone){
+                            Memory.openJobs.splice(i, 1)
+                        }
                         break;
                     }
                 }
             }
-            if(!isCreepGone){ // if creep is not gone but it is just the job that is done then cleanup the creep memory
-                creepMemory.jobName = "idle";
-                if(creepMemory.jobId               !== undefined){creepMemory.jobId               = undefined;}
-                if(creepMemory.energyTarget        !== undefined){creepMemory.energyTarget        = undefined;}
-                if(creepMemory.closestLink         !== undefined){creepMemory.closestLink         = undefined;}
-                if(creepMemory.storage             !== undefined){creepMemory.storage             = undefined;}
-                if(creepMemory.resourceDestination !== undefined){creepMemory.resourceDestination = undefined;}
-                if(creepMemory.flagName            !== undefined){
-                    if(Game.flags[creepMemory.flagName]){Game.flags[creepMemory.flagName].remove();}
-                    creepMemory.flagName     = undefined;
-                }
-            }else{
+            if(isCreepGone){
                 delete Memory.creeps[creepName];
+            }
+        }
+
+        function unassignCreep(creepMemory) {
+            creepMemory.jobName = "idle";
+            if(creepMemory.jobId               !== undefined){creepMemory.jobId               = undefined;}
+            if(creepMemory.energyTarget        !== undefined){creepMemory.energyTarget        = undefined;}
+            if(creepMemory.closestLink         !== undefined){creepMemory.closestLink         = undefined;}
+            if(creepMemory.storage             !== undefined){creepMemory.storage             = undefined;}
+            if(creepMemory.resourceDestination !== undefined){creepMemory.resourceDestination = undefined;}
+            if(creepMemory.flagName            !== undefined){
+                if(Game.flags[creepMemory.flagName]){Game.flags[creepMemory.flagName].remove();}
+                creepMemory.flagName     = undefined;
             }
         }
 
@@ -215,7 +222,6 @@ const DoClosedJobs = {
                                 jobStatus = 1;
                             }
                             if((actionResult === ERR_NOT_ENOUGH_RESOURCES || actionResult === ERR_INVALID_TARGET) && sumCreepCarry === 0){
-                                creep.memory.storage = undefined;
                                 jobStatus = 2;
                             }
                         }
@@ -305,7 +311,10 @@ const DoClosedJobs = {
 
         // used by creep-transporters to see which store in the room where the creep is is most full of energy
         function ClosestEnergyFullStoreInRoom(creep){
-            let bestEnergyLocation = creep.room.storage;
+            let bestEnergyLocation;
+            if(creep.room.storage && creep.room.storage.store[RESOURCE_ENERGY] > 0){
+                bestEnergyLocation = creep.room.storage;
+            }
             let bestRange = Number.MAX_SAFE_INTEGER;
             const energyCandidates = [];
 
