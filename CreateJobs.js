@@ -1,12 +1,10 @@
 const CreateJobs = {
     run: function (room) {
-        let newJobsCounter = 0;
-        let existingOpenJobsCounter = 0;
         const RCL = room.controller.level;
         // new jobs
         const activeSources = room.find(FIND_SOURCES_ACTIVE).map(function (p) {
             new RoomVisual(p.room.name).text("🏭💼", p.pos.x, p.pos.y);
-            return {'name': 'ActiveSources', 'id': p.id, 'creeps': []};
+            return {'name': 'ActiveSources', 'id': p.id, 'pos': p.pos, 'creeps': []};
         });
 
         const droppedResources = room.find(FIND_DROPPED_RESOURCES, {
@@ -15,7 +13,7 @@ const CreateJobs = {
             }
         }).map(function (p) {
             new RoomVisual(p.room.name).text("💰💼", p.pos.x, p.pos.y);
-            return {'name': 'DroppedResources', 'id': p.id, 'creeps': []};
+            return {'name': 'DroppedResources', 'id': p.id, 'pos': p.pos, 'creeps': []};
         });
 
         const spawnsAndExtensionsNeedEnergy = room.find(FIND_MY_STRUCTURES, {
@@ -24,7 +22,7 @@ const CreateJobs = {
             }
         }).map(function (p) {
             new RoomVisual(p.room.name).text("⚡💼", p.pos.x, p.pos.y);
-            return {'name': 'SpawnsAndExtensionsNeedEnergy', 'id': p.id, 'creeps': []};
+            return {'name': 'SpawnsAndExtensionsNeedEnergy', 'id': p.id, 'pos': p.pos, 'creeps': []};
         });
 
         const towersNeedEnergy = room.find(FIND_MY_STRUCTURES, {
@@ -33,7 +31,7 @@ const CreateJobs = {
             }
         }).map(function (p) {
             new RoomVisual(p.room.name).text("🏰⚡💼", p.pos.x, p.pos.y);
-            return {'name': 'TowersNeedEnergy', 'id': p.id, 'creeps': []};
+            return {'name': 'TowersNeedEnergy', 'id': p.id, 'pos': p.pos, 'creeps': []};
         });
 
         const fullLinks = room.find(FIND_MY_STRUCTURES, { // only find the links that are adjacent to storage
@@ -42,7 +40,7 @@ const CreateJobs = {
             }
         }).map(function (p) {
             new RoomVisual(p.room.name).text("⚡💼", p.pos.x, p.pos.y);
-            return {'name': 'FullLinks', 'id': p.id, 'creeps': []};
+            return {'name': 'FullLinks', 'id': p.id, 'pos': p.pos, 'creeps': []};
         });
 
         const fullContainers = room.find(FIND_STRUCTURES, {
@@ -51,7 +49,7 @@ const CreateJobs = {
             }
         }).map(function (p) {
             new RoomVisual(p.room.name).text("⚡💼", p.pos.x, p.pos.y);
-            return {'name': 'FullContainers', 'id': p.id, 'creeps': []};
+            return {'name': 'FullContainers', 'id': p.id, 'pos': p.pos, 'creeps': []};
         });
 
         const damagedStructures = room.find(FIND_STRUCTURES, {
@@ -76,12 +74,12 @@ const CreateJobs = {
             }
         }).map(function (p) {
             new RoomVisual(p.room.name).text("🛠💼", p.pos.x, p.pos.y);
-            return {'name': 'DamagedStructures', 'id': p.id, 'creeps': []};
+            return {'name': 'DamagedStructures', 'id': p.id, 'pos': p.pos, 'creeps': []};
         });
 
         const constructions = room.find(FIND_CONSTRUCTION_SITES).map(function (p) {
             new RoomVisual(p.room.name).text("🏗💼", p.pos.x, p.pos.y);
-            return {'name': 'Constructions', 'id': p.id, 'creeps': []};
+            return {'name': 'Constructions', 'id': p.id, 'pos': p.pos, 'creeps': []};
         });
 
         const activeExtractors = room.find(FIND_MY_STRUCTURES, {
@@ -93,7 +91,7 @@ const CreateJobs = {
         if(activeExtractors.length > 0){
             activeMinerals.push(...activeExtractors[0].pos.findInRange(FIND_MINERALS, 0, {filter: (mineral) => { return (mineral.mineralAmount > 0); }}).map(function (p) {
                 new RoomVisual(p.room.name).text("💎💼", p.pos.x, p.pos.y);
-                return {'name': 'ActiveMinerals', 'id': p.id, 'creeps': []};
+                return {'name': 'ActiveMinerals', 'id': p.id, 'pos': p.pos, 'creeps': []};
             }));
         }
 
@@ -103,11 +101,8 @@ const CreateJobs = {
             }
         }).map(function (p) {
             new RoomVisual(p.room.name).text("⚡💼", p.pos.x, p.pos.y);
-            return {'name': 'LabsNeedEnergy', 'id': p.id, 'creeps': []};
+            return {'name': 'LabsNeedEnergy', 'id': p.id, 'pos': p.pos, 'creeps': []};
         });
-
-
-        // TODO there are other jobs to create - protector jobs
 
         let newJobs = [];
         newJobs.push(...activeSources);
@@ -122,41 +117,43 @@ const CreateJobs = {
         newJobs.push(...labsNeedEnergy);
 
         new RoomVisual(room.name).text("🔩💼", room.controller.pos.x, room.controller.pos.y);
-        newJobs.push({'name': 'OwnedControllers', 'id': room.controller.id, 'creeps': []});
+        newJobs.push({'name': 'OwnedControllers', 'id': room.controller.id, 'room': room.name, 'creeps': []});
         if(room.storage !== undefined && room.terminal !== undefined && _.sum(room.terminal.store) < room.terminal.storeCapacity){
             if(room.terminal.store[RESOURCE_ENERGY] < 50000 && room.storage.store[RESOURCE_ENERGY] >= 50000){
                 new RoomVisual(room.name).text("⚡💼", room.terminal.pos.x, room.terminal.pos.y);
-                newJobs.push({'name': 'TerminalsNeedEnergy', 'id': room.terminal.id, 'creeps': []})
+                newJobs.push({'name': 'TerminalsNeedEnergy', 'id': room.terminal.id, 'room': room.name, 'creeps': []})
             }else if(room.terminal.store[RESOURCE_ENERGY] >= 50000){
                 for (const resourceType in room.storage.store) {
                     if(room.storage.store[resourceType] > 0){
                         new RoomVisual(room.name).text("💎💼", room.storage.pos.x, room.storage.pos.y);
-                        newJobs.push({'name': 'StorageHasMinerals', 'id': room.storage.id, 'creeps': []});
+                        newJobs.push({'name': 'StorageHasMinerals', 'id': room.storage.id, 'room': room.name, 'creeps': []});
                         break;
                     }
                 }
             }
         }
 
-
         const closedJobs = Memory.closedJobs;
         const openJobs = Memory.openJobs;
+        let newJobsCounter = 0;
+        let existingOpenJobsCounter = 0;
+        let existingClosedJobsCounter = 0;
 
         // loop through all new jobs
-        for (const newJobCount in newJobs) {
+        for (const newJobCount in newJobs) { // loop through all new jobs
             const newJob = newJobs[newJobCount];
             let isClosedJobFound = false;
-            let foundExistingOpenJob = undefined;
+            let foundExistingOpenJob;
 
             for (const closedJobsCount in closedJobs) { // first look through the closed jobs
                 const closedJob = closedJobs[closedJobsCount];
                 if (closedJob !== undefined && closedJob.id === newJob.id) {
-                    isClosedJobFound = true;
+                    isClosedJobFound = true; // closed job found - break and end
                     break;
                 }
             }
-            if (!isClosedJobFound) {
-                for (const openJobsCount in openJobs) { // if not in closed jobs then look in open jobs
+            if (!isClosedJobFound) { // was not in closed jobs - maybe in open jobs?
+                for (const openJobsCount in openJobs) { // look in open jobs
                     const openJob = openJobs[openJobsCount];
                     if (openJob !== undefined) {
                         if (openJob.id === newJob.id) {
@@ -170,12 +167,14 @@ const CreateJobs = {
             if (foundExistingOpenJob !== undefined) {
                 existingOpenJobsCounter++;
             } else
-            if (!isClosedJobFound) { // new job found - now it is created
+            if (!isClosedJobFound) { // new job found was not in either closed or open jobs - now save it in memory
                 Memory.openJobs.push(newJob);
                 newJobsCounter++;
+            }else{
+                existingClosedJobsCounter++;
             }
         }
-        console.log("CreateJobs " + room.name + ", new: " + newJobsCounter + ", existing: " + existingOpenJobsCounter);
+        console.log("CreateJobs " + room.name + ", new: " + newJobsCounter + ", open: " + existingOpenJobsCounter + ", closed: " + existingClosedJobsCounter);
     }
 };
 module.exports = CreateJobs;

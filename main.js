@@ -1,8 +1,8 @@
 let Towers = require('Towers');
 let CreateJobs = require('CreateJobs');
 let CreateFlagJobs = require('CreateFlagJobs');
-let AssignOpenJobs = require('AssignOpenJobs');
-let DoClosedJobs = require('DoClosedJobs');
+let AssignJobs = require('AssignJobs');
+let DoJobs = require('DoJobs');
 let Links = require('Links');
 let Terminals = require('Terminals');
 let Constructions = require('Constructions');
@@ -18,9 +18,8 @@ module.exports.loop = function () {
         Memory.links = [];
     }
     Towers.run();
-    let modCounter = 0;
-    for (let roomCount in Game.rooms) {
-        if (Game.time % 20 === modCounter) {
+    if (Game.time % 30 === 0) {
+        for (let roomCount in Game.rooms) {
             let room = Game.rooms[roomCount];
             if (room.controller !== undefined && room.controller.my) {
                 CreateJobs.run(room);
@@ -30,15 +29,12 @@ module.exports.loop = function () {
                 }
             }
         }
-        modCounter = (modCounter + 1) % 20;
-    }
-    if (Game.time % 3 === 0) {
-        AssignOpenJobs.run();
-    }
-    if (Game.time % 100 === 0) {
         CreateFlagJobs.run();
         Constructions.run(); // TODO
+    }else{
+        if (Game.time % 3 === 0) {
+            AssignJobs.run();
+        }
     }
-    DoClosedJobs.run();
-
+    DoJobs.run();
 };

@@ -16,7 +16,8 @@ const Terminals = {
                 orders.push(...Game.market.getAllOrders(order => order.resourceType === resourceType
                     && order.type === ORDER_BUY
                     && Game.market.calcTransactionCost(MIN_RESOURCE_AMOUNT, room.name, order.roomName) <= MAX_TRANSFER_ENERGY_COST
-                    && ((order.price >= MIN_PRICE_U && resourceType === RESOURCE_UTRIUM)
+                    && (
+                       (order.price >= MIN_PRICE_U && resourceType === RESOURCE_UTRIUM)
                     || (order.price >= MIN_PRICE_GO && resourceType === RESOURCE_GHODIUM_OXIDE)
                     || (order.price >= MIN_PRICE_UH && resourceType === RESOURCE_UTRIUM_HYDRIDE)
                     || (order.price >= MIN_PRICE_KO && resourceType === RESOURCE_KEANIUM_OXIDE)
