@@ -184,6 +184,7 @@ const DoJobs = {
                 case "FullLinks":
                 case "FullContainers":
                 case "StorageHasMinerals":
+                    // TODO something is off here - maybe remake it
                     let bestResDropoff;
                     if(creep.memory.storage){
                         bestResDropoff = Game.getObjectById(creep.memory.storage);
@@ -231,7 +232,7 @@ const DoJobs = {
                             }
                         } else {
                             if(creep.memory.resourceDestination){creep.memory.resourceDestination = undefined;} // reset
-                            if(creep.memory.storage){creep.memory.storage = undefined;} // reset
+                            if(creep.memory.storage){creep.memory.storage = undefined;console.log("removed " + creep.name);} // reset
                             actionResult = CreepAct(creep, closedJobName, 2, closedJobOBJ); // obtaining the stuff that should be moved around
                             if(actionResult === ERR_NOT_IN_RANGE){
                                 creep.moveTo(closedJobOBJ, {visualizePathStyle:{fill: 'transparent',stroke: '#0000ff',lineStyle: 'dashed',strokeWidth: .15,opacity: .1}});
