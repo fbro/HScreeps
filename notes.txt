@@ -14,6 +14,5 @@ and if bypassing an empty spawn/extension and you carry energy
 all **idle** creeps should move to storage and place all its content in storage
     recycle creeps if there are many idle!
 
-TODO: job now has pos - OBJ is not needed in many places. starting at assignJobs
 
 https://stardew.info/planner/terrible-robin-77/

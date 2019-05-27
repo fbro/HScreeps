@@ -34,9 +34,7 @@ const Terminals = {
                 const dealResult = Game.market.deal(order.id, order.amount, room.name);
                 if(dealResult === 0){
                     console.log("Terminals, deal success " + order.resourceType + ", " + order.amount + ", room: " + order.roomName);
-                    if(Memory.buyOrdersHistory === undefined){
-                        Memory.buyOrdersHistory = [];
-                    }
+                    if(!Memory.buyOrdersHistory){Memory.buyOrdersHistory = [];}
                     Memory.buyOrdersHistory.push({order: order, 'energyUsed': transferEnergyRealCost, 'fromRoom': room.name});
                 }else{
                     console.log("Terminals, ERROR deal failed " + order.resourceType + ", " + order.amount + ", room: " + order.roomName);

@@ -8,23 +8,17 @@ const AssignJobs = {
         const ALLOWED_COMPATIBILITY = 9; // do not assign the job to a creep that is not compatible
 
         /*creep types:
-        * [T] transporter   no work
-        * [H] harvester     only one carry
-        * [B] builder       equal work and carry
-        * [E] extractor     only one carry and maxed out work
+        * [T] transporter       no WORK
+        * [H] harvester         only one CARRY
+        * [B] builder           equal WORK and CARRY
+        * [E] extractor         only one CARRY and maxed out WORK
+        * [W] warrior           ATTACK and MOVE
+        * [S] scout             just a MOVE
+        * [C] claimer           CLAIM - many CLAIM when reserving
         * TODO not in first version
-        * [W] warrior
-        * [M] medic
-        * [S] scout
-        * [C] claimer
-        * [R] rangedHarvester
-        *
-        * TODO not in first version
-        * HC  -  -  -  -  HostileCreeps
-        * --  -  -  -  -  RemoteControllersToClaim
-        * --  -  -  -  -  RemoteRoomsToScout
-        * --  -  -  -  -  RemoteActiveSources
-        * --  -  -  -  -  RemoteRallyPoints
+        * [G] gunner            RANGED_ATTACK and MOVE
+        * [M] medic             HEAL
+        * [D] distantHarvester  equal WORK and CARRY
         */
         let isAllAssigned = false; // loop until all openJobs or idleCreeps is empty or not applicable
         while (!isAllAssigned) {
@@ -39,12 +33,7 @@ const AssignJobs = {
             let bestPositionWeight = Number.MAX_SAFE_INTEGER;
             for (let i = 0; i < Memory.openJobs.length; i++) { // loop through all open jobs
                 const openJob = Memory.openJobs[i];
-                if(!Game.getObjectById(openJob.id)){
-                    const splicedJob = Memory.openJobs.splice(i, 1)[0];
-                    console.log("AssignOpenJobs, " + JSON.stringify(splicedJob) + " is not found, removing job: " + JSON.stringify(openJob) + ", in idle section");
-                    i--;
-                    continue;
-                }else if(!AtCreepRoof(openJob.name, openJob, true)){
+                if(!AtCreepRoof(openJob.name, openJob, true)){
                     for (let e = 0; e < idleCreeps.length; e++) { // loop through all idle creeps
                         const creep = idleCreeps[e];
                         let weight = CreepOnJobPoints(creep.name.substring(0, 1), openJob.name);
@@ -107,11 +96,7 @@ const AssignJobs = {
 
             for (let i = 0; i < Memory.openJobs.length; i++) { // loop through all open jobs
                 const openJob = Memory.openJobs[i];
-                if(!Game.getObjectById(openJob.id)){
-                    const splicedJob = Memory.openJobs.splice(i, 1)[0];
-                    console.log("AssignOpenJobs, " + JSON.stringify(splicedJob) + " is not found, removing job: " + JSON.stringify(openJob) + ", in spawn section");
-                    i--;
-                }else if(!AtCreepRoof(openJob.name, openJob, false)){
+                if(!AtCreepRoof(openJob.name, openJob, false)){
                     for (let e = 0; e < availableSpawns.length; e++) {
                         const spawn = availableSpawns[e];
                         let weight = -spawn.room.energyAvailable;
@@ -166,7 +151,7 @@ const AssignJobs = {
                 // harvester
                 case "ActiveSources":
                     creepInitials = "H";
-                        maxCreepAtRoof = 2;
+                    maxCreepAtRoof = 2;
                     break;
                 // transporter
                 case "DroppedResources":
@@ -242,7 +227,6 @@ const AssignJobs = {
             }
             let isAtCreepRoof = true;
             if(creepCount < maxCreepAtRoof){
-                //console.log("WHY? " + jobName + " " + creepInitials + " " + maxCreepAtRoof + " creepCount " + creepCount + " room " + openJob.pos.roomName);
                 isAtCreepRoof = false;
             }
             return isAtCreepRoof;
@@ -510,9 +494,9 @@ const AssignJobs = {
                         case (energyAvailable >= 800): // energyCapacityAvailable: 1300
                             body = [WORK, WORK, WORK, WORK, WORK, WORK, CARRY, MOVE, MOVE, MOVE];break;
                         case (energyAvailable >= 300): // energyCapacityAvailable: 550
-                            body = [WORK, WORK, CARRY, MOVE];break;
+                            body = [];break;
                         case (energyAvailable >= 200): // energyCapacityAvailable: 300
-                            body = [WORK, CARRY, MOVE];break;
+                            body = [];break;
                     } creepRole = "E"; break;
 
                 // [S] scout
@@ -524,11 +508,24 @@ const AssignJobs = {
 
                 // [C] claimer
                 case "ClaimController":
-                    body = [TOUGH, MOVE, MOVE, CLAIM];
-                    creepRole = "C";
-                    break;
+                    switch (true) {
+                        case (energyAvailable >= 3250): // energyCapacityAvailable: 12900
+                            body = [TOUGH, TOUGH, TOUGH, MOVE, MOVE, MOVE, MOVE, CLAIM];break;
+                        case (energyAvailable >= 2050): // energyCapacityAvailable: 5600
+                            body = [TOUGH, TOUGH, MOVE, MOVE, MOVE, CLAIM];break;
+                        case (energyAvailable >= 1800): // energyCapacityAvailable: 2300
+                            body = [TOUGH, MOVE, MOVE, CLAIM];break;
+                        case (energyAvailable >= 1300): // energyCapacityAvailable: 1800
+                            body = [TOUGH, MOVE, MOVE, CLAIM];break;
+                        case (energyAvailable >= 800): // energyCapacityAvailable: 1300
+                            body = [TOUGH, MOVE, MOVE, CLAIM];break;
+                        case (energyAvailable >= 300): // energyCapacityAvailable: 550
+                            body = [];break;
+                        case (energyAvailable >= 200): // energyCapacityAvailable: 300
+                            body = [];break;
+                    } creepRole = "C"; break;
                 case "ReserveController":
-                    switch (true) { // TODO optimize
+                    switch (true) {
                         case (energyAvailable >= 3250): // energyCapacityAvailable: 12900
                             body = [MOVE, MOVE, MOVE, MOVE, MOVE, CLAIM, CLAIM, CLAIM, CLAIM, CLAIM];break;
                         case (energyAvailable >= 2050): // energyCapacityAvailable: 5600
@@ -549,34 +546,37 @@ const AssignJobs = {
                 case "GuardPos":
                     switch (true) { // TODO optimize
                         case (energyAvailable >= 2200): // energyCapacityAvailable: 12900
-                            body = [TOUGH, TOUGH, TOUGH, TOUGH, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK];break;
+                            body = [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK];break;
                         case (energyAvailable >= 2050): // energyCapacityAvailable: 5600
-                            body = [TOUGH, TOUGH, MOVE, MOVE, MOVE, MOVE, MOVE, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK];break;
+                            body = [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK];break;
                         case (energyAvailable >= 1800): // energyCapacityAvailable: 2300
-                            body = [TOUGH, TOUGH, MOVE, MOVE, MOVE, MOVE, MOVE, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK];break;
+                            body = [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK];break;
                         case (energyAvailable >= 1300): // energyCapacityAvailable: 1800
-                            body = [TOUGH, TOUGH, MOVE, MOVE, MOVE, MOVE, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK];break;
+                            body = [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK];break;
                         case (energyAvailable >= 800): // energyCapacityAvailable: 1300
-                            body = [TOUGH, TOUGH, MOVE, MOVE, MOVE, MOVE, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK];break;
+                            body = [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK];break;
                         case (energyAvailable >= 300): // energyCapacityAvailable: 550
-                            body = [TOUGH, TOUGH, MOVE, MOVE, ATTACK, ATTACK];break;
+                            body = [MOVE, MOVE, ATTACK, ATTACK];break;
                         case (energyAvailable >= 200): // energyCapacityAvailable: 300
-                            body = [TOUGH, TOUGH, MOVE, MOVE, ATTACK];break;
+                            body = [TOUGH, MOVE, MOVE, ATTACK];break;
                     } creepRole = "W"; break;
                 default:
                     console.log("AssignOpenJobs, ERROR! SpawnLogic job.name not found: " + job.name);
             }
-            if(creepRole !== undefined){
+            if(creepRole && body.length > 0){
                 const availableName = getAvailableName(creepRole);
                 let spawnResult = spawn.spawnCreep(body, availableName);
                 if(spawnResult !== OK){
-                    console.log("AssignOpenJobs, SpawnLogic error, spawnResult: " + spawnResult + ", availableName: " + availableName + ", jobName: " + job.name);
+                    console.log("AssignOpenJobs, SpawnLogic error, spawnResult: " + spawnResult + ", availableName: " + availableName + ", jobName: " + job.name + ", body: " + JSON.stringify(body));
                     return undefined;
                 }else{
                     return Game.creeps[availableName];
                 }
-            }else{
+            }else if(body.length > 0){
                 console.log("AssignOpenJobs, ERROR! SpawnLogic, creepRole is not found: " + creepRole + ", " + spawn + ", " + job.name + ", " + energyAvailable);
+                return undefined;
+            }else{
+                console.log("AssignOpenJobs, not enough energy to spawn! creepRole: " + creepRole + ", " + spawn + ", " + job.name + ", " + energyAvailable);
                 return undefined;
             }
         }

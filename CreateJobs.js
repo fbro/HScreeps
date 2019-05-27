@@ -117,16 +117,16 @@ const CreateJobs = {
         newJobs.push(...labsNeedEnergy);
 
         new RoomVisual(room.name).text("🔩💼", room.controller.pos.x, room.controller.pos.y);
-        newJobs.push({'name': 'OwnedControllers', 'id': room.controller.id, 'room': room.name, 'creeps': []});
+        newJobs.push({'name': 'OwnedControllers', 'id': room.controller.id, 'pos': room.controller.pos, 'creeps': []});
         if(room.storage !== undefined && room.terminal !== undefined && _.sum(room.terminal.store) < room.terminal.storeCapacity){
             if(room.terminal.store[RESOURCE_ENERGY] < 50000 && room.storage.store[RESOURCE_ENERGY] >= 50000){
                 new RoomVisual(room.name).text("⚡💼", room.terminal.pos.x, room.terminal.pos.y);
-                newJobs.push({'name': 'TerminalsNeedEnergy', 'id': room.terminal.id, 'room': room.name, 'creeps': []})
+                newJobs.push({'name': 'TerminalsNeedEnergy', 'id': room.terminal.id, 'pos': room.terminal.pos, 'creeps': []})
             }else if(room.terminal.store[RESOURCE_ENERGY] >= 50000){
                 for (const resourceType in room.storage.store) {
                     if(room.storage.store[resourceType] > 0){
                         new RoomVisual(room.name).text("💎💼", room.storage.pos.x, room.storage.pos.y);
-                        newJobs.push({'name': 'StorageHasMinerals', 'id': room.storage.id, 'room': room.name, 'creeps': []});
+                        newJobs.push({'name': 'StorageHasMinerals', 'id': room.storage.id, 'pos': room.storage.pos, 'creeps': []});
                         break;
                     }
                 }
@@ -147,7 +147,7 @@ const CreateJobs = {
 
             for (const closedJobsCount in closedJobs) { // first look through the closed jobs
                 const closedJob = closedJobs[closedJobsCount];
-                if (closedJob !== undefined && closedJob.id === newJob.id) {
+                if (closedJob && closedJob.id === newJob.id) {
                     isClosedJobFound = true; // closed job found - break and end
                     break;
                 }
@@ -155,7 +155,7 @@ const CreateJobs = {
             if (!isClosedJobFound) { // was not in closed jobs - maybe in open jobs?
                 for (const openJobsCount in openJobs) { // look in open jobs
                     const openJob = openJobs[openJobsCount];
-                    if (openJob !== undefined) {
+                    if (openJob) {
                         if (openJob.id === newJob.id) {
                             foundExistingOpenJob = openJob;
                             break;
@@ -164,10 +164,9 @@ const CreateJobs = {
                 }
             }
 
-            if (foundExistingOpenJob !== undefined) {
+            if (foundExistingOpenJob) {
                 existingOpenJobsCounter++;
-            } else
-            if (!isClosedJobFound) { // new job found was not in either closed or open jobs - now save it in memory
+            } else if (!isClosedJobFound) { // new job found was not in either closed or open jobs - now save it in memory
                 Memory.openJobs.push(newJob);
                 newJobsCounter++;
             }else{
