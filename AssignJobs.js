@@ -73,7 +73,7 @@ const AssignJobs = {
                     Memory.closedJobs.push(bestOpenJob);
                 }
                 bestCreep.say("new💼" + bestOpenJob.pos.x + "," + bestOpenJob.pos.y);
-                console.log("AssignOpenJobs, job: " + bestOpenJob.name + " (" + bestOpenJob.pos.x + ", " + bestOpenJob.pos.y + ", " + bestOpenJob.pos.roomName + "), assigned to creep: " + bestCreep.name);
+                console.log("AssignJobs,job: " + bestOpenJob.name + " (" + bestOpenJob.pos.x + ", " + bestOpenJob.pos.y + ", " + bestOpenJob.pos.roomName + "), assigned to creep: " + bestCreep.name);
             }
             else { // done
                 isAllAssigned = true;
@@ -119,9 +119,9 @@ const AssignJobs = {
             }
             if (bestSpawn) { // best spawn found - spawning creep
                 const spawningCreep = SpawnLogic(bestSpawn, bestOpenJob, bestSpawn.room.energyAvailable); // spawn
-                console.log("AssignOpenJobs, spawn: " + spawningCreep.name + ", " + bestSpawn.name + ", bestOpenJob: " + JSON.stringify(bestOpenJob) + ", energy available: " + bestSpawn.room.energyAvailable);
+                console.log("AssignJobs,spawn: " + spawningCreep.name + ", " + bestSpawn.name + ", bestOpenJob: " + JSON.stringify(bestOpenJob) + ", energy available: " + bestSpawn.room.energyAvailable);
                 if (!spawningCreep) {
-                    console.log("AssignOpenJobs, ERROR spawningCreep failed, job: " + bestOpenJob.name + " (" + bestOpenJob.pos.x + ", " + bestOpenJob.pos.y + ", " + bestOpenJob.pos.roomName + "), from spawn: " + bestSpawn.name);
+                    console.log("AssignJobs,ERROR spawningCreep failed, job: " + bestOpenJob.name + " (" + bestOpenJob.pos.x + ", " + bestOpenJob.pos.y + ", " + bestOpenJob.pos.roomName + "), from spawn: " + bestSpawn.name);
                 } else {
                     bestOpenJob.creeps.push(spawningCreep.name);
                     spawningCreep.memory.jobName = bestOpenJob.name;
@@ -137,7 +137,7 @@ const AssignJobs = {
                         Memory.closedJobs.push(bestOpenJob);
                         availableSpawns.splice(bestSpawnPlacement, 1);
                     }
-                    console.log("AssignOpenJobs, spawn: job: " + bestOpenJob.name + " (" + bestOpenJob.pos.x + ", " + bestOpenJob.pos.y + ", " + bestOpenJob.pos.roomName + "), assigned to creep: " + spawningCreep.name  + ", from spawn: " + bestSpawn.name);
+                    console.log("AssignJobs,spawn: job: " + bestOpenJob.name + " (" + bestOpenJob.pos.x + ", " + bestOpenJob.pos.y + ", " + bestOpenJob.pos.roomName + "), assigned to creep: " + spawningCreep.name  + ", from spawn: " + bestSpawn.name);
                 }
             }
         }
@@ -203,7 +203,7 @@ const AssignJobs = {
                     maxCreepAtRoof = 1;
                     break;
                 default:
-                    console.log("AssignOpenJobs, ERROR! AtCreepRoof jobName not found: " + jobName);
+                    console.log("AssignJobs,ERROR! AtCreepRoof jobName not found: " + jobName);
             }
             let creepCount = 0;
             for (const creepName in Game.creeps) {
@@ -264,7 +264,7 @@ const AssignJobs = {
                 // warrior
                 case "GuardPos": val = 10; break;
                 default:
-                    console.log("AssignOpenJobs, ERROR! JobImportance jobName not found: " + jobName);
+                    console.log("AssignJobs,ERROR! JobImportance jobName not found: " + jobName);
             }
             return val;
         }
@@ -305,7 +305,7 @@ const AssignJobs = {
                 case "ReserveController": numOfCreeps = 1; break;
                 case "GuardPos": numOfCreeps = 1; break;
                 default:
-                    console.log("AssignOpenJobs, ERROR! NumberOfCreepsOnJob jobName not found: " + jobName);
+                    console.log("AssignJobs,ERROR! NumberOfCreepsOnJob jobName not found: " + jobName);
             } return numOfCreeps;
         }
 
@@ -409,7 +409,7 @@ const AssignJobs = {
                     } break;
                 default:
                     val = -1;
-                    console.log("AssignOpenJobs, ERROR! CreepOnJobPoints jobName or creepInitial not found: " + jobName + ", " + creepInitial);
+                    console.log("AssignJobs,ERROR! CreepOnJobPoints jobName or creepInitial not found: " + jobName + ", " + creepInitial);
             } return val;
         }
 
@@ -561,22 +561,22 @@ const AssignJobs = {
                             body = [TOUGH, MOVE, MOVE, ATTACK];break;
                     } creepRole = "W"; break;
                 default:
-                    console.log("AssignOpenJobs, ERROR! SpawnLogic job.name not found: " + job.name);
+                    console.log("AssignJobs,ERROR! SpawnLogic job.name not found: " + job.name);
             }
             if(creepRole && body.length > 0){
                 const availableName = getAvailableName(creepRole);
                 let spawnResult = spawn.spawnCreep(body, availableName);
                 if(spawnResult !== OK){
-                    console.log("AssignOpenJobs, SpawnLogic error, spawnResult: " + spawnResult + ", availableName: " + availableName + ", jobName: " + job.name + ", body: " + JSON.stringify(body));
+                    console.log("AssignJobs,SpawnLogic error, spawnResult: " + spawnResult + ", availableName: " + availableName + ", jobName: " + job.name + ", body: " + JSON.stringify(body));
                     return undefined;
                 }else{
                     return Game.creeps[availableName];
                 }
             }else if(body.length > 0){
-                console.log("AssignOpenJobs, ERROR! SpawnLogic, creepRole is not found: " + creepRole + ", " + spawn + ", " + job.name + ", " + energyAvailable);
+                console.log("AssignJobs,ERROR! SpawnLogic, creepRole is not found: " + creepRole + ", " + spawn + ", " + job.name + ", " + energyAvailable);
                 return undefined;
             }else{
-                console.log("AssignOpenJobs, not enough energy to spawn! creepRole: " + creepRole + ", " + spawn + ", " + job.name + ", " + energyAvailable);
+                console.log("AssignJobs,not enough energy to spawn! creepRole: " + creepRole + ", " + spawn + ", " + job.name + ", " + energyAvailable);
                 return undefined;
             }
         }

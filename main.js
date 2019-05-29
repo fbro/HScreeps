@@ -8,8 +8,16 @@ let Terminals = require('Terminals');
 let Constructions = require('Constructions');
 
 module.exports.loop = function () {
+
+    if(!Memory.openJobs){
+        Memory.openJobs = [];
+        Memory.closedJobs = [];
+        Memory.links = [];
+        Memory.buyOrdersHistory = [];
+    }
+
     Towers.run();
-    if (Game.time % 31 === 0) {
+    if (Game.time % 30 === 0) { // tick burst from https://docs.screeps.com/cpu-limit.html#Bucket
         for (let roomCount in Game.rooms) {
             let room = Game.rooms[roomCount];
             if (room.controller && room.controller.my) {
@@ -20,19 +28,11 @@ module.exports.loop = function () {
                 }
             }
         }
-    }else if (Game.time % 7 === 0){
-        AssignJobs.run();
-    }else if(Game.time % 47 === 0){
         CreateFlagJobs.run();
-    }else if(Game.time % 103 === 0){
         Constructions.run(); // TODO
-    }else if(Game.time % 281 === 0){
-        for (let roomCount in Game.rooms) {
-            let room = Game.rooms[roomCount];
-            if (room.controller && room.controller.my && room.terminal) {
-                Terminals.run(room);
-            }
-        }
+    }
+    if (Game.time % 5 === 0){
+        AssignJobs.run();
     }
     DoJobs.run();
 };
