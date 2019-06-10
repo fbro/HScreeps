@@ -43,16 +43,15 @@ const DoJobs = {
                 }
 
                 let actionResult;
-                if(jobStatus > 0 && creep.carry[RESOURCE_ENERGY] > 0 && creep.body.filter(part => (part.type === WORK)).some(x => !!x)){ // creep only moved or is idle - try and act
-                    const structureToRepair = creep.pos.findInRange(FIND_STRUCTURES, 2, {filter: (structure) => {
-                            return structure.hits < structure.hitsMax
-                                && structure.structureType !== STRUCTURE_WALL
-                                && structure.structureType !== STRUCTURE_RAMPART;
+                if(jobStatus > 0 && creep.carry[RESOURCE_ENERGY] > 0){ // deposit energy in nearby extension or spawn if it needs it
+                    const toFill = creep.pos.findInRange(FIND_MY_STRUCTURES, 1, {filter: (structure) => {
+                            return (structure.structureType === STRUCTURE_SPAWN || structure.structureType === STRUCTURE_EXTENSION) && structure.energy < structure.energyCapacity;
                         }})[0];
-                    if(structureToRepair){
-                        actionResult = creep.repair(structureToRepair);
+                    if(toFill){
+                        actionResult = creep.transfer(toFill, RESOURCE_ENERGY);
+                        //console.log("DoJobs, " + creep.name + " transferred on the go to spawn or extension in " + toFill.pos.roomName);
                         if(actionResult !== 0){
-                            console.log("DoJobs, ERROR: " + creep.name + ", could not repair on the go: " + JSON.stringify(structureToRepair));
+                            console.log("DoJobs, ERROR: " + creep.name + ", could not transfer on the go: " + JSON.stringify(toFill));
                         }
                     }
                 }
@@ -66,15 +65,16 @@ const DoJobs = {
                         }
                     }
                 }
-                if(actionResult !== 0 && jobStatus > 0 && creep.carry[RESOURCE_ENERGY] > 0){ // deposit energy in nearby extension or spawn if it needs it
-                    const toFill = creep.pos.findInRange(FIND_MY_STRUCTURES, 1, {filter: (structure) => {
-                            return (structure.structureType === STRUCTURE_SPAWN || structure.structureType === STRUCTURE_EXTENSION) && structure.energy < structure.energyCapacity;
+                if(jobStatus > 0 && jobStatus > 0 && creep.carry[RESOURCE_ENERGY] > 0 && creep.body.filter(part => (part.type === WORK)).some(x => !!x)){ // creep only moved or is idle - try and act
+                    const structureToRepair = creep.pos.findInRange(FIND_STRUCTURES, 2, {filter: (structure) => {
+                            return structure.hits < structure.hitsMax
+                                && structure.structureType !== STRUCTURE_WALL
+                                && structure.structureType !== STRUCTURE_RAMPART;
                         }})[0];
-                    if(toFill){
-                        actionResult = creep.transfer(toFill, RESOURCE_ENERGY);
-                        //console.log("DoJobs, " + creep.name + " transferred on the go to spawn or extension in " + toFill.pos.roomName);
+                    if(structureToRepair){
+                        actionResult = creep.repair(structureToRepair);
                         if(actionResult !== 0){
-                            console.log("DoJobs, ERROR: " + creep.name + ", could not transfer on the go: " + JSON.stringify(toFill));
+                            console.log("DoJobs, ERROR: " + creep.name + ", could not repair on the go: " + JSON.stringify(structureToRepair));
                         }
                     }
                 }
@@ -275,16 +275,18 @@ const DoJobs = {
                                     creep.memory.resourceDestination = bestResDropoff.id;
                                 }
                             }
-
                         }
                         if(bestResDropoff){ // abort if storage or terminal was not found
                             actionResult = CreepAct(creep, closedJobName, 1, bestResDropoff);
                             if(actionResult === ERR_NOT_IN_RANGE){
                                 creep.moveTo(bestResDropoff, {visualizePathStyle:{fill: 'transparent',stroke: '#0000ff',lineStyle: 'dotted',strokeWidth: .15,opacity: .1}});
                                 jobStatus = 1;
+                            }else if(actionResult === ERR_FULL){
+                                console.log("DoJobs, depositing ERR_FULL! code: " + actionResult + ", creep: " + creep.name + ", job (" + bestResDropoff.pos.x + ", " + bestResDropoff.pos.y + ", " + bestResDropoff.pos.roomName + "), ending job!");
+                                jobStatus = 2;
                             }
                         }else{
-                            console.log("DoJobs, no storage or terminal found, creep " + creep.name + ", job: " + closedJobName);
+                            console.log("DoJobs, no storage or terminal found, creep " + creep.name + ", job: " + closedJobName + " ending job!");
                             jobStatus = 2;
                         }
                     } else {

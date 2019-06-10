@@ -16,3 +16,6 @@ all **idle** creeps should move to storage and place all its content in storage
 
 
 https://stardew.info/planner/terrible-robin-77/
+
+
+rare error where a creep dies but the job is not updated - it may still be in closed jobs

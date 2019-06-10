@@ -291,8 +291,8 @@ const AssignJobs = {
                 case "LabsNeedEnergy": numOfCreeps = 1; break;
                 case "OwnedControllers":
                     switch (RCL) {
-                        case 1: case 2: numOfCreeps = 2; break;
-                        case 3: case 4: case 5: numOfCreeps = 2; break;
+                        case 1: case 2: numOfCreeps = 3; break;
+                        case 3: case 4: case 5: numOfCreeps = 3; break;
                         case 6: case 7: numOfCreeps = 2; break;
                         case 8: numOfCreeps = 1; break;
                     } break;

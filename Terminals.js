@@ -3,7 +3,10 @@ const Terminals = {
         // try to sell stuff
         const MIN_RESOURCE_AMOUNT = 1000;
         const MAX_TRANSFER_ENERGY_COST = 500;
-        const MIN_PRICE_E = 0.1;
+        let MIN_PRICE_E = 0.1;
+        if(room.storage && room.storage.store[RESOURCE_ENERGY] > 500000){
+            MIN_PRICE_E = 0.005;
+        }
         const MIN_PRICE_U = 0.08;
         const MIN_PRICE_GO = 0.3;
         const MIN_PRICE_UH = 0.3;
