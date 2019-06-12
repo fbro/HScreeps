@@ -1,9 +1,10 @@
 const DoJobs = {
     run: function() {
         // constants
-        const MAX_HITS_TO_MAINTAIN = 200000; // when repair and build, walls and ramparts have high hits - only maintain up to this
+        const MAX_HITS_TO_MAINTAIN = 1000000; // when repair and build, walls and ramparts have high hits - only maintain up to this
         const MIN_VALID_ENERGY_AMOUNT = 50; // when searching for stored energy in links, containers, storage, dropped energy, ignore below this number
         const MAX_ENERGY_TERMINAL = 100000; // end TerminalsNeedEnergy job when terminal has more than MAX_ENERGY_TERMINAL energy
+        const MIN_ENERGY_TERMINAL = 50000; // end StorageHasMinerals job when terminal has less than MIN_ENERGY_TERMINAL energy
 
         for(const creepName in Memory.creeps) {
             const creepMemory = Memory.creeps[creepName];
@@ -24,6 +25,7 @@ const DoJobs = {
                     // jobStatus = 1 - moved to job
                     // jobStatus = 2 - job is done
                     // jobStatus = 3 - not enough energy
+                    // jobStatus = 4 - creep carry full
                     jobStatus = CreepActions(creep, creepMemory.jobName, jobOBJ);
 
                     if(jobStatus >= 2){ // job is done
@@ -33,6 +35,9 @@ const DoJobs = {
                         }else if(jobStatus === 3){ // no energy for job
                             console.log("DoJobs, no energy, job set to done: " + creepMemory.jobName + ", room: " + jobOBJ.pos.roomName);
                             creep.say("job⚡" + jobOBJ.pos.x + "," + jobOBJ.pos.y);
+                        }else if(jobStatus === 4){ // creep carry full
+                            console.log("DoJobs, creep carry full, job set to done: " + creepMemory.jobName + ", room: " + jobOBJ.pos.roomName);
+                            creep.say("full" + jobOBJ.pos.x + "," + jobOBJ.pos.y);
                         }
                         UpdateJob(creepName, creepMemory, false);
                     }
@@ -80,6 +85,8 @@ const DoJobs = {
                 }
                 if(actionResult !== 0 && jobStatus > 0 && creepMemory.jobName === "idle" && _.sum(creep.carry) > 0){ // deposit stuff if creep is idle and has stuff
                     // TODO more extensive lookup of a valid storage and then move to it to deposit in it
+                    const bestResDropoff = GetStorageWithRoom(creep, creep.room.storage); // TODO object should be another thing
+                    const actionResult = CreepAct(creep, "DroppedResources", 1, bestResDropoff);
                 }
             }else{ // creep is gone
                 console.log("DoJobs, creep " + creepName + " is gone " + JSON.stringify(creep));
@@ -90,24 +97,28 @@ const DoJobs = {
         // end job or remove creep on job, if closed job move to open jobs
         function UpdateJob(creepName, creepMemory, isCreepGone){
             let foundJob = false;
-            for(let i = 0; i < Memory.closedJobs.length; i++){
-                if(Memory.closedJobs[i].name === creepMemory.jobName && Memory.closedJobs[i].id === creepMemory.jobId && Memory.closedJobs[i].flagName === creepMemory.flagName){
-                    foundJob = true;
-                    for(let e = 0; e < Memory.closedJobs[i].creeps.length; e++){
-                        if(isCreepGone) { // remove creep from job
-                            if(Memory.closedJobs[i].creeps[e] === creepName){
-                                Memory.closedJobs[i].creeps.splice(e, 1); // remove dead creep
-                                Memory.openJobs.push(Memory.closedJobs.splice(i, 1)[0]); // move closed job to open jobs
-                                break;
+            if(creepMemory.jobName === "idle"){
+                foundJob = true;
+            }else{
+                for(let i = 0; i < Memory.closedJobs.length; i++){
+                    if(Memory.closedJobs[i].name === creepMemory.jobName && Memory.closedJobs[i].id === creepMemory.jobId && Memory.closedJobs[i].flagName === creepMemory.flagName){
+                        foundJob = true;
+                        for(let e = 0; e < Memory.closedJobs[i].creeps.length; e++){
+                            if(isCreepGone) { // remove creep from job
+                                if(Memory.closedJobs[i].creeps[e] === creepName){
+                                    Memory.closedJobs[i].creeps.splice(e, 1); // remove dead creep
+                                    Memory.openJobs.push(Memory.closedJobs.splice(i, 1)[0]); // move closed job to open jobs
+                                    break;
+                                }
+                            }else{ // remove job, done or gone
+                                UnassignCreep(Memory.creeps[Memory.closedJobs[i].creeps[e]]);
                             }
-                        }else{ // remove job, done or gone
-                            UnassignCreep(Memory.creeps[Memory.closedJobs[i].creeps[e]]);
                         }
+                        if(!isCreepGone){
+                            Memory.closedJobs.splice(i, 1)
+                        }
+                        break;
                     }
-                    if(!isCreepGone){
-                        Memory.closedJobs.splice(i, 1)
-                    }
-                    break;
                 }
             }
             if(!foundJob){ // then search in open jobs
@@ -131,11 +142,13 @@ const DoJobs = {
                     }
                 }
             }
-            if(!foundJob){ // did not find the job that was in creep memory
-                console.log("DoJobs, could not find job " + creepMemory.jobName + " that " + creepName + " had, unassigning creep only");
-                UnassignCreep(Memory.creeps[creepName]);
+            if(!foundJob && !isCreepGone){ // did not find the job that was in creep memory
+                console.log("DoJobs, ERROR!!! could not find job " + creepMemory.jobName + " that " + creepName + " had, unassigning creep only");
+                //UnassignCreep(Memory.creeps[creepName]);
             }
-            if(isCreepGone){
+
+            if(foundJob && isCreepGone){
+                console.log("DoJobs, " + creepName + " deleted, had job " + creepMemory.jobName + " " + creepMemory.jobId);
                 delete Memory.creeps[creepName];
             }
         }
@@ -228,16 +241,16 @@ const DoJobs = {
                             // get a valid terminal
                             if(creep.memory.resourceDestination){
                                 bestResDropoff = Game.getObjectById(creep.memory.resourceDestination);
-                            }else if(closedJobOBJ.room && closedJobOBJ.room.terminal && _.sum(closedJobOBJ.room.terminal.store) < closedJobOBJ.room.terminal.storeCapacity){ // we know it has a storage that I own in this room but does it have a terminal?
+                            }else if(closedJobOBJ.room && closedJobOBJ.room.terminal && _.sum(closedJobOBJ.room.terminal.store) < closedJobOBJ.room.terminal.storeCapacity && closedJobOBJ.room.terminal.store[RESOURCE_ENERGY] > MIN_ENERGY_TERMINAL){ // we know it has a storage that I own in this room but does it have a terminal?
                                 bestResDropoff = closedJobOBJ.room.terminal;
-                            }else if(closedJobOBJ.pos.roomName !== creep.pos.roomName && creep.room.terminal && _.sum(creep.room.terminal.store) < creep.room.terminal.storeCapacity){ // then check creep room
+                            }else if(closedJobOBJ.pos.roomName !== creep.pos.roomName && creep.room.terminal && _.sum(creep.room.terminal.store) < creep.room.terminal.storeCapacity && creep.room.terminal.store[RESOURCE_ENERGY] > MIN_ENERGY_TERMINAL){ // then check creep room
                                 bestResDropoff = creep.room.terminal;
                                 creep.memory.resourceDestination = bestResDropoff.id;
                             }else{ // still no luck then search for terminals in other rooms
                                 let roomWithStorageLinearDistance = Number.MAX_SAFE_INTEGER;
                                 for (let roomCount in Game.rooms) {
                                     const room = Game.rooms[roomCount];
-                                    if(room.terminal && _.sum(room.terminal.store) < room.terminal.storeCapacity){
+                                    if(room.terminal && _.sum(room.terminal.store) < room.terminal.storeCapacity && room.terminal.store[RESOURCE_ENERGY] > MIN_ENERGY_TERMINAL){
                                         if(!bestResDropoff || Game.map.getRoomLinearDistance(room.name, creep.pos.roomName) < roomWithStorageLinearDistance){
                                             bestResDropoff = room.terminal;
                                             roomWithStorageLinearDistance = Game.map.getRoomLinearDistance(room.name, creep.pos.roomName);
@@ -251,30 +264,7 @@ const DoJobs = {
                             }
                         }else{
                             // get a valid storage
-                            if(creep.memory.resourceDestination){
-                                bestResDropoff = Game.getObjectById(creep.memory.resourceDestination);
-                            }else if(closedJobOBJ.room && closedJobOBJ.room.storage && _.sum(closedJobOBJ.room.storage.store) < closedJobOBJ.room.storage.storeCapacity){ // first check job room
-                                bestResDropoff = closedJobOBJ.room.storage;
-                                creep.memory.resourceDestination = bestResDropoff.id;
-                            }else if(closedJobOBJ.pos.roomName !== creep.pos.roomName && creep.room.storage && _.sum(creep.room.storage.store) < creep.room.storage.storeCapacity){ // then check creep room
-                                bestResDropoff = creep.room.storage;
-                                creep.memory.resourceDestination = bestResDropoff.id;
-                            }else{ // still no luck then search for storage in other rooms
-                                let roomWithStorageLinearDistance = Number.MAX_SAFE_INTEGER;
-                                for (let roomCount in Game.rooms) {
-                                    const room = Game.rooms[roomCount];
-                                    if(room.storage && _.sum(room.storage.store) < room.storage.storeCapacity){
-                                        if(!bestResDropoff || Game.map.getRoomLinearDistance(room.name, creep.pos.roomName) < roomWithStorageLinearDistance){
-                                            bestResDropoff = room.storage;
-                                            roomWithStorageLinearDistance = Game.map.getRoomLinearDistance(room.name, creep.pos.roomName);
-                                            console.log(creep.name + " found alternate storage in room " + bestResDropoff.pos.roomName);
-                                        }
-                                    }
-                                }
-                                if(bestResDropoff){
-                                    creep.memory.resourceDestination = bestResDropoff.id;
-                                }
-                            }
+                            bestResDropoff = GetStorageWithRoom(creep, closedJobOBJ);
                         }
                         if(bestResDropoff){ // abort if storage or terminal was not found
                             actionResult = CreepAct(creep, closedJobName, 1, bestResDropoff);
@@ -324,6 +314,8 @@ const DoJobs = {
                             jobStatus = 1;
                         }else if(actionResult ===  ERR_NOT_ENOUGH_RESOURCES){
                             jobStatus = 3; // drop job if there are no energy available - it will be recreated later
+                        }else if(actionResult === ERR_FULL){ // creep os probably holding a lot of minerals
+                            jobStatus = 4; // drop job if creep carry is full - it will be recreated later
                         }
                     } else { // go build/repair/upgrade/transfer
                         actionResult = CreepAct(creep, closedJobName, 2, closedJobOBJ);
@@ -378,6 +370,36 @@ const DoJobs = {
                     jobStatus = 0;
             }
             return jobStatus;
+        }
+
+        function GetStorageWithRoom(creep, closedJobOBJ){
+            // get a valid storage
+            let bestResDropoff;
+            if(creep.memory.resourceDestination){
+                bestResDropoff = Game.getObjectById(creep.memory.resourceDestination);
+            }else if(closedJobOBJ.room && closedJobOBJ.room.storage && _.sum(closedJobOBJ.room.storage.store) < closedJobOBJ.room.storage.storeCapacity){ // first check job room
+                bestResDropoff = closedJobOBJ.room.storage;
+                creep.memory.resourceDestination = bestResDropoff.id;
+            }else if(closedJobOBJ.pos.roomName !== creep.pos.roomName && creep.room.storage && _.sum(creep.room.storage.store) < creep.room.storage.storeCapacity){ // then check creep room
+                bestResDropoff = creep.room.storage;
+                creep.memory.resourceDestination = bestResDropoff.id;
+            }else{ // still no luck then search for storage in other rooms
+                let roomWithStorageLinearDistance = Number.MAX_SAFE_INTEGER;
+                for (let roomCount in Game.rooms) {
+                    const room = Game.rooms[roomCount];
+                    if(room.storage && _.sum(room.storage.store) < room.storage.storeCapacity){
+                        if(!bestResDropoff || Game.map.getRoomLinearDistance(room.name, creep.pos.roomName) < roomWithStorageLinearDistance){
+                            bestResDropoff = room.storage;
+                            roomWithStorageLinearDistance = Game.map.getRoomLinearDistance(room.name, creep.pos.roomName);
+                            console.log(creep.name + " found alternate storage in room " + bestResDropoff.pos.roomName);
+                        }
+                    }
+                }
+                if(bestResDropoff){
+                    creep.memory.resourceDestination = bestResDropoff.id;
+                }
+            }
+            return bestResDropoff;
         }
 
         // used by creep-transporters to see which store in the room where the creep is is most full of energy
