@@ -22,7 +22,11 @@ const AssignJobs = {
         */
         let isAllAssigned = false; // loop until all openJobs or idleCreeps is empty or not applicable
         while (!isAllAssigned) {
-            let idleCreeps = _(Game.creeps).filter({memory: {jobName: 'idle'}}).value(); // new search each time because a creep may have been assigned
+            let idleCreeps = _.filter(Game.creeps, function(o) { return o.memory.jobName === 'idle' && _.sum(o.carry) < o.carryCapacity; }); // new search each time because a creep may have been assigned
+            //let testString = "idle creeps:";
+            //for (let i = 0; i < idleCreeps.length; i++) {
+            //    testString += " " + idleCreeps[i].name;
+            //} console.log(testString);
             if(idleCreeps.length === 0){
                 break; // no need to enter algorithm if there are no idle creeps
             }

@@ -1,7 +1,7 @@
 const Towers = {
     run: function() {
         // TODO - right now it is just a copy from the old - it may be good enough
-
+        // make targeting better - do not target one creep but spread out to counter overwhelming healers
         const allMyTowers = _.filter(Game.structures, (structure) => structure.structureType == STRUCTURE_TOWER && structure.energy > 0);
         for(const count in allMyTowers){
             const tower = allMyTowers[count];
