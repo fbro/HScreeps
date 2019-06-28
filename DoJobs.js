@@ -39,12 +39,12 @@ const DoJobs = {
                             console.log("DoJobs, creep carry full, job set to done: " + creepMemory.jobName + ", room: " + jobOBJ.pos.roomName);
                             creep.say("full" + jobOBJ.pos.x + "," + jobOBJ.pos.y);
                         }
-                        UpdateJob(creepName, creepMemory, false);
+                        UpdateJob(creepName, creepMemory, false); // job is done
                     }
                 }else if(creepMemory.jobName !== "idle"){ // job object is gone
                     console.log("DoJobs, job object disappeared: " + creepMemory.jobName);
                     creep.say("job🌀 gone"); // most common job object to disappear is the DroppedResources job
-                    UpdateJob(creepName, creepMemory, false);
+                    UpdateJob(creepName, creepMemory, false); // job object is gone
                 }
 
                 let actionResult = -1;
@@ -109,7 +109,8 @@ const DoJobs = {
                         for(let e = 0; e < Memory.closedJobs[i].creeps.length; e++){
                             if(isCreepGone) { // remove creep from job
                                 if(Memory.closedJobs[i].creeps[e] === creepName){
-                                    Memory.closedJobs[i].creeps.splice(e, 1); // remove dead creep
+                                    const splicedResult = Memory.closedJobs[i].creeps.splice(e, 1); // remove dead creep
+                                    console.log("TEST! removed dead creep closed jobs: " + creepName + " " + JSON.stringify(splicedResult));
                                     Memory.openJobs.push(Memory.closedJobs.splice(i, 1)[0]); // move closed job to open jobs
                                     break;
                                 }
@@ -118,7 +119,7 @@ const DoJobs = {
                             }
                         }
                         if(!isCreepGone){
-                            Memory.closedJobs.splice(i, 1)
+                            Memory.closedJobs.splice(i, 1);
                         }
                         break;
                     }
@@ -131,7 +132,8 @@ const DoJobs = {
                         for(let e = 0; e < Memory.openJobs[i].creeps.length; e++){
                             if(isCreepGone) { // remove creep from job
                                 if(Memory.openJobs[i].creeps[e] === creepName){
-                                    Memory.openJobs[i].creeps.splice(e, 1); // remove dead creep
+                                    const splicedResult = Memory.openJobs[i].creeps.splice(e, 1); // remove dead creep
+                                    console.log("TEST! removed dead creep open jobs: " + creepName + " " + JSON.stringify(splicedResult));
                                     break;
                                 }
                             }else{ // remove job, done or gone
@@ -139,7 +141,7 @@ const DoJobs = {
                             }
                         }
                         if(!isCreepGone){
-                            Memory.openJobs.splice(i, 1)
+                            Memory.openJobs.splice(i, 1);
                         }
                         break;
                     }
@@ -163,7 +165,7 @@ const DoJobs = {
             if(creepMemory.closestLink        ){creepMemory.closestLink         = undefined;}
             if(creepMemory.resourceDestination){creepMemory.resourceDestination = undefined;}
             if(creepMemory.flagName           ){
-                if(Game.flags[creepMemory.flagName]){Game.flags[creepMemory.flagName].remove();}
+                if(Game.flags[creepMemory.flagName]){Game.flags[creepMemory.flagName].remove();} // delete flag if job is gone/done
                 creepMemory.flagName     = undefined;
             }
         }
