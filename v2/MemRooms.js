@@ -62,9 +62,15 @@ const MemRooms = {
                 // TODO FillTerminalMineral
                 case 5:
                 case 4:
-                // TODO FillStorage
+                    if(gameRoom.storage !== undefined){
+                        // FillStorage
+                        RefreshFillStorageJobs(gameRoom, roomObjJobs);
+                        // ResourceDrop
+                        RefreshResourceDropJobs(gameRoom, roomObjJobs);
+                    }
                 case 3:
-                // TODO FillTower
+                    // FillTower
+                    RefreshFillTowerJobs(gameRoom, roomObjJobs);
                 case 2:
                 case 1:
                     // Controller
@@ -72,8 +78,6 @@ const MemRooms = {
                     roomObjJobs['Controller(' + gameRoom.controller.pos.x + ',' + gameRoom.controller.pos.y + ')'] = {'JobObjId': gameRoom.controller.id, 'JobObjCreeps': []};
                     // FillSpawnExtension
                     RefreshFillSpawnExtensionJobs(gameRoom, roomObjJobs);
-                    // ResourceDrop
-                    RefreshResourceDropJobs(gameRoom, roomObjJobs);
                     // Construction
                     RefreshConstructionJobs(gameRoom, roomObjJobs);
                     // Repair
@@ -85,12 +89,13 @@ const MemRooms = {
                         new RoomVisual(gameRoom.name).text("🏭💼", source.pos.x, source.pos.y);
                         roomObjJobs['Source(' + source.pos.x + ',' + source.pos.y + ')'] = {'JobObjId': source.id, 'JobObjCreeps': []};
                     }
+                    roomObjJobs['Idle'] = {'JobObjCreeps': []};
                     break;
                 default:
                     console.log("MemRooms, createDefaultJobs: ERROR! level not found");
             }
 
-            for(const oldRoomObjJobKey in oldRoomObjJobs){ // if a job with similar key already existed in room then use that job
+            for(const oldRoomObjJobKey in oldRoomObjJobs){ // if a job with similar key already existed in room then use that job to reuse creep on job
                 const oldRoomObjJob = oldRoomObjJobs[oldRoomObjJobKey];
                 for(const roomObjJobKey in roomObjJobs){
                     if(oldRoomObjJobKey === roomObjJobKey){
@@ -107,6 +112,31 @@ const MemRooms = {
                 };
         }
 
+        function RefreshFillStorageJobs(gameRoom, roomObjJobs){
+            const fillStorages = gameRoom.find(FIND_MY_STRUCTURES, {
+                filter: (s) => {
+                    return (s.structureType === STRUCTURE_CONTAINER && s.energy >= 1900)
+                        || (s.structureType === STRUCTURE_LINK && s.energy >= 700 && s.room.storage.pos.inRangeTo(s, 1));
+                }
+            });
+            for (const fillStorageKey in fillStorages) {
+                const fillStorage = fillStorages[fillStorageKey];
+                new RoomVisual(gameRoom.name).text("⚡💼", fillStorage.pos.x, fillStorage.pos.y);
+                roomObjJobs['FillStorage' + fillStorage.structureType.substring(10) + '(' + fillStorage.pos.x + ',' + fillStorage.pos.y + ')'] = {'JobObjId': fillStorage.id, 'JobObjCreeps': []};
+            }
+        }
+        function RefreshFillTowerJobs(gameRoom, roomObjJobs){
+            const fillTowers = gameRoom.find(FIND_MY_STRUCTURES, {
+                filter: (s) => {
+                    return ((s.structureType === STRUCTURE_TOWER) && s.energy < s.energyCapacity);
+                }
+            });
+            for (const fillTowerKey in fillTowers) {
+                const fillTower = fillTowers[fillTowerKey];
+                new RoomVisual(gameRoom.name).text("⚡💼", fillTower.pos.x, fillTower.pos.y);
+                roomObjJobs['FillTower(' + fillTower.pos.x + ',' + fillTower.pos.y + ')'] = {'JobObjId': fillTower.id, 'JobObjCreeps': []};
+            }
+        }
         function RefreshFillSpawnExtensionJobs(gameRoom, roomObjJobs){
             const fillSpawnExtensions = gameRoom.find(FIND_MY_STRUCTURES, {
                 filter: (s) => {
