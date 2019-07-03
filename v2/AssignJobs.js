@@ -24,14 +24,22 @@ const AssignJobs = {
         for (let creepKey in Game.creeps) {
             const creep = Game.creeps[creepKey];
             if(creep.memory.jobName === "idle" && Memory.MemRooms[creep.pos.roomName] !== undefined){
-                for(let jobKey in Memory.MemRooms[creep.pos.roomName].RoomJobs){
-                    if(Memory.MemRooms[creep.pos.roomName].RoomJobs[jobKey].JobCreep === "vacant"){
-                        // an idle creep that is in a room that exist in memory looks at a specific job that is vacant
-                        
+                const roomJobs = Memory.MemRooms[creep.pos.roomName].RoomJobs;
+                for(let jobKey in roomJobs){
+                    const roomJob = roomJobs[jobKey];
+                    if(roomJob.JobCreep === "vacant" && roomJob.JobType === creepKey.substring(0, 1)){
+                        // an idle creep that is in a room that exist in memory looks at a specific job that is vacant and matching jobType
+                        creep.memory.jobName = jobKey;
+                        roomJob.JobCreep = creepKey;
                     }
                 }
             }
         }
+
+        // loop through vacant jobs and see if a creep should be spawned
+        // be careful not to spawn too many or too few creeps
+        // introduce max creep per room but for each job -
+
     }
 };
 module.exports = AssignJobs;
