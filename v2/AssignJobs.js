@@ -26,7 +26,8 @@ const AssignJobs = {
             if(creep.memory.jobName === "idle" && Memory.MemRooms[creep.pos.roomName] !== undefined){
                 for(let jobKey in Memory.MemRooms[creep.pos.roomName].RoomJobs){
                     if(Memory.MemRooms[creep.pos.roomName].RoomJobs[jobKey].JobCreep === "vacant"){
-
+                        // an idle creep that is in a room that exist in memory looks at a specific job that is vacant
+                        
                     }
                 }
             }
