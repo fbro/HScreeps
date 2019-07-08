@@ -5,8 +5,9 @@ const CreateJobs = {
         //     RoomLevel - 0 to 8
         //     RoomJobs - [JobName(x,y)] - user friendly name
         //       JobId - real id
-        //       JobCreeps -[CreepName] - array of creep names
         //       JobType - int enum - OBJECT_JOB = 1, FLAG_JOB = 2
+        //       CreepType - T, H, B...
+        //       Creep - CreepName
 
         /* jobs:
         * Source
@@ -42,12 +43,12 @@ const CreateJobs = {
         // updates my rooms which had its level changed
         // removes rooms that i do not own anymore
         function UpdateObjJobs(){
-            for (let gameRoomKey in Game.rooms) {
+            for(const gameRoomKey in Game.rooms) {
                 const gameRoom = Game.rooms[gameRoomKey]; // visible room
                 if (gameRoom.controller) { // has a controller - is ownable
                     let isFullUpdate = true; // if room does not exist or controller level have changed
                     let oldMemRoom = [];
-                    for (let memRoomKey in Memory.MemRooms) {
+                    for(const memRoomKey in Memory.MemRooms) {
                         const memRoom = Memory.MemRooms[memRoomKey]; // memory room
                         if(gameRoomKey === memRoomKey){ // I have it in memory!
                             oldMemRoom = memRoom;
@@ -74,7 +75,7 @@ const CreateJobs = {
         }
 
         function UpdateFlagJobs(){
-            for (let gameFlagKey in Game.flags) {
+            for(const gameFlagKey in Game.flags) {
                 const gameFlag = Game.flags[gameFlagKey];
                 if(Memory.MemRooms[gameFlag.pos.roomName] === undefined){ // room does not exist - create it
                     Memory.MemRooms[gameFlag.pos.roomName] = CreateRoom(gameFlag.pos.roomName, 0, []);
@@ -263,7 +264,7 @@ const CreateJobs = {
         }
 
         function CreateJob(roomJobs, roomJobKey, jobId, jobType, creepType){
-            roomJobs[roomJobKey] = {'JobId': jobId, 'JobType': jobType, 'CreepType': creepType, 'JobCreep': 'vacant'};
+            roomJobs[roomJobKey] = {'JobId': jobId, 'JobType': jobType, 'CreepType': creepType, 'Creep': 'vacant'};
         }
     }
 };

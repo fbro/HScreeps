@@ -30,29 +30,36 @@ const AssignJobs = {
         function AssignOrSpawnCreeps() {
             const idleCreeps = _.filter(Game.creeps, function(creep) { return creep.memory.jobName === 'idle'});
             const availableSpawns = _.filter(Game.spawns, function(spawn) { return spawn.spawning === null && spawn.room.energyAvailable >= MINIMUM_ENERGY_REQUIRED});
-            for(let memRoomKey in Memory.MemRooms) {
+            for(const memRoomKey in Memory.MemRooms) {
                 const memRoom = Memory.MemRooms[memRoomKey];
                 const idleCreepsInRoom = _.filter(idleCreeps, function(creep) { return creep.pos.roomName === memRoomKey});
-                for(let roomJobKey in memRoom.RoomJobs) {
+                for(const roomJobKey in memRoom.RoomJobs) {
                     const roomJob = memRoom.RoomJobs[roomJobKey];
-                    if(roomJob.JobCreep === "vacant"){
-                        let idleCreepFound = false;
-                        for (let idleCreepInRoomKey in idleCreepsInRoom) {
+                    if(roomJob.Creep === "vacant"){
+                        let creepFound = false;
+                        for(const idleCreepInRoomKey in idleCreepsInRoom) {
                             const idleCreepInRoom = idleCreepsInRoom[idleCreepInRoomKey];
-                            if(roomJob.JobType === idleCreepInRoomKey.substring(0, 1)){
+                            if(roomJob.CreepType === idleCreepInRoomKey.substring(0, 1)){
                                 // idle creep is in memory room with vacant job and matching job type
                                 idleCreepInRoom.memory.jobName = roomJobKey;
-                                roomJob.JobCreep = idleCreepInRoomKey;
-                                idleCreepFound = true;
+                                roomJob.Creep = idleCreepInRoomKey;
+                                creepFound = true;
+                                console.log("AssignJobs, AssignOrSpawnCreeps: " + idleCreepInRoom.name + " assigned to " + roomJobKey + " in " + memRoomKey);
                                 break;
                             }
                         }
-                        if(!idleCreepFound && ShouldSpawnCreep(roomJob.JobType, memRoomKey)){ // if idle creep not found for vacant job then look if spawn is possible
-                            for(let availableSpawnKey in availableSpawns){
+                        // if idle creep not found for vacant job then look if spawn is possible
+                        if(!creepFound && ShouldSpawnCreep(roomJob.CreepType, memRoomKey)){
+                            for(const availableSpawnKey in availableSpawns){
                                 const availableSpawn = availableSpawns[availableSpawnKey];
-                                const availableName = GetAvailableName(roomJob.JobType);
-                                const spawnResult = availableSpawn.spawnCreep(GetCreepBody(roomJob.JobType, Game.rooms[memRoomKey].energyAvailable), availableName);
-                                console.log("AssignJobs: spawnResult: " + spawnResult + ", name: " + availableName + ", job: " + roomJobKey + ", room: " + memRoomKey);
+                                const availableName = GetAvailableName(roomJob.CreepType);
+                                const spawnResult = availableSpawn.spawnCreep(GetCreepBody(roomJob.CreepType, Game.rooms[memRoomKey].energyAvailable), availableName);
+                                if(spawnResult === OK){
+                                    Game.creeps[availableName].memory.jobName = roomJobKey;
+                                    roomJob.Creep = availableName;
+                                    creepFound = true;
+                                }
+                                console.log("AssignJobs, AssignOrSpawnCreeps: " + availableName + " assigned to " + roomJobKey + " in " + memRoomKey + " spawnResult: " + spawnResult);
                             }
                         }
                     }
@@ -61,20 +68,19 @@ const AssignJobs = {
         }
 
         /**@return {boolean}*/
-        function ShouldSpawnCreep(jobType, roomKey){
-            // be careful not to spawn too many or too few creeps
+        function ShouldSpawnCreep(creepType, roomKey){
             let maxCreepsInRoom = 0;
-            const numOfIdleCreepsWithJobType = Game.rooms[roomKey].find(FIND_MY_CREEPS, {filter: function(creep) {return (creep.memory.jobName === 'idle' && creep.name.startsWith(jobType));}}).length;
-            let numOfEmployedCreepsWithJobType = 0;
+            const numOfIdleCreepsWithCreepType = Game.rooms[roomKey].find(FIND_MY_CREEPS, {filter: function(creep) {return (creep.memory.jobName === 'idle' && creep.name.startsWith(creepType));}}).length;
+            let numOfEmployedCreepsWithCreepType = 0;
             const memRoom = Memory.MemRooms[roomKey];
-            for(let roomJobKey in memRoom.RoomJobs){
+            for(const roomJobKey in memRoom.RoomJobs){
                 const roomJob = memRoom.RoomJobs[roomJobKey];
-                if(roomJob.JobCreep !== 'vacant' && roomJob.JobType === jobType){
-                    numOfEmployedCreepsWithJobType++;
+                if(roomJob.Creep !== 'vacant' && roomJob.CreepType === creepType){
+                    numOfEmployedCreepsWithCreepType++;
                 }
             }
-            const numOfCreepsWithJobType = numOfIdleCreepsWithJobType + numOfEmployedCreepsWithJobType;
-            switch (jobType) {
+            const numOfCreepsWithCreepType = numOfIdleCreepsWithCreepType + numOfEmployedCreepsWithCreepType;
+            switch (creepType) {
                 case "T": // transporter
                     maxCreepsInRoom = 3;
                     break;
@@ -94,9 +100,9 @@ const AssignJobs = {
                     maxCreepsInRoom = 10;
                     break;
                 default:
-                    console.log("AssignJobs, ShouldSpawnCreep: ERROR! jobType not found: " + jobType);
+                    console.log("AssignJobs, ShouldSpawnCreep: ERROR! creepType not found: " + creepType);
             }
-            if(numOfCreepsWithJobType < maxCreepsInRoom){
+            if(numOfCreepsWithCreepType < maxCreepsInRoom){
                 return true;
             }else{
                 return false;
@@ -104,9 +110,9 @@ const AssignJobs = {
         }
 
         /**@return {array}*/
-        function GetCreepBody(jobType, energyAvailable){
+        function GetCreepBody(creepType, energyAvailable){
             let body = [];
-            switch (jobType) {
+            switch (creepType) {
                 // harvester
                 case "H":
                     switch (true) {
@@ -230,22 +236,22 @@ const AssignJobs = {
                             body = [TOUGH, MOVE, MOVE, ATTACK];break;
                     } break;
                 default:
-                    console.log("AssignJobs, GetCreepBody: ERROR! jobType not found: " + jobType);
+                    console.log("AssignJobs, GetCreepBody: ERROR! creepType not found: " + creepType);
             }
             return body;
         }
 
         /**@return {string}*/
-        function GetAvailableName(jobType) {
+        function GetAvailableName(creepType) {
             let availableCount = 1;
             while (true) {
-                if(Game.creeps[jobType + availableCount]){
+                if(Game.creeps[creepType + availableCount]){
                     availableCount++;
                 }else{
                     break; // name is free
                 }
             }
-            return jobType + availableCount;
+            return creepType + availableCount;
         }
     }
 };
