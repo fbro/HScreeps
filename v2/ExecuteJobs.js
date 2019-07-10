@@ -19,7 +19,7 @@ const ExecuteJobs = {
                     if(roomJob.Creep !== "vacant") {
                         const gameCreep = Game.creeps[roomJob.Creep];
                         if(gameCreep){// creep is alive
-                            JobAction(gameCreep, roomJob, roomJobKey);
+                            JobAction(gameCreep, memRoom.RoomJobs, roomJobKey);
                         }else{ // creep is dead
                             console.log("ExecuteJobs, ExecuteRoomJobs: " + roomJob.Creep + " on " + roomJobKey + " in " + memRoomKey + " has died");
                             const tombstone = Game.rooms[memRoomKey].find(FIND_TOMBSTONES, {filter: function(tombstone) {return tombstone.creep.name === roomJob.Creep;}})[0];
@@ -32,7 +32,8 @@ const ExecuteJobs = {
             }
         }
 
-        function JobAction(creep, roomJob, jobKey){
+        function JobAction(creep, roomJobs, jobKey){
+            const roomJob = roomJobs[jobKey];
             let result = ERR_NO_RESULT_FOUND;
             switch (true) {
                 case jobKey.startsWith("Source"):
@@ -69,6 +70,8 @@ const ExecuteJobs = {
                     console.log("ExecuteJobs, JobAction: ERROR! no result gained: " + jobKey + ", " + creep.name);
                 }
                 // TODO end job
+                const removedJob = roomJobs.splice(jobKey, 1);
+                console.log("ExecuteJobs, JobAction: removed: " + JSON.stringify(removedJob) + ", " + creep.name);
             }
         }
 
