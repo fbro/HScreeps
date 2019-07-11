@@ -182,6 +182,15 @@ const CreateJobs = {
             }
         }
 
+        function ResourceDropJobs(gameRoom, roomJobs){
+            const resourceDrops = gameRoom.find(FIND_DROPPED_RESOURCES, {filter: (drop) => {return (drop.amount > 50);}});
+            for (const resourceDropKey in resourceDrops) {
+                const resourceDrop = resourceDrops[resourceDropKey];
+                new RoomVisual(gameRoom.name).text("💰💼", resourceDrop.pos.x, resourceDrop.pos.y);
+                CreateJob(roomJobs, 'ResourceDrop' + resourceDrop.resourceType.substring(9) + '(' + resourceDrop.pos.x + ',' + resourceDrop.pos.y + ',' + resourceDrop.amount + ')', resourceDrop.id, OBJECT_JOB, 'T');
+            }
+        }
+
         function FillTowerJobs(gameRoom, roomJobs){
             const fillTowers = gameRoom.find(FIND_MY_STRUCTURES, {
                 filter: (s) => {
@@ -205,15 +214,6 @@ const CreateJobs = {
                 const fillSpawnExtension = fillSpawnExtensions[fillSpawnExtensionKey];
                 new RoomVisual(gameRoom.name).text("⚡💼", fillSpawnExtension.pos.x, fillSpawnExtension.pos.y);
                 CreateJob(roomJobs, 'FillSpawnExtension(' + fillSpawnExtension.pos.x + ',' + fillSpawnExtension.pos.y + ')', fillSpawnExtension.id, OBJECT_JOB, 'T');
-            }
-        }
-
-        function ResourceDropJobs(gameRoom, roomJobs){
-            const resourceDrops = gameRoom.find(FIND_DROPPED_RESOURCES, {filter: (drop) => {return (drop.amount > 50);}});
-            for (const resourceDropKey in resourceDrops) {
-                const resourceDrop = resourceDrops[resourceDropKey];
-                new RoomVisual(gameRoom.name).text("💰💼", resourceDrop.pos.x, resourceDrop.pos.y);
-                CreateJob(roomJobs, 'ResourceDrop' + resourceDrop.resourceType.substring(9) + '(' + resourceDrop.pos.x + ',' + resourceDrop.pos.y + ',' + resourceDrop.amount + ')', resourceDrop.id, OBJECT_JOB, 'T');
             }
         }
 
