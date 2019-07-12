@@ -81,19 +81,28 @@ const CreateJobs = {
                     Memory.MemRooms[gameFlag.pos.roomName] = CreateRoom(gameFlag.pos.roomName, 0, []);
                 }
                 let jobName;
+                let creepType;
                 if(gameFlag.color === COLOR_ORANGE && gameFlag.secondaryColor === COLOR_ORANGE){ // scout tag
                     jobName = "TagController";
+                    creepType = 'S';
                 }else if(gameFlag.color === COLOR_ORANGE && gameFlag.secondaryColor === COLOR_YELLOW){ // scout at pos
                     jobName = "ScoutPos";
+                    creepType = 'S';
                 }else if(gameFlag.color === COLOR_GREEN && gameFlag.secondaryColor === COLOR_GREEN){ // claimer claim
                     jobName = "ClaimController";
+                    creepType = 'C';
                 }else if(gameFlag.color === COLOR_GREEN && gameFlag.secondaryColor === COLOR_YELLOW){ // claimer reserve
                     jobName = "ReserveController";
+                    creepType = 'R';
                 }else if(gameFlag.color === COLOR_ORANGE && gameFlag.secondaryColor === COLOR_RED){ // warrior at pos
                     jobName = "GuardPos";
+                    creepType = 'W';
+                }else{
+                    console.log("CreateJobs, UpdateJobsInRoom: ERROR! flag color not found: " + gameFlag.color + ", " + gameFlag.secondaryColor + ", (" + gameFlag.pos.x + "," + gameFlag.pos.y + ")");
                 }
-                if(Memory.MemRooms[gameFlag.pos.roomName].RoomJobs[jobName + '-' + gameFlagKey] === undefined){ // if exist do not recreate
-                    CreateJob(Memory.MemRooms[gameFlag.pos.roomName].RoomJobs, jobName + '-' + gameFlagKey, gameFlagKey, FLAG_JOB);
+                const newRoomJobKey = jobName + '-' + gameFlagKey; // for flag
+                if(Memory.MemRooms[gameFlag.pos.roomName].RoomJobs[newRoomJobKey] === undefined && jobName && creepType){ // if exist do not recreate - and if color is found
+                    CreateJob(Memory.MemRooms[gameFlag.pos.roomName].RoomJobs, newRoomJobKey, gameFlagKey, FLAG_JOB, creepType);
                 }
             }
         }
@@ -115,10 +124,8 @@ const CreateJobs = {
                 case 5:
                 case 4:
                     if(gameRoom.storage !== undefined){
-                        // FillStorage
+                        // FillStorage - link, container and resource drops
                         FillStorageJobs(gameRoom, roomJobs);
-                        // ResourceDrop
-                        ResourceDropJobs(gameRoom, roomJobs);
                     }
                 case 3:
                     // FillTower
@@ -151,7 +158,6 @@ const CreateJobs = {
                 default:
                     console.log("CreateJobs, UpdateJobsInRoom: ERROR! level not found");
             }
-
             for(const oldRoomJobKey in oldRoomJobs){ // if a job with similar key already existed in room then use that job to reuse creep on job
                 const oldRoomJob = oldRoomJobs[oldRoomJobKey];
                 for(const roomJobKey in roomJobs){
@@ -160,7 +166,6 @@ const CreateJobs = {
                     }
                 }
             }
-
             if(isFullUpdate) {
                 CreateRoom(gameRoom.name, gameRoom.controller.level, roomJobs);
             }else{
@@ -178,16 +183,14 @@ const CreateJobs = {
             for (const fillStorageKey in fillStorages) {
                 const fillStorage = fillStorages[fillStorageKey];
                 new RoomVisual(gameRoom.name).text("⚡💼", fillStorage.pos.x, fillStorage.pos.y);
-                CreateJob(roomJobs, 'FillStorage' + fillStorage.structureType.substring(10) + '(' + fillStorage.pos.x + ',' + fillStorage.pos.y + ')', fillStorage.id, OBJECT_JOB), 'T';
+                CreateJob(roomJobs, 'FillStorage' + fillStorage.structureType.substring(10) + '(' + fillStorage.pos.x + ',' + fillStorage.pos.y + ')', fillStorage.id, OBJECT_JOB, 'T');
             }
-        }
-
-        function ResourceDropJobs(gameRoom, roomJobs){
+            // drop is a little bit different - but same kind of job as above
             const resourceDrops = gameRoom.find(FIND_DROPPED_RESOURCES, {filter: (drop) => {return (drop.amount > 50);}});
             for (const resourceDropKey in resourceDrops) {
                 const resourceDrop = resourceDrops[resourceDropKey];
                 new RoomVisual(gameRoom.name).text("💰💼", resourceDrop.pos.x, resourceDrop.pos.y);
-                CreateJob(roomJobs, 'ResourceDrop' + resourceDrop.resourceType.substring(9) + '(' + resourceDrop.pos.x + ',' + resourceDrop.pos.y + ',' + resourceDrop.amount + ')', resourceDrop.id, OBJECT_JOB, 'T');
+                CreateJob(roomJobs, 'FillStorage' + resourceDrop.resourceType.substring(9) + '(' + resourceDrop.pos.x + ',' + resourceDrop.pos.y + ',' + resourceDrop.amount + ')', resourceDrop.id, OBJECT_JOB, 'T');
             }
         }
 

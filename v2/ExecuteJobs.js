@@ -8,6 +8,7 @@ const ExecuteJobs = {
                 // if job is done then set creep to idle and remove job from memory
 
         const ERR_NO_RESULT_FOUND = -20; // job flow did not encounter any actions that lead to any results!
+        const JOB_IS_DONE = -21; // when the job should be removed but there are no ERR codes
 
         ExecuteRoomJobs();
 
@@ -36,29 +37,44 @@ const ExecuteJobs = {
             const roomJob = roomJobs[jobKey];
             let result = ERR_NO_RESULT_FOUND;
             switch (true) {
+                // obj jobs
                 case jobKey.startsWith("Source"):
                     result = JobSource(creep, roomJob);
                     break;
                 case jobKey.startsWith("Controller"):
-                    result = JobController(creep, roomJob);
+                    result = JobController(creep, roomJob); // uses JobEnergyAction()
                     break;
                 case jobKey.startsWith("Repair"):
-                    result = JobRepair(creep, roomJob);
+                    result = JobRepair(creep, roomJob); // uses JobEnergyAction()
                     break;
                 case jobKey.startsWith("Construction"):
-                    result = JobConstruction(creep, roomJob);
+                    result = JobConstruction(creep, roomJob); // uses JobEnergyAction()
                     break;
                 case jobKey.startsWith("FillSpawnExtension"):
-                    result = JobFillSpawnExtension(creep, roomJob);
+                    result = JobFillSpawnExtension(creep, roomJob); // uses JobEnergyAction()
                     break;
                 case jobKey.startsWith("FillTower"):
-                    result = JobFillTower(creep, roomJob);
-                    break;
-                case jobKey.startsWith("ResourceDrop"):
-                    result = JobResourceDrop(creep, roomJob);
+                    result = JobFillTower(creep, roomJob); // uses JobEnergyAction()
                     break;
                 case jobKey.startsWith("FillStorage"):
                     result = JobFillStorage(creep, roomJob);
+                    break;
+
+                // flag jobs
+                case jobKey.startsWith("TagController"):
+                    result = JobTagController(creep, roomJob);
+                    break;
+                case jobKey.startsWith("ScoutPos"):
+                    result = JobScoutPos(creep, roomJob);
+                    break;
+                case jobKey.startsWith("ClaimController"):
+                    result = JobClaimController(creep, roomJob);
+                    break;
+                case jobKey.startsWith("ReserveController"):
+                    result = JobReserveController(creep, roomJob);
+                    break;
+                case jobKey.startsWith("GuardPos"):
+                    result = JobGuardPos(creep, roomJob);
                     break;
                 default:
                     console.log("ExecuteJobs, JobAction: ERROR! job not found: " + jobKey + ", " + creep.name);
@@ -71,9 +87,12 @@ const ExecuteJobs = {
                 }
                 console.log("ExecuteJobs, JobAction: removing: " + jobKey + ", " + roomJobs[jobKey].Creep + ", " + JSON.stringify(roomJobs[jobKey]));
                 delete roomJobs[jobKey];
+                creep.say("✔ " + result);
                 creep.memory.JobName = "idle";
             }
         }
+
+        // obj jobs:
 
         /**@return {int}*/
         function JobSource(creep, roomJob){
@@ -138,24 +157,125 @@ const ExecuteJobs = {
         }
 
         /**@return {int}*/
-        function JobResourceDrop(creep, roomJob){
+        function JobFillStorage(creep, roomJob){
             let result = ERR_NO_RESULT_FOUND;
             const obj = Game.getObjectById(roomJob.JobId);
-            // TODO
+            if(obj !== undefined && _.sum(creep.carry) < creep.carryCapacity && !creep.memory.Transfering){ // fill creep
+                if(obj.structureType === STRUCTURE_CONTAINER){
+                    for (const resourceType in obj.store) {
+                        result = creep.withdraw(obj, resourceType);
+                    }
+                }else if(obj.resourceType !== undefined){ // drop
+                    result = creep.pickup(obj);
+                }else{ // link
+                    result = creep.withdraw(obj, RESOURCE_ENERGY);
+                }
+                if(result === ERR_NOT_IN_RANGE){
+                    result = creep.moveTo(obj, {visualizePathStyle:{fill: 'transparent',stroke: '#00f5ff',lineStyle: 'dashed',strokeWidth: .15,opacity: .1}});
+                }else if(result === ERR_NOT_ENOUGH_RESOURCES && _.sum(creep.carry) > 0){
+                    result = OK;
+                    creep.memory.Transfering = true;
+                }
+            }else if(_.sum(creep.carry) > 0){ // empty creep
+                for(const resourceType in creep.carry) {
+                    result = creep.transfer(obj.room.storage, resourceType);
+                }
+                if(result === ERR_NOT_IN_RANGE){
+                    result = creep.moveTo(obj.room.storage, {visualizePathStyle:{fill: 'transparent',stroke: '#0048ff',lineStyle: 'dashed',strokeWidth: .15,opacity: .1}});
+                }
+                if(_.sum(creep.carry) > 0){
+                    creep.memory.Transfering = true;
+                }else{
+                    creep.memory.Transfering = false;
+                }
+            }
+            return result;
+        }
+
+        // flag jobs:
+
+        /**@return {int}*/
+        function JobTagController(creep, roomJob){
+            let result = ERR_NO_RESULT_FOUND;
+            const flagObj = Game.flags[roomJob.JobId];
+            if(flagObj.room === undefined){ // room is not in Game.rooms
+                result = creep.moveTo(flagObj);
+            }else{
+                result = creep.signController(flagObj.room.controller, flagObj.name);
+                if(result === ERR_NOT_IN_RANGE){
+                    result = creep.moveTo(flagObj.room.controller, {visualizePathStyle:{fill: 'transparent',stroke: '#ffb900',lineStyle: 'dashed',strokeWidth: .15,opacity: .1}});
+                }else if(result === OK ){
+                    result = JOB_IS_DONE;
+                }
+            }
             return result;
         }
 
         /**@return {int}*/
-        function JobFillStorage(creep, roomJob){
+        function JobScoutPos(creep, roomJob){
             let result = ERR_NO_RESULT_FOUND;
-            const obj = Game.getObjectById(roomJob.JobId);
-            // TODO
-
-            if(_.sum(creep.carry) === creep.carryCapacity){ // carry full - fill storage
-                
+            const flagObj = Game.flags[roomJob.JobId];
+            if(flagObj.room === undefined){ // room is not in Game.rooms
+                result = creep.moveTo(flagObj);
+            }else{
+                if(flagObj.pos.x === creep.pos.x && flagObj.pos.y === creep.pos.y && flagObj.pos.roomName === creep.pos.roomName){
+                    result = creep.say(flagObj.name, true);
+                }else{
+                    result = creep.moveTo(flagObj, {visualizePathStyle:{fill: 'transparent',stroke: '#ffdb00',lineStyle: 'dashed',strokeWidth: .15,opacity: .1}});
+                }
             }
             return result;
         }
+
+        /**@return {int}*/
+        function JobClaimController(creep, roomJob){
+            let result = ERR_NO_RESULT_FOUND;
+            const flagObj = Game.flags[roomJob.JobId];
+            if(flagObj.room === undefined){ // room is not in Game.rooms
+                result = creep.moveTo(flagObj);
+            }else{
+                result = creep.claimController(flagObj.room.controller);
+                if(result === ERR_NOT_IN_RANGE){
+                    result = creep.moveTo(flagObj.room.controller, {visualizePathStyle:{fill: 'transparent',stroke: '#04ff00',lineStyle: 'dashed',strokeWidth: .15,opacity: .1}});
+                }else if(result === OK ){
+                    result = JOB_IS_DONE;
+                }
+            }
+            return result;
+        }
+
+        /**@return {int}*/
+        function JobReserveController(creep, roomJob){
+            let result = ERR_NO_RESULT_FOUND;
+            const flagObj = Game.flags[roomJob.JobId];
+            if(flagObj.room === undefined){ // room is not in Game.rooms
+                result = creep.moveTo(flagObj);
+            }else{
+                result = creep.reserveController(flagObj.room.controller);
+                if(result === ERR_NOT_IN_RANGE){
+                    result = creep.moveTo(flagObj.room.controller, {visualizePathStyle:{fill: 'transparent',stroke: '#d8ff00',lineStyle: 'dashed',strokeWidth: .15,opacity: .1}});
+                }
+            }
+            return result;
+        }
+
+        /**@return {int}*/
+        function JobGuardPos(creep, roomJob){
+            let result = ERR_NO_RESULT_FOUND;
+            const flagObj = Game.flags[roomJob.JobId];
+            if(flagObj.room === undefined){ // room is not in Game.rooms
+                result = creep.moveTo(flagObj);
+            }else{
+                if(flagObj.pos.x === creep.pos.x && flagObj.pos.y === creep.pos.y && flagObj.pos.roomName === creep.pos.roomName){
+                    result = creep.say(flagObj.name, true);
+                }else{
+                    result = creep.moveTo(flagObj, {visualizePathStyle:{fill: 'transparent',stroke: '#ff5600',lineStyle: 'dashed',strokeWidth: .15,opacity: .1}});
+                }
+            }
+            return result;
+        }
+
+        // helper functions:
 
         /**@return {int}*/
         function JobEnergyAction(creep, roomJob, obj, actionFunction){

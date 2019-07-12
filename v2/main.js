@@ -14,5 +14,5 @@ module.exports.loop = function () {
         }
         AssignJobs.run();
     }
-    ExecuteJobs.run(); // TODO
+    ExecuteJobs.run();
 };
