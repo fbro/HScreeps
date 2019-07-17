@@ -13,12 +13,12 @@ const AssignJobs = {
         * [T] transporter       no WORK
         * [H] harvester         only one CARRY
         * [B] builder           equal WORK and CARRY
-        * TODO not in first version
         * [E] extractor         only one CARRY and maxed out WORK
         * [W] warrior           ATTACK and MOVE
         * [S] scout             just a MOVE
         * [C] claimer           CLAIM - one CLAIM
         * [R] reserver          CLAIM - many CLAIM when reserving
+        * TODO not in first version
         * [G] gunner            RANGED_ATTACK and MOVE
         * [M] medic             HEAL
         * [D] distantHarvester  equal WORK and CARRY

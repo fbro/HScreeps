@@ -111,16 +111,17 @@ const CreateJobs = {
             let roomJobs = [];
             switch (gameRoom.controller.level) {
                 case 8:
-                // TODO FillPowerSpawnEnergy
-                // TODO FillPowerSpawnPowerUnits
+                    // TODO FillPowerSpawnEnergy
+                    // TODO FillPowerSpawnPowerUnits
                 case 7:
                 case 6:
-                // TODO Extractor
-                // TODO FillLabEnergy
-                // TODO FillLabMineral
-                // TODO EmptyLabMineral
-                // TODO FillTerminalEnergy
-                // TODO FillTerminalMineral
+                    // TODO FillLabEnergy
+                    // TODO FillLabMineral
+                    // TODO EmptyLabMineral
+                    // TODO FillTerminalEnergy
+                    // TODO FillTerminalMineral
+                    // ExtractMineral
+                    ExtractMineralJobs(gameRoom, roomJobs);
                 case 5:
                 case 4:
                     if(gameRoom.storage !== undefined){
@@ -173,8 +174,17 @@ const CreateJobs = {
             }
         }
 
+        function ExtractMineralJobs(gameRoom, roomJobs){
+            const extractMineral = gameRoom.find(FIND_MY_STRUCTURES, {filter: (s) => {return s.structureType === STRUCTURE_EXTRACTOR;}})[0];
+            const mineral = gameRoom.find(FIND_MINERALS, {filter: (s) => {return s.mineralAmount > 0;}})[0];
+            if(mineral && extractMineral){
+                new RoomVisual(gameRoom.name).text("⛏💼", extractMineral.pos.x, extractMineral.pos.y);
+                CreateJob(roomJobs, 'ExtractMineral' + extractMineral.structureType.substring(10) + '(' + extractMineral.pos.x + ',' + extractMineral.pos.y + ')', mineral.id, OBJECT_JOB, 'E');
+            }
+        }
+
         function FillStorageJobs(gameRoom, roomJobs){
-            const fillStorages = gameRoom.find(FIND_MY_STRUCTURES, {
+            const fillStorages = gameRoom.find(FIND_STRUCTURES, {
                 filter: (s) => {
                     return (s.structureType === STRUCTURE_CONTAINER && s.energy >= 1900)
                         || (s.structureType === STRUCTURE_LINK && s.energy >= 700 && s.room.storage.pos.inRangeTo(s, 1));

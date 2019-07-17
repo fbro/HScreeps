@@ -19,7 +19,7 @@ const ExecuteJobs = {
                     const roomJob = memRoom.RoomJobs[roomJobKey];
                     if(roomJob.Creep !== "vacant") {
                         const gameCreep = Game.creeps[roomJob.Creep];
-                        if(gameCreep){// creep is alive
+                        if(gameCreep){ // creep is alive
                             JobAction(gameCreep, memRoom.RoomJobs, roomJobKey);
                         }else{ // creep is dead
                             console.log("ExecuteJobs, ExecuteRoomJobs: " + roomJob.Creep + " on " + roomJobKey + " in " + memRoomKey + " has died");
@@ -58,6 +58,9 @@ const ExecuteJobs = {
                     break;
                 case jobKey.startsWith("FillStorage"):
                     result = JobFillStorage(creep, roomJob);
+                    break;
+                case jobKey.startsWith("ExtractMineral"):
+                    result = JobExtractMineral(creep, roomJob);
                     break;
 
                 // flag jobs
@@ -192,6 +195,23 @@ const ExecuteJobs = {
             return result;
         }
 
+        /**@return {int}*/
+        function JobExtractMineral(creep, roomJob){
+            let result = ERR_NO_RESULT_FOUND;
+            const obj = Game.getObjectById(roomJob.JobId);
+            if(_.sum(creep.carry) < creep.carryCapacity){
+                result = creep.harvest(obj);
+                if(result === ERR_NOT_IN_RANGE){
+                    result = creep.moveTo(obj, {visualizePathStyle:{fill: 'transparent',stroke: '#fffdfe',lineStyle: 'undefined',strokeWidth: .15,opacity: .5}});
+                }
+            }else{
+                for(const resourceType in creep.carry) {
+                    result = creep.drop(resourceType);
+                }
+            }
+            return result;
+        }
+
         // flag jobs:
 
         /**@return {int}*/
@@ -266,8 +286,12 @@ const ExecuteJobs = {
             if(flagObj.room === undefined){ // room is not in Game.rooms
                 result = creep.moveTo(flagObj);
             }else{
-                if(flagObj.pos.x === creep.pos.x && flagObj.pos.y === creep.pos.y && flagObj.pos.roomName === creep.pos.roomName){
-                    result = creep.say(flagObj.name, true);
+                const hostileCreep = creep.find(FIND_HOSTILE_CREEPS)[0];
+                if(hostileCreep){
+                    creep.moveTo(hostileCreep, {visualizePathStyle:{fill: 'transparent',stroke: '#ff5600',lineStyle: 'undefined',strokeWidth: .15,opacity: .5}});
+                    result = creep.attack(hostileCreep);
+                }else if(flagObj.inRangeTo(creep, 1)){
+                    result = creep.say(flagObj.name);
                 }else{
                     result = creep.moveTo(flagObj, {visualizePathStyle:{fill: 'transparent',stroke: '#ff5600',lineStyle: 'dashed',strokeWidth: .15,opacity: .1}});
                 }
@@ -299,7 +323,7 @@ const ExecuteJobs = {
                         for(const resourceType in creep.carry) {
                             result = creep.transfer(energySupply, resourceType);
                         }
-                    }else{
+                    }else{ // DROP
                         for(const resourceType in creep.carry) {
                             result = creep.drop(resourceType);
                         }
