@@ -38,148 +38,16 @@ const CreateJobs = {
         const OBJECT_JOB = 1;
         const FLAG_JOB = 2;
 
-        UpdateObjJobs(); // TODO old remove
-        UpdateFlagJobs(); // TODO old remove
+        for(const gameRoomKey in Game.rooms) {
+            const gameRoom = Game.rooms[gameRoomKey]; // visible room
 
-        const objJobs = CreateObjJobList();
-        const flagJobs = CreateFlagJobList();
-        UpdateJobList(objJobs, flagJobs);
-
-        function CreateFlagJobList(){
-            let flagJobs = [];
-            for(const gameFlagKey in Game.flags) {
-                const gameFlag = Game.flags[gameFlagKey];
-                let jobName;
-                let creepType;
-                if (gameFlag.color === COLOR_ORANGE && gameFlag.secondaryColor === COLOR_ORANGE) { // scout tag
-                    jobName = "TagController";
-                    creepType = 'S';
-                } else if (gameFlag.color === COLOR_ORANGE && gameFlag.secondaryColor === COLOR_YELLOW) { // scout at pos
-                    jobName = "ScoutPos";
-                    creepType = 'S';
-                } else if (gameFlag.color === COLOR_GREEN && gameFlag.secondaryColor === COLOR_GREEN) { // claimer claim
-                    jobName = "ClaimController";
-                    creepType = 'C';
-                } else if (gameFlag.color === COLOR_GREEN && gameFlag.secondaryColor === COLOR_YELLOW) { // claimer reserve
-                    jobName = "ReserveController";
-                    creepType = 'R';
-                } else if (gameFlag.color === COLOR_ORANGE && gameFlag.secondaryColor === COLOR_RED) { // warrior at pos
-                    jobName = "GuardPos";
-                    creepType = 'W';
-                } else {
-                    console.log("CreateJobs, UpdateJobsInRoom: ERROR! flag color not found: " + gameFlag.color + ", " + gameFlag.secondaryColor + ", (" + gameFlag.pos.x + "," + gameFlag.pos.y + ")");
-                }
-                const newJobName = jobName + '-' + gameFlagKey; // for flag
-                CreateJob(flagJobs, newJobName, gameFlagKey, FLAG_JOB, creepType);
-            }
-            return flagJobs;
+            const objJobs = CreateObjJobs(gameRoom);
+            const flagJobs = CreateFlagJobs(gameRoom);
+            UpdateJobs(gameRoom, objJobs, flagJobs);
         }
-        function CreateObjJobList(){
+
+        function CreateObjJobs(gameRoom){
             let objJobs = [];
-            // TODO
-            return objJobs;
-        }
-        function UpdateJobList(objJobs, flagJobs){
-            // TODO
-        }
-
-
-
-
-
-
-
-
-
-
-
-
-        // adds new rooms that i own
-        // updates my rooms which had its level changed
-        // removes rooms that i do not own anymore
-        function UpdateObjJobs(){
-            for(const gameRoomKey in Game.rooms) {
-                const gameRoom = Game.rooms[gameRoomKey]; // visible room
-                if (gameRoom.controller) { // has a controller - is ownable
-                    let isFullUpdate = true; // if room does not exist or controller level have changed
-                    let oldMemRoom = undefined; // TODO WTF
-                    for(const memRoomCount in Memory.MemRooms) {
-                        const memRoom = Memory.MemRooms[memRoomCount]; // memory room
-                        if(gameRoomKey === memRoom.RoomNumber){ // I have it in memory!
-                            oldMemRoom = memRoom; // TODO WTF
-                            if(gameRoom.controller.my){ // still my room
-                                if(gameRoom.controller.level !== memRoom.RoomLevel){ // room found and room has changed level - also update the room
-                                    isFullUpdate = true;
-                                    console.log("CreateJobs, UpdateObjJobs: " + gameRoomKey + " changed level from " + memRoom.RoomLevel + " to " + gameRoom.controller.level);
-                                }else{ // room found and it is my room and it has not changed level - do not update just refresh
-                                    isFullUpdate = false;
-                                }
-                            }else{ // not my room anymore
-                                console.log("CreateJobs, UpdateObjJobs: do not own " + gameRoom.name + " anymore. removing room from mem");
-                                Memory.MemRooms[gameRoom.name] = undefined; // remove room - I do no own it anymore
-                                isFullUpdate = false;
-                            }
-                            break;
-                        }
-                    }
-                    if(gameRoom.controller.my){
-                        UpdateJobsInRoom(gameRoom, oldMemRoom.RoomJobs, isFullUpdate);
-                    }
-                }
-            }
-        }
-
-        function UpdateFlagJobs(){
-            for(const gameFlagKey in Game.flags) {
-                const gameFlag = Game.flags[gameFlagKey];
-                let jobName;
-                let creepType;
-                if(gameFlag.color === COLOR_ORANGE && gameFlag.secondaryColor === COLOR_ORANGE){ // scout tag
-                    jobName = "TagController";
-                    creepType = 'S';
-                }else if(gameFlag.color === COLOR_ORANGE && gameFlag.secondaryColor === COLOR_YELLOW){ // scout at pos
-                    jobName = "ScoutPos";
-                    creepType = 'S';
-                }else if(gameFlag.color === COLOR_GREEN && gameFlag.secondaryColor === COLOR_GREEN){ // claimer claim
-                    jobName = "ClaimController";
-                    creepType = 'C';
-                }else if(gameFlag.color === COLOR_GREEN && gameFlag.secondaryColor === COLOR_YELLOW){ // claimer reserve
-                    jobName = "ReserveController";
-                    creepType = 'R';
-                }else if(gameFlag.color === COLOR_ORANGE && gameFlag.secondaryColor === COLOR_RED){ // warrior at pos
-                    jobName = "GuardPos";
-                    creepType = 'W';
-                }else{
-                    console.log("CreateJobs, UpdateJobsInRoom: ERROR! flag color not found: " + gameFlag.color + ", " + gameFlag.secondaryColor + ", (" + gameFlag.pos.x + "," + gameFlag.pos.y + ")");
-                }
-                const newJobName = jobName + '-' + gameFlagKey; // for flag
-                let roomExist = false;
-                let flagJobExist = false;
-                for(const memRoomCount in Memory.MemRooms) {
-                    const memRoom = Memory.MemRooms[memRoomCount];
-                    if(memRoom.RoomNumber === gameFlag.pos.roomName){
-                        roomExist = true;
-                        for(const roomJobCount in Memory.MemRooms[memRoomCount].RoomJobs) {
-                            const roomJob = Memory.MemRooms[memRoomCount].RoomJobs[roomJobCount];
-                            if(roomJob.JobName === newJobName){
-                                flagJobExist = true;
-                                break;
-                            }
-                        }
-                        if(!flagJobExist && jobName && creepType){ // if exist do not recreate - and if color is found
-                            CreateJob(Memory.MemRooms[memRoomCount].RoomJobs, newJobName, gameFlagKey, FLAG_JOB, creepType);
-                        }
-                    }
-                }
-                if(!roomExist){ // room does not exist - create it and its job
-                    CreateRoom(gameFlag.pos.roomName, 0, []);
-                    CreateJob(Memory.MemRooms[Memory.MemRooms.length].RoomJobs, newJobName, gameFlagKey, FLAG_JOB, creepType);
-                }
-            }
-        }
-
-        function UpdateJobsInRoom(gameRoom, oldRoomJobs, isFullUpdate){
-            let roomJobs = [];
             switch (gameRoom.controller.level) { // create all the jobs
                 case 8:
                     // TODO FillPowerSpawnEnergy
@@ -192,59 +60,121 @@ const CreateJobs = {
                     // TODO FillTerminalEnergy
                     // TODO FillTerminalMineral
                     // ExtractMineral
-                    ExtractMineralJobs(gameRoom, roomJobs);
+                    ExtractMineralJobs(gameRoom, objJobs);
                 case 5:
                 case 4:
                     if(gameRoom.storage !== undefined){
                         // FillStorage - link, container and resource drops
-                        FillStorageJobs(gameRoom, roomJobs);
+                        FillStorageJobs(gameRoom, objJobs);
                     }
                 case 3:
                     // FillTower
-                    FillTowerJobs(gameRoom, roomJobs);
+                    FillTowerJobs(gameRoom, objJobs);
                 case 2:
                 case 1:
                     // FillSpawnExtension
-                    FillSpawnExtensionJobs(gameRoom, roomJobs);
+                    FillSpawnExtensionJobs(gameRoom, objJobs);
                     // Construction
-                    ConstructionJobs(gameRoom, roomJobs);
+                    ConstructionJobs(gameRoom, objJobs);
                     // Repair
-                    RepairJobs(gameRoom, roomJobs);
-                    if(isFullUpdate){
-                        // Controller
-                        new RoomVisual(gameRoom.name).text("💼", gameRoom.controller.pos.x, gameRoom.controller.pos.y);
-                        CreateJob(roomJobs, 'Controller(' + gameRoom.controller.pos.x + ',' + gameRoom.controller.pos.y + ')', gameRoom.controller.id, OBJECT_JOB, 'B');
-                        if(gameRoom.controller.level < 8){ // not at max level - more creeps on the controller job
-                            CreateJob(roomJobs, 'Controller1(' + gameRoom.controller.pos.x + ',' + gameRoom.controller.pos.y + ')', gameRoom.controller.id, OBJECT_JOB, 'B');
-                            CreateJob(roomJobs, 'Controller2(' + gameRoom.controller.pos.x + ',' + gameRoom.controller.pos.y + ')', gameRoom.controller.id, OBJECT_JOB, 'B');
-                        }
-                        // Source
-                        const sources = gameRoom.find(FIND_SOURCES);
-                        for (const sourceKey in sources) {
-                            const source = sources[sourceKey];
-                            new RoomVisual(gameRoom.name).text("🏭💼", source.pos.x, source.pos.y);
-                            CreateJob(roomJobs, 'Source(' + source.pos.x + ',' + source.pos.y + ')', source.id, OBJECT_JOB, 'H');
-                        }
+                    RepairJobs(gameRoom, objJobs);
+                    // Controller
+                    new RoomVisual(gameRoom.name).text("💼", gameRoom.controller.pos.x, gameRoom.controller.pos.y);
+                    CreateJob(objJobs, 'Controller(' + gameRoom.controller.pos.x + ',' + gameRoom.controller.pos.y + ')', gameRoom.controller.id, OBJECT_JOB, 'B');
+                    if(gameRoom.controller.level < 8){ // not at max level - more creeps on the controller job
+                        CreateJob(objJobs, 'Controller1(' + gameRoom.controller.pos.x + ',' + gameRoom.controller.pos.y + ')', gameRoom.controller.id, OBJECT_JOB, 'B');
+                        CreateJob(objJobs, 'Controller2(' + gameRoom.controller.pos.x + ',' + gameRoom.controller.pos.y + ')', gameRoom.controller.id, OBJECT_JOB, 'B');
+                    }
+                    // Source
+                    const sources = gameRoom.find(FIND_SOURCES);
+                    for (const sourceKey in sources) {
+                        const source = sources[sourceKey];
+                        new RoomVisual(gameRoom.name).text("🏭💼", source.pos.x, source.pos.y);
+                        CreateJob(objJobs, 'Source(' + source.pos.x + ',' + source.pos.y + ')', source.id, OBJECT_JOB, 'H');
                     }
                     break;
                 default:
                     console.log("CreateJobs, UpdateJobsInRoom: ERROR! level not found");
             }
-            for(const oldRoomJobCount in oldRoomJobs){ // if a job with similar key already existed in room then use that job to reuse creep on job
-                const oldRoomJob = oldRoomJobs[oldRoomJobCount];
-                for(const roomJobCount in roomJobs){
-                    const roomJob = roomJobs[roomJobCount];
-                    if(oldRoomJob.JobName === roomJob.JobName){
-                        roomJobs[roomJobCount] = oldRoomJob;
+            return objJobs;
+        }
+
+        function CreateFlagJobs(gameRoom){
+            let flagJobs = [];
+            for(const gameFlagKey in Game.flags) {
+                const gameFlag = Game.flags[gameFlagKey];
+                if(gameRoom.name === gameFlag.pos.roomName){ // this flag is in this room
+                    let jobName;
+                    let creepType;
+                    if (gameFlag.color === COLOR_ORANGE && gameFlag.secondaryColor === COLOR_ORANGE) { // scout tag
+                        jobName = "TagController";
+                        creepType = 'S';
+                    } else if (gameFlag.color === COLOR_ORANGE && gameFlag.secondaryColor === COLOR_YELLOW) { // scout at pos
+                        jobName = "ScoutPos";
+                        creepType = 'S';
+                    } else if (gameFlag.color === COLOR_GREEN && gameFlag.secondaryColor === COLOR_GREEN) { // claimer claim
+                        jobName = "ClaimController";
+                        creepType = 'C';
+                    } else if (gameFlag.color === COLOR_GREEN && gameFlag.secondaryColor === COLOR_YELLOW) { // claimer reserve
+                        jobName = "ReserveController";
+                        creepType = 'R';
+                    } else if (gameFlag.color === COLOR_ORANGE && gameFlag.secondaryColor === COLOR_RED) { // warrior at pos
+                        jobName = "GuardPos";
+                        creepType = 'W';
+                    } else {
+                        console.log("CreateJobs, UpdateJobsInRoom: ERROR! flag color not found: " + gameFlag.color + ", " + gameFlag.secondaryColor + ", (" + gameFlag.pos.x + "," + gameFlag.pos.y + ")");
                     }
+                    const newJobName = jobName + '-' + gameFlagKey; // for flag
+                    CreateJob(flagJobs, newJobName, gameFlagKey, FLAG_JOB, creepType);
                 }
             }
-            if(isFullUpdate) {
-                CreateRoom(gameRoom.name, gameRoom.controller.level, roomJobs);
-            }else{
-                oldRoomJobs = roomJobs;
+            return flagJobs;
+        }
+
+        function UpdateJobs(gameRoom, objJobs, flagJobs){
+            // TODO
+            let roomFound = false;
+            let memRoomFoundCount;
+            for(const memRoomCount in Memory.MemRooms) {
+                const memRoom = Memory.MemRooms[memRoomCount]; // memory room
+                if(memRoom.RoomNumber === gameRoom.name){ // room found
+                    roomFound = true;
+                    memRoomFoundCount = memRoomCount;
+                    break;
+                }
+            }
+            if(!roomFound && (objJobs.length > 0 || flagJobs.length > 0)){ // room not found and there are jobs in it - create it
+                Memory.MemRooms.push({
+                    'RoomNumber': gameRoom.name,
+                    'RoomLevel': gameRoom.level,
+                    'RoomJobs': objJobs.concat(flagJobs),
+                });
+            }else if(roomFound){ // update jobs in memRoom
+                // update jobs if jobs does not exist - else do nothing
+                const newJobs = objJobs.concat(flagJobs);
+                const memRoom = Memory.MemRooms[memRoomFoundCount];
+
+                for(const newJobsCount in newJobs){ // loop through new jobs
+                    const newJob = newJobs[newJobsCount];
+                    for(const oldJobsCount in memRoom.RoomJobs) { // loop through old jobs
+                        const oldJob = memRoom.RoomJobs[oldJobsCount];
+                        if(oldJob.JobName === newJob.JobName){
+                            newJobs[newJobsCount] = oldJob; // save the old job because of historic job info
+                            break;
+                        }
+                    }
+                }
+                memRoom.RoomLevel = gameRoom.level;
+                memRoom.RoomJobs = newJobs; // overwrite the old jobs with the new jobs - and the existing old jobs - old jobs that where not refound is forgotten
+                // TODO idle creep cleanup
             }
         }
+
+
+
+
+
+
 
         function ExtractMineralJobs(gameRoom, roomJobs){
             const extractMineral = gameRoom.find(FIND_MY_STRUCTURES, {filter: (s) => {return s.structureType === STRUCTURE_EXTRACTOR;}})[0];
