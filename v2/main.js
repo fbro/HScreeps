@@ -1,8 +1,8 @@
-let CreateJobs = require('v2/CreateJobs');
-let AssignJobs = require('v2/AssignJobs');
-let ExecuteJobs = require('v2/ExecuteJobs');
-let Towers = require('v2/Towers');
-let Links = require('v2/Links');
+let CreateJobs = require('CreateJobs');
+let AssignJobs = require('AssignJobs');
+let ExecuteJobs = require('ExecuteJobs');
+let Towers = require('Towers');
+let Links = require('Links');
 
 module.exports.loop = function () {
 
@@ -11,7 +11,23 @@ module.exports.loop = function () {
     }
     Towers.run();
     if(Game.time % 5 === 0){
-        if (Game.time % 30 === 0) { // tick burst from https://docs.screeps.com/cpu-limit.html#Bucket
+
+
+        // TODO remove after testing
+        for(const memRoomCount in Memory.MemRooms) {
+            const memRoom = Memory.MemRooms[memRoomCount];
+            let jobCounter = 0;
+            let takenJobCounter = 0;
+            for(const roomJobKey in memRoom.RoomJobs) {
+                const roomJob = memRoom.RoomJobs[roomJobKey];
+                //console.log(roomJobKey + " " + JSON.stringify(roomJob));
+                jobCounter++;
+                if(roomJob.Creep !== "vacant"){takenJobCounter++;}
+            }
+            console.log(memRoomCount + " " + memRoom.RoomNumber + " total " + jobCounter + " taken " + takenJobCounter + " " + JSON.stringify(memRoom));
+        }
+
+        if (Game.time % 10 === 0) { // tick burst from https://docs.screeps.com/cpu-limit.html#Bucket TODO change to 30
             CreateJobs.run();
             Links.run();
         }
