@@ -7,27 +7,11 @@ let Links = require('Links');
 module.exports.loop = function () {
 
     if(!Memory.MemRooms){
-        Memory.MemRooms = [];
+        Memory.MemRooms = new Object();
     }
     Towers.run();
     if(Game.time % 5 === 0){
-
-
-        // TODO remove after testing
-        for(const memRoomCount in Memory.MemRooms) {
-            const memRoom = Memory.MemRooms[memRoomCount];
-            let jobCounter = 0;
-            let takenJobCounter = 0;
-            for(const roomJobKey in memRoom.RoomJobs) {
-                const roomJob = memRoom.RoomJobs[roomJobKey];
-                //console.log(roomJobKey + " " + JSON.stringify(roomJob));
-                jobCounter++;
-                if(roomJob.Creep !== "vacant"){takenJobCounter++;}
-            }
-            console.log(memRoomCount + " " + memRoom.RoomNumber + " total " + jobCounter + " taken " + takenJobCounter + " " + JSON.stringify(memRoom));
-        }
-
-        if (Game.time % 10 === 0) { // tick burst from https://docs.screeps.com/cpu-limit.html#Bucket TODO change to 30
+        if (Game.time % 30 === 0) { // tick burst from https://docs.screeps.com/cpu-limit.html#Bucket
             CreateJobs.run();
             Links.run();
         }
@@ -39,6 +23,9 @@ module.exports.loop = function () {
 
 // TODO:
 // TEST !!!!!!!!!!!!!!!!!!!!!!!
+    // spawn is crazy
+    // memRooms disappears
+    // jobs are not executed
 // add more jobs...
 // add terminal logic
 // add constructions

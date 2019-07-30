@@ -351,13 +351,13 @@ const ExecuteJobs = {
                 }
             }
             if(!energySupply){
-                energySupply = obj.findClosestByPath(FIND_MY_STRUCTURES, {filter: function(s) {return s.structureType === STRUCTURE_LINK && s.energy > 0;}});
+                energySupply = obj.pos.findClosestByPath(FIND_MY_STRUCTURES, {filter: function(s) {return s.structureType === STRUCTURE_LINK && s.energy > 0;}});
                 energySupplyType = "LINK";
                 if(!energySupply){
-                    energySupply = obj.findClosestByPath(FIND_STRUCTURES, {filter: function(s) {return s.structureType === STRUCTURE_CONTAINER && s.store[RESOURCE_ENERGY] > 0;}});
+                    energySupply = obj.pos.findClosestByPath(FIND_STRUCTURES, {filter: function(s) {return s.structureType === STRUCTURE_CONTAINER && s.store[RESOURCE_ENERGY] > 0;}});
                     energySupplyType = "CONTAINER";
                     if(!energySupply){
-                        energySupply = obj.findClosestByPath(FIND_DROPPED_RESOURCES, {filter: function(d) {return d.resourceType === RESOURCE_ENERGY && d.amount > 50;}});
+                        energySupply = obj.pos.findClosestByPath(FIND_DROPPED_RESOURCES, {filter: function(d) {return d.resourceType === RESOURCE_ENERGY && d.amount > 50;}});
                         energySupplyType = "DROP";
                         if(!energySupply){
                             energySupply = obj.room.storage;

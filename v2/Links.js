@@ -1,14 +1,13 @@
 const Links = {
     run: function () {
 
-        for(const memRoomCount in Memory.MemRooms) {
-            const memRoom = Memory.MemRooms[memRoomCount];
-            const gameRoom = Game.rooms[memRoom.RoomNumber];
+        for(const memRoomKey in Memory.MemRooms) {
+            const memRoom = Memory.MemRooms[memRoomKey];
+            const gameRoom = Game.rooms[memRoomKey];
             let storageLink = undefined;
             let controllerLink = undefined;
             let harvesterLinks = [];
-            if(memRoom.links && memRoom.links.StorageLinkId && memRoom.links.ControllerLinkId && memRoom.links.harvesterLinksId[0]){
-                console.log("link in mem getObjectById " + memRoom.links.StorageLinkId);
+            if(memRoom.links && memRoom.links.StorageLinkId && memRoom.links.ControllerLinkId && memRoom.links.HarvesterLinksId.length === memRoom.SourceNumber){
                 storageLink = Game.getObjectById(memRoom.links.StorageLinkId);
                 controllerLink = Game.getObjectById(memRoom.links.ControllerLinkId);
                 harvesterLinks[0] = Game.getObjectById(memRoom.links.HarvesterLinksId[0]);
@@ -33,7 +32,7 @@ const Links = {
                     }
                 }
                 memRoom.links = {'StorageLinkId': storageLinkId, 'ControllerLinkId': controllerLinkId, 'HarvesterLinksId': harvesterLinksId};
-                console.log("Links: added in " + memRoomCount + ", storage: " + storageLinkId + ", controller: " + controllerLinkId + ", harvester: " + harvesterLinksId.length + ", roomLevel: " + memRoom.RoomLevel);
+                console.log("Links: added in " + memRoomKey + ", storage: " + storageLinkId + ", controller: " + controllerLinkId + ", harvester: " + harvesterLinksId.length + ", roomLevel: " + memRoom.RoomLevel);
             }
             if(storageLink && controllerLink && harvesterLinks.length > 0){
                 LinkTransfer(storageLink, controllerLink, harvesterLinks);
