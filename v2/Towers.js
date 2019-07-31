@@ -3,7 +3,7 @@ const Towers = {
 
         for(const gameRoomKey in Game.rooms) {
             const gameRoom = Game.rooms[gameRoomKey];
-            const towers = gameRoom.find(STRUCTURE_TOWER, {filter: function(tower) {return tower.energy > 0;}});
+            const towers = gameRoom.find(FIND_MY_STRUCTURES, {filter: function(tower) {return tower.structureType === STRUCTURE_TOWER && tower.energy > 0;}});
 
             const hostileTargets = gameRoom.find(FIND_HOSTILE_CREEPS, {
                 filter: function(hostile) {
@@ -28,17 +28,16 @@ const Towers = {
 
             for (let i = 0; i < towers.length; i++) {
                 if(hostileTargets.length > 0){
-                    const val = i % hostileTargets.length === 0;
+                    const val = ((i + 1) % hostileTargets.length);
+                    console.log("Towers hostileTargets val " + val + " i " + i + " num " + hostileTargets.length);
                     towers[i].attack(hostileTargets[val]);
-                }
-
-                if(damagedCreeps.length > 0){
-                    const val = i % damagedCreeps.length === 0;
+                }else if(damagedCreeps.length > 0){
+                    const val = ((i + 1) % damagedCreeps.length);
+                    console.log("Towers damagedCreeps val " + val + " i " + i + " num " + damagedCreeps.length);
                     towers[i].heal(damagedCreeps[val]);
-                }
-
-                if(damagedStructures.length > 0 && towers[i].energy < 700){
-                    const val = i % damagedStructures.length === 0;
+                }else if(damagedStructures.length > 0 && towers[i].energy < 700){
+                    const val = ((i + 1) % damagedStructures.length);
+                    console.log("Towers damagedStructures val " + val + " i " + i + " num " + damagedStructures.length);
                     towers[i].repair(damagedStructures[val]);
                 }
             }

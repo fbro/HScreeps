@@ -39,6 +39,7 @@ const ExecuteJobs = {
         function JobAction(creep, roomJobs, jobKey){
             const roomJob = roomJobs[jobKey];
             let result = ERR_NO_RESULT_FOUND;
+            // TODO on the move actions could be added here - fill extensions and fill towers
             switch (true) {
                 // obj jobs
                 case jobKey.startsWith("Source"):
@@ -89,6 +90,8 @@ const ExecuteJobs = {
                 // job is done everyone is happy, nothing to do.
             }else if(result === ERR_TIRED){
                 creep.say("😪 " + creep.fatigue);
+            }else if(result === ERR_BUSY){
+                // The creep is still being spawned
             }else{ // results where anything else than OK - one should end the job!
                 if(result === ERR_NO_RESULT_FOUND){
                     console.log("ExecuteJobs JobAction ERROR! no result gained " + jobKey + " " + result + " " + creep.name);
@@ -139,35 +142,35 @@ const ExecuteJobs = {
         /**@return {int}*/
         function JobController(creep, roomJob){
             const obj = Game.getObjectById(roomJob.JobId);
-            const result = JobEnergyAction(creep, roomJob, obj, {creepAction: function() {return creep.upgradeController(obj);}});
+            const result = JobEnergyAction(creep, roomJob, obj, {creepAction: function() {return creep.upgradeController(obj, RESOURCE_ENERGY);}});
             return result;
         }
 
         /**@return {int}*/
         function JobRepair(creep, roomJob){
             const obj = Game.getObjectById(roomJob.JobId);
-            const result = JobEnergyAction(creep, roomJob, obj, {creepAction: function() {return creep.repair(obj);}});
+            const result = JobEnergyAction(creep, roomJob, obj, {creepAction: function() {return creep.repair(obj, RESOURCE_ENERGY);}});
             return result;
         }
 
         /**@return {int}*/
         function JobConstruction(creep, roomJob){
             const obj = Game.getObjectById(roomJob.JobId);
-            const result = JobEnergyAction(creep, roomJob, obj, {creepAction: function() {return creep.build(obj);}});
+            const result = JobEnergyAction(creep, roomJob, obj, {creepAction: function() {return creep.build(obj, RESOURCE_ENERGY);}});
             return result;
         }
 
         /**@return {int}*/
         function JobFillSpawnExtension(creep, roomJob){
             const obj = Game.getObjectById(roomJob.JobId);
-            const result = JobEnergyAction(creep, roomJob, obj, {creepAction: function() {return creep.transfer(obj);}});
+            const result = JobEnergyAction(creep, roomJob, obj, {creepAction: function() {return creep.transfer(obj, RESOURCE_ENERGY);}});
             return result;
         }
 
         /**@return {int}*/
         function JobFillTower(creep, roomJob){
             const obj = Game.getObjectById(roomJob.JobId);
-            const result = JobEnergyAction(creep, roomJob, obj, {creepAction: function() {return creep.transfer(obj);}});
+            const result = JobEnergyAction(creep, roomJob, obj, {creepAction: function() {return creep.transfer(obj, RESOURCE_ENERGY);}});
             return result;
         }
 
@@ -378,6 +381,7 @@ const ExecuteJobs = {
                     creep.memory.EnergySupplyType = undefined;
                 }
             }
+            // TODO get closest for real!
             if(!energySupply){
                 energySupply = obj.pos.findClosestByPath(FIND_MY_STRUCTURES, {filter: function(s) {return s.structureType === STRUCTURE_LINK && s.energy > 0;}});
                 energySupplyType = "LINK";
