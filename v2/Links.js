@@ -32,7 +32,7 @@ const Links = {
                     }
                 }
                 memRoom.links = {'StorageLinkId': storageLinkId, 'ControllerLinkId': controllerLinkId, 'HarvesterLinksId': harvesterLinksId};
-                console.log("Links: added in " + memRoomKey + ", storage: " + storageLinkId + ", controller: " + controllerLinkId + ", harvester: " + harvesterLinksId.length + ", roomLevel: " + memRoom.RoomLevel);
+                console.log("Links added in " + memRoomKey + " storage: " + storageLinkId + " controller " + controllerLinkId + " harvester " + harvesterLinksId.length + " roomLevel " + memRoom.RoomLevel);
             }
             if(storageLink && controllerLink && harvesterLinks.length > 0){
                 LinkTransfer(storageLink, controllerLink, harvesterLinks);

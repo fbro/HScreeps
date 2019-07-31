@@ -97,7 +97,7 @@ const CreateJobs = {
                     // do nothing
                     break;
                 default:
-                    console.log("CreateJobs, UpdateJobsInRoom: ERROR! level not found: " + gameRoom.controller.level);
+                    console.log("CreateJobs UpdateJobsInRoom ERROR! level not found " + gameRoom.controller.level);
             }
         }
 
@@ -123,7 +123,7 @@ const CreateJobs = {
                         jobName = "GuardPos";
                         creepType = 'W';
                     } else {
-                        console.log("CreateJobs, UpdateJobsInRoom: ERROR! flag color not found: " + gameFlag.color + ", " + gameFlag.secondaryColor + ", (" + gameFlag.pos.x + "," + gameFlag.pos.y + ")");
+                        console.log("CreateJobs UpdateJobsInRoom ERROR! flag color not found " + gameFlag.color + " " + gameFlag.secondaryColor + " (" + gameFlag.pos.x + "," + gameFlag.pos.y + ")");
                     }
                     const newJobName = jobName + '-' + gameFlagKey; // for flag
                     CreateJob(jobs, newJobName, gameFlagKey, FLAG_JOB, creepType);
@@ -139,7 +139,7 @@ const CreateJobs = {
                     'RoomJobs': jobs,
                     'SourceNumber': gameRoom.find(FIND_SOURCES).length,
                 };
-                console.log("CreateJobs, UpdateJobs: add new room: " + gameRoom.name + " level: " + level + " jobs: " + JSON.stringify(jobs))
+                console.log("CreateJobs UpdateJobs add new room " + gameRoom.name + " level " + level + " jobs " + JSON.stringify(jobs))
             }else if(memRoom !== undefined){ // update jobs in memRoom
                 // update jobs if jobs does not exist - else do nothing
                 for(const newJobsKey in jobs){ // loop through new jobs

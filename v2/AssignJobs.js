@@ -37,35 +37,44 @@ const AssignJobs = {
                 for(const roomJobKey in memRoom.RoomJobs) {
                     const roomJob = memRoom.RoomJobs[roomJobKey];
                     if(roomJob.Creep === "vacant"){
-                        let creepFound = false;
-                        for(const idleCreepInRoomCounter in idleCreepsInRoom) {
-                            const idleCreepInRoom = idleCreepsInRoom[idleCreepInRoomCounter];
-                            if(roomJob.CreepType === idleCreepInRoom.name.substring(0, 1)){
-                                // idle creep is in memory room with vacant job and matching job type
-                                idleCreepInRoom.memory.JobName = roomJobKey;
-                                roomJob.Creep = idleCreepInRoom.name;
-                                creepFound = true;
-                                console.log("AssignJobs, AssignOrSpawnCreeps: " + idleCreepInRoom.name + " assigned to " + roomJobKey + " in " + memRoomKey);
-                                delete idleCreepsInRoom[idleCreepInRoomCounter];
-                                break;
-                            }
-                        }
-                        // if idle creep not found for vacant job then look if spawn is possible
-                        if(!creepFound && ShouldSpawnCreep(roomJob.CreepType, memRoomKey)){
-                            for(const availableSpawnCounter in availableSpawns){
-                                const availableSpawn = availableSpawns[availableSpawnCounter];
-                                const availableName = GetAvailableName(roomJob.CreepType);
-                                const spawnResult = availableSpawn.spawnCreep(GetCreepBody(roomJob.CreepType, Game.rooms[memRoomKey].energyAvailable), availableName);
-                                if(spawnResult === OK){
-                                    Game.creeps[availableName].memory.JobName = roomJobKey;
-                                    roomJob.Creep = availableName;
-                                    creepFound = true;
-                                }
-                                console.log("AssignJobs, AssignOrSpawnCreeps: " + availableName + " assigned to " + roomJobKey + " in " + memRoomKey + " spawnResult " + spawnResult + " spawn " + availableSpawn.name);
-                                delete availableSpawns[availableSpawnCounter];
-                            }
-                        }
+                        let creepFound = AssignCreeps(roomJob, memRoomKey, idleCreepsInRoom, roomJobKey)
+                        SpawnCreeps(creepFound, roomJob, memRoomKey, availableSpawns, roomJobKey);
                     }
+                }
+            }
+        }
+
+        /**@return {boolean}*/
+        function AssignCreeps(roomJob, memRoomKey, idleCreepsInRoom, roomJobKey) {
+            for(const idleCreepInRoomCounter in idleCreepsInRoom) {
+                const idleCreepInRoom = idleCreepsInRoom[idleCreepInRoomCounter];
+                if(roomJob.CreepType === idleCreepInRoom.name.substring(0, 1)){
+                    // idle creep is in memory room with vacant job and matching job type
+                    idleCreepInRoom.memory.JobName = roomJobKey;
+                    roomJob.Creep = idleCreepInRoom.name;
+                    console.log("AssignJobs AssignCreeps " + idleCreepInRoom.name + " assigned to " + roomJobKey + " in " + memRoomKey);
+                    delete idleCreepsInRoom[idleCreepInRoomCounter];
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        function SpawnCreeps(creepFound, roomJob, memRoomKey, availableSpawns, roomJobKey) {
+            // if idle creep not found for vacant job then look if spawn is possible
+            if(!creepFound && ShouldSpawnCreep(roomJob.CreepType, memRoomKey)){
+                for(const availableSpawnCounter in availableSpawns){
+                    const availableSpawn = availableSpawns[availableSpawnCounter];
+                    const availableName = GetAvailableName(roomJob.CreepType);
+                    const spawnResult = availableSpawn.spawnCreep(GetCreepBody(roomJob.CreepType, Game.rooms[memRoomKey].energyAvailable), availableName);
+                    if(spawnResult === OK){
+                        Game.creeps[availableName].memory.JobName = roomJobKey;
+                        roomJob.Creep = availableName;
+                        creepFound = true;
+                    }
+                    console.log("AssignJobs SpawnCreeps " + availableName + " assigned to " + roomJobKey + " in " + memRoomKey + " spawnResult " + spawnResult + " spawn " + availableSpawn.name);
+                    delete availableSpawns[availableSpawnCounter];
+                    return;
                 }
             }
         }
@@ -102,7 +111,7 @@ const AssignJobs = {
                     maxCreepsInRoom = 6;
                     break;
                 default:
-                    console.log("AssignJobs, ShouldSpawnCreep: ERROR! creepType not found: " + creepType);
+                    console.log("AssignJobs ShouldSpawnCreep ERROR! creepType not found " + creepType);
             }
             if(numOfEmployedCreepsWithCreepType < maxCreepsInRoom){
                 return true;
@@ -238,7 +247,7 @@ const AssignJobs = {
                             body = [TOUGH, MOVE, MOVE, ATTACK];break;
                     } break;
                 default:
-                    console.log("AssignJobs, GetCreepBody: ERROR! creepType not found: " + creepType);
+                    console.log("AssignJobs GetCreepBody ERROR! creepType not found " + creepType);
             }
             return body;
         }

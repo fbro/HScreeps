@@ -23,9 +23,11 @@ const ExecuteJobs = {
                         if(gameCreep){ // creep is alive
                             JobAction(gameCreep, memRoom.RoomJobs, roomJobKey);
                         }else{ // creep is dead
-                            console.log("ExecuteJobs, ExecuteRoomJobs: " + roomJob.Creep + " on " + roomJobKey + " in " + memRoomKey + " has died");
+                            console.log("ExecuteJobs ExecuteRoomJobs " + roomJob.Creep + " on " + roomJobKey + " in " + memRoomKey + " has died");
                             const tombstone = Game.rooms[memRoomKey].find(FIND_TOMBSTONES, {filter: function(tombstone) {return tombstone.creep.name === roomJob.Creep;}})[0];
-                            new RoomVisual(memRoomKey).text(roomJob.Creep + "⚰", tombstone.pos.x, tombstone.pos.y);
+                            if(tombstone){
+                                new RoomVisual(memRoomKey).text(roomJob.Creep + "⚰", tombstone.pos.x, tombstone.pos.y);
+                            }
                             roomJob.Creep = "vacant";
                             delete Memory.creeps[roomJob.Creep];
                         }
@@ -81,7 +83,7 @@ const ExecuteJobs = {
                     result = JobGuardPos(creep, roomJob);
                     break;
                 default:
-                    console.log("ExecuteJobs, JobAction: ERROR! job not found: " + jobKey + ", " + creep.name);
+                    console.log("ExecuteJobs JobAction ERROR! job not found " + jobKey + " " + creep.name);
             }
             if(result === OK){
                 // job is done everyone is happy, nothing to do.
@@ -89,13 +91,13 @@ const ExecuteJobs = {
                 creep.say("😪 " + creep.fatigue);
             }else{ // results where anything else than OK - one should end the job!
                 if(result === ERR_NO_RESULT_FOUND){
-                    console.log("ExecuteJobs, JobAction: ERROR! no result gained: " + jobKey + ", " + creep.name);
+                    console.log("ExecuteJobs JobAction ERROR! no result gained " + jobKey + " " + result + " " + creep.name);
                     creep.say("⚠ " + result);
                 }else if(result === JOB_DISAPPEARED){
-                    console.log("ExecuteJobs, JobAction: removing disappeared job: " + jobKey + ", " + roomJobs[jobKey].Creep + ", " + JSON.stringify(roomJobs[jobKey]));
+                    console.log("ExecuteJobs JobAction removing disappeared job " + jobKey + " " + result + " " + roomJobs[jobKey].Creep + " " + JSON.stringify(roomJobs[jobKey]));
                     creep.say("🙈 " + result);
                 }else{
-                    console.log("ExecuteJobs, JobAction: removing: " + jobKey + ", " + roomJobs[jobKey].Creep + ", " + JSON.stringify(roomJobs[jobKey]));
+                    console.log("ExecuteJobs JobAction removing " + jobKey + " " + result + " " + roomJobs[jobKey].Creep + " " + JSON.stringify(roomJobs[jobKey]));
                     creep.say("✔ " + result);
                 }
                 delete roomJobs[jobKey];
@@ -187,7 +189,7 @@ const ExecuteJobs = {
                 }
                 if(result === ERR_NOT_IN_RANGE){
                     result = creep.moveTo(obj, {visualizePathStyle:{fill: 'transparent',stroke: '#00f5ff',lineStyle: 'dashed',strokeWidth: .15,opacity: .1}});
-                }else if(result === ERR_NOT_ENOUGH_RESOURCES && _.sum(creep.carry) > 0){
+                }else if((result === ERR_NOT_ENOUGH_RESOURCES || result === ERR_INVALID_ARGS) && _.sum(creep.carry) > 0){
                     result = OK;
                     creep.memory.Transfering = true;
                 }
@@ -337,10 +339,10 @@ const ExecuteJobs = {
                 }
             }else{ // find more energy
                 const energySupply = FindClosestEnergy(creep, obj);
-                if(creep.memory.EnergySupplyType === "DROP"){
+                if(energySupply && creep.memory.EnergySupplyType === "DROP"){
                     result = creep.pickup(energySupply);
-                }else{
-                    result = creep.withdraw(energySupply);
+                }else if(energySupply){
+                    result = creep.withdraw(energySupply, RESOURCE_ENERGY);
                 }
                 if(result === ERR_NOT_IN_RANGE){
                     result = creep.moveTo(energySupply, {visualizePathStyle:{fill: 'transparent',stroke: '#ffe100',lineStyle: 'dashed',strokeWidth: .15,opacity: .1}});
