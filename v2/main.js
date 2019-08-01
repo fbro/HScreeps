@@ -3,6 +3,7 @@ let AssignJobs = require('AssignJobs');
 let ExecuteJobs = require('ExecuteJobs');
 let Towers = require('Towers');
 let Links = require('Links');
+let Terminals = require('Terminals');
 
 module.exports.loop = function () {
 
@@ -14,6 +15,7 @@ module.exports.loop = function () {
         if (Game.time % 30 === 0) { // tick burst from https://docs.screeps.com/cpu-limit.html#Bucket
             CreateJobs.run();
             Links.run();
+            Terminals.run();
         }
         AssignJobs.run();
     }

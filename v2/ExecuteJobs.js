@@ -9,7 +9,7 @@ const ExecuteJobs = {
 
         const ERR_NO_RESULT_FOUND = -20; // job flow did not encounter any actions that lead to any results!
         const JOB_IS_DONE = -21; // when the job should be removed but there are no ERR codes
-        const JOB_DISAPPEARED = -22; // getObjectById returned null
+        const JOB_OBJ_DISAPPEARED = -22; // getObjectById returned null
 
         ExecuteRoomJobs();
 
@@ -104,7 +104,7 @@ const ExecuteJobs = {
                 if(result === ERR_NO_RESULT_FOUND){
                     console.log("ExecuteJobs JobAction ERROR! no result gained " + jobKey + " " + result + " " + creep.name);
                     creep.say("⚠ " + result);
-                }else if(result === JOB_DISAPPEARED){
+                }else if(result === JOB_OBJ_DISAPPEARED){
                     console.log("ExecuteJobs JobAction removing disappeared job " + jobKey + " " + result + " " + roomJob.Creep + " " + JSON.stringify(roomJob));
                     creep.say("🙈 " + result);
                 }else{
@@ -132,14 +132,14 @@ const ExecuteJobs = {
             let result = ERR_NO_RESULT_FOUND;
             const obj = Game.getObjectById(roomJob.JobId);
             if(obj === null){
-                result = JOB_DISAPPEARED;
+                result = JOB_OBJ_DISAPPEARED;
             }else if(_.sum(creep.carry) < creep.carryCapacity){
                 result = creep.harvest(obj);
                 if(result === ERR_NOT_IN_RANGE){
                     result = creep.moveTo(obj, {visualizePathStyle:{fill: 'transparent',stroke: '#ffe100',lineStyle: 'undefined',strokeWidth: .15,opacity: .5}});
                 }
             }else{
-                const link = obj.pos.findInRange(FIND_MY_STRUCTURES, 1, {filter: function(link) { return link.structureType === STRUCTURE_LINK && link.energy < link.energyCapacity;}})[0];
+                const link = obj.pos.findInRange(FIND_MY_STRUCTURES, 2, {filter: function(link) { return link.structureType === STRUCTURE_LINK && link.energy < link.energyCapacity;}})[0];
                 if(link && creep.carry[RESOURCE_ENERGY] === creep.carryCapacity){
                     result = creep.transfer(link, RESOURCE_ENERGY);
                 }else{
@@ -196,7 +196,7 @@ const ExecuteJobs = {
             let result = ERR_NO_RESULT_FOUND;
             const obj = Game.getObjectById(roomJob.JobId);
             if(obj === null){
-                result = JOB_DISAPPEARED;
+                result = JOB_OBJ_DISAPPEARED;
             }else if(_.sum(creep.carry) < creep.carryCapacity && !creep.memory.Transfering){ // fill creep
                 if(obj.structureType === STRUCTURE_CONTAINER){
                     for (const resourceType in obj.store) {
@@ -234,7 +234,7 @@ const ExecuteJobs = {
             let result = ERR_NO_RESULT_FOUND;
             const obj = Game.getObjectById(roomJob.JobId);
             if(obj === null){
-                result = JOB_DISAPPEARED;
+                result = JOB_OBJ_DISAPPEARED;
             }else if(_.sum(creep.carry) < creep.carryCapacity){
                 result = creep.harvest(obj);
                 if(result === ERR_NOT_IN_RANGE){
@@ -255,7 +255,7 @@ const ExecuteJobs = {
             let result = ERR_NO_RESULT_FOUND;
             const flagObj = Game.flags[roomJob.JobId];
             if(flagObj === undefined){
-                result = JOB_DISAPPEARED;
+                result = JOB_OBJ_DISAPPEARED;
             }else if(flagObj.room === undefined){ // room is not in Game.rooms
                 result = creep.moveTo(flagObj);
             }else{
@@ -274,7 +274,7 @@ const ExecuteJobs = {
             let result = ERR_NO_RESULT_FOUND;
             const flagObj = Game.flags[roomJob.JobId];
             if(flagObj === undefined){
-                result = JOB_DISAPPEARED;
+                result = JOB_OBJ_DISAPPEARED;
             }else if(flagObj.room === undefined){ // room is not in Game.rooms
                 result = creep.moveTo(flagObj);
             }else{
@@ -292,7 +292,7 @@ const ExecuteJobs = {
             let result = ERR_NO_RESULT_FOUND;
             const flagObj = Game.flags[roomJob.JobId];
             if(flagObj === undefined){
-                result = JOB_DISAPPEARED;
+                result = JOB_OBJ_DISAPPEARED;
             }else if(flagObj.room === undefined){ // room is not in Game.rooms
                 result = creep.moveTo(flagObj);
             }else{
@@ -311,7 +311,7 @@ const ExecuteJobs = {
             let result = ERR_NO_RESULT_FOUND;
             const flagObj = Game.flags[roomJob.JobId];
             if(flagObj === undefined){
-                result = JOB_DISAPPEARED;
+                result = JOB_OBJ_DISAPPEARED;
             }else if(flagObj.room === undefined){ // room is not in Game.rooms
                 result = creep.moveTo(flagObj);
             }else{
@@ -328,7 +328,7 @@ const ExecuteJobs = {
             let result = ERR_NO_RESULT_FOUND;
             const flagObj = Game.flags[roomJob.JobId];
             if(flagObj === undefined){
-                result = JOB_DISAPPEARED;
+                result = JOB_OBJ_DISAPPEARED;
             }else if(flagObj.room === undefined){ // room is not in Game.rooms
                 result = creep.moveTo(flagObj);
             }else{
@@ -351,7 +351,7 @@ const ExecuteJobs = {
         function JobEnergyAction(creep, roomJob, obj, actionFunction){
             let result = ERR_NO_RESULT_FOUND;
             if(obj === null){
-                result = JOB_DISAPPEARED;
+                result = JOB_OBJ_DISAPPEARED;
             }else if(creep.carry[RESOURCE_ENERGY] > 0){
                 result = actionFunction.creepAction();
                 if(result === ERR_NOT_IN_RANGE){
