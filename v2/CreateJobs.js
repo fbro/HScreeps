@@ -81,17 +81,17 @@ const CreateJobs = {
                     RepairJobs(gameRoom, jobs);
                     // Controller
                     new RoomVisual(gameRoom.name).text("💼", gameRoom.controller.pos.x, gameRoom.controller.pos.y);
-                    CreateJob(jobs, 'Controller(' + gameRoom.controller.pos.x + ',' + gameRoom.controller.pos.y + ')', gameRoom.controller.id, OBJECT_JOB, 'B');
+                    CreateJob(jobs, 'Controller(' + gameRoom.controller.pos.x + ',' + gameRoom.controller.pos.y + ')' + gameRoom.name, gameRoom.controller.id, OBJECT_JOB, 'B');
                     if(gameRoom.controller.level < 8){ // not at max level - more creeps on the controller job
-                        CreateJob(jobs, 'Controller1(' + gameRoom.controller.pos.x + ',' + gameRoom.controller.pos.y + ')', gameRoom.controller.id, OBJECT_JOB, 'B');
-                        CreateJob(jobs, 'Controller2(' + gameRoom.controller.pos.x + ',' + gameRoom.controller.pos.y + ')', gameRoom.controller.id, OBJECT_JOB, 'B');
+                        CreateJob(jobs, 'Controller1(' + gameRoom.controller.pos.x + ',' + gameRoom.controller.pos.y + ')' + gameRoom.name, gameRoom.controller.id, OBJECT_JOB, 'B');
+                        CreateJob(jobs, 'Controller2(' + gameRoom.controller.pos.x + ',' + gameRoom.controller.pos.y + ')' + gameRoom.name, gameRoom.controller.id, OBJECT_JOB, 'B');
                     }
                     // Source
                     const sources = gameRoom.find(FIND_SOURCES);
                     for (const sourceKey in sources) {
                         const source = sources[sourceKey];
                         new RoomVisual(gameRoom.name).text("🏭💼", source.pos.x, source.pos.y);
-                        CreateJob(jobs, 'Source(' + source.pos.x + ',' + source.pos.y + ')', source.id, OBJECT_JOB, 'H');
+                        CreateJob(jobs, 'Source(' + source.pos.x + ',' + source.pos.y + ')' + gameRoom.name, source.id, OBJECT_JOB, 'H');
                     }
                 case 0:
                     // do nothing
@@ -152,7 +152,6 @@ const CreateJobs = {
                 }
                 memRoom.RoomLevel = level;
                 memRoom.RoomJobs = jobs; // overwrite the old jobs with the new jobs - and the existing old jobs - old jobs that where not refound is forgotten
-                // TODO - remember to check new idle creeps because of old removed jobs
             }
         }
 
@@ -163,7 +162,7 @@ const CreateJobs = {
             const mineral = gameRoom.find(FIND_MINERALS, {filter: (s) => {return s.mineralAmount > 0;}})[0];
             if(mineral && extractMineral){
                 new RoomVisual(gameRoom.name).text("⛏💼", extractMineral.pos.x, extractMineral.pos.y);
-                CreateJob(roomJobs, 'ExtractMineral' + extractMineral.structureType.substring(10) + '(' + extractMineral.pos.x + ',' + extractMineral.pos.y + ')', mineral.id, OBJECT_JOB, 'E');
+                CreateJob(roomJobs, 'ExtractMineral' + extractMineral.structureType.substring(10) + '(' + extractMineral.pos.x + ',' + extractMineral.pos.y + ')' + gameRoom.name, mineral.id, OBJECT_JOB, 'E');
             }
         }
 
@@ -177,14 +176,14 @@ const CreateJobs = {
             for (const fillStorageKey in fillStorages) {
                 const fillStorage = fillStorages[fillStorageKey];
                 new RoomVisual(gameRoom.name).text("⚡💼", fillStorage.pos.x, fillStorage.pos.y);
-                CreateJob(roomJobs, 'FillStorage' + fillStorage.structureType.substring(10) + '(' + fillStorage.pos.x + ',' + fillStorage.pos.y + ')', fillStorage.id, OBJECT_JOB, 'T');
+                CreateJob(roomJobs, 'FillStorage' + fillStorage.structureType.substring(10) + '(' + fillStorage.pos.x + ',' + fillStorage.pos.y + ')' + gameRoom.name, fillStorage.id, OBJECT_JOB, 'T');
             }
             // drop is a little bit different - but same kind of job as above
             const resourceDrops = gameRoom.find(FIND_DROPPED_RESOURCES, {filter: (drop) => {return (drop.amount > 50);}});
             for (const resourceDropKey in resourceDrops) {
                 const resourceDrop = resourceDrops[resourceDropKey];
                 new RoomVisual(gameRoom.name).text("💰💼", resourceDrop.pos.x, resourceDrop.pos.y);
-                CreateJob(roomJobs, 'FillStorage' + resourceDrop.resourceType.substring(9) + '(' + resourceDrop.pos.x + ',' + resourceDrop.pos.y + ',' + resourceDrop.amount + ')', resourceDrop.id, OBJECT_JOB, 'T');
+                CreateJob(roomJobs, 'FillStorage' + resourceDrop.resourceType.substring(9) + '(' + resourceDrop.pos.x + ',' + resourceDrop.pos.y + ',' + resourceDrop.amount + ')' + gameRoom.name, resourceDrop.id, OBJECT_JOB, 'T');
             }
         }
 
@@ -197,7 +196,7 @@ const CreateJobs = {
             for (const fillTowerKey in fillTowers) {
                 const fillTower = fillTowers[fillTowerKey];
                 new RoomVisual(gameRoom.name).text("⚡💼", fillTower.pos.x, fillTower.pos.y);
-                CreateJob(roomJobs, 'FillTower(' + fillTower.pos.x + ',' + fillTower.pos.y + ')', fillTower.id, OBJECT_JOB, 'T');
+                CreateJob(roomJobs, 'FillTower(' + fillTower.pos.x + ',' + fillTower.pos.y + ')' + gameRoom.name, fillTower.id, OBJECT_JOB, 'T');
             }
         }
 
@@ -210,7 +209,7 @@ const CreateJobs = {
             for (const fillSpawnExtensionKey in fillSpawnExtensions) {
                 const fillSpawnExtension = fillSpawnExtensions[fillSpawnExtensionKey];
                 new RoomVisual(gameRoom.name).text("⚡💼", fillSpawnExtension.pos.x, fillSpawnExtension.pos.y);
-                CreateJob(roomJobs, 'FillSpawnExtension(' + fillSpawnExtension.pos.x + ',' + fillSpawnExtension.pos.y + ')', fillSpawnExtension.id, OBJECT_JOB, 'T');
+                CreateJob(roomJobs, 'FillSpawnExtension(' + fillSpawnExtension.pos.x + ',' + fillSpawnExtension.pos.y + ')' + gameRoom.name, fillSpawnExtension.id, OBJECT_JOB, 'T');
             }
         }
 
@@ -219,7 +218,7 @@ const CreateJobs = {
             for (const constructionKey in constructions) {
                 const construction = constructions[constructionKey];
                 new RoomVisual(gameRoom.name).text("🏗💼", construction.pos.x, construction.pos.y);
-                CreateJob(roomJobs, 'Construction' + construction.structureType.substring(10) + '(' + construction.pos.x + ',' + construction.pos.y + ')', construction.id, OBJECT_JOB, 'B');
+                CreateJob(roomJobs, 'Construction' + construction.structureType.substring(10) + '(' + construction.pos.x + ',' + construction.pos.y + ')' + gameRoom.name, construction.id, OBJECT_JOB, 'B');
             }
         }
 
@@ -248,7 +247,7 @@ const CreateJobs = {
             for (const repairKey in repairs) {
                 const repair = repairs[repairKey];
                 new RoomVisual(gameRoom.name).text("🛠💼", repair.pos.x, repair.pos.y);
-                CreateJob(roomJobs, 'Repair' + repair.structureType.substring(10) + '(' + repair.pos.x + ',' + repair.pos.y + ')', repair.id, OBJECT_JOB, 'B');
+                CreateJob(roomJobs, 'Repair' + repair.structureType.substring(10) + '(' + repair.pos.x + ',' + repair.pos.y + ')' + gameRoom.name, repair.id, OBJECT_JOB, 'B');
             }
         }
 

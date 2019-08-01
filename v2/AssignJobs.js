@@ -33,12 +33,13 @@ const AssignJobs = {
             for(const memRoomKey in Memory.MemRooms) {
                 const memRoom = Memory.MemRooms[memRoomKey];
                 const idleCreepsInRoom = _.filter(idleCreeps, function(creep) { return creep.pos.roomName === memRoomKey; });
+                const availableSpawnsInRoom = _.filter(availableSpawns, function(spawn) { return spawn.pos.roomName === memRoomKey; });
                 // TODO what about idle creeps in neutral rooms - and many idle creeps in one room that could be moved to another room
                 for(const roomJobKey in memRoom.RoomJobs) {
                     const roomJob = memRoom.RoomJobs[roomJobKey];
                     if(roomJob.Creep === "vacant"){
                         let creepFound = AssignCreeps(roomJob, memRoomKey, idleCreepsInRoom, roomJobKey)
-                        SpawnCreeps(creepFound, roomJob, memRoomKey, availableSpawns, roomJobKey);
+                        SpawnCreeps(creepFound, roomJob, memRoomKey, availableSpawnsInRoom, roomJobKey);
                     }
                 }
             }
