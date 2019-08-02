@@ -7,11 +7,12 @@ for(const creepName in Memory.creeps) {
     if(gc === undefined){
         delete Memory.creeps[creepName];
     }else{
-        mc.transferring = undefined;
+        mc.Transferring = undefined;
         mc.JobName = "idle";
         mc.EnergySupply = undefined;
         mc.EnergySupplyType = undefined;
-        //gc.suicide(); // total reset
+
     }
 }
+//gc.suicide(); // total reset
 console.log("manual search: " + JSON.stringify(Game.getObjectById("5cee5f96d1936f6f4667aa35")))
