@@ -94,7 +94,7 @@ const AssignJobs = {
             }
             switch (creepType) {
                 case 'T': // transporter
-                    maxCreepsInRoom = 3;
+                    maxCreepsInRoom = 2;
                     break;
                 case 'H': // harvester
                     maxCreepsInRoom = Game.rooms[roomKey].find(FIND_SOURCES).length;
