@@ -418,6 +418,7 @@ const ExecuteJobs = {
                     const distance = Math.sqrt(Math.pow(energySupplies[i].pos.x - creep.pos.x, 2) + Math.pow(energySupplies[i].pos.y - creep.pos.y, 2));
                     if(distance < bestDistance){
                         energySupply = energySupplies[i];
+                        bestDistance = distance;
                     }
                 }
                 if(energySupply){
