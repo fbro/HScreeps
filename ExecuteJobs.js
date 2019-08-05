@@ -78,6 +78,12 @@ const ExecuteJobs = {
                 case jobKey.startsWith('ExtractMineral'):
                     result = JobExtractMineral(creep, roomJob);
                     break;
+                case jobKey.startsWith('FillTerminalMineral'):
+                    result = JobFillTerminalMineral(creep, roomJob);
+                    break;
+                case jobKey.startsWith('FillTerminalEnergy'):
+                    result = JobFillTerminalEnergy(creep, roomJob);
+                    break;
 
                 // flag jobs
                 case jobKey.startsWith('TagController'):
@@ -250,6 +256,27 @@ const ExecuteJobs = {
                     result = creep.drop(resourceType);
                 }
             }
+            return result;
+        }
+
+        /**@return {int}*/
+        function JobFillTerminalMineral(creep, roomJob){
+            const obj = Game.getObjectById(roomJob.JobId);
+            let savedResourceType;
+            for(const resourceType in creep.carry) {
+                if(resourceType !== RESOURCE_ENERGY){
+                    savedResourceType = resourceType;
+                    break;
+                }
+            }
+            let result = JobEnergyAction(creep, roomJob, obj, {creepAction: function() {return creep.transfer(obj, savedResourceType);}});
+            return result;
+        }
+
+        /**@return {int}*/
+        function JobFillTerminalEnergy(creep, roomJob){
+            const obj = Game.getObjectById(roomJob.JobId);
+            let result = JobEnergyAction(creep, roomJob, obj, {creepAction: function() {return creep.transfer(obj, RESOURCE_ENERGY);}});
             return result;
         }
 

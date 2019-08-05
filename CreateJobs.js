@@ -58,8 +58,10 @@ const CreateJobs = {
                     // TODO FillLabEnergy
                     // TODO FillLabMineral
                     // TODO EmptyLabMineral
-                    // TODO FillTerminalEnergy
-                    // TODO FillTerminalMineral
+                    // FillTerminalEnergy
+                    FillTerminalEnergyJobs(gameRoom, jobs);
+                    // FillTerminalMineral
+                    FillTerminalMineralJobs(gameRoom, jobs);
                     // ExtractMineral
                     ExtractMineralJobs(gameRoom, jobs);
                 case 5:
@@ -176,6 +178,27 @@ const CreateJobs = {
 
         // jobs:
 
+        function FillTerminalMineralJobs(gameRoom, roomJobs){
+            if(gameRoom.storage){
+                const terminal = gameRoom.find(FIND_MY_STRUCTURES, {filter: (s) => {return s.structureType === STRUCTURE_TERMINAL;}})[0];
+                if(terminal && _.sum(terminal.store) < (terminal.storeCapacity - (100000 - terminal.store[RESOURCE_ENERGY]))){
+                    for (const resourceType in gameRoom.storage.store) {
+                        if(gameRoom.storage.store[resourceType] > 0 && resourceType !== RESOURCE_ENERGY){
+                            CreateJob(roomJobs, 'FillTerminalMineral-' + resourceType + '(' + terminal.pos.x + ',' + terminal.pos.y + ')' + gameRoom.name, terminal.id, OBJECT_JOB, 'T', 5);
+                        }
+                    }
+                }
+            }
+        }
+        function FillTerminalEnergyJobs(gameRoom, roomJobs){
+            if(gameRoom.storage && gameRoom.storage.store[RESOURCE_ENERGY] > 50000){
+                const terminal = gameRoom.find(FIND_MY_STRUCTURES, {filter: (s) => {return s.structureType === STRUCTURE_TERMINAL;}})[0];
+                if(terminal && terminal.store[RESOURCE_ENERGY] < 100000 && _.sum(terminal.store) < terminal.storeCapacity){
+                    CreateJob(roomJobs, 'FillTerminalEnergy(' + terminal.pos.x + ',' + terminal.pos.y + ')' + gameRoom.name, terminal.id, OBJECT_JOB, 'T', 4);
+                }
+            }
+        }
+
         function ExtractMineralJobs(gameRoom, roomJobs){
             const extractMineral = gameRoom.find(FIND_MY_STRUCTURES, {filter: (s) => {return s.structureType === STRUCTURE_EXTRACTOR;}})[0];
             const mineral = gameRoom.find(FIND_MINERALS, {filter: (s) => {return s.mineralAmount > 0;}})[0];
@@ -273,11 +296,6 @@ const CreateJobs = {
         function CreateJob(roomJobs, jobName, jobId, jobType, creepType, jobImportance){
             roomJobs[jobName] = {'JobId': jobId, 'JobType': jobType, 'CreepType': creepType, 'Creep': 'vacant', 'JobImportance': jobImportance};
         }
-
-        function compareByJobImportance( a, b ) { // objs.sort( compareByJobImportance );
-            return a.JobImportance - b.JobImportance;
-        }
-
     }
 };
 module.exports = CreateJobs;
