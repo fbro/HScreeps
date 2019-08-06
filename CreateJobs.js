@@ -84,9 +84,11 @@ const CreateJobs = {
                     // Controller
                     new RoomVisual(gameRoom.name).text('🧠', gameRoom.controller.pos.x, gameRoom.controller.pos.y);
                     CreateJob(jobs, 'Controller(' + gameRoom.controller.pos.x + ',' + gameRoom.controller.pos.y + ')' + gameRoom.name, gameRoom.controller.id, OBJECT_JOB, 'B', 1);
-                    if(gameRoom.controller.level < 8){ // not at max level - more creeps on the controller job
+                    if(gameRoom.controller.level < 8 && gameRoom.storage && gameRoom.storage.store[RESOURCE_ENERGY] > 100000){ // not at max level - more creeps on the controller job
                         CreateJob(jobs, 'Controller1(' + gameRoom.controller.pos.x + ',' + gameRoom.controller.pos.y + ')' + gameRoom.name, gameRoom.controller.id, OBJECT_JOB, 'B', 5);
-                        CreateJob(jobs, 'Controller2(' + gameRoom.controller.pos.x + ',' + gameRoom.controller.pos.y + ')' + gameRoom.name, gameRoom.controller.id, OBJECT_JOB, 'B', 5);
+                        if(gameRoom.storage.store[RESOURCE_ENERGY] > 200000){
+                            CreateJob(jobs, 'Controller2(' + gameRoom.controller.pos.x + ',' + gameRoom.controller.pos.y + ')' + gameRoom.name, gameRoom.controller.id, OBJECT_JOB, 'B', 5);
+                        }
                     }
                     // Source
                     const sources = gameRoom.find(FIND_SOURCES);
@@ -225,7 +227,7 @@ const CreateJobs = {
             for (const resourceDropKey in resourceDrops) {
                 const resourceDrop = resourceDrops[resourceDropKey];
                 new RoomVisual(gameRoom.name).text('💰', resourceDrop.pos.x, resourceDrop.pos.y);
-                CreateJob(roomJobs, 'FillStorage-dropped' + '(' + resourceDrop.pos.x + ',' + resourceDrop.pos.y + ',' + resourceDrop.resourceType + ')' + gameRoom.name, resourceDrop.id, OBJECT_JOB, 'T', 4);
+                CreateJob(roomJobs, 'FillStorage-drop' + '(' + resourceDrop.pos.x + ',' + resourceDrop.pos.y + ',' + resourceDrop.resourceType + ')' + gameRoom.name, resourceDrop.id, OBJECT_JOB, 'T', 4);
             }
         }
 

@@ -208,23 +208,23 @@ const ExecuteJobs = {
             const obj = Game.getObjectById(roomJob.JobId);
             if(obj === null){
                 result = JOB_OBJ_DISAPPEARED;
-            }else if(_.sum(creep.carry) < creep.carryCapacity && !creep.memory.Transferring){ // fill creep
+            }else if(_.sum(creep.carry) < creep.carryCapacity && !creep.memory.Transferring){ // fill creep - not full and is not transferring
                 if(obj.structureType === STRUCTURE_CONTAINER){
                     for (const resourceType in obj.store) {
                         result = creep.withdraw(obj, resourceType);
                     }
+                }else if(obj.structureType === STRUCTURE_LINK){
+                    result = creep.withdraw(obj, RESOURCE_ENERGY);
                 }else if(obj.resourceType !== undefined){ // drop
                     result = creep.pickup(obj);
-                }else{ // link
-                    result = creep.withdraw(obj, RESOURCE_ENERGY);
                 }
                 if(result === ERR_NOT_IN_RANGE){
                     result = creep.moveTo(obj, {visualizePathStyle:{fill: 'transparent',stroke: '#00f5ff',lineStyle: 'dashed',strokeWidth: .15,opacity: .1}});
-                }else if((result === ERR_NOT_ENOUGH_RESOURCES) && _.sum(creep.carry) > 0){
+                }else if(result === ERR_NOT_ENOUGH_RESOURCES && _.sum(creep.carry) > 0){ // obj ran out of the resource
                     result = OK;
-                    creep.memory.Transferring = true;
+                    creep.memory.Transferring = true; // done filling creep up
                 }
-            }else if(_.sum(creep.carry) > 0){ // empty creep
+            }else if(_.sum(creep.carry) > 0){ // not empty creep
                 for(const resourceType in creep.carry) {
                     result = creep.transfer(obj.room.storage, resourceType);
                 }
@@ -236,6 +236,9 @@ const ExecuteJobs = {
                 }else{
                     creep.memory.Transferring = false;
                 }
+            }else{ // creep is empty, and is transferring
+                result = OK;
+                creep.memory.Transferring = false;
             }
             return result;
         }
