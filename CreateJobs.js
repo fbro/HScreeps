@@ -184,10 +184,14 @@ const CreateJobs = {
             if(gameRoom.storage){
                 const terminal = gameRoom.find(FIND_MY_STRUCTURES, {filter: (s) => {return s.structureType === STRUCTURE_TERMINAL;}})[0];
                 if(terminal && _.sum(terminal.store) < (terminal.storeCapacity - (100000 - terminal.store[RESOURCE_ENERGY]))){
+                    let storageHasMinerals = false;
                     for (const resourceType in gameRoom.storage.store) {
                         if(gameRoom.storage.store[resourceType] > 0 && resourceType !== RESOURCE_ENERGY){
-                            CreateJob(roomJobs, 'FillTerminalMineral-' + resourceType + '(' + terminal.pos.x + ',' + terminal.pos.y + ')' + gameRoom.name, terminal.id, OBJECT_JOB, 'T', 5);
+                            storageHasMinerals = true;
                         }
+                    }
+                    if(storageHasMinerals){
+                        CreateJob(roomJobs, 'FillTerminalMineral(' + terminal.pos.x + ',' + terminal.pos.y + ')' + gameRoom.name, terminal.id, OBJECT_JOB, 'T', 5);
                     }
                 }
             }
@@ -202,11 +206,13 @@ const CreateJobs = {
         }
 
         function ExtractMineralJobs(gameRoom, roomJobs){
-            const extractMineral = gameRoom.find(FIND_MY_STRUCTURES, {filter: (s) => {return s.structureType === STRUCTURE_EXTRACTOR;}})[0];
-            const mineral = gameRoom.find(FIND_MINERALS, {filter: (s) => {return s.mineralAmount > 0;}})[0];
-            if(mineral && extractMineral){
-                new RoomVisual(gameRoom.name).text('⛏', extractMineral.pos.x, extractMineral.pos.y);
-                CreateJob(roomJobs, 'ExtractMineral-' + mineral.mineralType + '(' + extractMineral.pos.x + ',' + extractMineral.pos.y + ')' + gameRoom.name, mineral.id, OBJECT_JOB, 'E', 5);
+            if(gameRoom.storage && gameRoom.storage.store[RESOURCE_ENERGY] > 50000){ // only create these jobs when one has energy in the room
+                const extractMineral = gameRoom.find(FIND_MY_STRUCTURES, {filter: (s) => {return s.structureType === STRUCTURE_EXTRACTOR;}})[0];
+                const mineral = gameRoom.find(FIND_MINERALS, {filter: (s) => {return s.mineralAmount > 0;}})[0];
+                if(mineral && extractMineral){
+                    new RoomVisual(gameRoom.name).text('⛏', extractMineral.pos.x, extractMineral.pos.y);
+                    CreateJob(roomJobs, 'ExtractMineral-' + mineral.mineralType + '(' + extractMineral.pos.x + ',' + extractMineral.pos.y + ')' + gameRoom.name, mineral.id, OBJECT_JOB, 'E', 5);
+                }
             }
         }
 
@@ -234,7 +240,7 @@ const CreateJobs = {
         function FillTowerJobs(gameRoom, roomJobs){
             const fillTowers = gameRoom.find(FIND_MY_STRUCTURES, {
                 filter: (s) => {
-                    return ((s.structureType === STRUCTURE_TOWER) && s.energy < s.energyCapacity);
+                    return ((s.structureType === STRUCTURE_TOWER) && s.energy < (s.energyCapacity - 100));
                 }
             });
             for (const fillTowerKey in fillTowers) {

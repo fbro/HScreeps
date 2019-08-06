@@ -79,7 +79,7 @@ const ExecuteJobs = {
                     result = JobExtractMineral(creep, roomJob);
                     break;
                 case jobKey.startsWith('FillTerminalMineral'):
-                    result = JobFillTerminalMineral(creep, roomJob);
+                    result = JobFillTerminalMineral(creep, roomJob, jobKey);
                     break;
                 case jobKey.startsWith('FillTerminalEnergy'):
                     result = JobFillTerminalEnergy(creep, roomJob);
@@ -126,11 +126,11 @@ const ExecuteJobs = {
             }
             if(creep.carry[RESOURCE_ENERGY] > 0){
                 const toFill = creep.pos.findInRange(FIND_MY_STRUCTURES, 1, {filter: (structure) => {
-                        return (structure.structureType === STRUCTURE_SPAWN || structure.structureType === STRUCTURE_EXTENSION) && structure.energy < structure.energyCapacity;
+                        return (structure.structureType === STRUCTURE_SPAWN || structure.structureType === STRUCTURE_EXTENSION || structure.structureType === STRUCTURE_TOWER) && structure.energy < structure.energyCapacity;
                     }})[0];
                 if(toFill){
                     creep.transfer(toFill, RESOURCE_ENERGY);
-                    console.log('ExecuteJobs JobAction ' + creep.name + ' transferred energy to adjacent spawn or extension (' + toFill.pos.x + ',' + toFill.pos.y + ',' + toFill.pos.roomName + ')');
+                    console.log('ExecuteJobs JobAction ' + creep.name + ' transferred energy to adjacent spawn tower or extension (' + toFill.pos.x + ',' + toFill.pos.y + ',' + toFill.pos.roomName + ')');
                 }
             }
             return isJobDone;
@@ -263,16 +263,31 @@ const ExecuteJobs = {
         }
 
         /**@return {int}*/
-        function JobFillTerminalMineral(creep, roomJob){
+        function JobFillTerminalMineral(creep, roomJob, roomJobKey){
             const obj = Game.getObjectById(roomJob.JobId);
-            let savedResourceType;
-            for(const resourceType in creep.carry) {
-                if(resourceType !== RESOURCE_ENERGY){
-                    savedResourceType = resourceType;
-                    break;
+            let result = ERR_NO_RESULT_FOUND;
+            if((_.sum(obj.store) - obj.store[RESOURCE_ENERGY]) > (obj.storeCapacity - 100000)){
+                return JOB_IS_DONE;
+            }
+            if(_.sum(creep.carry) === 0){ // creep empty
+                for (const resourceType in obj.room.storage.store) {
+                    if(resourceType !== RESOURCE_ENERGY){
+                        result = creep.withdraw(obj.room.storage, resourceType);
+                    }
+                }
+                if(result === ERR_NOT_IN_RANGE){
+                    result = creep.moveTo(obj.room.storage, {visualizePathStyle:{fill: 'transparent',stroke: '#ffe100',lineStyle: 'dashed',strokeWidth: .15,opacity: .1}});
                 }
             }
-            let result = JobEnergyAction(creep, roomJob, obj, {creepAction: function() {return creep.transfer(obj, savedResourceType);}});
+
+            if(result === ERR_NO_RESULT_FOUND){ // creep is either full or nothing to withdraw
+               for(const resourceType in creep.carry) {
+                    result = creep.transfer(obj, resourceType);
+                }
+                if(result === ERR_NOT_IN_RANGE){
+                    result = creep.moveTo(obj, {visualizePathStyle:{fill: 'transparent',stroke: '#ffe100',lineStyle: 'dashed',strokeWidth: .15,opacity: .1}});
+                }
+            }
             return result;
         }
 
@@ -421,20 +436,23 @@ const ExecuteJobs = {
 
         /**@return {object}*/
         function FindClosestEnergy(creep, obj){
+            // set EnergySupply and EnergySupplyType on creep memory
             let energySupply = undefined;
             let energySupplyType = undefined;
-            if(creep.memory.EnergySupply){
+            if(creep.memory.EnergySupply && creep.memory.EnergySupplyType){
                 energySupply = Game.getObjectById(creep.memory.EnergySupply);// closest link then container then droppedRes then storage
+                energySupplyType = creep.memory.EnergySupplyType;
                 // if the saved energySupply does not have any energy then remove it to make way for a new search
-                if(energySupply && (creep.memory.EnergySupplyType === 'LINK' && energySupply.energy === 0)
-                    || (creep.memory.EnergySupplyType === 'CONTAINER' && energySupply.store[RESOURCE_ENERGY] === 0)){
+                if(energySupply && (energySupplyType === 'LINK' && energySupply.energy === 0)
+                    || (energySupplyType === 'CONTAINER' && energySupply.store[RESOURCE_ENERGY] === 0)){
+                    energySupply = undefined;
                     energySupplyType = undefined;
                     creep.memory.EnergySupply = undefined;
                     creep.memory.EnergySupplyType = undefined;
                 }
             }
 
-            if(!energySupply){
+            if(!energySupply){ // creep memory had nothing stored
                 const energySupplies = obj.room.find(FIND_STRUCTURES, {filter: function(s) {
                     return ((s.structureType === STRUCTURE_STORAGE
                         || s.structureType === STRUCTURE_CONTAINER) && s.store[RESOURCE_ENERGY] >= 100
