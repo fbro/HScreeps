@@ -29,7 +29,7 @@ const ExecuteJobs = {
                 const roomName = creepMemory.JobName.split(')').pop();
                 const job = Memory.MemRooms[roomName].RoomJobs[creepMemory.JobName];
 
-                if(job === undefined){ // job is outdated and removed from Memory
+                if(!job){ // job is outdated and removed from Memory
                     console.log('ExecuteJobs ExecuteRoomJobs job gone ' + creepName + ' in' + roomName + ' job ' + creepMemory.JobName);
                     creepMemory.JobName = 'idle';
                 }else if(!gameCreep){ // creep is dead
