@@ -1,6 +1,6 @@
 // reset for v2:
-Memory.MemRooms = {};
 Memory.buyOrdersHistory = {};
+Memory.MemRooms = {};
 for(const creepName in Memory.creeps) {
     const gc = Game.creeps[creepName];
     const mc = Memory.creeps[creepName];

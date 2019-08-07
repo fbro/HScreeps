@@ -49,11 +49,11 @@ const AssignJobs = {
         function AssignCreeps(roomJob, memRoomKey, idleCreepsInRoom, roomJobKey) {
             for(const idleCreepInRoomCounter in idleCreepsInRoom) {
                 const idleCreepInRoom = idleCreepsInRoom[idleCreepInRoomCounter];
-                if(roomJob.CreepType === idleCreepInRoom.name.substring(0, 1)){
+                if(idleCreepInRoom.name.startsWith(roomJob.CreepType)){
                     // idle creep is in memory room with vacant job and matching job type
                     idleCreepInRoom.memory.JobName = roomJobKey;
                     roomJob.Creep = idleCreepInRoom.name;
-                    console.log('AssignJobs AssignCreeps ' + idleCreepInRoom.name + ' assigned to ' + roomJobKey + ' in ' + memRoomKey);
+                    //console.log('AssignJobs AssignCreeps ' + idleCreepInRoom.name + ' assigned to ' + roomJobKey + ' in ' + memRoomKey);
                     delete idleCreepsInRoom[idleCreepInRoomCounter];
                     return true;
                 }
@@ -84,23 +84,28 @@ const AssignJobs = {
         function ShouldSpawnCreep(creepType, roomKey){
             // TODO save the results of these finds and reset the memory for that every 30 tick
             let maxCreepsInRoom = 0;
-            let numOfEmployedCreepsWithCreepType = 0;
             const memRoom = Memory.MemRooms[roomKey];
-            for(const roomJobKey in memRoom.RoomJobs){
-                const roomJob = memRoom.RoomJobs[roomJobKey];
-                if(roomJob.Creep !== 'vacant' && roomJob.CreepType === creepType){
-                    numOfEmployedCreepsWithCreepType++;
+            // loop through all creeps - take those with job in room or idle and placed in room - count
+            let numOfCreepsWithCreepTypeInRoom = 0;
+            for(const creepName in Game.creeps) {
+                const gameCreep = Game.creeps[creepName];
+                if(gameCreep.name.substring(0, 1) === creepType){
+                    if(gameCreep.memory.JobName === 'idle' && gameCreep.pos.roomName === roomKey){ // idle creep in room
+                        numOfCreepsWithCreepTypeInRoom++;
+                    }else if(gameCreep.memory.JobName.split(')').pop() === roomKey){ // employed creep that is employed in this room
+                        numOfCreepsWithCreepTypeInRoom++;
+                    }
                 }
             }
             switch (creepType) {
                 case 'T': // transporter
-                    maxCreepsInRoom = 2;
+                    maxCreepsInRoom = memRoom.SourceNumber;
                     break;
                 case 'H': // harvester
-                    maxCreepsInRoom = Game.rooms[roomKey].find(FIND_SOURCES).length;
+                    maxCreepsInRoom = memRoom.SourceNumber;
                     break;
                 case 'B': // builder
-                    maxCreepsInRoom = 3;
+                    maxCreepsInRoom = 1 + memRoom.SourceNumber;
                     break;
                 case 'E': // extractor
                     maxCreepsInRoom = 1;
@@ -114,7 +119,7 @@ const AssignJobs = {
                 default:
                     console.log('AssignJobs ShouldSpawnCreep ERROR! creepType not found ' + creepType);
             }
-            if(numOfEmployedCreepsWithCreepType < maxCreepsInRoom){
+            if(numOfCreepsWithCreepTypeInRoom < maxCreepsInRoom){
                 return true;
             }else{
                 return false;
@@ -233,19 +238,19 @@ const AssignJobs = {
                 case 'W':
                     switch (true) { // TODO optimize
                         case (energyAvailable >= 2200): // energyCapacityAvailable: 12900
-                            body = [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK];break;
+                            body = [ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE];break;
                         case (energyAvailable >= 2050): // energyCapacityAvailable: 5600
-                            body = [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK];break;
+                            body = [ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE];break;
                         case (energyAvailable >= 1800): // energyCapacityAvailable: 2300
-                            body = [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK];break;
+                            body = [ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE];break;
                         case (energyAvailable >= 1300): // energyCapacityAvailable: 1800
-                            body = [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK];break;
+                            body = [ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE];break;
                         case (energyAvailable >= 800): // energyCapacityAvailable: 1300
-                            body = [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK];break;
+                            body = [ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE];break;
                         case (energyAvailable >= 300): // energyCapacityAvailable: 550
-                            body = [MOVE, MOVE, ATTACK, ATTACK];break;
+                            body = [ATTACK, MOVE, ATTACK, MOVE];break;
                         case (energyAvailable >= 200): // energyCapacityAvailable: 300
-                            body = [TOUGH, MOVE, MOVE, ATTACK];break;
+                            body = [TOUGH, MOVE, ATTACK, MOVE];break;
                     } break;
                 default:
                     console.log('AssignJobs GetCreepBody ERROR! creepType not found ' + creepType);

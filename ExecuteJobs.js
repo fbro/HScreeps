@@ -10,6 +10,7 @@ const ExecuteJobs = {
         const ERR_NO_RESULT_FOUND = -20; // job flow did not encounter any actions that lead to any results!
         const JOB_IS_DONE = -21; // when the job should be removed but there are no ERR codes
         const JOB_OBJ_DISAPPEARED = -22; // getObjectById returned null
+        const NO_ENERGY_FOUND = -23; // creep could not find any energy to take from
 
         ExecuteRoomJobs();
 
@@ -82,7 +83,7 @@ const ExecuteJobs = {
                     result = JobFillTerminalMineral(creep, roomJob, jobKey);
                     break;
                 case jobKey.startsWith('FillTerminalEnergy'):
-                    result = JobFillTerminalEnergy(creep, roomJob);
+                    result = JobFillTerminalEnergy(creep, roomJob); // uses JobEnergyAction()
                     break;
 
                 // flag jobs
@@ -108,29 +109,40 @@ const ExecuteJobs = {
             if(result === OK){
                 // job is done everyone is happy, nothing to do.
             }else if(result === ERR_TIRED){
-                creep.say('😪 ' + creep.fatigue);
+                creep.say('😫 ' + creep.fatigue);
             }else if(result === ERR_BUSY){
                 // The creep is still being spawned
             }else{ // results where anything else than OK - one should end the job!
                 if(result === ERR_NO_RESULT_FOUND){
-                    console.log('ExecuteJobs JobAction ERROR! no result gained ' + jobKey + ' ' + result + ' ' + creep.name);
-                    creep.say('⚠ ' + result);
+                    console.log('ExecuteJobs JobAction ERROR! no result gained ' + jobKey + ' ' + result + ' ' + roomJob.Creep);
+                    creep.say('⚠' + result);
                 }else if(result === JOB_OBJ_DISAPPEARED){
-                    console.log('ExecuteJobs JobAction removing disappeared job ' + jobKey + ' ' + result + ' ' + roomJob.Creep + ' ' + JSON.stringify(roomJob));
-                    creep.say('🙈 ' + result);
+                    console.log('ExecuteJobs JobAction removing disappeared job ' + jobKey + ' ' + result + ' ' + roomJob.Creep);
+                    creep.say('⚠' + result);
+                }else if(result === NO_ENERGY_FOUND){
+                    console.log('ExecuteJobs JobAction WARNING! not enough energy ' + jobKey + ' ' + result + ' ' + roomJob.Creep);
+                    creep.say('🙈' + result);
                 }else{
-                    console.log('ExecuteJobs JobAction removing ' + jobKey + ' ' + result + ' ' + roomJob.Creep + ' ' + JSON.stringify(roomJob));
-                    creep.say('✔ ' + result);
+                    console.log('ExecuteJobs JobAction removing ' + jobKey + ' ' + result + ' ' + roomJob.Creep);
+                    creep.say('✔' + result);
                 }
                 isJobDone = true;
             }
             if(creep.carry[RESOURCE_ENERGY] > 0){
                 const toFill = creep.pos.findInRange(FIND_MY_STRUCTURES, 1, {filter: (structure) => {
-                        return (structure.structureType === STRUCTURE_SPAWN || structure.structureType === STRUCTURE_EXTENSION || structure.structureType === STRUCTURE_TOWER) && structure.energy < structure.energyCapacity;
+                        return (structure.structureType === STRUCTURE_SPAWN
+                            || structure.structureType === STRUCTURE_EXTENSION
+                            || structure.structureType === STRUCTURE_TOWER) && structure.energy < structure.energyCapacity;
                     }})[0];
                 if(toFill){
-                    creep.transfer(toFill, RESOURCE_ENERGY);
-                    console.log('ExecuteJobs JobAction ' + creep.name + ' transferred energy to adjacent spawn tower or extension (' + toFill.pos.x + ',' + toFill.pos.y + ',' + toFill.pos.roomName + ')');
+                    creep.transfer(toFill, RESOURCE_ENERGY); // it may do that "double" but it really does not matter
+                    //console.log('ExecuteJobs JobAction ' + creep.name + ' transferred energy to adjacent spawn tower or extension (' + toFill.pos.x + ',' + toFill.pos.y + ',' + toFill.pos.roomName + ')');
+                }
+            }else if(_.sum(creep.carry) < creep.carryCapacity){
+                const drop = creep.pos.findInRange(FIND_DROPPED_RESOURCES, 1)[0];
+                if(drop){
+                    creep.pickup(drop); // it may do that "double" but it really does not matter
+                    console.log('ExecuteJobs JobAction ' + creep.name + ' picked up adjacent resource (' + drop.pos.x + ',' + drop.pos.y + ',' + drop.pos.roomName + ',' + drop.amount + ',' + drop.resourceType + ')');
                 }
             }
             return isJobDone;
@@ -206,9 +218,7 @@ const ExecuteJobs = {
         function JobFillStorage(creep, roomJob){
             let result = ERR_NO_RESULT_FOUND;
             const obj = Game.getObjectById(roomJob.JobId);
-            if(obj === null){
-                result = JOB_OBJ_DISAPPEARED;
-            }else if(_.sum(creep.carry) < creep.carryCapacity && !creep.memory.Transferring){ // fill creep - not full and is not transferring
+            if(obj && _.sum(creep.carry) < creep.carryCapacity && !creep.memory.Transferring){ // fill creep - not full and is not transferring
                 if(obj.structureType === STRUCTURE_CONTAINER){
                     for (const resourceType in obj.store) {
                         result = creep.withdraw(obj, resourceType);
@@ -222,23 +232,26 @@ const ExecuteJobs = {
                     result = creep.moveTo(obj, {visualizePathStyle:{fill: 'transparent',stroke: '#00f5ff',lineStyle: 'dashed',strokeWidth: .15,opacity: .1}});
                 }else if(result === ERR_NOT_ENOUGH_RESOURCES && _.sum(creep.carry) > 0){ // obj ran out of the resource
                     result = OK;
-                    creep.memory.Transferring = true; // done filling creep up
+                    creep.memory.Transferring = true; // done filling creep up - moving to storage to transfer
                 }
             }else if(_.sum(creep.carry) > 0){ // not empty creep
                 for(const resourceType in creep.carry) {
-                    result = creep.transfer(obj.room.storage, resourceType);
+                    result = creep.transfer(creep.room.storage, resourceType);
                 }
                 if(result === ERR_NOT_IN_RANGE){
-                    result = creep.moveTo(obj.room.storage, {visualizePathStyle:{fill: 'transparent',stroke: '#0048ff',lineStyle: 'dashed',strokeWidth: .15,opacity: .1}});
+                    result = creep.moveTo(creep.room.storage, {visualizePathStyle:{fill: 'transparent',stroke: '#0048ff',lineStyle: 'dashed',strokeWidth: .15,opacity: .1}});
                 }
                 if(_.sum(creep.carry) > 0){
-                    creep.memory.Transferring = true;
+                    creep.memory.Transferring = true; // moving to storage to transfer
                 }else{
-                    creep.memory.Transferring = false;
+                    creep.memory.Transferring = undefined;
                 }
-            }else{ // creep is empty, and is transferring
+            }else if(!obj){ // creep is empty, and is transferring and obj has disappeared
+                result = JOB_OBJ_DISAPPEARED;
+                creep.memory.Transferring = undefined;
+            }else{ // creep is empty, and was transferring
                 result = OK;
-                creep.memory.Transferring = false;
+                creep.memory.Transferring = undefined; // setting to not be transferring - forcing the creep to go back and withdraw/pickup
             }
             return result;
         }
@@ -313,6 +326,8 @@ const ExecuteJobs = {
                 if(result === ERR_NOT_IN_RANGE){
                     result = creep.moveTo(flagObj.room.controller, {visualizePathStyle:{fill: 'transparent',stroke: '#ffb900',lineStyle: 'dashed',strokeWidth: .15,opacity: .1}});
                 }else if(result === OK ){
+                    console.log("ExecuteJobs JobTagController done in " + flagObj.pos.roomName + " with " + creep.name + " tag " + flagObj.name);
+                    flagObj.remove();
                     result = JOB_IS_DONE;
                 }
             }
@@ -382,11 +397,12 @@ const ExecuteJobs = {
             }else if(flagObj.room === undefined){ // room is not in Game.rooms
                 result = creep.moveTo(flagObj);
             }else{
-                const hostileCreep = creep.find(FIND_HOSTILE_CREEPS)[0];
+                const hostileCreep = creep.room.find(FIND_HOSTILE_CREEPS)[0];
                 if(hostileCreep){
                     creep.moveTo(hostileCreep, {visualizePathStyle:{fill: 'transparent',stroke: '#ff5600',lineStyle: 'undefined',strokeWidth: .15,opacity: .5}});
                     result = creep.attack(hostileCreep);
-                }else if(flagObj.inRangeTo(creep, 1)){
+                    if(result === ERR_NOT_IN_RANGE){result = OK;}
+                }else if(flagObj.pos.inRangeTo(creep, 1)){
                     result = creep.say(flagObj.name);
                 }else{
                     result = creep.moveTo(flagObj, {visualizePathStyle:{fill: 'transparent',stroke: '#ff5600',lineStyle: 'dashed',strokeWidth: .15,opacity: .1}});
@@ -402,28 +418,36 @@ const ExecuteJobs = {
             let result = ERR_NO_RESULT_FOUND;
             if(obj === null){
                 result = JOB_OBJ_DISAPPEARED;
-            }else if(creep.carry[RESOURCE_ENERGY] > 0){
+            }else if(creep.carry[RESOURCE_ENERGY] > 0){ // creep has energy
                 result = actionFunction.creepAction();
                 if(result === ERR_NOT_IN_RANGE){
                     result = creep.moveTo(obj, {visualizePathStyle:{fill: 'transparent',stroke: '#00ff00',lineStyle: 'dashed',strokeWidth: .15,opacity: .1}});
                 }
             }else{ // find more energy
                 const energySupply = FindClosestEnergy(creep, obj);
-                if(energySupply && creep.memory.EnergySupplyType === 'DROP'){
+                const energySupplyType = creep.memory.EnergySupplyType;
+                if(energySupply && energySupplyType === 'DROP'){
                     result = creep.pickup(energySupply);
                 }else if(energySupply){
                     result = creep.withdraw(energySupply, RESOURCE_ENERGY);
+                }else{
+                    result = NO_ENERGY_FOUND; // FindClosestEnergy did not find any energy
                 }
+
                 if(result === ERR_NOT_IN_RANGE){
                     result = creep.moveTo(energySupply, {visualizePathStyle:{fill: 'transparent',stroke: '#ffe100',lineStyle: 'dashed',strokeWidth: .15,opacity: .1}});
                 }else if(result === ERR_FULL){ // creep store is full with anything other than ENERGY - get rid of it asap
-                    if(creep.memory.EnergySupplyType === 'CONTAINER' || creep.memory.EnergySupplyType === 'STORAGE'){
+                    if(energySupplyType === 'CONTAINER' || energySupplyType === 'STORAGE'){
                         for(const resourceType in creep.carry) {
-                            result = creep.transfer(energySupply, resourceType);
+                            if(resourceType !== RESOURCE_ENERGY){
+                                result = creep.transfer(energySupply, resourceType);
+                            }
                         }
                     }else{ // DROP
                         for(const resourceType in creep.carry) {
-                            result = creep.drop(resourceType);
+                            if(resourceType !== RESOURCE_ENERGY) {
+                                result = creep.drop(resourceType);
+                            }
                         }
                     }
                 }else if(result === OK){ // energy withdrawn successfully - now remove creep.memory.EnergySupply
@@ -444,7 +468,7 @@ const ExecuteJobs = {
                 energySupplyType = creep.memory.EnergySupplyType;
                 // if the saved energySupply does not have any energy then remove it to make way for a new search
                 if(energySupply && (energySupplyType === 'LINK' && energySupply.energy === 0)
-                    || (energySupplyType === 'CONTAINER' && energySupply.store[RESOURCE_ENERGY] === 0)){
+                    || ((energySupplyType === 'CONTAINER' || energySupplyType === 'STORAGE') && energySupply.store[RESOURCE_ENERGY] === 0)){
                     energySupply = undefined;
                     energySupplyType = undefined;
                     creep.memory.EnergySupply = undefined;

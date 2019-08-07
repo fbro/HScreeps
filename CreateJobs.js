@@ -135,7 +135,7 @@ const CreateJobs = {
                     } else {
                         console.log('CreateJobs UpdateJobsInRoom ERROR! flag color not found ' + gameFlag.color + ' ' + gameFlag.secondaryColor + ' (' + gameFlag.pos.x + ',' + gameFlag.pos.y + ')');
                     }
-                    const newJobName = jobName + '-' + gameFlagKey; // for flag
+                    const newJobName = jobName + '-' + gameFlagKey + '(' + gameFlag.pos.x + ',' + gameFlag.pos.y + ')' + gameRoom.name; // for flag
                     CreateJob(jobs, newJobName, gameFlagKey, FLAG_JOB, creepType, jobImportance);
                 }
             }
@@ -161,7 +161,7 @@ const CreateJobs = {
                     }
                 }
                 memRoom.RoomLevel = level;
-                // TODO maybe the sorting can be weaved into the generation og the job array
+                // TODO maybe the sorting can be weaved into the generation of the job array
                 const keysRes = Object.keys(jobs).sort(function(a,b){return jobs[a].JobImportance-jobs[b].JobImportance});
                 const sortedJobs = {};
                 for(const keysResKey in keysRes){
@@ -174,6 +174,7 @@ const CreateJobs = {
                         }
                     }
                 }
+                // TODO - by overwriting and removing old jobs the creeps finishing the job ends up idle before it can really finish its job
                 memRoom.RoomJobs = sortedJobs; // overwrite the old jobs with the new jobs - and the existing old jobs - old jobs that where not refound is forgotten
             }
         }
@@ -196,6 +197,7 @@ const CreateJobs = {
                 }
             }
         }
+
         function FillTerminalEnergyJobs(gameRoom, roomJobs){
             if(gameRoom.storage && gameRoom.storage.store[RESOURCE_ENERGY] > 50000){
                 const terminal = gameRoom.find(FIND_MY_STRUCTURES, {filter: (s) => {return s.structureType === STRUCTURE_TERMINAL;}})[0];
@@ -206,7 +208,7 @@ const CreateJobs = {
         }
 
         function ExtractMineralJobs(gameRoom, roomJobs){
-            if(gameRoom.storage && gameRoom.storage.store[RESOURCE_ENERGY] > 50000){ // only create these jobs when one has energy in the room
+            if(gameRoom.storage && gameRoom.storage.store[RESOURCE_ENERGY] > 50000 || gameRoom.find(FIND_MY_CREEPS, {filter: (c) => {return c.name.startsWith('E');}})[0]){ // only create these jobs when one has energy in the room
                 const extractMineral = gameRoom.find(FIND_MY_STRUCTURES, {filter: (s) => {return s.structureType === STRUCTURE_EXTRACTOR;}})[0];
                 const mineral = gameRoom.find(FIND_MINERALS, {filter: (s) => {return s.mineralAmount > 0;}})[0];
                 if(mineral && extractMineral){
@@ -219,17 +221,17 @@ const CreateJobs = {
         function FillStorageJobs(gameRoom, roomJobs){
             const fillStorages = gameRoom.find(FIND_STRUCTURES, {
                 filter: (s) => {
-                    return (s.structureType === STRUCTURE_CONTAINER && s.energy >= 1900)
-                        || (s.structureType === STRUCTURE_LINK && s.energy >= 700 && s.room.storage.pos.inRangeTo(s, 1));
+                    return (s.structureType === STRUCTURE_CONTAINER && _.sum(s.store) >= 600)
+                        || (s.structureType === STRUCTURE_LINK && s.energy >= 600 && s.room.storage.pos.inRangeTo(s, 1));
                 }
             });
             for (const fillStorageKey in fillStorages) {
                 const fillStorage = fillStorages[fillStorageKey];
-                new RoomVisual(gameRoom.name).text('⚡', fillStorage.pos.x, fillStorage.pos.y);
+                new RoomVisual(gameRoom.name).text('📦', fillStorage.pos.x, fillStorage.pos.y);
                 CreateJob(roomJobs, 'FillStorage-' + fillStorage.structureType + '(' + fillStorage.pos.x + ',' + fillStorage.pos.y + ')' + gameRoom.name, fillStorage.id, OBJECT_JOB, 'T', 5);
             }
             // drop is a little bit different - but same kind of job as above
-            const resourceDrops = gameRoom.find(FIND_DROPPED_RESOURCES, {filter: (drop) => {return (drop.amount > 50);}});
+            const resourceDrops = gameRoom.find(FIND_DROPPED_RESOURCES, {filter: (drop) => {return (drop.resourceType === RESOURCE_ENERGY && drop.amount > 100 || drop.resourceType !== RESOURCE_ENERGY && drop.amount > 30);}});
             for (const resourceDropKey in resourceDrops) {
                 const resourceDrop = resourceDrops[resourceDropKey];
                 new RoomVisual(gameRoom.name).text('💰', resourceDrop.pos.x, resourceDrop.pos.y);
