@@ -71,6 +71,7 @@ const AssignJobs = {
                     if(spawnResult === OK){
                         Game.creeps[availableName].memory.JobName = roomJobKey;
                         roomJob.Creep = availableName;
+                        Memory.MemRooms[memRoomKey].MaxCreeps[availableName.substring(0, 1)].NumOfCreepsInRoom++;
                         creepFound = true;
                     }
                     console.log('AssignJobs SpawnCreeps ' + availableName + ' assigned to ' + roomJobKey + ' in ' + memRoomKey + ' spawnResult ' + spawnResult + ' spawn ' + availableSpawn.name);
