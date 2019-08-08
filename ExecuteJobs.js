@@ -40,6 +40,7 @@ const ExecuteJobs = {
                     }
                     job.Creep = 'vacant';
                     delete Memory.creeps[creepName];
+                    Memory.MemRooms[roomName].MaxCreeps[creepName.substring(0, 1)].NumOfCreepsInRoom--;
                 }else if(job.Creep !== 'vacant') { // creep is alive and its job is found
                     const isJobDone = JobAction(gameCreep, job, creepMemory.JobName);
                     if(isJobDone){

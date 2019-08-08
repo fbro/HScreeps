@@ -50,16 +50,16 @@ const Terminals = {
                 const order = orders[orderCount];
                 const transferEnergyRealCost = Game.market.calcTransactionCost(order.amount, room.name, order.roomName);
                 if(transferEnergyRealCost <= room.terminal.store[RESOURCE_ENERGY]){
-                    const dealResult = Game.market.deal(order.id, order.amount, room.name);
+                    const dealResult = Game.market.deal(order.id, room.terminal.store[order.resourceType], room.name);
                     if(dealResult === 0){
-                        console.log('Terminals, deal success ' + order.resourceType + ', ' + order.amount + ', room: ' + order.roomName);
+                        console.log('Terminals SellResources deal success ' + order.resourceType + ' ' + order.amount + ' from ' + room.name + ' to ' + order.roomName);
                         if(!Memory.buyOrdersHistory){Memory.buyOrdersHistory = {};}
                         Memory.buyOrdersHistory['(' + order.amount + ',' + order.resourceType + ',' + (order.price*order.amount) + ')' + room.name + '-' + order.roomName + '_' + order.id] = {order: order, 'energyUsed': transferEnergyRealCost, 'fromRoom': room.name};
                     }else{
-                        console.log('Terminals, ERROR deal failed ' + order.resourceType + ', ' + order.amount + ', room: ' + order.roomName);
+                        console.log('Terminals SellResources ERROR! deal failed ' + order.resourceType + ' ' + order.amount + ' from ' + room.name + ' to ' + order.roomName + ' code ' + dealResult + ' transfer cost ' + transferEnergyRealCost + ' terminal energy ' + room.terminal.store[RESOURCE_ENERGY]);
                     }
                 }else{
-                    console.log('terminal, not enough energy ' + room.name + ', transfer cost: ' + transferEnergyRealCost + ', terminal energy: ' + room.terminal.store[RESOURCE_ENERGY]);
+                    console.log('Terminals SellResources not enough energy ' + order.resourceType + ' ' + order.amount + ' from ' + room.name + ' to ' + order.roomName + ' transfer cost ' + transferEnergyRealCost + ' terminal energy ' + room.terminal.store[RESOURCE_ENERGY]);
                 }
             }
 

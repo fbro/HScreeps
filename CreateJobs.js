@@ -3,6 +3,7 @@ const CreateJobs = {
         // CreateJobs
         //   Rooms - RoomNumber - room.name
         //     RoomLevel - 0 to 8
+        //     MaxCreeps
         //     RoomJobs - JobName - [JobName(x,y)] - user friendly, unique per room, name
         //       JobId - real id
         //       JobType - int enum - OBJECT_JOB = 1, FLAG_JOB = 2
@@ -147,6 +148,7 @@ const CreateJobs = {
                 Memory.MemRooms[gameRoom.name] = {
                     'RoomLevel': level,
                     'RoomJobs': jobs,
+                    'MaxCreeps': {},
                     'SourceNumber': gameRoom.find(FIND_SOURCES).length,
                 };
                 console.log('CreateJobs UpdateJobs add new room ' + gameRoom.name + ' level ' + level + ' jobs ' + JSON.stringify(jobs))

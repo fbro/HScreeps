@@ -82,44 +82,50 @@ const AssignJobs = {
 
         /**@return {boolean}*/
         function ShouldSpawnCreep(creepType, roomKey){
-            // TODO save the results of these finds and reset the memory for that every 30 tick
-            let maxCreepsInRoom = 0;
             const memRoom = Memory.MemRooms[roomKey];
-            // loop through all creeps - take those with job in room or idle and placed in room - count
-            let numOfCreepsWithCreepTypeInRoom = 0;
-            for(const creepName in Game.creeps) {
-                const gameCreep = Game.creeps[creepName];
-                if(gameCreep.name.substring(0, 1) === creepType){
-                    if(gameCreep.memory.JobName === 'idle' && gameCreep.pos.roomName === roomKey){ // idle creep in room
-                        numOfCreepsWithCreepTypeInRoom++;
-                    }else if(gameCreep.memory.JobName.split(')').pop() === roomKey){ // employed creep that is employed in this room
-                        numOfCreepsWithCreepTypeInRoom++;
+            let maxCreepsInRoom = 0;
+            let numOfCreepsInRoom = 0;
+            if(memRoom.MaxCreeps[creepType]){
+                maxCreepsInRoom = memRoom.MaxCreeps[creepType].MaxCreepsInRoom;
+                numOfCreepsInRoom = memRoom.MaxCreeps[creepType].NumOfCreepsInRoom;
+            }else{
+                // loop through all creeps - take those with job in room or idle and placed in room - count
+                for(const creepName in Game.creeps) {
+                    const gameCreep = Game.creeps[creepName];
+                    if(gameCreep.name.substring(0, 1) === creepType){
+                        if(gameCreep.memory.JobName === 'idle' && gameCreep.pos.roomName === roomKey){ // idle creep in room
+                            numOfCreepsInRoom++;
+                        }else if(gameCreep.memory.JobName.split(')').pop() === roomKey){ // employed creep that is employed in this room
+                            numOfCreepsInRoom++;
+                        }
                     }
                 }
+                switch (creepType) {
+                    case 'T': // transporter
+                        maxCreepsInRoom = memRoom.SourceNumber;
+                        break;
+                    case 'H': // harvester
+                        maxCreepsInRoom = memRoom.SourceNumber;
+                        break;
+                    case 'B': // builder
+                        maxCreepsInRoom = 1 + memRoom.SourceNumber;
+                        break;
+                    case 'E': // extractor
+                        maxCreepsInRoom = 1;
+                        break;
+                    case 'W': // warrior
+                    case 'S': // scout
+                    case 'C': // claimer
+                    case 'R': // reserver
+                        maxCreepsInRoom = 6;
+                        break;
+                    default:
+                        console.log('AssignJobs ShouldSpawnCreep ERROR! creepType not found ' + creepType);
+                }
+                memRoom.MaxCreeps[creepType] = {'NumOfCreepsInRoom': numOfCreepsInRoom, 'MaxCreepsInRoom': maxCreepsInRoom};
             }
-            switch (creepType) {
-                case 'T': // transporter
-                    maxCreepsInRoom = memRoom.SourceNumber;
-                    break;
-                case 'H': // harvester
-                    maxCreepsInRoom = memRoom.SourceNumber;
-                    break;
-                case 'B': // builder
-                    maxCreepsInRoom = 1 + memRoom.SourceNumber;
-                    break;
-                case 'E': // extractor
-                    maxCreepsInRoom = 1;
-                    break;
-                case 'W': // warrior
-                case 'S': // scout
-                case 'C': // claimer
-                case 'R': // reserver
-                    maxCreepsInRoom = 6;
-                    break;
-                default:
-                    console.log('AssignJobs ShouldSpawnCreep ERROR! creepType not found ' + creepType);
-            }
-            if(numOfCreepsWithCreepTypeInRoom < maxCreepsInRoom){
+
+            if(numOfCreepsInRoom < maxCreepsInRoom){
                 return true;
             }else{
                 return false;
