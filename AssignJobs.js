@@ -262,7 +262,7 @@ const AssignJobs = {
         function GetAvailableName(creepType) {
             let availableCount = 1;
             while (true) {
-                if(Game.creeps[creepType + availableCount]){
+                if(Memory.creeps[creepType + availableCount]){
                     availableCount++;
                 }else{
                     break; // name is free
