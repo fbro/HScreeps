@@ -39,7 +39,7 @@ const CreateJobs = {
 
         for(const gameRoomKey in Game.rooms) {
             const gameRoom = Game.rooms[gameRoomKey]; // visible room
-            let jobs = new Object();
+            let jobs = {};
             let level = -1;
             if(gameRoom.controller && gameRoom.controller.my){
                 level = gameRoom.controller.level;
@@ -272,7 +272,7 @@ const CreateJobs = {
             for (const constructionKey in constructions) {
                 const construction = constructions[constructionKey];
                 new RoomVisual(gameRoom.name).text('🏗', construction.pos.x, construction.pos.y);
-                CreateJob(roomJobs, 'Construction-' + construction.structureType + '(' + construction.pos.x + ',' + construction.pos.y + ')' + gameRoom.name, construction.id, OBJECT_JOB, 'B', 5);
+                CreateJob(roomJobs, 'Construction-' + construction.structureType + '(' + construction.pos.x + ',' + construction.pos.y + ')' + gameRoom.name, construction.id, OBJECT_JOB, 'B', 2);
             }
         }
 
@@ -284,8 +284,8 @@ const CreateJobs = {
                         &&
                         (
                             (
-                                s.structureType === STRUCTURE_RAMPART && (gameRoom.controller.level < 8 && s.hits < 100000 || gameRoom.controller.level === 8 && s.hits < 10000000) ||
-                                s.structureType === STRUCTURE_WALL && (gameRoom.controller.level < 8 && s.hits < 100000 || gameRoom.controller.level === 8 && s.hits < 10000000) ||
+                                s.structureType === STRUCTURE_RAMPART && (gameRoom.controller.level < 8 && s.hits < 100000 || gameRoom.controller.level === 8 && s.hits < 2000000) ||
+                                s.structureType === STRUCTURE_WALL && (gameRoom.controller.level < 8 && s.hits < 100000 || gameRoom.controller.level === 8 && s.hits < 2000000) ||
                                 s.structureType === STRUCTURE_ROAD && s.hits < s.hitsMax / 2
                             )
                             ||

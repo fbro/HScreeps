@@ -8,7 +8,7 @@ for(const creepName in Memory.creeps) {
         delete Memory.creeps[creepName];
     }else{
         mc.Transferring = undefined;
-        mc.JobName = "idle";
+        mc.JobName = 'idle(' + gc.pos.x + ',' + gc.pos.y + ')'  + gc.pos.roomName;
         mc.EnergySupply = undefined;
         mc.EnergySupplyType = undefined;
 

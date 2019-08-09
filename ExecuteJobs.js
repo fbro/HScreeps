@@ -19,34 +19,43 @@ const ExecuteJobs = {
                 const creepMemory = Memory.creeps[creepName];
                 const gameCreep = Game.creeps[creepName];
                 const roomName = creepMemory.JobName.split(')').pop();
-                if(!gameCreep && creepMemory.JobName === 'idle'){ // idle creep is dead
-                    console.log('ExecuteJobs ExecuteRoomJobs idle creep ' + creepName + ' has died');
-                    delete Memory.creeps[creepName];
-                    Memory.MemRooms[roomName].MaxCreeps[creepName.substring(0, 1)].NumOfCreepsInRoom--;
-                    continue;
-                }else if(creepMemory.JobName === 'idle'){
-                    // TODO - idle actions to be added here
-                    continue;
-                }
-                const job = Memory.MemRooms[roomName].RoomJobs[creepMemory.JobName];
-
-                if(!job){ // job is outdated and removed from Memory
-                    console.log('ExecuteJobs ExecuteRoomJobs job gone ' + creepName + ' in' + roomName + ' job ' + creepMemory.JobName);
-                    creepMemory.JobName = 'idle';
-                }else if(!gameCreep){ // creep is dead
-                    console.log('ExecuteJobs ExecuteRoomJobs ' + creepName + ' on ' + creepMemory.JobName + ' in ' + roomName + ' has died');
-                    const tombstone = Game.rooms[roomName].find(FIND_TOMBSTONES, {filter: function(tombstone) {return tombstone.creep.name === creepName;}})[0];
-                    if(tombstone){
-                        new RoomVisual(roomName).text(creepName + '⚰', tombstone.pos.x, tombstone.pos.y);
+                if(!gameCreep && creepMemory.JobName.startsWith('idle')){ // idle creep is dead
+                    console.log('ExecuteJobs ExecuteRoomJobs idle creep ' + creepName + ' in ' + roomName + ' has died');
+                    if(Memory.MemRooms[roomName].MaxCreeps[creepName.substring(0, 1)]){
+                        Memory.MemRooms[roomName].MaxCreeps[creepName.substring(0, 1)].NumOfCreepsInRoom--;
                     }
-                    job.Creep = 'vacant';
                     delete Memory.creeps[creepName];
-                    Memory.MemRooms[roomName].MaxCreeps[creepName.substring(0, 1)].NumOfCreepsInRoom--;
-                }else if(job.Creep !== 'vacant') { // creep is alive and its job is found
-                    const isJobDone = JobAction(gameCreep, job, creepMemory.JobName);
-                    if(isJobDone){
-                        delete Memory.MemRooms[roomName].RoomJobs[creepMemory.JobName];
-                        creepMemory.JobName = 'idle';
+                }else if(creepMemory.JobName.startsWith('idle')){
+                    // TODO - idle actions to be added here
+                }else{ // creep is not idle
+                    const job = Memory.MemRooms[roomName].RoomJobs[creepMemory.JobName];
+
+                    if(!job && gameCreep){ // job is outdated and removed from Memory and creep is still alive
+                        console.log('ExecuteJobs ExecuteRoomJobs job gone ' + creepName + ' on ' + creepMemory.JobName + ' in' + roomName);
+                        creepMemory.JobName = 'idle(' + gameCreep.pos.x + ',' + gameCreep.pos.y + ')'  + gameCreep.pos.roomName;
+                    }else if(job && !gameCreep){ // job exists and creep is dead
+                        console.log('ExecuteJobs ExecuteRoomJobs ' + creepName + ' on ' + creepMemory.JobName + ' in ' + roomName + ' has died');
+                        const tombstone = Game.rooms[roomName].find(FIND_TOMBSTONES, {filter: function(tombstone) {return tombstone.creep.name === creepName;}})[0];
+                        if(tombstone){
+                            new RoomVisual(roomName).text(creepName + '⚰', tombstone.pos.x, tombstone.pos.y);
+                        }
+                        job.Creep = 'vacant';
+                        if(Memory.MemRooms[roomName].MaxCreeps[creepName.substring(0, 1)]){
+                            Memory.MemRooms[roomName].MaxCreeps[creepName.substring(0, 1)].NumOfCreepsInRoom--;
+                        }
+                        delete Memory.creeps[creepName];
+                    }else if(job && gameCreep) { // creep is alive and its job is found
+                        const isJobDone = JobAction(gameCreep, job, creepMemory.JobName);
+                        if(isJobDone){
+                            delete Memory.MemRooms[roomName].RoomJobs[creepMemory.JobName];
+                            creepMemory.JobName = 'idle(' + gameCreep.pos.x + ',' + gameCreep.pos.y + ')'  + gameCreep.pos.roomName;
+                        }
+                    }else{ // both job and creep is gone
+                        console.log('ExecuteJobs ExecuteRoomJobs ' + creepName + ' on ' + creepMemory.JobName + ' in ' + roomName + ' has died and the job has disappeared');
+                        if(Memory.MemRooms[roomName].MaxCreeps[creepName.substring(0, 1)]){
+                            Memory.MemRooms[roomName].MaxCreeps[creepName.substring(0, 1)].NumOfCreepsInRoom--;
+                        }
+                        delete Memory.creeps[creepName];
                     }
                 }
             }
@@ -333,8 +342,8 @@ const ExecuteJobs = {
                     result = creep.moveTo(flagObj.room.controller, {visualizePathStyle:{fill: 'transparent',stroke: '#ffb900',lineStyle: 'dashed',strokeWidth: .15,opacity: .1}});
                 }else if(result === OK ){
                     console.log("ExecuteJobs JobTagController done in " + flagObj.pos.roomName + " with " + creep.name + " tag " + flagObj.name);
-                    flagObj.remove();
                     result = JOB_IS_DONE;
+                    flagObj.remove();
                 }
             }
             return result;
@@ -369,9 +378,10 @@ const ExecuteJobs = {
             }else{
                 result = creep.claimController(flagObj.room.controller);
                 if(result === ERR_NOT_IN_RANGE){
-                    result = creep.moveTo(flagObj.room.controller, {visualizePathStyle:{fill: 'transparent',stroke: '#04ff00',lineStyle: 'dashed',strokeWidth: .15,opacity: .1}});
+                    result = creep.moveTo(flagObj.room.controller, {visualizePathStyle:{fill: 'transparent',stroke: '#ff00e9',lineStyle: 'undefined',strokeWidth: .15,opacity: .5}});
                 }else if(result === OK ){
                     result = JOB_IS_DONE;
+                    flagObj.remove();
                 }
             }
             return result;
@@ -388,7 +398,7 @@ const ExecuteJobs = {
             }else{
                 result = creep.reserveController(flagObj.room.controller);
                 if(result === ERR_NOT_IN_RANGE){
-                    result = creep.moveTo(flagObj.room.controller, {visualizePathStyle:{fill: 'transparent',stroke: '#d8ff00',lineStyle: 'dashed',strokeWidth: .15,opacity: .1}});
+                    result = creep.moveTo(flagObj.room.controller, {visualizePathStyle:{fill: 'transparent',stroke: '#ff00e9',lineStyle: 'dashed',strokeWidth: .15,opacity: .5}});
                 }
             }
             return result;

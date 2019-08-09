@@ -23,6 +23,13 @@ module.exports.loop = function () {
             CreateJobs.run();
             Links.run();
             Terminals.run();
+            if(Game.time % 120 === 0){
+                console.log('main reset MaxCreeps in MemRooms'); // this is needed because a creep may sometimes move to another room for a job there and then the counter will be wrong in the source rom
+                for(const memRoomKey in Memory.MemRooms){
+                    const memRoom = Memory.MemRooms[memRoomKey];
+                    memRoom.MaxCreeps = {};
+                }
+            }
         }
         AssignJobs.run();
     }
