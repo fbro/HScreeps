@@ -1,19 +1,19 @@
 const Terminals = {
-    run: function() {
+    run: function () {
 
-        for(const gameRoomKey in Game.rooms) {
+        for (const gameRoomKey in Game.rooms) {
             const gameRoom = Game.rooms[gameRoomKey]; // visible room
-            if(gameRoom.terminal){
+            if (gameRoom.terminal && gameRoom.terminal.store[RESOURCE_ENERGY] > 10000) {
                 SellResources(gameRoom);
             }
         }
 
-        function SellResources(room){
+        function SellResources(room) {
             // try to sell stuff
             const MIN_RESOURCE_AMOUNT = 1000;
             const MAX_TRANSFER_ENERGY_COST = 500;
             let MIN_PRICE_E = 0.1;
-            if(room.storage && room.storage.store[RESOURCE_ENERGY] > 500000){
+            if (room.storage && room.storage.store[RESOURCE_ENERGY] > 500000) {
                 MIN_PRICE_E = 0.009;
             }
             const MIN_PRICE_U = 0.06;
@@ -46,19 +46,25 @@ const Terminals = {
                         )));
                 }
             }
-            for(const orderCount in orders){
+            for (const orderCount in orders) {
                 const order = orders[orderCount];
                 const transferEnergyRealCost = Game.market.calcTransactionCost(order.amount, room.name, order.roomName);
-                if(transferEnergyRealCost <= room.terminal.store[RESOURCE_ENERGY]){
+                if (transferEnergyRealCost <= room.terminal.store[RESOURCE_ENERGY]) {
                     const dealResult = Game.market.deal(order.id, room.terminal.store[order.resourceType], room.name);
-                    if(dealResult === 0){
+                    if (dealResult === 0) {
                         console.log('Terminals SellResources deal success ' + order.resourceType + ' ' + order.amount + ' from ' + room.name + ' to ' + order.roomName);
-                        if(!Memory.buyOrdersHistory){Memory.buyOrdersHistory = {};}
-                        Memory.buyOrdersHistory['(' + order.amount + ',' + order.resourceType + ',' + (order.price*order.amount) + ')' + room.name + '-' + order.roomName + '_' + order.id] = {order: order, 'energyUsed': transferEnergyRealCost, 'fromRoom': room.name};
-                    }else{
+                        if (!Memory.buyOrdersHistory) {
+                            Memory.buyOrdersHistory = {};
+                        }
+                        Memory.buyOrdersHistory['(' + order.amount + ',' + order.resourceType + ',' + (order.price * order.amount) + ')' + room.name + '-' + order.roomName + '_' + order.id] = {
+                            order: order,
+                            'energyUsed': transferEnergyRealCost,
+                            'fromRoom': room.name
+                        };
+                    } else {
                         console.log('Terminals SellResources ERROR! deal failed ' + order.resourceType + ' ' + order.amount + ' from ' + room.name + ' to ' + order.roomName + ' code ' + dealResult + ' transfer cost ' + transferEnergyRealCost + ' terminal energy ' + room.terminal.store[RESOURCE_ENERGY]);
                     }
-                }else{
+                } else {
                     console.log('Terminals SellResources not enough energy ' + order.resourceType + ' ' + order.amount + ' from ' + room.name + ' to ' + order.roomName + ' transfer cost ' + transferEnergyRealCost + ' terminal energy ' + room.terminal.store[RESOURCE_ENERGY]);
                 }
             }

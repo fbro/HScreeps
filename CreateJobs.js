@@ -37,11 +37,11 @@ const CreateJobs = {
         const OBJECT_JOB = 1;
         const FLAG_JOB = 2;
 
-        for(const gameRoomKey in Game.rooms) {
+        for (const gameRoomKey in Game.rooms) {
             const gameRoom = Game.rooms[gameRoomKey]; // visible room
             let jobs = {};
             let level = -1;
-            if(gameRoom.controller && gameRoom.controller.my){
+            if (gameRoom.controller && gameRoom.controller.my) {
                 level = gameRoom.controller.level;
                 CreateObjJobs(gameRoom, jobs, level);
             }
@@ -49,15 +49,17 @@ const CreateJobs = {
             UpdateJobs(gameRoom, jobs, level);
         }
 
-        function CreateObjJobs(gameRoom, jobs, level){
+        function CreateObjJobs(gameRoom, jobs, level) {
             switch (level) { // create all the jobs
                 case 8:
-                    // TODO FillPowerSpawnEnergy
-                    // TODO FillPowerSpawnPowerUnits
+                // TODO FillPowerSpawnEnergy
+                // TODO FillPowerSpawnPowerUnits
                 case 7:
                 case 6:
                     // TODO FillLabEnergy
+                    FillLabEnergyJobs(gameRoom, jobs); // TODO add executeJob
                     // TODO FillLabMineral
+                    //FillLabMineralJobs(gameRoom, jobs);
                     // TODO EmptyLabMineral
                     // FillTerminalEnergy
                     FillTerminalEnergyJobs(gameRoom, jobs);
@@ -67,7 +69,7 @@ const CreateJobs = {
                     ExtractMineralJobs(gameRoom, jobs);
                 case 5:
                 case 4:
-                    if(gameRoom.storage !== undefined){
+                    if (gameRoom.storage !== undefined) {
                         // FillStorage - link, container and resource drops
                         FillStorageJobs(gameRoom, jobs);
                     }
@@ -85,9 +87,9 @@ const CreateJobs = {
                     // Controller
                     new RoomVisual(gameRoom.name).text('🧠', gameRoom.controller.pos.x, gameRoom.controller.pos.y);
                     CreateJob(jobs, 'Controller(' + gameRoom.controller.pos.x + ',' + gameRoom.controller.pos.y + ')' + gameRoom.name, gameRoom.controller.id, OBJECT_JOB, 'B', 1);
-                    if(gameRoom.controller.level < 8 && gameRoom.storage && gameRoom.storage.store[RESOURCE_ENERGY] > 100000){ // not at max level - more creeps on the controller job
+                    if (gameRoom.controller.level < 8 && gameRoom.storage && gameRoom.storage.store[RESOURCE_ENERGY] > 100000) { // not at max level - more creeps on the controller job
                         CreateJob(jobs, 'Controller1(' + gameRoom.controller.pos.x + ',' + gameRoom.controller.pos.y + ')' + gameRoom.name, gameRoom.controller.id, OBJECT_JOB, 'B', 5);
-                        if(gameRoom.storage.store[RESOURCE_ENERGY] > 200000){
+                        if (gameRoom.storage.store[RESOURCE_ENERGY] > 200000) {
                             CreateJob(jobs, 'Controller2(' + gameRoom.controller.pos.x + ',' + gameRoom.controller.pos.y + ')' + gameRoom.name, gameRoom.controller.id, OBJECT_JOB, 'B', 5);
                         }
                     }
@@ -106,10 +108,10 @@ const CreateJobs = {
             }
         }
 
-        function CreateFlagJobs(gameRoom, jobs){
-            for(const gameFlagKey in Game.flags) {
+        function CreateFlagJobs(gameRoom, jobs) {
+            for (const gameFlagKey in Game.flags) {
                 const gameFlag = Game.flags[gameFlagKey];
-                if(gameRoom.name === gameFlag.pos.roomName){ // this flag is in this room
+                if (gameRoom.name === gameFlag.pos.roomName) { // this flag is in this room
                     let jobName;
                     let creepType;
                     let jobImportance = 5;
@@ -129,10 +131,14 @@ const CreateJobs = {
                         jobName = 'ReserveController';
                         creepType = 'R';
                         jobImportance = 4;
-                    } else if (gameFlag.color === COLOR_ORANGE && gameFlag.secondaryColor === COLOR_RED) { // warrior at pos
+                    } else if (gameFlag.color === COLOR_RED && gameFlag.secondaryColor === COLOR_RED) { // warrior at pos
                         jobName = 'GuardPos';
                         creepType = 'W';
                         jobImportance = 2;
+                    } else if (gameFlag.color === COLOR_YELLOW && gameFlag.secondaryColor === COLOR_YELLOW) { // distantHarvester on source at flag pos
+                        jobName = 'RemoteHarvest';
+                        creepType = 'D';
+                        jobImportance = 5;
                     } else {
                         console.log('CreateJobs UpdateJobsInRoom ERROR! flag color not found ' + gameFlag.color + ' ' + gameFlag.secondaryColor + ' (' + gameFlag.pos.x + ',' + gameFlag.pos.y + ')');
                     }
@@ -142,9 +148,9 @@ const CreateJobs = {
             }
         }
 
-        function UpdateJobs(gameRoom, jobs, level){
+        function UpdateJobs(gameRoom, jobs, level) {
             const memRoom = Memory.MemRooms[gameRoom.name];
-            if(memRoom === undefined && Object.keys(jobs).length > 0){ // room not found and there are jobs in it - create it
+            if (memRoom === undefined && Object.keys(jobs).length > 0) { // room not found and there are jobs in it - create it
                 Memory.MemRooms[gameRoom.name] = {
                     'RoomLevel': level,
                     'RoomJobs': jobs,
@@ -152,11 +158,11 @@ const CreateJobs = {
                     'SourceNumber': gameRoom.find(FIND_SOURCES).length,
                 };
                 console.log('CreateJobs UpdateJobs add new room ' + gameRoom.name + ' level ' + level + ' jobs ' + JSON.stringify(jobs))
-            }else if(memRoom !== undefined){ // update jobs in memRoom
+            } else if (memRoom !== undefined) { // update jobs in memRoom
                 // update jobs if jobs does not exist - else do nothing
-                for(const newJobKey in jobs){ // loop through new jobs
-                    for(const oldJobKey in memRoom.RoomJobs) { // loop through old jobs
-                        if(oldJobKey === newJobKey){
+                for (const newJobKey in jobs) { // loop through new jobs
+                    for (const oldJobKey in memRoom.RoomJobs) { // loop through old jobs
+                        if (oldJobKey === newJobKey) {
                             jobs[newJobKey] = memRoom.RoomJobs[oldJobKey]; // save the old job because of historic job info
                             break;
                         }
@@ -164,12 +170,14 @@ const CreateJobs = {
                 }
                 memRoom.RoomLevel = level;
                 // TODO maybe the sorting can be weaved into the generation of the job array
-                const keysRes = Object.keys(jobs).sort(function(a,b){return jobs[a].JobImportance-jobs[b].JobImportance});
+                const keysRes = Object.keys(jobs).sort(function (a, b) {
+                    return jobs[a].JobImportance - jobs[b].JobImportance
+                });
                 const sortedJobs = {};
-                for(const keysResKey in keysRes){
+                for (const keysResKey in keysRes) {
                     const key = keysRes[keysResKey];
-                    for(const jobKey in jobs){
-                        if(key === jobKey){
+                    for (const jobKey in jobs) {
+                        if (key === jobKey) {
                             const job = jobs[jobKey];
                             sortedJobs[jobKey] = job;
                             break;
@@ -183,44 +191,80 @@ const CreateJobs = {
 
         // jobs:
 
-        function FillTerminalMineralJobs(gameRoom, roomJobs){
-            if(gameRoom.storage){
-                const terminal = gameRoom.find(FIND_MY_STRUCTURES, {filter: (s) => {return s.structureType === STRUCTURE_TERMINAL;}})[0];
-                if(terminal && _.sum(terminal.store) < (terminal.storeCapacity - (100000 - terminal.store[RESOURCE_ENERGY]))){
+        function FillLabEnergyJobs(gameRoom, roomJobs) {
+            if (gameRoom.storage && gameRoom.storage.store[RESOURCE_ENERGY] > 50000) {
+                const labs = gameRoom.find(FIND_MY_STRUCTURES, {
+                    filter: (s) => {
+                        return s.structureType === STRUCTURE_LAB;
+                    }
+                });
+                for (const labKey in labs) {
+                    const lab = labs[labKey];
+                    if (lab && lab.energy < lab.energyCapacity) {
+                        CreateJob(roomJobs, 'FillLabEnergy(' + lab.pos.x + ',' + lab.pos.y + ')' + gameRoom.name, lab.id, OBJECT_JOB, 'T', 5);
+                    }
+                }
+            }
+        }
+
+        function FillTerminalEnergyJobs(gameRoom, roomJobs) {
+            if (gameRoom.storage && gameRoom.storage.store[RESOURCE_ENERGY] > 50000) {
+                const terminal = gameRoom.find(FIND_MY_STRUCTURES, {
+                    filter: (s) => {
+                        return s.structureType === STRUCTURE_TERMINAL;
+                    }
+                })[0];
+                if (terminal && terminal.store[RESOURCE_ENERGY] < 100000 && _.sum(terminal.store) < terminal.storeCapacity) {
+                    CreateJob(roomJobs, 'FillTerminalEnergy(' + terminal.pos.x + ',' + terminal.pos.y + ')' + gameRoom.name, terminal.id, OBJECT_JOB, 'T', 4);
+                }
+            }
+        }
+
+        function FillTerminalMineralJobs(gameRoom, roomJobs) {
+            if (gameRoom.storage) {
+                const terminal = gameRoom.find(FIND_MY_STRUCTURES, {
+                    filter: (s) => {
+                        return s.structureType === STRUCTURE_TERMINAL;
+                    }
+                })[0];
+                if (terminal && _.sum(terminal.store) < (terminal.storeCapacity - 100000)) {
                     let storageHasMinerals = false;
                     for (const resourceType in gameRoom.storage.store) {
-                        if(gameRoom.storage.store[resourceType] > 0 && resourceType !== RESOURCE_ENERGY){
+                        if (gameRoom.storage.store[resourceType] > 0 && resourceType !== RESOURCE_ENERGY) {
                             storageHasMinerals = true;
                         }
                     }
-                    if(storageHasMinerals){
+                    if (storageHasMinerals) {
                         CreateJob(roomJobs, 'FillTerminalMineral(' + terminal.pos.x + ',' + terminal.pos.y + ')' + gameRoom.name, terminal.id, OBJECT_JOB, 'T', 5);
                     }
                 }
             }
         }
 
-        function FillTerminalEnergyJobs(gameRoom, roomJobs){
-            if(gameRoom.storage && gameRoom.storage.store[RESOURCE_ENERGY] > 50000){
-                const terminal = gameRoom.find(FIND_MY_STRUCTURES, {filter: (s) => {return s.structureType === STRUCTURE_TERMINAL;}})[0];
-                if(terminal && terminal.store[RESOURCE_ENERGY] < 100000 && _.sum(terminal.store) < terminal.storeCapacity){
-                    CreateJob(roomJobs, 'FillTerminalEnergy(' + terminal.pos.x + ',' + terminal.pos.y + ')' + gameRoom.name, terminal.id, OBJECT_JOB, 'T', 4);
+        function ExtractMineralJobs(gameRoom, roomJobs) {
+            if (gameRoom.storage && gameRoom.storage.store[RESOURCE_ENERGY] > 50000 || gameRoom.find(FIND_MY_CREEPS, {
+                filter: (c) => {
+                    return c.name.startsWith('E');
                 }
-            }
-        }
-
-        function ExtractMineralJobs(gameRoom, roomJobs){
-            if(gameRoom.storage && gameRoom.storage.store[RESOURCE_ENERGY] > 50000 || gameRoom.find(FIND_MY_CREEPS, {filter: (c) => {return c.name.startsWith('E');}})[0]){ // only create these jobs when one has energy in the room
-                const extractMineral = gameRoom.find(FIND_MY_STRUCTURES, {filter: (s) => {return s.structureType === STRUCTURE_EXTRACTOR;}})[0];
-                const mineral = gameRoom.find(FIND_MINERALS, {filter: (s) => {return s.mineralAmount > 0;}})[0];
-                if(mineral && extractMineral){
+            })[0]) { // only create these jobs when one has energy in the room
+                const extractMineral = gameRoom.find(FIND_MY_STRUCTURES, {
+                    filter: (s) => {
+                        return s.structureType === STRUCTURE_EXTRACTOR;
+                    }
+                })[0];
+                const mineral = gameRoom.find(FIND_MINERALS, {
+                    filter: (s) => {
+                        return s.mineralAmount > 0;
+                    }
+                })[0];
+                if (mineral && extractMineral) {
                     new RoomVisual(gameRoom.name).text('⛏', extractMineral.pos.x, extractMineral.pos.y);
                     CreateJob(roomJobs, 'ExtractMineral-' + mineral.mineralType + '(' + extractMineral.pos.x + ',' + extractMineral.pos.y + ')' + gameRoom.name, mineral.id, OBJECT_JOB, 'E', 5);
                 }
             }
         }
 
-        function FillStorageJobs(gameRoom, roomJobs){
+        function FillStorageJobs(gameRoom, roomJobs) {
             const fillStorages = gameRoom.find(FIND_STRUCTURES, {
                 filter: (s) => {
                     return (s.structureType === STRUCTURE_CONTAINER && _.sum(s.store) >= 600)
@@ -233,7 +277,11 @@ const CreateJobs = {
                 CreateJob(roomJobs, 'FillStorage-' + fillStorage.structureType + '(' + fillStorage.pos.x + ',' + fillStorage.pos.y + ')' + gameRoom.name, fillStorage.id, OBJECT_JOB, 'T', 5);
             }
             // drop is a little bit different - but same kind of job as above
-            const resourceDrops = gameRoom.find(FIND_DROPPED_RESOURCES, {filter: (drop) => {return (drop.resourceType === RESOURCE_ENERGY && drop.amount > 100 || drop.resourceType !== RESOURCE_ENERGY && drop.amount > 30);}});
+            const resourceDrops = gameRoom.find(FIND_DROPPED_RESOURCES, {
+                filter: (drop) => {
+                    return (drop.resourceType === RESOURCE_ENERGY && drop.amount > 100 || drop.resourceType !== RESOURCE_ENERGY && drop.amount > 30);
+                }
+            });
             for (const resourceDropKey in resourceDrops) {
                 const resourceDrop = resourceDrops[resourceDropKey];
                 new RoomVisual(gameRoom.name).text('💰', resourceDrop.pos.x, resourceDrop.pos.y);
@@ -241,7 +289,7 @@ const CreateJobs = {
             }
         }
 
-        function FillTowerJobs(gameRoom, roomJobs){
+        function FillTowerJobs(gameRoom, roomJobs) {
             const fillTowers = gameRoom.find(FIND_MY_STRUCTURES, {
                 filter: (s) => {
                     return ((s.structureType === STRUCTURE_TOWER) && s.energy < (s.energyCapacity - 100));
@@ -254,7 +302,7 @@ const CreateJobs = {
             }
         }
 
-        function FillSpawnExtensionJobs(gameRoom, roomJobs){
+        function FillSpawnExtensionJobs(gameRoom, roomJobs) {
             const fillSpawnExtensions = gameRoom.find(FIND_MY_STRUCTURES, {
                 filter: (s) => {
                     return ((s.structureType === STRUCTURE_SPAWN || s.structureType === STRUCTURE_EXTENSION) && s.energy < s.energyCapacity);
@@ -267,7 +315,7 @@ const CreateJobs = {
             }
         }
 
-        function ConstructionJobs(gameRoom, roomJobs){
+        function ConstructionJobs(gameRoom, roomJobs) {
             const constructions = gameRoom.find(FIND_CONSTRUCTION_SITES);
             for (const constructionKey in constructions) {
                 const construction = constructions[constructionKey];
@@ -276,7 +324,7 @@ const CreateJobs = {
             }
         }
 
-        function RepairJobs(gameRoom, roomJobs){
+        function RepairJobs(gameRoom, roomJobs) {
             const repairs = gameRoom.find(FIND_STRUCTURES, {
                 filter: (s) => {
                     return (
@@ -305,8 +353,14 @@ const CreateJobs = {
             }
         }
 
-        function CreateJob(roomJobs, jobName, jobId, jobType, creepType, jobImportance){
-            roomJobs[jobName] = {'JobId': jobId, 'JobType': jobType, 'CreepType': creepType, 'Creep': 'vacant', 'JobImportance': jobImportance};
+        function CreateJob(roomJobs, jobName, jobId, jobType, creepType, jobImportance) {
+            roomJobs[jobName] = {
+                'JobId': jobId,
+                'JobType': jobType,
+                'CreepType': creepType,
+                'Creep': 'vacant',
+                'JobImportance': jobImportance
+            };
         }
     }
 };

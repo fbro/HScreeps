@@ -1,14 +1,14 @@
 // reset for v2:
 Memory.buyOrdersHistory = {};
 Memory.MemRooms = {};
-for(const creepName in Memory.creeps) {
+for (const creepName in Memory.creeps) {
     const gc = Game.creeps[creepName];
     const mc = Memory.creeps[creepName];
-    if(gc === undefined){
+    if (gc === undefined) {
         delete Memory.creeps[creepName];
-    }else{
+    } else {
         mc.Transferring = undefined;
-        mc.JobName = 'idle(' + gc.pos.x + ',' + gc.pos.y + ')'  + gc.pos.roomName;
+        mc.JobName = 'idle(' + gc.pos.x + ',' + gc.pos.y + ')' + gc.pos.roomName;
         mc.EnergySupply = undefined;
         mc.EnergySupplyType = undefined;
 

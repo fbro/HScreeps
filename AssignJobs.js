@@ -28,17 +28,23 @@ const AssignJobs = {
 
         // loop through vacant jobs per room and see if an idle creep could be assigned or a new creep should be spawned
         function AssignOrSpawnCreeps() {
-            const idleCreeps = _.filter(Game.creeps, function(creep) { return creep.memory.JobName.startsWith('idle'); });
-            const availableSpawns = _.filter(Game.spawns, function(spawn) { return spawn.spawning === null && spawn.room.energyAvailable >= MINIMUM_ENERGY_REQUIRED; });
-            for(const memRoomKey in Memory.MemRooms) {
+            const idleCreeps = _.filter(Game.creeps, function (creep) {
+                return creep.memory.JobName.startsWith('idle');
+            });
+            const availableSpawns = _.filter(Game.spawns, function (spawn) {
+                return spawn.spawning === null && spawn.room.energyAvailable >= MINIMUM_ENERGY_REQUIRED;
+            });
+            for (const memRoomKey in Memory.MemRooms) {
                 const memRoom = Memory.MemRooms[memRoomKey];
-                const idleCreepsInRoom = _.filter(idleCreeps, function(creep) { return creep.pos.roomName === memRoomKey; });
+                const idleCreepsInRoom = _.filter(idleCreeps, function (creep) {
+                    return creep.pos.roomName === memRoomKey;
+                });
                 // TODO what about idle creeps in neutral rooms - and many idle creeps in one room that could be moved to another room
-                for(const roomJobKey in memRoom.RoomJobs) {
+                for (const roomJobKey in memRoom.RoomJobs) {
                     const roomJob = memRoom.RoomJobs[roomJobKey];
-                    if(roomJob.Creep === 'vacant'){
+                    if (roomJob.Creep === 'vacant') {
                         let creepFound = AssignCreeps(roomJob, idleCreepsInRoom, roomJobKey);
-                        if(!creepFound){
+                        if (!creepFound) {
                             SpawnCreeps(roomJob, availableSpawns, roomJobKey);
                         }
                     }
@@ -48,9 +54,9 @@ const AssignJobs = {
 
         /**@return {boolean}*/
         function AssignCreeps(roomJob, idleCreepsInRoom, roomJobKey) {
-            for(const idleCreepInRoomCounter in idleCreepsInRoom) {
+            for (const idleCreepInRoomCounter in idleCreepsInRoom) {
                 const idleCreepInRoom = idleCreepsInRoom[idleCreepInRoomCounter];
-                if(idleCreepInRoom.name.startsWith(roomJob.CreepType)){
+                if (idleCreepInRoom.name.startsWith(roomJob.CreepType)) {
                     // idle creep is in memory room with vacant job and matching job type
                     idleCreepInRoom.memory.JobName = roomJobKey;
                     roomJob.Creep = idleCreepInRoom.name;
@@ -65,32 +71,34 @@ const AssignJobs = {
         function SpawnCreeps(roomJob, availableSpawns, roomJobKey) {
             const memRoomKey = roomJobKey.split(')').pop();
             // if idle creep not found for vacant job then look if spawn is possible
-            if(ShouldSpawnCreep(roomJob.CreepType, memRoomKey)){
+            if (ShouldSpawnCreep(roomJob.CreepType, memRoomKey)) {
                 const availableName = GetAvailableName(roomJob.CreepType);
                 let bestLinearDistance = 1;
-                if(!Game.rooms[memRoomKey].controller || !Game.rooms[memRoomKey].controller.my){
+                if (!Game.rooms[memRoomKey].controller || !Game.rooms[memRoomKey].controller.my) {
                     console.log('AssignJobs SpawnCreeps job in another room needs a spawn ' + roomJobKey);
                     bestLinearDistance = Number.MAX_SAFE_INTEGER;
                 }
                 let bestAvailableSpawn;
                 let bestAvailableSpawnCounter;
-                for(const availableSpawnCounter in availableSpawns){ // find closest spawn
+                for (const availableSpawnCounter in availableSpawns) { // find closest spawn
                     const availableSpawn = availableSpawns[availableSpawnCounter];
                     const linearDistance = Game.map.getRoomLinearDistance(availableSpawn.pos.roomName, memRoomKey);
-                    if(linearDistance < bestLinearDistance){
+                    if (linearDistance < bestLinearDistance) {
                         bestLinearDistance = linearDistance;
                         bestAvailableSpawn = availableSpawn;
                         bestAvailableSpawnCounter = availableSpawnCounter;
                     }
-                    if(bestLinearDistance === 0){break;} // get on with it if a spawn in room is found!
+                    if (bestLinearDistance === 0) {
+                        break;
+                    } // get on with it if a spawn in room is found!
                 }
 
-                if(bestAvailableSpawn){ // the closest spawn is found
+                if (bestAvailableSpawn) { // the closest spawn is found
                     const spawnResult = bestAvailableSpawn.spawnCreep(GetCreepBody(roomJob.CreepType, Game.rooms[bestAvailableSpawn.pos.roomName].energyAvailable), availableName);
-                    if(spawnResult === OK){
+                    if (spawnResult === OK) {
                         Game.creeps[availableName].memory.JobName = roomJobKey;
                         roomJob.Creep = availableName;
-                        if(Memory.MemRooms[memRoomKey].MaxCreeps[availableName.substring(0, 1)]){
+                        if (Memory.MemRooms[memRoomKey].MaxCreeps[availableName.substring(0, 1)]) {
                             Memory.MemRooms[memRoomKey].MaxCreeps[availableName.substring(0, 1)].NumOfCreepsInRoom++;
                         }
                     }
@@ -101,19 +109,19 @@ const AssignJobs = {
         }
 
         /**@return {boolean}*/
-        function ShouldSpawnCreep(creepType, roomKey){
+        function ShouldSpawnCreep(creepType, roomKey) {
             const memRoom = Memory.MemRooms[roomKey];
             let maxCreepsInRoom = 0;
             let numOfCreepsInRoom = 0;
-            if(memRoom.MaxCreeps[creepType]){
+            if (memRoom.MaxCreeps[creepType]) {
                 maxCreepsInRoom = memRoom.MaxCreeps[creepType].MaxCreepsInRoom;
                 numOfCreepsInRoom = memRoom.MaxCreeps[creepType].NumOfCreepsInRoom;
-            }else{
+            } else {
                 // loop through all creeps - take those with job in room or idle and placed in room - count
-                for(const creepName in Game.creeps) {
+                for (const creepName in Game.creeps) {
                     const gameCreep = Game.creeps[creepName];
-                    if(gameCreep.name.substring(0, 1) === creepType){
-                        if(gameCreep.memory.JobName.split(')').pop() === roomKey){ // employed creep that is employed in this room
+                    if (gameCreep.name.substring(0, 1) === creepType) {
+                        if (gameCreep.memory.JobName.split(')').pop() === roomKey) { // employed creep that is employed in this room
                             numOfCreepsInRoom++;
                         }
                     }
@@ -140,84 +148,115 @@ const AssignJobs = {
                     default:
                         console.log('AssignJobs ShouldSpawnCreep ERROR! creepType not found ' + creepType);
                 }
-                memRoom.MaxCreeps[creepType] = {'NumOfCreepsInRoom': numOfCreepsInRoom, 'MaxCreepsInRoom': maxCreepsInRoom};
+                memRoom.MaxCreeps[creepType] = {
+                    'NumOfCreepsInRoom': numOfCreepsInRoom,
+                    'MaxCreepsInRoom': maxCreepsInRoom
+                };
             }
 
-            if(numOfCreepsInRoom < maxCreepsInRoom){
+            if (numOfCreepsInRoom < maxCreepsInRoom) {
                 return true;
-            }else{
+            } else {
                 return false;
             }
         }
 
         /**@return {array}*/
-        function GetCreepBody(creepType, energyAvailable){
+        function GetCreepBody(creepType, energyAvailable) {
             let body = [];
             switch (creepType) {
                 // harvester
                 case 'H':
                     switch (true) {
                         case (energyAvailable >= 800): // energyCapacityAvailable: 12900, 5600, 2300, 1800, 1300
-                            body = [WORK, WORK, WORK, WORK, WORK, WORK, CARRY, MOVE, MOVE, MOVE];break;
+                            body = [WORK, WORK, WORK, WORK, WORK, WORK, CARRY, MOVE, MOVE, MOVE];
+                            break;
                         case (energyAvailable >= 450): // energyCapacityAvailable: 550
-                            body = [WORK, WORK, WORK, CARRY, MOVE, MOVE];break;
+                            body = [WORK, WORK, WORK, CARRY, MOVE, MOVE];
+                            break;
                         case (energyAvailable >= 200): // energyCapacityAvailable: 300
-                            body = [WORK, CARRY, MOVE];break;
-                    } break;
+                            body = [WORK, CARRY, MOVE];
+                            break;
+                    }
+                    break;
                 // transporter
                 case 'T':
                     switch (true) {
                         case (energyAvailable >= 1350): // energyCapacityAvailable: 12900
-                            body = [CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];break;
+                            body = [CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];
+                            break;
                         case (energyAvailable >= 1200): // energyCapacityAvailable: 5600
-                            body = [CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];break;
+                            body = [CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];
+                            break;
                         case (energyAvailable >= 1050): // energyCapacityAvailable: 2300
-                            body = [CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE];break;
+                            body = [CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE];
+                            break;
                         case (energyAvailable >= 900): // energyCapacityAvailable: 1800
-                            body = [CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE];break;
+                            body = [CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE];
+                            break;
                         case (energyAvailable >= 600): // energyCapacityAvailable: 1300
-                            body = [CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE];break;
+                            body = [CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE];
+                            break;
                         case (energyAvailable >= 300): // energyCapacityAvailable: 550
-                            body = [CARRY, CARRY, CARRY, CARRY, MOVE, MOVE];break;
+                            body = [CARRY, CARRY, CARRY, CARRY, MOVE, MOVE];
+                            break;
                         case (energyAvailable >= 150): // energyCapacityAvailable: 300
-                            body = [CARRY, CARRY, MOVE];break;
-                    } break;
+                            body = [CARRY, CARRY, MOVE];
+                            break;
+                    }
+                    break;
                 // builder
                 case 'B':
                     switch (true) {
                         case (energyAvailable >= 2200): // energyCapacityAvailable: 12900
-                            body = [WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];break;
+                            body = [WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];
+                            break;
                         case (energyAvailable >= 2000): // energyCapacityAvailable: 5600
-                            body = [WORK, WORK, WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];break;
+                            body = [WORK, WORK, WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];
+                            break;
                         case (energyAvailable >= 1800): // energyCapacityAvailable: 2300
-                            body = [WORK, WORK, WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];break;
+                            body = [WORK, WORK, WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];
+                            break;
                         case (energyAvailable >= 1400): // energyCapacityAvailable: 1800
-                            body = [WORK, WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];break;
+                            body = [WORK, WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];
+                            break;
                         case (energyAvailable >= 1000): // energyCapacityAvailable: 1300
-                            body = [WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE];break;
+                            body = [WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE];
+                            break;
                         case (energyAvailable >= 400): // energyCapacityAvailable: 550
-                            body = [WORK, WORK, CARRY, CARRY, MOVE, MOVE];break;
+                            body = [WORK, WORK, CARRY, CARRY, MOVE, MOVE];
+                            break;
                         case (energyAvailable >= 200): // energyCapacityAvailable: 300
-                            body = [WORK, CARRY, MOVE];break;
-                    } break;
+                            body = [WORK, CARRY, MOVE];
+                            break;
+                    }
+                    break;
                 // extractor
                 case 'E':
                     switch (true) {
                         case (energyAvailable >= 2200): // energyCapacityAvailable: 12900
-                            body = [WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];break;
+                            body = [WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];
+                            break;
                         case (energyAvailable >= 2050): // energyCapacityAvailable: 5600
-                            body = [WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];break;
+                            body = [WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];
+                            break;
                         case (energyAvailable >= 1800): // energyCapacityAvailable: 2300
-                            body = [WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];break;
+                            body = [WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];
+                            break;
                         case (energyAvailable >= 1300): // energyCapacityAvailable: 1800
-                            body = [WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE];break;
+                            body = [WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE];
+                            break;
                         case (energyAvailable >= 800): // energyCapacityAvailable: 1300
-                            body = [WORK, WORK, WORK, WORK, WORK, WORK, CARRY, MOVE, MOVE, MOVE];break;
+                            body = [WORK, WORK, WORK, WORK, WORK, WORK, CARRY, MOVE, MOVE, MOVE];
+                            break;
                         case (energyAvailable >= 300): // energyCapacityAvailable: 550
-                            body = [];break;
+                            body = [];
+                            break;
                         case (energyAvailable >= 200): // energyCapacityAvailable: 300
-                            body = [];break;
-                    } break;
+                            body = [];
+                            break;
+                    }
+                    break;
                 // scout
                 case 'S':
                     body = [TOUGH, MOVE];
@@ -226,56 +265,80 @@ const AssignJobs = {
                 case 'C':
                     switch (true) {
                         case (energyAvailable >= 3250): // energyCapacityAvailable: 12900
-                            body = [TOUGH, TOUGH, TOUGH, MOVE, MOVE, MOVE, MOVE, CLAIM];break;
+                            body = [TOUGH, TOUGH, TOUGH, MOVE, MOVE, MOVE, MOVE, CLAIM];
+                            break;
                         case (energyAvailable >= 2050): // energyCapacityAvailable: 5600
-                            body = [TOUGH, TOUGH, MOVE, MOVE, MOVE, CLAIM];break;
+                            body = [TOUGH, TOUGH, MOVE, MOVE, MOVE, CLAIM];
+                            break;
                         case (energyAvailable >= 1800): // energyCapacityAvailable: 2300
-                            body = [TOUGH, MOVE, MOVE, CLAIM];break;
+                            body = [TOUGH, MOVE, MOVE, CLAIM];
+                            break;
                         case (energyAvailable >= 1300): // energyCapacityAvailable: 1800
-                            body = [TOUGH, MOVE, MOVE, CLAIM];break;
+                            body = [TOUGH, MOVE, MOVE, CLAIM];
+                            break;
                         case (energyAvailable >= 800): // energyCapacityAvailable: 1300
-                            body = [TOUGH, MOVE, MOVE, CLAIM];break;
+                            body = [TOUGH, MOVE, MOVE, CLAIM];
+                            break;
                         case (energyAvailable >= 300): // energyCapacityAvailable: 550
-                            body = [];break;
+                            body = [];
+                            break;
                         case (energyAvailable >= 200): // energyCapacityAvailable: 300
-                            body = [];break;
-                    } break;
+                            body = [];
+                            break;
+                    }
+                    break;
                 // reserver
                 case 'R':
                     switch (true) {
                         case (energyAvailable >= 3250): // energyCapacityAvailable: 12900
-                            body = [MOVE, MOVE, MOVE, MOVE, MOVE, CLAIM, CLAIM, CLAIM, CLAIM, CLAIM];break;
+                            body = [MOVE, MOVE, MOVE, MOVE, MOVE, CLAIM, CLAIM, CLAIM, CLAIM, CLAIM];
+                            break;
                         case (energyAvailable >= 2050): // energyCapacityAvailable: 5600
-                            body = [MOVE, MOVE, MOVE, CLAIM, CLAIM, CLAIM];break;
+                            body = [MOVE, MOVE, MOVE, CLAIM, CLAIM, CLAIM];
+                            break;
                         case (energyAvailable >= 1800): // energyCapacityAvailable: 2300
-                            body = [MOVE, MOVE, CLAIM, CLAIM];break;
+                            body = [MOVE, MOVE, CLAIM, CLAIM];
+                            break;
                         case (energyAvailable >= 1300): // energyCapacityAvailable: 1800
-                            body = [MOVE, MOVE, CLAIM, CLAIM];break;
+                            body = [MOVE, MOVE, CLAIM, CLAIM];
+                            break;
                         case (energyAvailable >= 800): // energyCapacityAvailable: 1300
-                            body = [MOVE, CLAIM];break;
+                            body = [MOVE, CLAIM];
+                            break;
                         case (energyAvailable >= 300): // energyCapacityAvailable: 550
-                            body = [];break;
+                            body = [];
+                            break;
                         case (energyAvailable >= 200): // energyCapacityAvailable: 300
-                            body = [];break;
-                    } break;
+                            body = [];
+                            break;
+                    }
+                    break;
                 // warrior
                 case 'W':
                     switch (true) { // TODO optimize
                         case (energyAvailable >= 2200): // energyCapacityAvailable: 12900
-                            body = [ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE];break;
+                            body = [ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE];
+                            break;
                         case (energyAvailable >= 2050): // energyCapacityAvailable: 5600
-                            body = [ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE];break;
+                            body = [ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE];
+                            break;
                         case (energyAvailable >= 1800): // energyCapacityAvailable: 2300
-                            body = [ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE];break;
+                            body = [ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE];
+                            break;
                         case (energyAvailable >= 1300): // energyCapacityAvailable: 1800
-                            body = [ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE];break;
+                            body = [ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE];
+                            break;
                         case (energyAvailable >= 800): // energyCapacityAvailable: 1300
-                            body = [ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE];break;
+                            body = [ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE];
+                            break;
                         case (energyAvailable >= 300): // energyCapacityAvailable: 550
-                            body = [ATTACK, MOVE, ATTACK, MOVE];break;
+                            body = [ATTACK, MOVE, ATTACK, MOVE];
+                            break;
                         case (energyAvailable >= 200): // energyCapacityAvailable: 300
-                            body = [TOUGH, MOVE, ATTACK, MOVE];break;
-                    } break;
+                            body = [TOUGH, MOVE, ATTACK, MOVE];
+                            break;
+                    }
+                    break;
                 default:
                     console.log('AssignJobs GetCreepBody ERROR! creepType not found ' + creepType);
             }
@@ -286,9 +349,9 @@ const AssignJobs = {
         function GetAvailableName(creepType) {
             let availableCount = 1;
             while (true) {
-                if(Memory.creeps[creepType + availableCount]){
+                if (Memory.creeps[creepType + availableCount]) {
                     availableCount++;
-                }else{
+                } else {
                     break; // name is free
                 }
             }
