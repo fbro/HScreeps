@@ -26,12 +26,21 @@ const ExecuteJobs = {
                     }
                     delete Memory.creeps[creepName];
                 } else if (creepMemory.JobName.startsWith('idle')) {
-                    // TODO - idle actions to be added here
+                    if(gameCreep.room.storage && _.sum(gameCreep.room.storage.store) < gameCreep.room.storage.storeCapacity && _.sum(gameCreep.carry) > 0){
+                        let result;
+                        for (const resourceType in gameCreep.carry) {
+                            result = gameCreep.transfer(gameCreep.room.storage, resourceType);
+                        }
+                        if(result === ERR_NOT_IN_RANGE){
+                            result = gameCreep.moveTo(gameCreep.room.storage);
+                        }
+                        gameCreep.say('idle 📦');
+                    }
                 } else { // creep is not idle
                     const job = Memory.MemRooms[roomName].RoomJobs[creepMemory.JobName];
 
                     if (!job && gameCreep) { // job is outdated and removed from Memory and creep is still alive
-                        console.log('ExecuteJobs ExecuteRoomJobs job gone ' + creepName + ' on ' + creepMemory.JobName + ' in' + roomName);
+                        console.log('ExecuteJobs ExecuteRoomJobs job gone ' + creepName + ' on ' + creepMemory.JobName + ' in ' + roomName);
                         creepMemory.JobName = 'idle(' + gameCreep.pos.x + ',' + gameCreep.pos.y + ')' + gameCreep.pos.roomName;
                     } else if (job && !gameCreep) { // job exists and creep is dead
                         console.log('ExecuteJobs ExecuteRoomJobs ' + creepName + ' on ' + creepMemory.JobName + ' in ' + roomName + ' has died');

@@ -227,7 +227,7 @@ const CreateJobs = {
                         return s.structureType === STRUCTURE_TERMINAL;
                     }
                 })[0];
-                if (terminal && _.sum(terminal.store) < (terminal.storeCapacity - 100000)) {
+                if (terminal && (_.sum(terminal.store) - terminal.store[RESOURCE_ENERGY]) < (terminal.storeCapacity - 100000)) {
                     let storageHasMinerals = false;
                     for (const resourceType in gameRoom.storage.store) {
                         if (gameRoom.storage.store[resourceType] > 0 && resourceType !== RESOURCE_ENERGY) {
