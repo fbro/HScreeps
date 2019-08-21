@@ -21,7 +21,7 @@ const ExecuteJobs = {
                 const roomName = creepMemory.JobName.split(')').pop();
                 if (!gameCreep && creepMemory.JobName.startsWith('idle')) { // idle creep is dead
                     console.log('ExecuteJobs ExecuteRoomJobs idle creep ' + creepName + ' in ' + roomName + ' has died');
-                    if (Memory.MemRooms[roomName].MaxCreeps[creepName.substring(0, 1)]) {
+                    if (Memory.MemRooms[roomName] && Memory.MemRooms[roomName].MaxCreeps[creepName.substring(0, 1)]) {
                         Memory.MemRooms[roomName].MaxCreeps[creepName.substring(0, 1)].NumOfCreepsInRoom--;
                     }
                     delete Memory.creeps[creepName];
@@ -53,7 +53,7 @@ const ExecuteJobs = {
                             new RoomVisual(roomName).text(creepName + '⚰', tombstone.pos.x, tombstone.pos.y);
                         }
                         job.Creep = 'vacant';
-                        if (Memory.MemRooms[roomName].MaxCreeps[creepName.substring(0, 1)]) {
+                        if (Memory.MemRooms[roomName] && Memory.MemRooms[roomName].MaxCreeps[creepName.substring(0, 1)]) {
                             Memory.MemRooms[roomName].MaxCreeps[creepName.substring(0, 1)].NumOfCreepsInRoom--;
                         }
                         delete Memory.creeps[creepName];
@@ -65,7 +65,7 @@ const ExecuteJobs = {
                         }
                     } else { // both job and creep is gone
                         console.log('ExecuteJobs ExecuteRoomJobs ' + creepName + ' on ' + creepMemory.JobName + ' in ' + roomName + ' has died and the job has disappeared');
-                        if (Memory.MemRooms[roomName].MaxCreeps[creepName.substring(0, 1)]) {
+                        if (Memory.MemRooms[roomName] && Memory.MemRooms[roomName].MaxCreeps[creepName.substring(0, 1)]) {
                             Memory.MemRooms[roomName].MaxCreeps[creepName.substring(0, 1)].NumOfCreepsInRoom--;
                         }
                         delete Memory.creeps[creepName];
