@@ -14,7 +14,7 @@ const Links = {
                 if (memRoom.links.HarvesterLinksId[1]) {
                     harvesterLinks[1] = Game.getObjectById(memRoom.links.HarvesterLinksId[1]);
                 }
-            } else if (gameRoom.controller !== undefined && gameRoom.controller.my && gameRoom.storage) {
+            } else if (gameRoom && gameRoom.controller !== undefined && gameRoom.controller.my && gameRoom.storage) {
                 const links = gameRoom.find(FIND_MY_STRUCTURES, {
                     filter: (s) => {
                         return s.structureType === STRUCTURE_LINK;

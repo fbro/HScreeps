@@ -95,7 +95,7 @@ const CreateJobs = {
                         }
                     }
                     if (!Memory.MemRooms[gameRoom.name] && Object.keys(jobs).length > 0) { // room not found and there are jobs in it - create it
-                        CreateRoom(gameRoom, jobs);
+                        CreateRoom(gameRoom.name, jobs);
                     } else if (Memory.MemRooms[gameRoom.name]) { // update jobs in memRoom
                         // update jobs if jobs does not exist - else do nothing
                         for (const newJobKey in jobs) { // loop through new jobs
@@ -159,7 +159,9 @@ const CreateJobs = {
                 if(Memory.MemRooms[gameFlag.pos.roomName]){
                     Memory.MemRooms[gameFlag.pos.roomName].RoomJobs[newJobName] = job;
                 }else{
-                    CreateRoom(Game.rooms[gameFlag.pos.roomName], {}[newJobName] = job);
+                    const jobs = {};
+                    jobs[newJobName] = job;
+                    CreateRoom(gameFlag.pos.roomName, jobs);
                 }
             }
         }
@@ -328,14 +330,21 @@ const CreateJobs = {
             }
         }
 
-        function CreateRoom(gameRoom, jobs){
-            Memory.MemRooms[gameRoom.name] = {
-                'RoomLevel': gameRoom.controller.level,
+        function CreateRoom(roomName, jobs){
+            const gameRoom = Game.rooms[roomName];
+            let level = -1;
+            let sourceNumber = -1;
+            if(gameRoom){
+                level = gameRoom.controller.level;
+                sourceNumber = gameRoom.find(FIND_SOURCES).length;
+            }
+            Memory.MemRooms[roomName] = {
+                'RoomLevel': level,
                 'RoomJobs': jobs,
                 'MaxCreeps': {},
-                'SourceNumber': gameRoom.find(FIND_SOURCES).length,
+                'SourceNumber': sourceNumber,
             };
-            console.log('CreateJobs CreateRoom add new room ' + gameRoom.name + ' level ' + gameRoom.controller.level + ' jobs ' + JSON.stringify(jobs))
+            console.log('CreateJobs CreateRoom add new room ' + roomName + ' level ' + level + ' sourceNumber ' + sourceNumber + ' jobs ' + JSON.stringify(jobs))
         }
 
         function CreateJob(roomJobs, jobName, jobId, jobType, creepType, jobImportance) {

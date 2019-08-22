@@ -74,7 +74,7 @@ const AssignJobs = {
             if (ShouldSpawnCreep(roomJob.CreepType, memRoomKey)) {
                 const availableName = GetAvailableName(roomJob.CreepType);
                 let bestLinearDistance = 1;
-                if (!Game.rooms[memRoomKey].controller || !Game.rooms[memRoomKey].controller.my) {
+                if (!Game.rooms[memRoomKey] || !Game.rooms[memRoomKey].controller || !Game.rooms[memRoomKey].controller.my) {
                     console.log('AssignJobs SpawnCreeps job in another room needs a spawn ' + roomJobKey);
                     bestLinearDistance = Number.MAX_SAFE_INTEGER;
                 }
