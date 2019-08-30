@@ -19,6 +19,7 @@ const Terminals = {
             const MIN_PRICE_U = 0.07;
             const MIN_PRICE_O = 0.09;
             const MIN_PRICE_H = 0.1;
+            const MIN_PRICE_K = 0.05;
 
             const MIN_PRICE_GO = 0.2;
             const MIN_PRICE_UH = 0.2;
@@ -37,6 +38,7 @@ const Terminals = {
                             || (order.price >= MIN_PRICE_U && resourceType === RESOURCE_UTRIUM)
                             || (order.price >= MIN_PRICE_O && resourceType === RESOURCE_OXYGEN)
                             || (order.price >= MIN_PRICE_H && resourceType === RESOURCE_HYDROGEN)
+                            || (order.price >= MIN_PRICE_K && resourceType === RESOURCE_KEANIUM)
 
                             || (order.price >= MIN_PRICE_GO && resourceType === RESOURCE_GHODIUM_OXIDE)
                             || (order.price >= MIN_PRICE_UH && resourceType === RESOURCE_UTRIUM_HYDRIDE)

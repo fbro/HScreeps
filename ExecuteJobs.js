@@ -167,7 +167,7 @@ const ExecuteJobs = {
                     creep.transfer(toFill, RESOURCE_ENERGY); // it may do that "double" but it really does not matter
                     //console.log('ExecuteJobs JobAction ' + creep.name + ' transferred energy to adjacent spawn tower or extension (' + toFill.pos.x + ',' + toFill.pos.y + ',' + toFill.pos.roomName + ')');
                 }
-            } else if (_.sum(creep.carry) < creep.carryCapacity && !creep.name.startsWith('H')) { // pickup adjacent resources
+            } else if (_.sum(creep.carry) < creep.carryCapacity && !creep.name.startsWith('H') && !creep.name.startsWith('E')) { // pickup adjacent resources
                 const drop = creep.pos.findInRange(FIND_DROPPED_RESOURCES, 1)[0];
                 if (drop) {
                     creep.pickup(drop); // it may do that "double" but it really does not matter
