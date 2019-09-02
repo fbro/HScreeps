@@ -70,14 +70,33 @@ const AssignJobs = {
 
         function SpawnCreeps(roomJob, availableSpawns, roomJobKey) {
             const memRoomKey = roomJobKey.split(')').pop();
+
             // if idle creep not found for vacant job then look if spawn is possible
             if (ShouldSpawnCreep(roomJob.CreepType, memRoomKey)) {
                 const availableName = GetAvailableName(roomJob.CreepType);
                 let bestLinearDistance = 1;
-                if (!Game.rooms[memRoomKey] || !Game.rooms[memRoomKey].controller || !Game.rooms[memRoomKey].controller.my) {
-                    console.log('AssignJobs SpawnCreeps job in another room needs a spawn ' + roomJobKey);
+
+                // job in another room
+                if (Game.rooms[memRoomKey]) { // flag in invisible room
+                    if (Game.rooms[memRoomKey].controller) { // flag in controller less room
+                        if (Game.rooms[memRoomKey].controller.my) { // not my room
+                            if (Game.rooms[memRoomKey].find(FIND_MY_SPAWNS).length === 0) { // no spawn in my room
+                                console.log('AssignJobs SpawnCreeps job in another room, no spawns ' + roomJobKey);
+                                bestLinearDistance = Number.MAX_SAFE_INTEGER;
+                            }
+                        }else{
+                            console.log('AssignJobs SpawnCreeps job in another room, not my room ' + roomJobKey);
+                            bestLinearDistance = Number.MAX_SAFE_INTEGER;
+                        }
+                    }else{
+                        console.log('AssignJobs SpawnCreeps job in another room, no controller ' + roomJobKey);
+                        bestLinearDistance = Number.MAX_SAFE_INTEGER;
+                    }
+                }else{
+                    console.log('AssignJobs SpawnCreeps job in another room, invisible room ' + roomJobKey);
                     bestLinearDistance = Number.MAX_SAFE_INTEGER;
                 }
+
                 let bestAvailableSpawn;
                 let bestAvailableSpawnCounter;
                 for (const availableSpawnCounter in availableSpawns) { // find closest spawn

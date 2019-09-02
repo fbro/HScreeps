@@ -496,7 +496,15 @@ const ExecuteJobs = {
             if (flagObj === undefined) {
                 result = JOB_OBJ_DISAPPEARED;
             } else if (flagObj.room === undefined) { // room is not in Game.rooms
-                result = creep.moveTo(flagObj);
+                result = creep.moveTo(flagObj, {
+                    visualizePathStyle: {
+                        fill: 'transparent',
+                        stroke: '#ff00e9',
+                        lineStyle: 'undefined',
+                        strokeWidth: .15,
+                        opacity: .5
+                    }
+                });
             } else {
                 result = creep.claimController(flagObj.room.controller);
                 if (result === ERR_NOT_IN_RANGE) {
@@ -631,14 +639,21 @@ const ExecuteJobs = {
                     });
                 }
             } else { // find more energy
-                const energySupply = FindClosestEnergy(creep, obj);
+                let energySupply = FindClosestEnergyInRoom(creep, obj.room);
                 const energySupplyType = creep.memory.EnergySupplyType;
+                if(!energySupply){
+                    result = NO_ENERGY_FOUND; // FindClosestEnergyInRoom did not find any energy
+                    if(creep.pos.roomName !== obj.pos.roomName){
+                        energySupply = FindClosestEnergyInRoom(creep, creep.room); // try again but look at the room the creep is in
+                        if(!energySupply){
+                            result = NO_ENERGY_FOUND; // FindClosestEnergyInRoom did not find any energy
+                        }
+                    }
+                }
                 if (energySupply && energySupplyType === 'DROP') {
                     result = creep.pickup(energySupply);
                 } else if (energySupply) {
                     result = creep.withdraw(energySupply, RESOURCE_ENERGY);
-                } else {
-                    result = NO_ENERGY_FOUND; // FindClosestEnergy did not find any energy
                 }
 
                 if (result === ERR_NOT_IN_RANGE) {
@@ -674,7 +689,7 @@ const ExecuteJobs = {
         }
 
         /**@return {object}*/
-        function FindClosestEnergy(creep, obj) {
+        function FindClosestEnergyInRoom(creep, room) {
             // set EnergySupply and EnergySupplyType on creep memory
             let energySupply = undefined;
             let energySupplyType = undefined;
@@ -692,14 +707,14 @@ const ExecuteJobs = {
             }
 
             if (!energySupply) { // creep memory had nothing stored
-                const energySupplies = obj.room.find(FIND_STRUCTURES, {
+                let energySupplies = room.find(FIND_STRUCTURES, {
                     filter: function (s) {
                         return ((s.structureType === STRUCTURE_STORAGE
                             || s.structureType === STRUCTURE_CONTAINER) && s.store[RESOURCE_ENERGY] >= 100
                             || s.structureType === STRUCTURE_LINK && s.energy >= 100);
                     }
                 });
-                energySupplies.concat(obj.room.find(FIND_DROPPED_RESOURCES, {
+                energySupplies = energySupplies.concat(room.find(FIND_DROPPED_RESOURCES, {
                     filter: function (d) {
                         return (d.resourceType === RESOURCE_ENERGY && d.amount >= 50);
                     }

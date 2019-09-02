@@ -37,24 +37,32 @@ const CreateJobs = {
         const OBJECT_JOB = 1;
         const FLAG_JOB = 2;
 
-        CreateObjJobs();
-        CreateFlagJobs();
+        let flagJobs = CreateFlagJobs();
+        CreateObjJobs(flagJobs);
 
-        function CreateObjJobs() {
+        function CreateObjJobs(flagJobs) {
             for (const gameRoomKey in Game.rooms) {
                 const gameRoom = Game.rooms[gameRoomKey]; // visible room
                 let jobs = {};
+                // weave flag jobs into the job array that is in this room object
+                for (const flagJobKey in flagJobs) {
+                    if(flagJobKey.split(')').pop() === gameRoomKey){
+                        const flagJob = flagJobs[flagJobKey];
+                        jobs[flagJobKey] = flagJob; // add job to this room job array
+                        delete flagJobs[flagJobKey];
+                    }
+                }
                 if (gameRoom.controller && gameRoom.controller.my) { // create all the jobs in this room
                     // Source
                     const sources = gameRoom.find(FIND_SOURCES);
                     for (const sourceKey in sources) {
                         const source = sources[sourceKey];
                         new RoomVisual(gameRoom.name).text('🏭', source.pos.x, source.pos.y);
-                        CreateJob(jobs, 'Source(' + source.pos.x + ',' + source.pos.y + ')' + gameRoom.name, source.id, OBJECT_JOB, 'H', 2);
+                        AddJob(jobs, 'Source(' + source.pos.x + ',' + source.pos.y + ')' + gameRoom.name, source.id, OBJECT_JOB, 'H', 2);
                     }
                     // Controller
                     new RoomVisual(gameRoom.name).text('🧠', gameRoom.controller.pos.x, gameRoom.controller.pos.y);
-                    CreateJob(jobs, 'Controller(' + gameRoom.controller.pos.x + ',' + gameRoom.controller.pos.y + ')' + gameRoom.name, gameRoom.controller.id, OBJECT_JOB, 'B', 1);
+                    AddJob(jobs, 'Controller(' + gameRoom.controller.pos.x + ',' + gameRoom.controller.pos.y + ')' + gameRoom.name, gameRoom.controller.id, OBJECT_JOB, 'B', 1);
                     // FillSpawnExtension
                     FillSpawnExtensionJobs(gameRoom, jobs);
                     // Construction
@@ -62,9 +70,9 @@ const CreateJobs = {
                     // Repair
                     RepairJobs(gameRoom, jobs);
                     if (gameRoom.controller.level < 8 && gameRoom.storage && gameRoom.storage.store[RESOURCE_ENERGY] > 100000) { // not at max level - more creeps on the controller job
-                        CreateJob(jobs, 'Controller1(' + gameRoom.controller.pos.x + ',' + gameRoom.controller.pos.y + ')' + gameRoom.name, gameRoom.controller.id, OBJECT_JOB, 'B', 5);
+                        AddJob(jobs, 'Controller1(' + gameRoom.controller.pos.x + ',' + gameRoom.controller.pos.y + ')' + gameRoom.name, gameRoom.controller.id, OBJECT_JOB, 'B', 5);
                         if (gameRoom.storage.store[RESOURCE_ENERGY] > 200000) {
-                            CreateJob(jobs, 'Controller2(' + gameRoom.controller.pos.x + ',' + gameRoom.controller.pos.y + ')' + gameRoom.name, gameRoom.controller.id, OBJECT_JOB, 'B', 5);
+                            AddJob(jobs, 'Controller2(' + gameRoom.controller.pos.x + ',' + gameRoom.controller.pos.y + ')' + gameRoom.name, gameRoom.controller.id, OBJECT_JOB, 'B', 5);
                         }
                     }
                     if (gameRoom.controller.level >= 3) {
@@ -106,15 +114,34 @@ const CreateJobs = {
                                 }
                             }
                         }
-                        Memory.MemRooms[gameRoom.name].RoomLevel = gameRoom.controller.level;
-                        // TODO - by overwriting and removing old jobs the creeps finishing the job ends up idle before it can really finish its job
+                        if(Memory.MemRooms[gameRoom.name].RoomLevel !== gameRoom.controller.level){
+                            Memory.MemRooms[gameRoom.name].RoomLevel = gameRoom.controller.level;
+                            Memory.MemRooms[gameRoom.name].SourceNumber = gameRoom.find(FIND_SOURCES).length;
+                        }
                         Memory.MemRooms[gameRoom.name].RoomJobs = jobs; // overwrite the old jobs with the new jobs - and the existing old jobs - old jobs that where not refound is forgotten
                     }
                 }
             }
+
+            // now some flag jobs might still be unplaced, loop trough them and add them maybe also create the room object
+            for (const flagJobKey in flagJobs) {
+                const roomName = flagJobKey.split(')').pop();
+                const flagJob = flagJobs[flagJobKey];
+                if(Memory.MemRooms[roomName]){
+                    if(!Memory.MemRooms[roomName].RoomJobs[flagJobKey]){
+                        Memory.MemRooms[roomName].RoomJobs[flagJobKey] = flagJob;
+                    }
+                }else{
+                    const jobs = {};
+                    jobs[flagJobKey] = flagJob;
+                    CreateRoom(roomName, jobs);
+                }
+            }
         }
 
+        // this method is not just run in the Game.rooms loop because flags may be in "invisible" rooms
         function CreateFlagJobs() {
+            let jobs = {};
             for (const gameFlagKey in Game.flags) {
                 const gameFlag = Game.flags[gameFlagKey];
                 let jobName;
@@ -145,25 +172,11 @@ const CreateJobs = {
                     creepType = 'D';
                     jobImportance = 5;
                 } else {
-                    console.log('CreateJobs UpdateJobsInRoom ERROR! flag color not found ' + gameFlag.color + ' ' + gameFlag.secondaryColor + ' (' + gameFlag.pos.x + ',' + gameFlag.pos.y + ')');
+                    console.log('CreateJobs UpdateJobsInRoom ERROR! flag color not found ' + gameFlagKey + ' ' + gameFlag.color + ' ' + gameFlag.secondaryColor + ' (' + gameFlag.pos.x + ',' + gameFlag.pos.y + ')');
                 }
-                const newJobName = jobName + '-' + gameFlagKey + '(' + gameFlag.pos.x + ',' + gameFlag.pos.y + ')' + gameFlag.pos.roomName; // for flag
-                const job = {
-                    'JobId': gameFlagKey,
-                    'JobType': FLAG_JOB,
-                    'CreepType': creepType,
-                    'Creep': 'vacant',
-                    'JobImportance': jobImportance
-                };
-                // TODO BUG ERR!!!!! the job will be overwritten each 30 tick because CreateObjJobs only looks at ObjJobs in room
-                if(Memory.MemRooms[gameFlag.pos.roomName]){
-                    Memory.MemRooms[gameFlag.pos.roomName].RoomJobs[newJobName] = job;
-                }else{
-                    const jobs = {};
-                    jobs[newJobName] = job;
-                    CreateRoom(gameFlag.pos.roomName, jobs);
-                }
+                AddJob(jobs, jobName + '-' + gameFlagKey + '(' + gameFlag.pos.x + ',' + gameFlag.pos.y + ')' + gameFlag.pos.roomName, gameFlagKey, FLAG_JOB, creepType, jobImportance);
             }
+            return jobs;
         }
 
         // jobs:
@@ -178,7 +191,7 @@ const CreateJobs = {
                 for (const labKey in labs) {
                     const lab = labs[labKey];
                     if (lab && lab.energy < lab.energyCapacity) {
-                        CreateJob(roomJobs, 'FillLabEnergy(' + lab.pos.x + ',' + lab.pos.y + ')' + gameRoom.name, lab.id, OBJECT_JOB, 'T', 5);
+                        AddJob(roomJobs, 'FillLabEnergy(' + lab.pos.x + ',' + lab.pos.y + ')' + gameRoom.name, lab.id, OBJECT_JOB, 'T', 5);
                     }
                 }
             }
@@ -192,7 +205,7 @@ const CreateJobs = {
                     }
                 })[0];
                 if (terminal && terminal.store[RESOURCE_ENERGY] < 100000 && _.sum(terminal.store) < terminal.storeCapacity) {
-                    CreateJob(roomJobs, 'FillTerminalEnergy(' + terminal.pos.x + ',' + terminal.pos.y + ')' + gameRoom.name, terminal.id, OBJECT_JOB, 'T', 4);
+                    AddJob(roomJobs, 'FillTerminalEnergy(' + terminal.pos.x + ',' + terminal.pos.y + ')' + gameRoom.name, terminal.id, OBJECT_JOB, 'T', 4);
                 }
             }
         }
@@ -212,7 +225,7 @@ const CreateJobs = {
                         }
                     }
                     if (storageHasMinerals) {
-                        CreateJob(roomJobs, 'FillTerminalMineral(' + terminal.pos.x + ',' + terminal.pos.y + ')' + gameRoom.name, terminal.id, OBJECT_JOB, 'T', 5);
+                        AddJob(roomJobs, 'FillTerminalMineral(' + terminal.pos.x + ',' + terminal.pos.y + ')' + gameRoom.name, terminal.id, OBJECT_JOB, 'T', 5);
                     }
                 }
             }
@@ -236,7 +249,7 @@ const CreateJobs = {
                 })[0];
                 if (mineral && extractMineral) {
                     new RoomVisual(gameRoom.name).text('⛏', extractMineral.pos.x, extractMineral.pos.y);
-                    CreateJob(roomJobs, 'ExtractMineral-' + mineral.mineralType + '(' + extractMineral.pos.x + ',' + extractMineral.pos.y + ')' + gameRoom.name, mineral.id, OBJECT_JOB, 'E', 5);
+                    AddJob(roomJobs, 'ExtractMineral-' + mineral.mineralType + '(' + extractMineral.pos.x + ',' + extractMineral.pos.y + ')' + gameRoom.name, mineral.id, OBJECT_JOB, 'E', 5);
                 }
             }
         }
@@ -251,7 +264,7 @@ const CreateJobs = {
             for (const fillStorageKey in fillStorages) {
                 const fillStorage = fillStorages[fillStorageKey];
                 new RoomVisual(gameRoom.name).text('📦', fillStorage.pos.x, fillStorage.pos.y);
-                CreateJob(roomJobs, 'FillStorage-' + fillStorage.structureType + '(' + fillStorage.pos.x + ',' + fillStorage.pos.y + ')' + gameRoom.name, fillStorage.id, OBJECT_JOB, 'T', 5);
+                AddJob(roomJobs, 'FillStorage-' + fillStorage.structureType + '(' + fillStorage.pos.x + ',' + fillStorage.pos.y + ')' + gameRoom.name, fillStorage.id, OBJECT_JOB, 'T', 5);
             }
             // drop is a little bit different - but same kind of job as above
             const resourceDrops = gameRoom.find(FIND_DROPPED_RESOURCES, {
@@ -262,7 +275,7 @@ const CreateJobs = {
             for (const resourceDropKey in resourceDrops) {
                 const resourceDrop = resourceDrops[resourceDropKey];
                 new RoomVisual(gameRoom.name).text('💰', resourceDrop.pos.x, resourceDrop.pos.y);
-                CreateJob(roomJobs, 'FillStorage-drop' + '(' + resourceDrop.pos.x + ',' + resourceDrop.pos.y + ',' + resourceDrop.resourceType + ')' + gameRoom.name, resourceDrop.id, OBJECT_JOB, 'T', 4);
+                AddJob(roomJobs, 'FillStorage-drop' + '(' + resourceDrop.pos.x + ',' + resourceDrop.pos.y + ',' + resourceDrop.resourceType + ')' + gameRoom.name, resourceDrop.id, OBJECT_JOB, 'T', 4);
             }
         }
 
@@ -275,7 +288,7 @@ const CreateJobs = {
             for (const fillTowerKey in fillTowers) {
                 const fillTower = fillTowers[fillTowerKey];
                 new RoomVisual(gameRoom.name).text('🗼', fillTower.pos.x, fillTower.pos.y);
-                CreateJob(roomJobs, 'FillTower(' + fillTower.pos.x + ',' + fillTower.pos.y + ')' + gameRoom.name, fillTower.id, OBJECT_JOB, 'T', 2);
+                AddJob(roomJobs, 'FillTower(' + fillTower.pos.x + ',' + fillTower.pos.y + ')' + gameRoom.name, fillTower.id, OBJECT_JOB, 'T', 2);
             }
         }
 
@@ -288,7 +301,7 @@ const CreateJobs = {
             for (const fillSpawnExtensionKey in fillSpawnExtensions) {
                 const fillSpawnExtension = fillSpawnExtensions[fillSpawnExtensionKey];
                 new RoomVisual(gameRoom.name).text('🌱', fillSpawnExtension.pos.x, fillSpawnExtension.pos.y);
-                CreateJob(roomJobs, 'FillSpawnExtension(' + fillSpawnExtension.pos.x + ',' + fillSpawnExtension.pos.y + ')' + gameRoom.name, fillSpawnExtension.id, OBJECT_JOB, 'T', 1);
+                AddJob(roomJobs, 'FillSpawnExtension(' + fillSpawnExtension.pos.x + ',' + fillSpawnExtension.pos.y + ')' + gameRoom.name, fillSpawnExtension.id, OBJECT_JOB, 'T', 1);
             }
         }
 
@@ -297,7 +310,7 @@ const CreateJobs = {
             for (const constructionKey in constructions) {
                 const construction = constructions[constructionKey];
                 new RoomVisual(gameRoom.name).text('🏗', construction.pos.x, construction.pos.y);
-                CreateJob(roomJobs, 'Construction-' + construction.structureType + '(' + construction.pos.x + ',' + construction.pos.y + ')' + gameRoom.name, construction.id, OBJECT_JOB, 'B', 2);
+                AddJob(roomJobs, 'Construction-' + construction.structureType + '(' + construction.pos.x + ',' + construction.pos.y + ')' + gameRoom.name, construction.id, OBJECT_JOB, 'B', 2);
             }
         }
 
@@ -326,9 +339,10 @@ const CreateJobs = {
             for (const repairKey in repairs) {
                 const repair = repairs[repairKey];
                 new RoomVisual(gameRoom.name).text('🛠', repair.pos.x, repair.pos.y);
-                CreateJob(roomJobs, 'Repair-' + repair.structureType + '(' + repair.pos.x + ',' + repair.pos.y + ')' + gameRoom.name, repair.id, OBJECT_JOB, 'B', 3);
+                AddJob(roomJobs, 'Repair-' + repair.structureType + '(' + repair.pos.x + ',' + repair.pos.y + ')' + gameRoom.name, repair.id, OBJECT_JOB, 'B', 3);
             }
         }
+
 
         function CreateRoom(roomName, jobs){
             const gameRoom = Game.rooms[roomName];
@@ -347,8 +361,12 @@ const CreateJobs = {
             console.log('CreateJobs CreateRoom add new room ' + roomName + ' level ' + level + ' sourceNumber ' + sourceNumber + ' jobs ' + JSON.stringify(jobs))
         }
 
-        function CreateJob(roomJobs, jobName, jobId, jobType, creepType, jobImportance) {
-            roomJobs[jobName] = {
+        function AddJob(roomJobs, jobName, jobId, jobType, creepType, jobImportance) {
+            roomJobs[jobName] = CreateJob(jobId, jobType, creepType, jobImportance);
+        }
+
+        function CreateJob(jobId, jobType, creepType, jobImportance) {
+            return {
                 'JobId': jobId,
                 'JobType': jobType,
                 'CreepType': creepType,
