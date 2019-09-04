@@ -90,14 +90,14 @@ const CreateJobs = {
                                     // FillTerminalMineral
                                     FillTerminalMineralJobs(gameRoom, jobs);
                                     // TODO FillLabEnergy
-                                    FillLabEnergyJobs(gameRoom, jobs); // TODO add executeJob
+                                    FillLabEnergyJobs(gameRoom, jobs);
                                     // TODO FillLabMineral
                                     //FillLabMineralJobs(gameRoom, jobs);
                                     // TODO EmptyLabMineral
-                                    if (gameRoom.controller.level === 8) {
+                                    // if (gameRoom.controller.level === 8) {
                                         // TODO FillPowerSpawnEnergy
                                         // TODO FillPowerSpawnPowerUnits
-                                    }
+                                    // }
                                 }
                             }
                         }
@@ -322,8 +322,9 @@ const CreateJobs = {
                         &&
                         (
                             (
-                                s.structureType === STRUCTURE_RAMPART && (gameRoom.controller.level < 8 && s.hits < 100000 || gameRoom.controller.level === 8 && s.hits < 2000000) ||
-                                s.structureType === STRUCTURE_WALL && (gameRoom.controller.level < 8 && s.hits < 100000 || gameRoom.controller.level === 8 && s.hits < 2000000) ||
+                                (s.structureType === STRUCTURE_RAMPART || s.structureType === STRUCTURE_WALL)
+                                    && (gameRoom.controller.level < 8 && s.hits < 100000 || gameRoom.controller.level === 8 && (s.hits < 2000000 || gameRoom.storage && gameRoom.storage.store[RESOURCE_ENERGY] > 500000))
+                                ||
                                 s.structureType === STRUCTURE_ROAD && s.hits < s.hitsMax / 2
                             )
                             ||

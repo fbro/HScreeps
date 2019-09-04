@@ -109,6 +109,9 @@ const ExecuteJobs = {
                 case jobKey.startsWith('FillTerminalEnergy'):
                     result = JobFillTerminalEnergy(creep, roomJob); // uses JobEnergyAction()
                     break;
+                case jobKey.startsWith('FillLabEnergy'):
+                    result = JobFillLabEnergy(creep, roomJob); // uses JobEnergyAction()
+                    break;
 
                 // flag jobs
                 case jobKey.startsWith('TagController'):
@@ -423,6 +426,17 @@ const ExecuteJobs = {
 
         /**@return {int}*/
         function JobFillTerminalEnergy(creep, roomJob) {
+            const obj = Game.getObjectById(roomJob.JobId);
+            let result = JobEnergyAction(creep, roomJob, obj, {
+                creepAction: function () {
+                    return creep.transfer(obj, RESOURCE_ENERGY);
+                }
+            });
+            return result;
+        }
+
+        /**@return {int}*/
+        function JobFillLabEnergy(creep, roomJob) {
             const obj = Game.getObjectById(roomJob.JobId);
             let result = JobEnergyAction(creep, roomJob, obj, {
                 creepAction: function () {

@@ -14,7 +14,7 @@ const Terminals = {
             const MAX_TRANSFER_ENERGY_COST = 500;
             let MIN_PRICE_E = 0.1;
             if (room.storage && room.storage.store[RESOURCE_ENERGY] > 500000) {
-                MIN_PRICE_E = 0.01;
+                MIN_PRICE_E = 0.007;
             }
             const MIN_PRICE_U = 0.07;
             const MIN_PRICE_O = 0.09;
