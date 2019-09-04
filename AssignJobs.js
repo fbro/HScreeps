@@ -154,6 +154,9 @@ const AssignJobs = {
                         break;
                     case 'B': // builder
                         maxCreepsInRoom = 1 + memRoom.SourceNumber;
+                        if(Game.rooms[roomKey] && Game.rooms[roomKey].storage && Game.rooms[roomKey].storage.store[RESOURCE_ENERGY] > 500000){
+                            maxCreepsInRoom = maxCreepsInRoom + 2;
+                        }
                         break;
                     case 'E': // extractor
                         maxCreepsInRoom = 1;
@@ -162,7 +165,8 @@ const AssignJobs = {
                     case 'S': // scout
                     case 'C': // claimer
                     case 'R': // reserver
-                        maxCreepsInRoom = 6;
+                    case 'D': // distantHarvester
+                        maxCreepsInRoom = 5;
                         break;
                     default:
                         console.log('AssignJobs ShouldSpawnCreep ERROR! creepType not found ' + creepType);
