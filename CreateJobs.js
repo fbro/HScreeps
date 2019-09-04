@@ -89,7 +89,7 @@ const CreateJobs = {
                                     FillTerminalEnergyJobs(gameRoom, jobs);
                                     // FillTerminalMineral
                                     FillTerminalMineralJobs(gameRoom, jobs);
-                                    // TODO FillLabEnergy
+                                    // FillLabEnergy
                                     FillLabEnergyJobs(gameRoom, jobs);
                                     // TODO FillLabMineral
                                     //FillLabMineralJobs(gameRoom, jobs);
@@ -191,7 +191,7 @@ const CreateJobs = {
                 for (const labKey in labs) {
                     const lab = labs[labKey];
                     if (lab && lab.energy < lab.energyCapacity) {
-                        AddJob(roomJobs, 'FillLabEnergy(' + lab.pos.x + ',' + lab.pos.y + ')' + gameRoom.name, lab.id, OBJECT_JOB, 'T', 5);
+                        AddJob(roomJobs, 'FillLabEnergy(' + lab.pos.x + ',' + lab.pos.y + ')' + gameRoom.name, lab.id, OBJECT_JOB, 'T', 3);
                     }
                 }
             }
