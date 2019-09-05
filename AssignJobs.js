@@ -154,7 +154,7 @@ const AssignJobs = {
                         break;
                     case 'B': // builder
                         maxCreepsInRoom = 1 + memRoom.SourceNumber;
-                        if(Game.rooms[roomKey] && Game.rooms[roomKey].storage && Game.rooms[roomKey].storage.store[RESOURCE_ENERGY] > 500000){
+                        if(Game.rooms[roomKey] && Game.rooms[roomKey].storage && Game.rooms[roomKey].storage.store[RESOURCE_ENERGY] > 700000){
                             maxCreepsInRoom = maxCreepsInRoom + 2;
                         }
                         break;
