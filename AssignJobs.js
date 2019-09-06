@@ -14,14 +14,14 @@ const AssignJobs = {
         * [H] harvester         only one CARRY
         * [B] builder           equal WORK and CARRY
         * [E] extractor         only one CARRY and maxed out WORK
-        * [W] warrior           ATTACK and MOVE
         * [S] scout             just a MOVE
         * [C] claimer           CLAIM - one CLAIM
         * [R] reserver          CLAIM - many CLAIM when reserving
+        * [W] warrior           ATTACK and MOVE
+        * [D] distantHarvester  equal WORK and CARRY
         * TODO not in first version
         * [G] gunner            RANGED_ATTACK and MOVE
         * [M] medic             HEAL
-        * [D] distantHarvester  equal WORK and CARRY
         */
 
         AssignOrSpawnCreeps();
@@ -359,6 +359,32 @@ const AssignJobs = {
                             break;
                         case (energyAvailable >= 200): // energyCapacityAvailable: 300
                             body = [TOUGH, MOVE, ATTACK, MOVE];
+                            break;
+                    }
+                    break;
+                // transporter
+                case 'D':
+                    switch (true) {
+                        case (energyAvailable >= 1500): // energyCapacityAvailable: 12900
+                            body = [WORK, WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];
+                            break;
+                        case (energyAvailable >= 1250): // energyCapacityAvailable: 5600
+                            body = [WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];
+                            break;
+                        case (energyAvailable >= 1000): // energyCapacityAvailable: 2300
+                            body = [WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];
+                            break;
+                        case (energyAvailable >= 750): // energyCapacityAvailable: 1800
+                            body = [WORK, WORK, WORK, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];
+                            break;
+                        case (energyAvailable >= 500): // energyCapacityAvailable: 1300
+                            body = [WORK, WORK, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE];
+                            break;
+                        case (energyAvailable >= 300): // energyCapacityAvailable: 550
+                            body = [WORK, CARRY, MOVE, MOVE];
+                            break;
+                        case (energyAvailable >= 200): // energyCapacityAvailable: 300
+                            body = [WORK, CARRY, MOVE];
                             break;
                     }
                     break;

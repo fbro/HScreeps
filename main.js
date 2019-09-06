@@ -38,11 +38,15 @@ module.exports.loop = function () {
 
 
 // TODO:
-// add more jobs
+
+// add more jobs:
+// TODO FillLabMineral
+// TODO EmptyLabMineral
+// TODO FillPowerSpawnEnergy
+// TODO FillPowerSpawnPowerUnits
+
 // add constructions
 
-// pickup dropped resources on its path if possible
-// place its stuff in nearby container if possible
-
-// all **idle** creeps should move to storage and place all its content in storage
 // recycle creeps if there are many idle!
+
+// TODO remote harvester needs to go back with its energy

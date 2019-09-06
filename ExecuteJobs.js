@@ -1,11 +1,5 @@
 const ExecuteJobs = {
     run: function () {
-        // jobs have been created
-        // creeps where assigned
-        // check if creep on job is dead then set job to vacant - one room at a time - one job at a time
-        // if creep alive then execute the job
-        // after execution - check if job is done
-        // if job is done then set creep to idle and remove job from memory
 
         const ERR_NO_RESULT_FOUND = -20; // job flow did not encounter any actions that lead to any results!
         const JOB_IS_DONE = -21; // when the job should be removed but there are no ERR codes
@@ -216,7 +210,7 @@ const ExecuteJobs = {
                         }
                     })[0];
                     if (container) {
-                        result = creep.transfer(link, RESOURCE_ENERGY);
+                        result = creep.transfer(container, RESOURCE_ENERGY);
                     } else {
                         for (const resourceType in creep.carry) {
                             result = creep.drop(resourceType);
@@ -455,7 +449,15 @@ const ExecuteJobs = {
             if (flagObj === undefined) {
                 result = JOB_OBJ_DISAPPEARED;
             } else if (flagObj.room === undefined) { // room is not in Game.rooms
-                result = creep.moveTo(flagObj);
+                result = creep.moveTo(flagObj, {
+                    visualizePathStyle: {
+                        fill: 'transparent',
+                        stroke: '#ffb900',
+                        lineStyle: 'dashed',
+                        strokeWidth: .15,
+                        opacity: .1
+                    }
+                });
             } else {
                 result = creep.signController(flagObj.room.controller, flagObj.name);
                 if (result === ERR_NOT_IN_RANGE) {
@@ -484,7 +486,15 @@ const ExecuteJobs = {
             if (flagObj === undefined) {
                 result = JOB_OBJ_DISAPPEARED;
             } else if (flagObj.room === undefined) { // room is not in Game.rooms
-                result = creep.moveTo(flagObj);
+                result = creep.moveTo(flagObj, {
+                    visualizePathStyle: {
+                        fill: 'transparent',
+                        stroke: '#ffdb00',
+                        lineStyle: 'dashed',
+                        strokeWidth: .15,
+                        opacity: .1
+                    }
+                });
             } else {
                 if (flagObj.pos.x === creep.pos.x && flagObj.pos.y === creep.pos.y && flagObj.pos.roomName === creep.pos.roomName) {
                     result = creep.say(flagObj.name, true);
@@ -543,10 +553,20 @@ const ExecuteJobs = {
         function JobReserveController(creep, roomJob) {
             let result = ERR_NO_RESULT_FOUND;
             const flagObj = Game.flags[roomJob.JobId];
-            if (flagObj === undefined) {
+            if (!flagObj) {
                 result = JOB_OBJ_DISAPPEARED;
-            } else if (flagObj.room === undefined) { // room is not in Game.rooms
-                result = creep.moveTo(flagObj);
+            } else if (!flagObj.room) { // room is not in Game.rooms
+                result = creep.moveTo(flagObj, {
+                    visualizePathStyle: {
+                        fill: 'transparent',
+                        stroke: '#ff00e9',
+                        lineStyle: 'dashed',
+                        strokeWidth: .15,
+                        opacity: .5
+                    }
+                });
+            } else if (!flagObj.room.controller || flagObj.room.controller.reservation.ticksToEnd >= 4999) {
+                result = JOB_IS_DONE;
             } else {
                 result = creep.reserveController(flagObj.room.controller);
                 if (result === ERR_NOT_IN_RANGE) {
@@ -571,7 +591,15 @@ const ExecuteJobs = {
             if (flagObj === undefined) {
                 result = JOB_OBJ_DISAPPEARED;
             } else if (flagObj.room === undefined) { // room is not in Game.rooms
-                result = creep.moveTo(flagObj);
+                result = creep.moveTo(flagObj, {
+                    visualizePathStyle: {
+                        fill: 'transparent',
+                        stroke: '#ff5600',
+                        lineStyle: 'undefined',
+                        strokeWidth: .15,
+                        opacity: .5
+                    }
+                });
             } else {
                 const hostileCreep = creep.room.find(FIND_HOSTILE_CREEPS)[0];
                 if (hostileCreep) {
@@ -612,13 +640,46 @@ const ExecuteJobs = {
             if (flagObj === undefined) {
                 result = JOB_OBJ_DISAPPEARED;
             } else if (flagObj.room === undefined) { // room is not in Game.rooms
-                result = creep.moveTo(flagObj);
-            } else {
+                result = creep.moveTo(flagObj, {
+                    visualizePathStyle: {
+                        fill: 'transparent',
+                        stroke: '#ffe100',
+                        lineStyle: 'undefined',
+                        strokeWidth: .15,
+                        opacity: .5
+                    }
+                });
+            } else if (_.sum(creep.carry) < creep.carryCapacity) {
                 const source = flagObj.pos.findInRange(FIND_SOURCES, 0)[0];
                 result = creep.harvest(source);
-
                 if (result === ERR_NOT_IN_RANGE) {
                     result = creep.moveTo(source, {
+                        visualizePathStyle: {
+                            fill: 'transparent',
+                            stroke: '#ffe100',
+                            lineStyle: 'undefined',
+                            strokeWidth: .15,
+                            opacity: .5
+                        }
+                    });
+                }
+            } else {
+                const container = flagObj.pos.findInRange(FIND_MY_STRUCTURES, 1, {
+                    filter: function (container) {
+                        return container.structureType === STRUCTURE_CONTAINER && _.sum(container.store) < container.storeCapacity;
+                    }
+                })[0];
+                if (container) {
+                    result = creep.transfer(container, RESOURCE_ENERGY);
+                } else {
+                    // TODO else go back with carried energy!
+                    for (const resourceType in creep.carry) {
+                        result = creep.drop(resourceType);
+                    }
+                }
+
+                if (result === ERR_NOT_IN_RANGE) {
+                    result = creep.moveTo(flagObj, {
                         visualizePathStyle: {
                             fill: 'transparent',
                             stroke: '#ffe100',

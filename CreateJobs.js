@@ -160,9 +160,11 @@ const CreateJobs = {
                     creepType = 'C';
                     jobImportance = 1;
                 } else if (gameFlag.color === COLOR_GREEN && gameFlag.secondaryColor === COLOR_YELLOW) { // claimer reserve
-                    jobName = 'ReserveController';
-                    creepType = 'R';
-                    jobImportance = 4;
+                    if(!gameFlag.room || (gameFlag.room.controller.reservation.ticksToEnd < 2000 && !Memory.MemRooms[gameFlag.pos.roomName].RoomJobs[gameFlagKey])){
+                        jobName = 'ReserveController';
+                        creepType = 'R';
+                        jobImportance = 4;
+                    }
                 } else if (gameFlag.color === COLOR_RED && gameFlag.secondaryColor === COLOR_RED) { // warrior at pos
                     jobName = 'GuardPos';
                     creepType = 'W';
@@ -174,7 +176,10 @@ const CreateJobs = {
                 } else {
                     console.log('CreateJobs UpdateJobsInRoom ERROR! flag color not found ' + gameFlagKey + ' ' + gameFlag.color + ' ' + gameFlag.secondaryColor + ' (' + gameFlag.pos.x + ',' + gameFlag.pos.y + ')');
                 }
-                AddJob(jobs, jobName + '-' + gameFlagKey + '(' + gameFlag.pos.x + ',' + gameFlag.pos.y + ')' + gameFlag.pos.roomName, gameFlagKey, FLAG_JOB, creepType, jobImportance);
+
+                if(jobName){
+                    AddJob(jobs, jobName + '-' + gameFlagKey + '(' + gameFlag.pos.x + ',' + gameFlag.pos.y + ')' + gameFlag.pos.roomName, gameFlagKey, FLAG_JOB, creepType, jobImportance);
+                }
             }
             return jobs;
         }
@@ -191,6 +196,7 @@ const CreateJobs = {
                 for (const labKey in labs) {
                     const lab = labs[labKey];
                     if (lab && lab.energy < lab.energyCapacity) {
+                        new RoomVisual(gameRoom.name).text('⚡', lab.pos.x, lab.pos.y);
                         AddJob(roomJobs, 'FillLabEnergy(' + lab.pos.x + ',' + lab.pos.y + ')' + gameRoom.name, lab.id, OBJECT_JOB, 'T', 3);
                     }
                 }
@@ -205,6 +211,7 @@ const CreateJobs = {
                     }
                 })[0];
                 if (terminal && terminal.store[RESOURCE_ENERGY] < 100000 && _.sum(terminal.store) < terminal.storeCapacity) {
+                    new RoomVisual(gameRoom.name).text('⚡', terminal.pos.x, terminal.pos.y);
                     AddJob(roomJobs, 'FillTerminalEnergy(' + terminal.pos.x + ',' + terminal.pos.y + ')' + gameRoom.name, terminal.id, OBJECT_JOB, 'T', 4);
                 }
             }
@@ -225,6 +232,7 @@ const CreateJobs = {
                         }
                     }
                     if (storageHasMinerals) {
+                        new RoomVisual(gameRoom.name).text('⛏', terminal.pos.x, terminal.pos.y);
                         AddJob(roomJobs, 'FillTerminalMineral(' + terminal.pos.x + ',' + terminal.pos.y + ')' + gameRoom.name, terminal.id, OBJECT_JOB, 'T', 5);
                     }
                 }
