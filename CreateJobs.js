@@ -160,7 +160,7 @@ const CreateJobs = {
                     creepType = 'C';
                     jobImportance = 1;
                 } else if (gameFlag.color === COLOR_GREEN && gameFlag.secondaryColor === COLOR_YELLOW) { // claimer reserve
-                    if(!gameFlag.room || (gameFlag.room.controller.reservation.ticksToEnd < 2000 && !Memory.MemRooms[gameFlag.pos.roomName].RoomJobs[gameFlagKey])){
+                    if(!gameFlag.room || !gameFlag.room.controller.reservation || !Memory.MemRooms[gameFlag.pos.roomName] || (gameFlag.room.controller.reservation.ticksToEnd < 2000 && !Memory.MemRooms[gameFlag.pos.roomName].RoomJobs[gameFlagKey])){
                         jobName = 'ReserveController';
                         creepType = 'R';
                         jobImportance = 4;
