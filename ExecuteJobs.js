@@ -565,7 +565,7 @@ const ExecuteJobs = {
                         opacity: .5
                     }
                 });
-            } else if (!flagObj.room.controller || flagObj.room.controller.reservation.ticksToEnd >= 4999) {
+            } else if (!flagObj.room.controller || (flagObj.room.controller.reservation && flagObj.room.controller.reservation.ticksToEnd >= 4999)) {
                 result = JOB_IS_DONE;
             } else {
                 result = creep.reserveController(flagObj.room.controller);

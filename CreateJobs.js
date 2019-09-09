@@ -160,10 +160,11 @@ const CreateJobs = {
                     creepType = 'C';
                     jobImportance = 1;
                 } else if (gameFlag.color === COLOR_GREEN && gameFlag.secondaryColor === COLOR_YELLOW) { // claimer reserve
-                    if(!gameFlag.room || !gameFlag.room.controller.reservation || !Memory.MemRooms[gameFlag.pos.roomName] || (gameFlag.room.controller.reservation.ticksToEnd < 2000 && !Memory.MemRooms[gameFlag.pos.roomName].RoomJobs[gameFlagKey])){
+                    if(!gameFlag.room || !gameFlag.room.controller.reservation || !Memory.MemRooms[gameFlag.pos.roomName] || Memory.MemRooms[gameFlag.pos.roomName].RoomJobs[gameFlagKey] || gameFlag.room.controller.reservation.ticksToEnd < 2000 && !Memory.MemRooms[gameFlag.pos.roomName].RoomJobs[gameFlagKey]){
                         jobName = 'ReserveController';
                         creepType = 'R';
                         jobImportance = 4;
+                        //console.log('CreateJobs CreateFlagJobs ReserveController job created ' + gameFlag.pos.roomName + ' ' + gameFlagKey);
                     }
                 } else if (gameFlag.color === COLOR_RED && gameFlag.secondaryColor === COLOR_RED) { // warrior at pos
                     jobName = 'GuardPos';
@@ -173,11 +174,13 @@ const CreateJobs = {
                     jobName = 'RemoteHarvest';
                     creepType = 'D';
                     jobImportance = 5;
+                    //console.log('CreateJobs CreateFlagJobs RemoteHarvest job created ' + gameFlag.pos.roomName + ' ' + gameFlagKey);
                 } else {
-                    console.log('CreateJobs UpdateJobsInRoom ERROR! flag color not found ' + gameFlagKey + ' ' + gameFlag.color + ' ' + gameFlag.secondaryColor + ' (' + gameFlag.pos.x + ',' + gameFlag.pos.y + ')');
+                    console.log('CreateJobs CreateFlagJobs ERROR! flag color not found ' + gameFlagKey + ' ' + gameFlag.color + ' ' + gameFlag.secondaryColor + ' (' + gameFlag.pos.x + ',' + gameFlag.pos.y + ')');
                 }
 
                 if(jobName){
+                    //console.log('CreateJobs CreateFlagJobs AddJob ' + gameFlagKey);
                     AddJob(jobs, jobName + '-' + gameFlagKey + '(' + gameFlag.pos.x + ',' + gameFlag.pos.y + ')' + gameFlag.pos.roomName, gameFlagKey, FLAG_JOB, creepType, jobImportance);
                 }
             }
