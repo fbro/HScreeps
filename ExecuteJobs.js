@@ -164,7 +164,7 @@ const ExecuteJobs = {
                     creep.transfer(toFill, RESOURCE_ENERGY); // it may do that "double" but it really does not matter
                     //console.log('ExecuteJobs JobAction ' + creep.name + ' transferred energy to adjacent spawn tower or extension (' + toFill.pos.x + ',' + toFill.pos.y + ',' + toFill.pos.roomName + ')');
                 }
-            } else if (_.sum(creep.carry) < creep.carryCapacity && !creep.name.startsWith('H') && !creep.name.startsWith('E')) { // pickup adjacent resources
+            } else if (_.sum(creep.carry) < creep.carryCapacity && !creep.name.startsWith('H') && !creep.name.startsWith('E') && !creep.name.startsWith('D')) { // pickup adjacent resources
                 const drop = creep.pos.findInRange(FIND_DROPPED_RESOURCES, 1)[0];
                 if (drop) {
                     creep.pickup(drop); // it may do that "double" but it really does not matter
@@ -649,7 +649,7 @@ const ExecuteJobs = {
                         opacity: .5
                     }
                 });
-            } else if (_.sum(creep.carry) < creep.carryCapacity) {
+            } else if (_.sum(creep.carry) < creep.carryCapacity) { // can harvest
                 const source = flagObj.pos.findInRange(FIND_SOURCES, 0)[0];
                 result = creep.harvest(source);
                 if (result === ERR_NOT_IN_RANGE) {
@@ -663,31 +663,55 @@ const ExecuteJobs = {
                         }
                     });
                 }
-            } else {
+            } else { // carrying capacity is full - transfer to container or build container or move energy to nearest storage
                 const container = flagObj.pos.findInRange(FIND_MY_STRUCTURES, 1, {
                     filter: function (container) {
                         return container.structureType === STRUCTURE_CONTAINER && _.sum(container.store) < container.storeCapacity;
                     }
                 })[0];
-                if (container) {
+                if (container) { // container found now transfer to container
                     result = creep.transfer(container, RESOURCE_ENERGY);
-                } else {
-                    // TODO else go back with carried energy!
-                    for (const resourceType in creep.carry) {
-                        result = creep.drop(resourceType);
-                    }
-                }
-
-                if (result === ERR_NOT_IN_RANGE) {
-                    result = creep.moveTo(flagObj, {
-                        visualizePathStyle: {
-                            fill: 'transparent',
-                            stroke: '#ffe100',
-                            lineStyle: 'undefined',
-                            strokeWidth: .15,
-                            opacity: .5
+                } else { // build container or go to nearest storage
+                    const containerConstruction = flagObj.pos.findInRange(FIND_CONSTRUCTION_SITES, 1, {
+                        filter: function(construction){return construction.structureType == STRUCTURE_CONTAINER;
                         }
-                    });
+                    })[0];
+                    if(containerConstruction){ // build found - now build it
+                        result = creep.build(containerConstruction);
+                    }else{ // TODO nothing to build and no empty containers - now move to nearest storage
+                        /*
+                        let closestRoomWithStorage;
+                        let bestDistance = Number.MAX_SAFE_INTEGER;
+                        for(const memRoomKey in Memory.MemRooms){
+                            if(Game.rooms[memRoomKey].storage){
+                                const distance = Game.map.getRoomLinearDistance(flagObj.pos.roomName, memRoomKey);
+                                if(distance < bestDistance){
+                                    closestRoomWithStorage = memRoomKey;
+                                    bestDistance = distance;
+                                }
+                            }
+                        }
+                        if(closestRoomWithStorage){
+                            creep.memory.ClosestRoomWithStorage = closestRoomWithStorage;
+                            creep.moveTo(Game.rooms[closestRoomWithStorage].storage, {
+                                visualizePathStyle: {
+                                    fill: 'transparent',
+                                    stroke: '#ffe100',
+                                    lineStyle: 'undefined',
+                                    strokeWidth: .15,
+                                    opacity: .5
+                                }
+                            });
+                        }else{
+                            for (const resourceType in creep.carry) {
+                                result = creep.drop(resourceType);
+                            }
+                        }*/
+                        // TODO remove
+                        for (const resourceType in creep.carry) {
+                            result = creep.drop(resourceType);
+                        }
+                    }
                 }
             }
             return result;

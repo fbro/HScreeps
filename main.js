@@ -50,3 +50,5 @@ module.exports.loop = function () {
 // recycle creeps if there are many idle!
 
 // TODO remote harvester needs to go back with its energy
+
+// TODO repair on the road
