@@ -23,11 +23,19 @@ module.exports.loop = function () {
             CreateJobs.run();
             Links.run();
             Terminals.run();
-            if (Game.time % 120 === 0) {
+            if (Game.time % 150 === 0) {
                 console.log('main reset MaxCreeps in MemRooms'); // this is needed because a creep may sometimes move to another room for a job there and then the counter will be wrong in the source rom
                 for (const memRoomKey in Memory.MemRooms) {
                     const memRoom = Memory.MemRooms[memRoomKey];
                     memRoom.MaxCreeps = {};
+                }
+                if (Game.time % 9000 === 0) {
+                    console.log('main reset AttachedRooms and PrimaryRoom in MemRooms');
+                    for (const memRoomKey in Memory.MemRooms) {
+                        const memRoom = Memory.MemRooms[memRoomKey];
+                        memRoom.AttachedRooms = undefined;
+                        memRoom.PrimaryRoom = undefined;
+                    }
                 }
             }
         }
@@ -49,6 +57,5 @@ module.exports.loop = function () {
 
 // recycle creeps if there are many idle!
 
-// TODO remote harvester needs to go back with its energy
-
-// TODO repair on the road
+// TODO add code to rescue stranded idle creeps from other rooms
+// TODO fix remote mining - keep jobs that are assigned - only remove unassigned jobs!

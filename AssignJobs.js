@@ -42,7 +42,7 @@ const AssignJobs = {
                 // TODO what about idle creeps in neutral rooms - and many idle creeps in one room that could be moved to another room
                 for (const roomJobKey in memRoom.RoomJobs) {
                     const roomJob = memRoom.RoomJobs[roomJobKey];
-                    if (roomJob.Creep === 'vacant') {
+                    if (roomJob && roomJob.Creep === 'vacant') {
                         let creepFound = AssignCreeps(roomJob, idleCreepsInRoom, roomJobKey);
                         if (!creepFound) {
                             SpawnCreeps(roomJob, availableSpawns, roomJobKey);
@@ -74,11 +74,11 @@ const AssignJobs = {
             // if idle creep not found for vacant job then look if spawn is possible
             if (ShouldSpawnCreep(roomJob.CreepType, memRoomKey)) {
                 const availableName = GetAvailableName(roomJob.CreepType);
-                let bestLinearDistance = 1;
+                let bestLinearDistance = 1; // normally creeps should only be spawned in the room they are needed
 
                 // job in another room
                 if (Game.rooms[memRoomKey]) { // flag in invisible room
-                    if (Game.rooms[memRoomKey].controller) { // flag in controller less room
+                    if (Game.rooms[memRoomKey].controller) { // flag in controller-less room
                         if (Game.rooms[memRoomKey].controller.my) { // not my room
                             if (Game.rooms[memRoomKey].find(FIND_MY_SPAWNS).length === 0) { // no spawn in my room
                                 console.log('AssignJobs SpawnCreeps job in another room, no spawns ' + roomJobKey);
@@ -102,14 +102,15 @@ const AssignJobs = {
                 for (const availableSpawnCounter in availableSpawns) { // find closest spawn
                     const availableSpawn = availableSpawns[availableSpawnCounter];
                     const linearDistance = Game.map.getRoomLinearDistance(availableSpawn.pos.roomName, memRoomKey);
-                    if (linearDistance < bestLinearDistance) {
+                    if (linearDistance < bestLinearDistance || Memory.MemRooms[memRoomKey].PrimaryRoom === availableSpawn.pos.roomName) {
                         bestLinearDistance = linearDistance;
                         bestAvailableSpawn = availableSpawn;
                         bestAvailableSpawnCounter = availableSpawnCounter;
                     }
-                    if (bestLinearDistance === 0) {
+                    // get on with it if a spawn in room is found or if the primary room is found
+                    if (bestLinearDistance === 0 || Memory.MemRooms[memRoomKey].PrimaryRoom === availableSpawn.pos.roomName) {
                         break;
-                    } // get on with it if a spawn in room is found!
+                    }
                 }
 
                 if (bestAvailableSpawn) { // the closest spawn is found

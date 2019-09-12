@@ -11,6 +11,7 @@ for (const creepName in Memory.creeps) {
         mc.JobName = 'idle(' + gc.pos.x + ',' + gc.pos.y + ')' + gc.pos.roomName;
         mc.EnergySupply = undefined;
         mc.EnergySupplyType = undefined;
+        mc.ClosestRoomWithStorage = undefined;
 
     }
 }

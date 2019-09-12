@@ -52,7 +52,7 @@ const ExecuteJobs = {
                         }
                         delete Memory.creeps[creepName];
                     } else if (job && gameCreep) { // creep is alive and its job is found
-                        const isJobDone = JobAction(gameCreep, job, creepMemory.JobName);
+                        const isJobDone = JobAction(gameCreep, job, creepMemory.JobName, roomName);
                         if (isJobDone) {
                             delete Memory.MemRooms[roomName].RoomJobs[creepMemory.JobName];
                             creepMemory.JobName = 'idle(' + gameCreep.pos.x + ',' + gameCreep.pos.y + ')' + gameCreep.pos.roomName;
@@ -69,7 +69,7 @@ const ExecuteJobs = {
         }
 
         /**@return {boolean}*/
-        function JobAction(creep, roomJob, jobKey) {
+        function JobAction(creep, roomJob, jobKey, roomName) {
             let result = ERR_NO_RESULT_FOUND;
             switch (true) {
                 // obj jobs
@@ -92,7 +92,7 @@ const ExecuteJobs = {
                     result = JobFillTower(creep, roomJob); // uses JobEnergyAction()
                     break;
                 case jobKey.startsWith('FillStorage'):
-                    result = JobFillStorage(creep, roomJob);
+                    result = JobFillStorage(creep, roomJob, roomName);
                     break;
                 case jobKey.startsWith('ExtractMineral'):
                     result = JobExtractMineral(creep, roomJob);
@@ -152,17 +152,25 @@ const ExecuteJobs = {
                 }
                 isJobDone = true;
             }
+
             if (creep.carry[RESOURCE_ENERGY] > 0) { // fill adjacent spawns, extensions and towers
                 const toFill = creep.pos.findInRange(FIND_MY_STRUCTURES, 1, {
                     filter: (structure) => {
                         return (structure.structureType === STRUCTURE_SPAWN
                             || structure.structureType === STRUCTURE_EXTENSION
-                            || structure.structureType === STRUCTURE_TOWER) && structure.energy < structure.energyCapacity;
-                    }
-                })[0];
+                            || structure.structureType === STRUCTURE_TOWER) && structure.energy < structure.energyCapacity;}})[0];
                 if (toFill) {
                     creep.transfer(toFill, RESOURCE_ENERGY); // it may do that "double" but it really does not matter
                     //console.log('ExecuteJobs JobAction ' + creep.name + ' transferred energy to adjacent spawn tower or extension (' + toFill.pos.x + ',' + toFill.pos.y + ',' + toFill.pos.roomName + ')');
+                }else if(creep.name.startsWith('H') || creep.name.startsWith('B') || creep.name.startsWith('D')){ // repair on the road
+                    const toRepair = creep.pos.findInRange(FIND_STRUCTURES, 2, {
+                        filter: (structure) => {
+                            return (structure.structureType !== STRUCTURE_WALL
+                                && structure.structureType !== STRUCTURE_RAMPART) && structure.hits < structure.hitsMax;}})[0];
+                    if (toRepair) {
+                        creep.repair(toRepair);
+                        //console.log('ExecuteJobs JobAction ' + creep.name + ' repaired ' + toRepair.structureType + ' (' + toRepair.pos.x + ',' + toRepair.pos.y + ',' + toRepair.pos.roomName + ',' + toRepair.hits + ',' + toRepair.hitsMax + ')');
+                    }
                 }
             } else if (_.sum(creep.carry) < creep.carryCapacity && !creep.name.startsWith('H') && !creep.name.startsWith('E') && !creep.name.startsWith('D')) { // pickup adjacent resources
                 const drop = creep.pos.findInRange(FIND_DROPPED_RESOURCES, 1)[0];
@@ -289,7 +297,7 @@ const ExecuteJobs = {
         }
 
         /**@return {int}*/
-        function JobFillStorage(creep, roomJob) {
+        function JobFillStorage(creep, roomJob, roomName) {
             let result = ERR_NO_RESULT_FOUND;
             const obj = Game.getObjectById(roomJob.JobId);
             if (obj && _.sum(creep.carry) < creep.carryCapacity && !creep.memory.Transferring) { // fill creep - not full and is not transferring
@@ -317,11 +325,12 @@ const ExecuteJobs = {
                     creep.memory.Transferring = true; // done filling creep up - moving to storage to transfer
                 }
             } else if (_.sum(creep.carry) > 0) { // not empty creep
+                const gameRoom = Game.rooms[roomName];
                 for (const resourceType in creep.carry) {
-                    result = creep.transfer(creep.room.storage, resourceType);
+                    result = creep.transfer(gameRoom.storage, resourceType);
                 }
                 if (result === ERR_NOT_IN_RANGE) {
-                    result = creep.moveTo(creep.room.storage, {
+                    result = creep.moveTo(gameRoom.storage, {
                         visualizePathStyle: {
                             fill: 'transparent',
                             stroke: '#0048ff',
@@ -637,9 +646,10 @@ const ExecuteJobs = {
         function JobRemoteHarvest(creep, roomJob) {
             let result = ERR_NO_RESULT_FOUND;
             const flagObj = Game.flags[roomJob.JobId];
+            let closestRoomWithStorage = creep.memory.ClosestRoomWithStorage; // try and load from creep memory
             if (flagObj === undefined) {
                 result = JOB_OBJ_DISAPPEARED;
-            } else if (flagObj.room === undefined) { // room is not in Game.rooms
+            } else if (flagObj.room === undefined && !closestRoomWithStorage) { // room is not in Game.rooms
                 result = creep.moveTo(flagObj, {
                     visualizePathStyle: {
                         fill: 'transparent',
@@ -649,7 +659,7 @@ const ExecuteJobs = {
                         opacity: .5
                     }
                 });
-            } else if (_.sum(creep.carry) < creep.carryCapacity) { // can harvest
+            } else if (_.sum(creep.carry) < creep.carryCapacity && !closestRoomWithStorage) { // can harvest
                 const source = flagObj.pos.findInRange(FIND_SOURCES, 0)[0];
                 result = creep.harvest(source);
                 if (result === ERR_NOT_IN_RANGE) {
@@ -689,18 +699,26 @@ const ExecuteJobs = {
                     }
 
                     // nothing to build and no empty containers - now move to nearest storage
-                    let bestDistance = Number.MAX_SAFE_INTEGER;
-                    for(const memRoomKey in Memory.MemRooms){ // search for best storage
-                        if(Game.rooms[memRoomKey].storage && _.sum(Game.rooms[memRoomKey].storage.store) < Game.rooms[memRoomKey].storage.storeCapacity){ // exist and has room
-                            const distance = Game.map.getRoomLinearDistance(flagObj.pos.roomName, memRoomKey);
-                            if(distance < bestDistance){
-                                closestRoomWithStorage = memRoomKey;
-                                bestDistance = distance;
+                    closestRoomWithStorage = Memory.MemRooms[flagObj.pos.roomName].PrimaryRoom; // if the primary room already have been designated, then use that
+                    if(!closestRoomWithStorage){
+                        let bestDistance = Number.MAX_SAFE_INTEGER;
+                        for(const memRoomKey in Memory.MemRooms){ // search for best storage
+                            if(Game.rooms[memRoomKey].storage && _.sum(Game.rooms[memRoomKey].storage.store) < Game.rooms[memRoomKey].storage.storeCapacity){ // exist and has room
+                                const distance = Game.map.getRoomLinearDistance(flagObj.pos.roomName, memRoomKey);
+                                if(distance < bestDistance){
+                                    closestRoomWithStorage = memRoomKey;
+                                    bestDistance = distance;
+                                }
                             }
                         }
                     }
-                    if(closestRoomWithStorage) {
+                    if(closestRoomWithStorage) { // save to creep and MemRooms
                         creep.memory.ClosestRoomWithStorage = closestRoomWithStorage; // save in creep memory
+                        if(!Memory.MemRooms[closestRoomWithStorage].AttachedRooms) {
+                            Memory.MemRooms[closestRoomWithStorage].AttachedRooms = {};
+                        }
+                        Memory.MemRooms[closestRoomWithStorage].AttachedRooms[flagObj.pos.roomName] = {};
+                        Memory.MemRooms[flagObj.pos.roomName].PrimaryRoom = closestRoomWithStorage;
                     }
                 }
 

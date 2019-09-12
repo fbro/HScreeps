@@ -9,11 +9,7 @@ const Towers = {
                 }
             });
 
-            const hostileTargets = gameRoom.find(FIND_HOSTILE_CREEPS, {
-                filter: function (hostile) {
-                    return hostile.getActiveBodyparts(ATTACK) > 0 || hostile.getActiveBodyparts(RANGED_ATTACK) > 0 || hostile.getActiveBodyparts(HEAL) > 0;
-                }
-            });
+            const hostileTargets = gameRoom.find(FIND_HOSTILE_CREEPS);
 
             const damagedCreeps = gameRoom.find(FIND_MY_CREEPS, {
                 filter: function (creep) {
