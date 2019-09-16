@@ -88,10 +88,9 @@ const CreateJobs = {
                             if (gameRoom.storage !== undefined) {
                                 // FillStorage - link, container and resource drops
                                 FillStorageJobs(gameRoom, jobs);
-                                // TODO FillStorageFromRemote
+                                // FillStorageFromRemote
                                 if(Memory.MemRooms[gameRoom.name].AttachedRooms){
-                                    // TODO job is getting removed when container is low on energy
-                                    // FillStorageFromRemoteJobs(gameRoom, jobs);
+                                    FillStorageFromRemoteJobs(gameRoom, jobs);
                                 }
                                 if (gameRoom.controller.level >= 6) {
                                     // ExtractMineral
@@ -117,20 +116,23 @@ const CreateJobs = {
                 if (!Memory.MemRooms[gameRoom.name] && Object.keys(jobs).length > 0) { // room not found and there are jobs in it - create it
                     CreateRoom(gameRoom.name, jobs);
                 } else if (Memory.MemRooms[gameRoom.name]) { // update jobs in memRoom
-                    // update jobs if jobs does not exist - else do nothing
+                    // add new jobs
                     for (const newJobKey in jobs) { // loop through new jobs
-                        for (const oldJobKey in Memory.MemRooms[gameRoom.name].RoomJobs) { // loop through old jobs
-                            if (oldJobKey === newJobKey) {
-                                jobs[newJobKey] = Memory.MemRooms[gameRoom.name].RoomJobs[oldJobKey]; // save the old job because of historic job info
-                                break;
-                            }
+                        if(!Memory.MemRooms[gameRoom.name].RoomJobs[newJobKey]){ // new job does not already exist
+                            Memory.MemRooms[gameRoom.name].RoomJobs[newJobKey] = jobs[newJobKey]; // save it
                         }
                     }
-                    if(Memory.MemRooms[gameRoom.name].RoomLevel !== gameRoom.controller.level){
+                    // remove only old disappeared vacant jobs
+                    for (const oldJobKey in Memory.MemRooms[gameRoom.name].RoomJobs) { // loop through old jobs
+                        const oldJob = Memory.MemRooms[gameRoom.name].RoomJobs[oldJobKey];
+                        if(oldJob.Creep === 'vacant' && !jobs[oldJobKey]){ // old job is vacant and old job id not en the new job array
+                            Memory.MemRooms[gameRoom.name].RoomJobs[oldJobKey] = undefined; // delete old vacant disappeared job
+                        }
+                    }
+                    if(Memory.MemRooms[gameRoom.name].RoomLevel !== gameRoom.controller.level){ // room level change
                         Memory.MemRooms[gameRoom.name].RoomLevel = gameRoom.controller.level;
                         Memory.MemRooms[gameRoom.name].SourceNumber = gameRoom.find(FIND_SOURCES).length;
                     }
-                    Memory.MemRooms[gameRoom.name].RoomJobs = jobs; // overwrite the old jobs with the new jobs - and the existing old jobs - old jobs that where not refound is forgotten
                 }
             }
 
@@ -282,15 +284,20 @@ const CreateJobs = {
 
         function FillStorageFromRemoteJobs(gameRoom, roomJobs){
             for (const attachedRoomKey in Memory.MemRooms[gameRoom.name].AttachedRooms) {
-                console.log("TEST " + attachedRoomKey);
-                const fillStorageFromRemotes = Game.rooms[attachedRoomKey].find(FIND_STRUCTURES, {
-                    filter: (s) => {
-                        return s.structureType === STRUCTURE_CONTAINER && _.sum(s.store) >= 600;
+                if(Game.rooms[attachedRoomKey]){
+                    const fillStorageFromRemotes = Game.rooms[attachedRoomKey].find(FIND_STRUCTURES, {
+                        filter: (s) => {
+                            return s.structureType === STRUCTURE_CONTAINER && _.sum(s.store) >= 600;
+                        }
+                    });
+                    for (const fillStorageFromRemoteKey in fillStorageFromRemotes) {
+                        const fillStorageFromRemote = fillStorageFromRemotes[fillStorageFromRemoteKey];
+                        const jobName = 'FillStorageFromRemote-' + fillStorageFromRemote.structureType + '(' + fillStorageFromRemote.pos.x + ',' + fillStorageFromRemote.pos.y + ')' + gameRoom.name;
+                        console.log('CreateJobs FillStorageFromRemoteJobs in ' + gameRoom.name + ' add job ' + jobName);
+                        AddJob(roomJobs, jobName, fillStorageFromRemote.id, OBJECT_JOB, 'T', 5);
                     }
-                });
-                for (const fillStorageFromRemoteKey in fillStorageFromRemotes) {
-                    const fillStorageFromRemote = fillStorageFromRemotes[fillStorageFromRemoteKey];
-                    AddJob(roomJobs, 'FillStorageFromRemote-' + fillStorageFromRemote.structureType + '(' + fillStorageFromRemote.pos.x + ',' + fillStorageFromRemote.pos.y + ')' + gameRoom.name, fillStorageFromRemote.id, OBJECT_JOB, 'T', 5);
+                }else{
+                    console.log('CreateJobs FillStorageFromRemoteJobs ERROR! Game.rooms[' + attachedRoomKey + '] is undefined from ' + gameRoom.name);
                 }
             }
         }

@@ -6,6 +6,10 @@ const ExecuteJobs = {
         const JOB_OBJ_DISAPPEARED = -22; // getObjectById returned null
         const NO_ENERGY_FOUND = -23; // creep could not find any energy to take from
 
+        const RAMPART_WALL_HITS_U_LVL8 = 100000;
+        const RAMPART_WALL_HITS_O_LVL8 = 2000000;
+        const RAMPART_WALL_MAX_HITS_WHEN_STORAGE_ENERGY = 600000;
+
         ExecuteRoomJobs();
 
         function ExecuteRoomJobs() {
@@ -46,7 +50,14 @@ const ExecuteJobs = {
                         if (tombstone) {
                             new RoomVisual(roomName).text(creepName + '⚰', tombstone.pos.x, tombstone.pos.y);
                         }
-                        job.Creep = 'vacant';
+
+                        const jobStillViable = JobStillViableAfterDeath(creepMemory, job, roomName);
+                        if(jobStillViable){
+                            job.Creep = 'vacant';
+                        }else{
+                            delete Memory.MemRooms[roomName].RoomJobs[creepMemory.JobName];
+                        }
+
                         if (Memory.MemRooms[roomName] && Memory.MemRooms[roomName].MaxCreeps[creepName.substring(0, 1)]) {
                             Memory.MemRooms[roomName].MaxCreeps[creepName.substring(0, 1)].NumOfCreepsInRoom--;
                         }
@@ -69,6 +80,37 @@ const ExecuteJobs = {
         }
 
         /**@return {boolean}*/
+        function JobStillViableAfterDeath(creepMemory, roomJob, roomName){
+            switch (true) {
+                case creepMemory.JobName.startsWith('RemoteHarvest'):
+                    const flagObj = Game.flags[roomJob.JobId];
+                    if(flagObj.room && flagObj.room.controller && flagObj.room.controller.reservation && flagObj.room.controller.reservation.ticksToEnd >= 4999){
+                        return false;
+                    }
+                    break;
+                case creepMemory.JobName.startsWith('Repair'):
+                    const obj = Game.getObjectById(roomJob.JobId);
+                    const gameRoom = Game.rooms[roomName];
+                    if((obj.structureType === STRUCTURE_RAMPART || obj.structureType === STRUCTURE_WALL) && (
+                            gameRoom.controller && (
+                                gameRoom.controller.level < 8 && obj.hits > RAMPART_WALL_HITS_U_LVL8
+                                ||
+                                gameRoom.controller.level === 8 && (
+                                    obj.hits > RAMPART_WALL_HITS_O_LVL8
+                                    ||
+                                    gameRoom.storage && gameRoom.storage.store[RESOURCE_ENERGY] < RAMPART_WALL_MAX_HITS_WHEN_STORAGE_ENERGY
+                                )
+                            )
+                        )
+                    ){
+                        return false;
+                    }
+                    break;
+            }
+            return true;
+        }
+
+        /**@return {boolean}*/
         function JobAction(creep, roomJob, jobKey, roomName) {
             let result = ERR_NO_RESULT_FOUND;
             switch (true) {
@@ -80,7 +122,7 @@ const ExecuteJobs = {
                     result = JobController(creep, roomJob); // uses JobEnergyAction()
                     break;
                 case jobKey.startsWith('Repair'):
-                    result = JobRepair(creep, roomJob); // uses JobEnergyAction()
+                    result = JobRepair(creep, roomJob, jobKey); // uses JobEnergyAction()
                     break;
                 case jobKey.startsWith('Construction'):
                     result = JobConstruction(creep, roomJob); // uses JobEnergyAction()
@@ -253,13 +295,18 @@ const ExecuteJobs = {
         }
 
         /**@return {int}*/
-        function JobRepair(creep, roomJob) {
+        function JobRepair(creep, roomJob, jobKey) {
             const obj = Game.getObjectById(roomJob.JobId);
+            if(obj.hits === obj.hitsMax) {
+                console.log('ExecuteJobs JobRepair nothing to repair ' + creep.name + ' on ' + jobKey + ' job is set to done');
+                return JOB_IS_DONE;
+            }
             const result = JobEnergyAction(creep, roomJob, obj, {
                 creepAction: function () {
                     return creep.repair(obj, RESOURCE_ENERGY);
                 }
             });
+
             return result;
         }
 
@@ -301,6 +348,12 @@ const ExecuteJobs = {
             let result = ERR_NO_RESULT_FOUND;
             const obj = Game.getObjectById(roomJob.JobId);
             if (obj && _.sum(creep.carry) < creep.carryCapacity && !creep.memory.Transferring) { // fill creep - not full and is not transferring
+
+                if((obj.structureType === STRUCTURE_CONTAINER && _.sum(obj.store) < 600)
+                || (obj.structureType === STRUCTURE_LINK && obj.energy < 600)){
+                    return JOB_IS_DONE;
+                }
+
                 if (obj.structureType === STRUCTURE_CONTAINER) {
                     for (const resourceType in obj.store) {
                         result = creep.withdraw(obj, resourceType);
@@ -574,7 +627,7 @@ const ExecuteJobs = {
                         opacity: .5
                     }
                 });
-            } else if (!flagObj.room.controller || (flagObj.room.controller.reservation && flagObj.room.controller.reservation.ticksToEnd >= 4999)) {
+            } else if (!flagObj.room.controller){
                 result = JOB_IS_DONE;
             } else {
                 result = creep.reserveController(flagObj.room.controller);
@@ -677,7 +730,7 @@ const ExecuteJobs = {
                 let closestRoomWithStorage = creep.memory.ClosestRoomWithStorage; // try and load from creep memory
                 if(!closestRoomWithStorage) {
                     // carrying capacity is full - transfer to container or build container or move energy to nearest storage
-                    const container = flagObj.pos.findInRange(FIND_MY_STRUCTURES, 1, {
+                    const container = flagObj.pos.findInRange(FIND_STRUCTURES, 1, {
                         filter: function (container) {
                             return container.structureType === STRUCTURE_CONTAINER && _.sum(container.store) < container.storeCapacity;
                         }

@@ -18,7 +18,7 @@ module.exports.loop = function () {
         Memory.MemRooms = new Object();
     }
     Towers.run();
-    if (Game.time % 5 === 0) {
+    if (Game.time % 10 === 0) {
         if (Game.time % 30 === 0) { // tick burst from https://docs.screeps.com/cpu-limit.html#Bucket
             CreateJobs.run();
             Links.run();
@@ -58,4 +58,5 @@ module.exports.loop = function () {
 // recycle creeps if there are many idle!
 
 // TODO add code to rescue stranded idle creeps from other rooms
-// TODO fix remote mining - keep jobs that are assigned - only remove unassigned jobs!
+
+// TODO transporters should look at a job and set it to done if it looks complete - need to do this because of job persistence
