@@ -69,3 +69,6 @@ module.exports.loop = function () {
 // TODO cache paths to be reused by creeps
 
 // TODO rewrite MaxCreeps system to instead of using counting then using creep names to monitor if a creep dies it gets "removed" from the right MaxCreeps-room if the creep has moved to another room
+
+// TODO remove jobImportance on jobs - controller1,2 jobs should be moved further down
+// TODO problem with how jobs now are preserved - priority does not shift this means that controller1,2 jobs has a larger priority than they should
