@@ -32,11 +32,11 @@ const Towers = {
             for (let i = 0; i < towers.length; i++) {
                 if (hostileTargets.length > 0) {
                     const val = ((i + 1) % hostileTargets.length);
-                    console.log('Towers hostileTargets val ' + val + ' i ' + i + ' num ' + hostileTargets.length + ' room ' + gameRoom.name);
+                    //console.log('Towers hostileTargets val ' + val + ' i ' + i + ' num ' + hostileTargets.length + ' room ' + gameRoom.name);
                     towers[i].attack(hostileTargets[val]);
                 } else if (damagedCreeps.length > 0) {
                     const val = ((i + 1) % damagedCreeps.length);
-                    console.log('Towers damagedCreeps val ' + val + ' i ' + i + ' num ' + damagedCreeps.length + ' room ' + gameRoom.name);
+                    //console.log('Towers damagedCreeps val ' + val + ' i ' + i + ' num ' + damagedCreeps.length + ' room ' + gameRoom.name);
                     towers[i].heal(damagedCreeps[val]);
                 } else if (damagedStructures.length > 0 && towers[i].energy > 700) {
                     const val = ((i + 1) % damagedStructures.length);

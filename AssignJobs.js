@@ -170,7 +170,7 @@ const AssignJobs = {
                         maxCreepsInRoom = 5;
                         break;
                     default:
-                        console.log('AssignJobs ShouldSpawnCreep ERROR! creepType not found ' + creepType);
+                        ErrorLog('AssignJobs-ShouldSpawnCreep-creepTypeNotFound', 'AssignJobs ShouldSpawnCreep ERROR! creepType not found ' + creepType);
                 }
                 memRoom.MaxCreeps[creepType] = {
                     'NumOfCreepsInRoom': numOfCreepsInRoom,
@@ -390,7 +390,7 @@ const AssignJobs = {
                     }
                     break;
                 default:
-                    console.log('AssignJobs GetCreepBody ERROR! creepType not found ' + creepType);
+                    ErrorLog('AssignJobs-GetCreepBody-creepTypeNotFound', 'AssignJobs GetCreepBody ERROR! creepType not found ' + creepType);
             }
             return body;
         }
@@ -406,6 +406,19 @@ const AssignJobs = {
                 }
             }
             return creepType + availableCount;
+        }
+
+        function ErrorLog(messageId, message){
+            console.log('--------------- ' + messageId + ' ---------------');
+            console.log(message);
+            console.log('--------------- ' + messageId + ' ---------------');
+            if(!Memory.ErrorLog){
+                Memory.ErrorLog = {};
+            }
+            if(!Memory.ErrorLog[messageId]) {
+                Memory.ErrorLog[messageId] = [];
+            }
+            Memory.ErrorLog[messageId].push(Game.time + ' ' + message);
         }
     }
 };

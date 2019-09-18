@@ -193,7 +193,7 @@ const CreateJobs = {
                     jobImportance = 5;
                     //console.log('CreateJobs CreateFlagJobs RemoteHarvest job created ' + gameFlag.pos.roomName + ' ' + gameFlagKey);
                 } else {
-                    console.log('CreateJobs CreateFlagJobs ERROR! flag color not found ' + gameFlagKey + ' ' + gameFlag.color + ' ' + gameFlag.secondaryColor + ' (' + gameFlag.pos.x + ',' + gameFlag.pos.y + ')');
+                    ErrorLog('CreateJobs-CreateFlagJobs-flagColorNotFound', 'CreateJobs CreateFlagJobs ERROR! flag color not found ' + gameFlagKey + ' ' + gameFlag.color + ' ' + gameFlag.secondaryColor + ' (' + gameFlag.pos.x + ',' + gameFlag.pos.y + ')');
                 }
 
                 if(jobName){
@@ -297,7 +297,7 @@ const CreateJobs = {
                         AddJob(roomJobs, jobName, fillStorageFromRemote.id, OBJECT_JOB, 'T', 5);
                     }
                 }else{
-                    console.log('CreateJobs FillStorageFromRemoteJobs ERROR! Game.rooms[' + attachedRoomKey + '] is undefined from ' + gameRoom.name);
+                    ErrorLog('CreateJobs-FillStorageFromRemoteJobs-roomNotExist', 'CreateJobs FillStorageFromRemoteJobs ERROR! Game.rooms[' + attachedRoomKey + '] is undefined from ' + gameRoom.name);
                 }
             }
         }
@@ -306,7 +306,8 @@ const CreateJobs = {
             const fillStorages = gameRoom.find(FIND_STRUCTURES, {
                 filter: (s) => {
                     return (s.structureType === STRUCTURE_CONTAINER && _.sum(s.store) >= 600)
-                        || (s.structureType === STRUCTURE_LINK && s.energy >= 600 && s.room.storage.pos.inRangeTo(s, 1));
+                        || (s.structureType === STRUCTURE_LINK && s.energy >= 600 && s.room.storage.pos.inRangeTo(s, 1))
+                        || (s.structureType === STRUCTURE_TERMINAL && s.store[RESOURCE_ENERGY] >= 120000);
                 }
             });
             for (const fillStorageKey in fillStorages) {
@@ -423,6 +424,19 @@ const CreateJobs = {
                 'Creep': 'vacant',
                 'JobImportance': jobImportance
             };
+        }
+
+        function ErrorLog(messageId, message){
+            console.log('--------------- ' + messageId + ' ---------------');
+            console.log(message);
+            console.log('--------------- ' + messageId + ' ---------------');
+            if(!Memory.ErrorLog){
+                Memory.ErrorLog = {};
+            }
+            if(!Memory.ErrorLog[messageId]) {
+                Memory.ErrorLog[messageId] = [];
+            }
+            Memory.ErrorLog[messageId].push(Game.time + ' ' + message);
         }
     }
 };
