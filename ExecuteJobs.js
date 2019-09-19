@@ -36,9 +36,20 @@ const ExecuteJobs = {
                                 result = Move(gameCreep, gameCreep.room.storage);
                             }
                             gameCreep.say('idle 📦');
-                        }else if(!gameCreep.room.my){ // I do not own the room the idle creep is in - move it to an owned room!
-                            // TODO rescue idle creep in foreign room
-
+                        }else if(!gameCreep.room.controller || !gameCreep.room.controller.my){ // I do not own the room the idle creep is in - move it to an owned room!
+                            let bestDistance = Number.MAX_SAFE_INTEGER;
+                            let closestOwnedRoom;
+                            for (const memRoomKey in Memory.MemRooms) { // search for best storage
+                                if (Game.rooms[memRoomKey] && Game.rooms[memRoomKey].controller.my) { // exist and has room
+                                    const distance = Game.map.getRoomLinearDistance(gameCreep.pos.roomName, memRoomKey);
+                                    if (distance < bestDistance) {
+                                        closestOwnedRoom = memRoomKey;
+                                        bestDistance = distance;
+                                    }
+                                }
+                            }
+                            Move(gameCreep, Game.rooms[closestOwnedRoom].controller);
+                            gameCreep.say('🏠🏃');
                         }
                     }
                 } else { // creep is not idle
