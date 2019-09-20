@@ -89,7 +89,7 @@ const CreateJobs = {
                                 // FillStorage - link, container and resource drops
                                 FillStorageJobs(gameRoom, jobs);
                                 // FillStorageFromRemote
-                                if(Memory.MemRooms[gameRoom.name].AttachedRooms){
+                                if(Memory.MemRooms[gameRoom.name] && Memory.MemRooms[gameRoom.name].AttachedRooms){
                                     FillStorageFromRemoteJobs(gameRoom, jobs);
                                 }
                                 if (gameRoom.controller.level >= 6) {

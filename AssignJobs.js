@@ -119,7 +119,7 @@ const AssignJobs = {
                         Game.creeps[availableName].memory.JobName = roomJobKey;
                         roomJob.Creep = availableName;
                         if (Memory.MemRooms[memRoomKey].MaxCreeps[availableName.substring(0, 1)]) {
-                            Memory.MemRooms[memRoomKey].MaxCreeps[availableName.substring(0, 1)].NumOfCreepsInRoom++;
+                            Memory.MemRooms[memRoomKey].MaxCreeps[availableName.substring(0, 1)][availableName] = {};
                         }
                     }
                     console.log('AssignJobs SpawnCreeps ' + availableName + ' assigned to ' + roomJobKey + ' in ' + memRoomKey + ' spawnResult ' + spawnResult + ' spawn ' + bestAvailableSpawn.name);
@@ -132,20 +132,9 @@ const AssignJobs = {
         function ShouldSpawnCreep(creepType, roomKey) {
             const memRoom = Memory.MemRooms[roomKey];
             let maxCreepsInRoom = 0;
-            let numOfCreepsInRoom = 0;
             if (memRoom.MaxCreeps[creepType]) {
                 maxCreepsInRoom = memRoom.MaxCreeps[creepType].MaxCreepsInRoom;
-                numOfCreepsInRoom = memRoom.MaxCreeps[creepType].NumOfCreepsInRoom;
             } else {
-                // loop through all creeps - take those with job in room or idle and placed in room - count
-                for (const creepName in Game.creeps) {
-                    const gameCreep = Game.creeps[creepName];
-                    if (gameCreep.name.substring(0, 1) === creepType) {
-                        if (gameCreep.memory.JobName.split(')').pop() === roomKey) { // employed creep that is employed in this room
-                            numOfCreepsInRoom++;
-                        }
-                    }
-                }
                 switch (creepType) {
                     case 'T': // transporter
                         maxCreepsInRoom = memRoom.SourceNumber;
@@ -154,10 +143,7 @@ const AssignJobs = {
                         maxCreepsInRoom = memRoom.SourceNumber;
                         break;
                     case 'B': // builder
-                        maxCreepsInRoom = memRoom.SourceNumber;
-                        if(Game.rooms[roomKey] && Game.rooms[roomKey].storage && Game.rooms[roomKey].storage.store[RESOURCE_ENERGY] > 700000){
-                            maxCreepsInRoom = maxCreepsInRoom + 1;
-                        }
+                        maxCreepsInRoom = 2;
                         break;
                     case 'E': // extractor
                         maxCreepsInRoom = 1;
@@ -167,18 +153,25 @@ const AssignJobs = {
                     case 'C': // claimer
                     case 'R': // reserver
                     case 'D': // distantHarvester
-                        maxCreepsInRoom = 5;
+                        maxCreepsInRoom = 3;
                         break;
                     default:
                         ErrorLog('AssignJobs-ShouldSpawnCreep-creepTypeNotFound', 'AssignJobs ShouldSpawnCreep ERROR! creepType not found ' + creepType);
                 }
                 memRoom.MaxCreeps[creepType] = {
-                    'NumOfCreepsInRoom': numOfCreepsInRoom,
-                    'MaxCreepsInRoom': maxCreepsInRoom
+                    'MaxCreepsInRoom': maxCreepsInRoom,
                 };
+                // loop through all creeps - take those with job in room or idle and placed in room - count
+                for (const creepName in Game.creeps) {
+                    const gameCreep = Game.creeps[creepName];
+                    if (gameCreep.name.substring(0, 1) === creepType) {
+                        if (gameCreep.memory.JobName.split(')').pop() === roomKey) { // employed creep that is employed in this room
+                            memRoom.MaxCreeps[creepType][gameCreep.name] = {};
+                        }
+                    }
+                }
             }
-
-            if (numOfCreepsInRoom < maxCreepsInRoom) {
+            if ((Object.keys(memRoom.MaxCreeps[creepType]).length - 1) < maxCreepsInRoom) {
                 return true;
             } else {
                 return false;
