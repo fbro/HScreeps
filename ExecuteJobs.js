@@ -34,20 +34,32 @@ const ExecuteJobs = {
                                 result = Move(gameCreep, gameCreep.room.storage);
                             }
                             gameCreep.say('idle 📦');
-                        }else if(!gameCreep.room.controller || !gameCreep.room.controller.my){ // I do not own the room the idle creep is in - move it to an owned room!
-                            let bestDistance = Number.MAX_SAFE_INTEGER;
+                        }else if(!gameCreep.room.controller || !gameCreep.room.controller.my || gameCreep.memory.MoveHome){ // I do not own the room the idle creep is in - move it to an owned room!
                             let closestOwnedRoom;
-                            for (const memRoomKey in Memory.MemRooms) { // search for best storage
-                                if (Game.rooms[memRoomKey] && Game.rooms[memRoomKey].controller.my) { // exist and has room
-                                    const distance = Game.map.getRoomLinearDistance(gameCreep.pos.roomName, memRoomKey);
-                                    if (distance < bestDistance) {
-                                        closestOwnedRoom = memRoomKey;
-                                        bestDistance = distance;
+                            if(!gameCreep.memory.MoveHome){
+                                let bestDistance = Number.MAX_SAFE_INTEGER;
+                                for (const memRoomKey in Memory.MemRooms) { // search for best storage
+                                    if (Game.rooms[memRoomKey] && Game.rooms[memRoomKey].controller.my) { // exist and has room
+                                        const distance = Game.map.getRoomLinearDistance(gameCreep.pos.roomName, memRoomKey);
+                                        if (distance < bestDistance) {
+                                            closestOwnedRoom = memRoomKey;
+                                            bestDistance = distance;
+                                        }
                                     }
                                 }
+                                gameCreep.memory.MoveHome = closestOwnedRoom;
+                                console.log('ExecuteJobs ExecuteRoomJobs idle ' + creepName + ' in ' + gameCreep.pos.roomName + ' moving to ' + closestOwnedRoom);
+                            }else{
+                                closestOwnedRoom = gameCreep.memory.MoveHome;
                             }
-                            Move(gameCreep, Game.rooms[closestOwnedRoom].controller);
-                            gameCreep.say('🏠🏃');
+
+                            if(closestOwnedRoom && (closestOwnedRoom !== gameCreep.pos.roomName || gameCreep.pos.getRangeTo(Game.rooms[closestOwnedRoom].controller) > 4)){
+                                Move(gameCreep, Game.rooms[closestOwnedRoom].controller);
+                                gameCreep.say('🏠🏃');
+                            }else{
+                                gameCreep.memory.MoveHome = undefined;
+                                gameCreep.say('🏠🏃✔');
+                            }
                         }
                     }
                 } else { // creep is not idle
@@ -352,7 +364,7 @@ const ExecuteJobs = {
 
                 if ((obj.structureType === STRUCTURE_CONTAINER && _.sum(obj.store) < 600)
                     || (obj.structureType === STRUCTURE_LINK && obj.energy < 600)
-                    || (obj.structureType === STRUCTURE_TERMINAL && obj.store[RESOURCE_ENERGY] < 120000)) {
+                    || (obj.structureType === STRUCTURE_TERMINAL && obj.store[RESOURCE_ENERGY] < 120000 && obj.store[RESOURCE_ENERGY] >= 5000)) {
                     return JOB_IS_DONE;
                 }
 

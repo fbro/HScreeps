@@ -39,7 +39,8 @@ const AssignJobs = {
                 const idleCreepsInRoom = _.filter(idleCreeps, function (creep) {
                     return creep.pos.roomName === memRoomKey;
                 });
-                // TODO what about idle creeps in neutral rooms - and many idle creeps in one room that could be moved to another room
+                // TODO what about many idle creeps in one room that could be moved to another room
+                // TODO what about idle creeps that could take a job in another neutral room so that one does not need to spawn a new creep
                 for (const roomJobKey in memRoom.RoomJobs) {
                     const roomJob = memRoom.RoomJobs[roomJobKey];
                     if (roomJob && roomJob.Creep === 'vacant') {
@@ -119,7 +120,7 @@ const AssignJobs = {
                         Game.creeps[availableName].memory.JobName = roomJobKey;
                         roomJob.Creep = availableName;
                         if (Memory.MemRooms[memRoomKey].MaxCreeps[availableName.substring(0, 1)]) {
-                            Memory.MemRooms[memRoomKey].MaxCreeps[availableName.substring(0, 1)][availableName] = {};
+                            Memory.MemRooms[memRoomKey].MaxCreeps[availableName.substring(0, 1)][availableName] = availableName;
                         }
                     }
                     console.log('AssignJobs SpawnCreeps ' + availableName + ' assigned to ' + roomJobKey + ' in ' + memRoomKey + ' spawnResult ' + spawnResult + ' spawn ' + bestAvailableSpawn.name);
@@ -166,7 +167,7 @@ const AssignJobs = {
                     const gameCreep = Game.creeps[creepName];
                     if (gameCreep.name.substring(0, 1) === creepType) {
                         if (gameCreep.memory.JobName.split(')').pop() === roomKey) { // employed creep that is employed in this room
-                            memRoom.MaxCreeps[creepType][gameCreep.name] = {};
+                            memRoom.MaxCreeps[creepType][gameCreep.name] = gameCreep.name;
                         }
                     }
                 }
@@ -276,7 +277,7 @@ const AssignJobs = {
                     break;
                 // scout
                 case 'S':
-                    body = [TOUGH, MOVE];
+                    body = [MOVE];
                     break;
                 // claimer
                 case 'C':

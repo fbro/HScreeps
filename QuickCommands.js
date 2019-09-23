@@ -1,4 +1,4 @@
-// reset for v2:
+// reset
 Memory.buyOrdersHistory = {};
 Memory.MemRooms = {};
 Memory.ErrorLog = undefined;
@@ -13,6 +13,7 @@ for (const creepName in Memory.creeps) {
         mc.EnergySupply = undefined;
         mc.EnergySupplyType = undefined;
         mc.ClosestRoomWithStorage = undefined;
+        mc.MoveHome = undefined;
 
     }
 }

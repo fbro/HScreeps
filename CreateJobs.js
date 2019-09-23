@@ -77,9 +77,6 @@ const CreateJobs = {
                     RepairJobs(gameRoom, jobs);
                     if (gameRoom.controller.level < 8 && gameRoom.storage && gameRoom.storage.store[RESOURCE_ENERGY] > 100000) { // not at max level - more creeps on the controller job
                         AddJob(jobs, 'Controller1(' + gameRoom.controller.pos.x + ',' + gameRoom.controller.pos.y + ')' + gameRoom.name, gameRoom.controller.id, OBJECT_JOB, 'B', 5);
-                        if (gameRoom.storage.store[RESOURCE_ENERGY] > 200000) {
-                            AddJob(jobs, 'Controller2(' + gameRoom.controller.pos.x + ',' + gameRoom.controller.pos.y + ')' + gameRoom.name, gameRoom.controller.id, OBJECT_JOB, 'B', 5);
-                        }
                     }
                     if (gameRoom.controller.level >= 3) {
                         // FillTower
@@ -307,7 +304,7 @@ const CreateJobs = {
                 filter: (s) => {
                     return (s.structureType === STRUCTURE_CONTAINER && _.sum(s.store) >= 600)
                         || (s.structureType === STRUCTURE_LINK && s.energy >= 600 && s.room.storage.pos.inRangeTo(s, 1))
-                        || (s.structureType === STRUCTURE_TERMINAL && s.store[RESOURCE_ENERGY] >= 120000);
+                        || (s.structureType === STRUCTURE_TERMINAL && (s.store[RESOURCE_ENERGY] >= 120000 || gameRoom.storage.store[RESOURCE_ENERGY] < 5000));
                 }
             });
             for (const fillStorageKey in fillStorages) {
