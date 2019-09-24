@@ -64,11 +64,11 @@ const CreateJobs = {
                     for (const sourceKey in sources) {
                         const source = sources[sourceKey];
                         new RoomVisual(gameRoom.name).text('🏭', source.pos.x, source.pos.y);
-                        AddJob(jobs, 'Source(' + source.pos.x + ',' + source.pos.y + ')' + gameRoom.name, source.id, OBJECT_JOB, 'H', 2);
+                        AddJob(jobs, '1Src(' + source.pos.x + ',' + source.pos.y + ')' + gameRoom.name, source.id, OBJECT_JOB, 'H');
                     }
                     // Controller
                     new RoomVisual(gameRoom.name).text('🧠', gameRoom.controller.pos.x, gameRoom.controller.pos.y);
-                    AddJob(jobs, 'Controller(' + gameRoom.controller.pos.x + ',' + gameRoom.controller.pos.y + ')' + gameRoom.name, gameRoom.controller.id, OBJECT_JOB, 'B', 1);
+                    AddJob(jobs, '0Ctrl(' + gameRoom.controller.pos.x + ',' + gameRoom.controller.pos.y + ')' + gameRoom.name, gameRoom.controller.id, OBJECT_JOB, 'B');
                     // FillSpawnExtension
                     FillSpawnExtensionJobs(gameRoom, jobs);
                     // Construction
@@ -76,7 +76,7 @@ const CreateJobs = {
                     // Repair
                     RepairJobs(gameRoom, jobs);
                     if (gameRoom.controller.level < 8 && gameRoom.storage && gameRoom.storage.store[RESOURCE_ENERGY] > 100000) { // not at max level - more creeps on the controller job
-                        AddJob(jobs, 'Controller1(' + gameRoom.controller.pos.x + ',' + gameRoom.controller.pos.y + ')' + gameRoom.name, gameRoom.controller.id, OBJECT_JOB, 'B', 5);
+                        AddJob(jobs, '9Ctrl(' + gameRoom.controller.pos.x + ',' + gameRoom.controller.pos.y + ')' + gameRoom.name, gameRoom.controller.id, OBJECT_JOB, 'B');
                     }
                     if (gameRoom.controller.level >= 3) {
                         // FillTower
@@ -113,10 +113,12 @@ const CreateJobs = {
                 if (!Memory.MemRooms[gameRoom.name] && Object.keys(jobs).length > 0) { // room not found and there are jobs in it - create it
                     CreateRoom(gameRoom.name, jobs);
                 } else if (Memory.MemRooms[gameRoom.name]) { // update jobs in memRoom
+                    let addedNewJob = false;
                     // add new jobs
                     for (const newJobKey in jobs) { // loop through new jobs
                         if(!Memory.MemRooms[gameRoom.name].RoomJobs[newJobKey]){ // new job does not already exist
                             Memory.MemRooms[gameRoom.name].RoomJobs[newJobKey] = jobs[newJobKey]; // save it
+                            addedNewJob = true;
                         }
                     }
                     // remove only old disappeared vacant jobs
@@ -129,6 +131,12 @@ const CreateJobs = {
                     if(Memory.MemRooms[gameRoom.name].RoomLevel !== gameRoom.controller.level){ // room level change
                         Memory.MemRooms[gameRoom.name].RoomLevel = gameRoom.controller.level;
                         Memory.MemRooms[gameRoom.name].SourceNumber = gameRoom.find(FIND_SOURCES).length;
+                        Memory.MemRooms[gameRoom.name].MaxCreeps = {}; // reset - maybe the MaxCreepsInRoom changes with room level
+                    }
+                    if(addedNewJob){ // new jobs have been added, now sort the job array
+                        console.log("TEST before: " + JSON.stringify(Memory.MemRooms[gameRoom.name].RoomJobs));
+                        Memory.MemRooms[gameRoom.name].RoomJobs = SortObj(Memory.MemRooms[gameRoom.name].RoomJobs);
+                        console.log("TEST after: " + JSON.stringify(Memory.MemRooms[gameRoom.name].RoomJobs));
                     }
                 }
             }
@@ -147,6 +155,15 @@ const CreateJobs = {
                     CreateRoom(roomName, jobs);
                 }
             }
+        }
+
+        function SortObj (map) {
+            const keys = _.sortBy(_.keys(map), function(a) { return a; });
+            const newmap = {};
+            _.each(keys, function(k) {
+                newmap[k] = map[k];
+            });
+            return newmap;
         }
 
         // this method is not just run in the Game.rooms loop because flags may be in "invisible" rooms
@@ -195,7 +212,7 @@ const CreateJobs = {
 
                 if(jobName){
                     //console.log('CreateJobs CreateFlagJobs AddJob ' + gameFlagKey);
-                    AddJob(jobs, jobName + '-' + gameFlagKey + '(' + gameFlag.pos.x + ',' + gameFlag.pos.y + ')' + gameFlag.pos.roomName, gameFlagKey, FLAG_JOB, creepType, jobImportance);
+                    AddJob(jobs, jobImportance + jobName + '-' + gameFlagKey + '(' + gameFlag.pos.x + ',' + gameFlag.pos.y + ')' + gameFlag.pos.roomName, gameFlagKey, FLAG_JOB, creepType);
                 }
             }
             return jobs;
@@ -214,7 +231,7 @@ const CreateJobs = {
                     const lab = labs[labKey];
                     if (lab && lab.energy < lab.energyCapacity) {
                         new RoomVisual(gameRoom.name).text('⚡', lab.pos.x, lab.pos.y);
-                        AddJob(roomJobs, 'FillLabEnergy(' + lab.pos.x + ',' + lab.pos.y + ')' + gameRoom.name, lab.id, OBJECT_JOB, 'T', 3);
+                        AddJob(roomJobs, '3FillLabE(' + lab.pos.x + ',' + lab.pos.y + ')' + gameRoom.name, lab.id, OBJECT_JOB, 'T');
                     }
                 }
             }
@@ -229,7 +246,7 @@ const CreateJobs = {
                 })[0];
                 if (terminal && terminal.store[RESOURCE_ENERGY] < 100000 && _.sum(terminal.store) < terminal.storeCapacity) {
                     new RoomVisual(gameRoom.name).text('⚡', terminal.pos.x, terminal.pos.y);
-                    AddJob(roomJobs, 'FillTerminalEnergy(' + terminal.pos.x + ',' + terminal.pos.y + ')' + gameRoom.name, terminal.id, OBJECT_JOB, 'T', 4);
+                    AddJob(roomJobs, '4FillTermE(' + terminal.pos.x + ',' + terminal.pos.y + ')' + gameRoom.name, terminal.id, OBJECT_JOB, 'T');
                 }
             }
         }
@@ -250,7 +267,7 @@ const CreateJobs = {
                     }
                     if (storageHasMinerals) {
                         new RoomVisual(gameRoom.name).text('⛏', terminal.pos.x, terminal.pos.y);
-                        AddJob(roomJobs, 'FillTerminalMineral(' + terminal.pos.x + ',' + terminal.pos.y + ')' + gameRoom.name, terminal.id, OBJECT_JOB, 'T', 5);
+                        AddJob(roomJobs, '5FillTermMin(' + terminal.pos.x + ',' + terminal.pos.y + ')' + gameRoom.name, terminal.id, OBJECT_JOB, 'T');
                     }
                 }
             }
@@ -274,7 +291,7 @@ const CreateJobs = {
                 })[0];
                 if (mineral && extractMineral) {
                     new RoomVisual(gameRoom.name).text('⛏', extractMineral.pos.x, extractMineral.pos.y);
-                    AddJob(roomJobs, 'ExtractMineral-' + mineral.mineralType + '(' + extractMineral.pos.x + ',' + extractMineral.pos.y + ')' + gameRoom.name, mineral.id, OBJECT_JOB, 'E', 5);
+                    AddJob(roomJobs, '5ExtrMin-' + mineral.mineralType + '(' + extractMineral.pos.x + ',' + extractMineral.pos.y + ')' + gameRoom.name, mineral.id, OBJECT_JOB, 'E');
                 }
             }
         }
@@ -289,9 +306,9 @@ const CreateJobs = {
                     });
                     for (const fillStorageFromRemoteKey in fillStorageFromRemotes) {
                         const fillStorageFromRemote = fillStorageFromRemotes[fillStorageFromRemoteKey];
-                        const jobName = 'FillStorageFromRemote-' + fillStorageFromRemote.structureType + '(' + fillStorageFromRemote.pos.x + ',' + fillStorageFromRemote.pos.y + ')' + gameRoom.name;
+                        const jobName = '5FillStrgFromRemote-' + fillStorageFromRemote.structureType + '(' + fillStorageFromRemote.pos.x + ',' + fillStorageFromRemote.pos.y + ')' + gameRoom.name;
                         console.log('CreateJobs FillStorageFromRemoteJobs in ' + gameRoom.name + ' add job ' + jobName);
-                        AddJob(roomJobs, jobName, fillStorageFromRemote.id, OBJECT_JOB, 'T', 5);
+                        AddJob(roomJobs, jobName, fillStorageFromRemote.id, OBJECT_JOB, 'T');
                     }
                 }else{
                     ErrorLog('CreateJobs-FillStorageFromRemoteJobs-roomNotExist', 'CreateJobs FillStorageFromRemoteJobs ERROR! Game.rooms[' + attachedRoomKey + '] is undefined from ' + gameRoom.name);
@@ -310,7 +327,7 @@ const CreateJobs = {
             for (const fillStorageKey in fillStorages) {
                 const fillStorage = fillStorages[fillStorageKey];
                 new RoomVisual(gameRoom.name).text('📦', fillStorage.pos.x, fillStorage.pos.y);
-                AddJob(roomJobs, 'FillStorage-' + fillStorage.structureType + '(' + fillStorage.pos.x + ',' + fillStorage.pos.y + ')' + gameRoom.name, fillStorage.id, OBJECT_JOB, 'T', 5);
+                AddJob(roomJobs, '5FillStrg-' + fillStorage.structureType + '(' + fillStorage.pos.x + ',' + fillStorage.pos.y + ')' + gameRoom.name, fillStorage.id, OBJECT_JOB, 'T');
             }
             // drop is a little bit different - but same kind of job as above
             const resourceDrops = gameRoom.find(FIND_DROPPED_RESOURCES, {
@@ -321,7 +338,7 @@ const CreateJobs = {
             for (const resourceDropKey in resourceDrops) {
                 const resourceDrop = resourceDrops[resourceDropKey];
                 new RoomVisual(gameRoom.name).text('💰', resourceDrop.pos.x, resourceDrop.pos.y);
-                AddJob(roomJobs, 'FillStorage-drop' + '(' + resourceDrop.pos.x + ',' + resourceDrop.pos.y + ',' + resourceDrop.resourceType + ')' + gameRoom.name, resourceDrop.id, OBJECT_JOB, 'T', 4);
+                AddJob(roomJobs, '4FillStrg-drp' + '(' + resourceDrop.pos.x + ',' + resourceDrop.pos.y + ',' + resourceDrop.resourceType + ')' + gameRoom.name, resourceDrop.id, OBJECT_JOB, 'T');
             }
         }
 
@@ -334,7 +351,7 @@ const CreateJobs = {
             for (const fillTowerKey in fillTowers) {
                 const fillTower = fillTowers[fillTowerKey];
                 new RoomVisual(gameRoom.name).text('🗼', fillTower.pos.x, fillTower.pos.y);
-                AddJob(roomJobs, 'FillTower(' + fillTower.pos.x + ',' + fillTower.pos.y + ')' + gameRoom.name, fillTower.id, OBJECT_JOB, 'T', 2);
+                AddJob(roomJobs, '2FillTwr(' + fillTower.pos.x + ',' + fillTower.pos.y + ')' + gameRoom.name, fillTower.id, OBJECT_JOB, 'T');
             }
         }
 
@@ -347,7 +364,7 @@ const CreateJobs = {
             for (const fillSpawnExtensionKey in fillSpawnExtensions) {
                 const fillSpawnExtension = fillSpawnExtensions[fillSpawnExtensionKey];
                 new RoomVisual(gameRoom.name).text('🌱', fillSpawnExtension.pos.x, fillSpawnExtension.pos.y);
-                AddJob(roomJobs, 'FillSpawnExtension(' + fillSpawnExtension.pos.x + ',' + fillSpawnExtension.pos.y + ')' + gameRoom.name, fillSpawnExtension.id, OBJECT_JOB, 'T', 1);
+                AddJob(roomJobs, '0FillSpwnEx(' + fillSpawnExtension.pos.x + ',' + fillSpawnExtension.pos.y + ')' + gameRoom.name, fillSpawnExtension.id, OBJECT_JOB, 'T');
             }
         }
 
@@ -356,7 +373,7 @@ const CreateJobs = {
             for (const constructionKey in constructions) {
                 const construction = constructions[constructionKey];
                 new RoomVisual(gameRoom.name).text('🏗', construction.pos.x, construction.pos.y);
-                AddJob(roomJobs, 'Construction-' + construction.structureType + '(' + construction.pos.x + ',' + construction.pos.y + ')' + gameRoom.name, construction.id, OBJECT_JOB, 'B', 2);
+                AddJob(roomJobs, '2Constr-' + construction.structureType + '(' + construction.pos.x + ',' + construction.pos.y + ')' + gameRoom.name, construction.id, OBJECT_JOB, 'B');
             }
         }
 
@@ -409,17 +426,16 @@ const CreateJobs = {
             console.log('CreateJobs CreateRoom add new room ' + roomName + ' level ' + level + ' sourceNumber ' + sourceNumber + ' jobs ' + JSON.stringify(jobs))
         }
 
-        function AddJob(roomJobs, jobName, jobId, jobType, creepType, jobImportance) {
-            roomJobs[jobName] = CreateJob(jobId, jobType, creepType, jobImportance);
+        function AddJob(roomJobs, jobName, jobId, jobType, creepType) {
+            roomJobs[jobName] = CreateJob(jobId, jobType, creepType);
         }
 
-        function CreateJob(jobId, jobType, creepType, jobImportance) {
+        function CreateJob(jobId, jobType, creepType) {
             return {
                 'JobId': jobId,
                 'JobType': jobType,
                 'CreepType': creepType,
-                'Creep': 'vacant',
-                'JobImportance': jobImportance
+                'Creep': 'vacant'
             };
         }
 

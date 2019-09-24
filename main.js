@@ -58,3 +58,4 @@ module.exports.loop = function () {
 // TODO cleanup remove jobImportance on jobs - controller1,2 jobs should be moved further down
 // TODO problem with how jobs now are preserved - priority does not shift this means that controller1,2 jobs has a larger priority than they should
 
+// TODO inefficient problem - creeps can be one tick quicker if I try and do the action after the movement

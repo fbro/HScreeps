@@ -20,7 +20,6 @@ const ExecuteJobs = {
                 const roomName = creepMemory.JobName.split(')').pop();
                 if (creepMemory.JobName.startsWith('idle')) { // idle creep
                     if (!gameCreep) { // idle creep is dead
-                        console.log('ExecuteJobs ExecuteRoomJobs idle creep ' + creepName + ' in ' + roomName + ' has died');
                         FindAndRemoveMaxCreeps(roomName, creepName);
                         delete Memory.creeps[creepName];
                     } else { // idle creep is alive
@@ -66,19 +65,8 @@ const ExecuteJobs = {
                     const job = Memory.MemRooms[roomName].RoomJobs[creepMemory.JobName];
 
                     if (!job && gameCreep) { // job is outdated and removed from Memory and creep is still alive
-                        console.log('ExecuteJobs ExecuteRoomJobs job gone ' + creepName + ' on ' + creepMemory.JobName + ' in ' + roomName);
                         creepMemory.JobName = 'idle(' + gameCreep.pos.x + ',' + gameCreep.pos.y + ')' + gameCreep.pos.roomName;
                     } else if (job && !gameCreep) { // job exists and creep is dead
-                        console.log('ExecuteJobs ExecuteRoomJobs ' + creepName + ' on ' + creepMemory.JobName + ' in ' + roomName + ' has died');
-                        const tombstone = Game.rooms[roomName].find(FIND_TOMBSTONES, {
-                            filter: function (tombstone) {
-                                return tombstone.creep.name === creepName;
-                            }
-                        })[0];
-                        if (tombstone) {
-                            new RoomVisual(roomName).text(creepName + '⚰', tombstone.pos.x, tombstone.pos.y);
-                        }
-
                         const jobStillViable = JobStillViableAfterDeath(creepMemory, job, roomName);
                         if (jobStillViable) {
                             job.Creep = 'vacant';
@@ -201,7 +189,7 @@ const ExecuteJobs = {
                 creep.say('😫 ' + creep.fatigue); // creep has fatigue and is limited in movement
             } else if (result === ERR_BUSY) {
                 // The creep is still being spawned
-            }  else if (result === JOB_MOVING) {
+            } else if (result === JOB_MOVING) {
                 creep.say('🏃'); // The creep is just moving to its target
             } else { // results where anything else than OK - one should end the job!
                 if (result === ERR_NO_RESULT_FOUND) {
@@ -219,34 +207,41 @@ const ExecuteJobs = {
                 isJobDone = true;
             }
 
-            if (creep.carry[RESOURCE_ENERGY] > 0 && result !== OK) { // fill adjacent spawns, extensions and towers or repair on the road
-                const toFill = creep.pos.findInRange(FIND_MY_STRUCTURES, 1, {
-                    filter: (structure) => {
-                        return (structure.structureType === STRUCTURE_SPAWN
-                            || structure.structureType === STRUCTURE_EXTENSION
-                            || structure.structureType === STRUCTURE_TOWER) && structure.energy < structure.energyCapacity;
-                    }
-                })[0];
-                if (toFill) {
-                    creep.transfer(toFill, RESOURCE_ENERGY); // it may do that "double" but it really does not matter
-                    //console.log('ExecuteJobs JobAction ' + creep.name + ' transferred energy to adjacent spawn tower or extension (' + toFill.pos.x + ',' + toFill.pos.y + ',' + toFill.pos.roomName + ')');
-                } else if (creep.name.startsWith('H') || creep.name.startsWith('B') || creep.name.startsWith('D')) { // repair on the road
-                    const toRepair = creep.pos.findInRange(FIND_STRUCTURES, 2, {
+            if(result !== OK){
+                if (creep.carry[RESOURCE_ENERGY] > 0) { // fill adjacent spawns, extensions and towers or repair or construct on the road
+                    const toFill = creep.pos.findInRange(FIND_MY_STRUCTURES, 1, {
                         filter: (structure) => {
-                            return (structure.structureType !== STRUCTURE_WALL
-                                && structure.structureType !== STRUCTURE_RAMPART) && structure.hits < structure.hitsMax;
+                            return (structure.structureType === STRUCTURE_SPAWN
+                                || structure.structureType === STRUCTURE_EXTENSION
+                                || structure.structureType === STRUCTURE_TOWER) && structure.energy < structure.energyCapacity;
                         }
                     })[0];
-                    if (toRepair) {
-                        creep.repair(toRepair);
-                        //console.log('ExecuteJobs JobAction ' + creep.name + ' repaired ' + toRepair.structureType + ' (' + toRepair.pos.x + ',' + toRepair.pos.y + ',' + toRepair.pos.roomName + ',' + toRepair.hits + ',' + toRepair.hitsMax + ')');
+                    if (toFill) { // fill adjacent spawns, extensions
+                        creep.transfer(toFill, RESOURCE_ENERGY); // it may do that "double" but it really does not matter
+                        //console.log('ExecuteJobs JobAction ' + creep.name + ' transferred energy to adjacent spawn tower or extension (' + toFill.pos.x + ',' + toFill.pos.y + ',' + toFill.pos.roomName + ')');
+                    } else if (creep.name.startsWith('H') || creep.name.startsWith('B') || creep.name.startsWith('D')) { // repair on the road
+                        const toRepair = creep.pos.findInRange(FIND_STRUCTURES, 2, {
+                            filter: (structure) => {
+                                return (structure.structureType !== STRUCTURE_WALL
+                                    && structure.structureType !== STRUCTURE_RAMPART) && structure.hits < structure.hitsMax;
+                            }
+                        })[0];
+                        if (toRepair) { // repair on the road
+                            creep.repair(toRepair);
+                            //console.log('ExecuteJobs JobAction ' + creep.name + ' repaired ' + toRepair.structureType + ' (' + toRepair.pos.x + ',' + toRepair.pos.y + ',' + toRepair.pos.roomName + ',' + toRepair.hits + ',' + toRepair.hitsMax + ')');
+                        }else{
+                            const toBuild = creep.pos.findInRange(FIND_CONSTRUCTION_SITES, 2)[0];
+                            if (toBuild) { // construct on the road
+                                creep.build(toBuild);
+                            }
+                        }
                     }
-                }
-            } else if (_.sum(creep.carry) < creep.carryCapacity && !creep.name.startsWith('H') && !creep.name.startsWith('E') && !creep.name.startsWith('D')) { // pickup adjacent resources
-                const drop = creep.pos.findInRange(FIND_DROPPED_RESOURCES, 1)[0];
-                if (drop) {
-                    creep.pickup(drop); // it may do that "double" but it really does not matter
-                    //console.log('ExecuteJobs JobAction ' + creep.name + ' picked up adjacent resource (' + drop.pos.x + ',' + drop.pos.y + ',' + drop.pos.roomName + ',' + drop.amount + ',' + drop.resourceType + ')');
+                } else if (_.sum(creep.carry) < creep.carryCapacity && !creep.name.startsWith('H') && !creep.name.startsWith('E') && !creep.name.startsWith('D')) { // pickup adjacent resources
+                    const drop = creep.pos.findInRange(FIND_DROPPED_RESOURCES, 1)[0];
+                    if (drop) {
+                        creep.pickup(drop); // it may do that "double" but it really does not matter
+                        //console.log('ExecuteJobs JobAction ' + creep.name + ' picked up adjacent resource (' + drop.pos.x + ',' + drop.pos.y + ',' + drop.pos.roomName + ',' + drop.amount + ',' + drop.resourceType + ')');
+                    }
                 }
             }
             return isJobDone;
