@@ -134,9 +134,7 @@ const CreateJobs = {
                         Memory.MemRooms[gameRoom.name].MaxCreeps = {}; // reset - maybe the MaxCreepsInRoom changes with room level
                     }
                     if(addedNewJob){ // new jobs have been added, now sort the job array
-                        console.log("TEST before: " + JSON.stringify(Memory.MemRooms[gameRoom.name].RoomJobs));
                         Memory.MemRooms[gameRoom.name].RoomJobs = SortObj(Memory.MemRooms[gameRoom.name].RoomJobs);
-                        console.log("TEST after: " + JSON.stringify(Memory.MemRooms[gameRoom.name].RoomJobs));
                     }
                 }
             }
@@ -173,38 +171,31 @@ const CreateJobs = {
                 const gameFlag = Game.flags[gameFlagKey];
                 let jobName;
                 let creepType;
-                let jobImportance = 5;
                 if (gameFlag.color === COLOR_ORANGE && gameFlag.secondaryColor === COLOR_ORANGE) { // scout tag
-                    jobName = 'TagController';
+                    jobName = '4TagCtrl';
                     creepType = 'S';
-                    jobImportance = 4;
                 } else if (gameFlag.color === COLOR_ORANGE && gameFlag.secondaryColor === COLOR_YELLOW) { // scout at pos
-                    jobName = 'ScoutPos';
+                    jobName = '5ScoutPos';
                     creepType = 'S';
-                    jobImportance = 5;
                 } else if (gameFlag.color === COLOR_GREEN && gameFlag.secondaryColor === COLOR_GREEN) { // claimer claim
-                    jobName = 'ClaimController';
+                    jobName = '1ClaimCtrl';
                     creepType = 'C';
-                    jobImportance = 1;
                 } else if (gameFlag.color === COLOR_GREEN && gameFlag.secondaryColor === COLOR_YELLOW) { // claimer reserve
                     if(!gameFlag.room
                         || !gameFlag.room.controller.reservation
                         || !Memory.MemRooms[gameFlag.pos.roomName]
-                        || Memory.MemRooms[gameFlag.pos.roomName].RoomJobs['ReserveController-' + gameFlagKey + '(' + gameFlag.pos.x + ',' + gameFlag.pos.y + ')' + gameFlag.pos.roomName]
+                        || Memory.MemRooms[gameFlag.pos.roomName].RoomJobs['4ReserveCtrl-' + gameFlagKey + '(' + gameFlag.pos.x + ',' + gameFlag.pos.y + ')' + gameFlag.pos.roomName]
                         || (gameFlag.room.controller.reservation.ticksToEnd < 2500 && !Memory.MemRooms[gameFlag.pos.roomName].RoomJobs[gameFlagKey])){
-                        jobName = 'ReserveController';
+                        jobName = '4ReserveCtrl';
                         creepType = 'R';
-                        jobImportance = 4;
                         //console.log('CreateJobs CreateFlagJobs ReserveController job created ' + gameFlag.pos.roomName + ' ' + gameFlagKey);
                     }
                 } else if (gameFlag.color === COLOR_RED && gameFlag.secondaryColor === COLOR_RED) { // warrior at pos
-                    jobName = 'GuardPos';
+                    jobName = '2GuardPos';
                     creepType = 'W';
-                    jobImportance = 2;
                 } else if (gameFlag.color === COLOR_YELLOW && gameFlag.secondaryColor === COLOR_YELLOW) { // distantHarvester on source at flag pos
-                    jobName = 'RemoteHarvest';
+                    jobName = '5RemoteHarvest';
                     creepType = 'D';
-                    jobImportance = 5;
                     //console.log('CreateJobs CreateFlagJobs RemoteHarvest job created ' + gameFlag.pos.roomName + ' ' + gameFlagKey);
                 } else {
                     ErrorLog('CreateJobs-CreateFlagJobs-flagColorNotFound', 'CreateJobs CreateFlagJobs ERROR! flag color not found ' + gameFlagKey + ' ' + gameFlag.color + ' ' + gameFlag.secondaryColor + ' (' + gameFlag.pos.x + ',' + gameFlag.pos.y + ')');
@@ -212,7 +203,7 @@ const CreateJobs = {
 
                 if(jobName){
                     //console.log('CreateJobs CreateFlagJobs AddJob ' + gameFlagKey);
-                    AddJob(jobs, jobImportance + jobName + '-' + gameFlagKey + '(' + gameFlag.pos.x + ',' + gameFlag.pos.y + ')' + gameFlag.pos.roomName, gameFlagKey, FLAG_JOB, creepType);
+                    AddJob(jobs, jobName + '-' + gameFlagKey + '(' + gameFlag.pos.x + ',' + gameFlag.pos.y + ')' + gameFlag.pos.roomName, gameFlagKey, FLAG_JOB, creepType);
                 }
             }
             return jobs;
@@ -403,7 +394,7 @@ const CreateJobs = {
             for (const repairKey in repairs) {
                 const repair = repairs[repairKey];
                 new RoomVisual(gameRoom.name).text('🛠', repair.pos.x, repair.pos.y);
-                AddJob(roomJobs, 'Repair-' + repair.structureType + '(' + repair.pos.x + ',' + repair.pos.y + ')' + gameRoom.name, repair.id, OBJECT_JOB, 'B', 3);
+                AddJob(roomJobs, '3Rep-' + repair.structureType + '(' + repair.pos.x + ',' + repair.pos.y + ')' + gameRoom.name, repair.id, OBJECT_JOB, 'B');
             }
         }
 

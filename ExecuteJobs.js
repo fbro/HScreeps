@@ -126,57 +126,57 @@ const ExecuteJobs = {
             let result = ERR_NO_RESULT_FOUND;
             switch (true) {
                 // obj jobs
-                case jobKey.startsWith('Source'):
+                case jobKey.startsWith('1Src'):
                     result = JobSource(creep, roomJob);
                     break;
-                case jobKey.startsWith('Controller'):
+                case jobKey.startsWith('0Ctrl') || jobKey.startsWith('9Ctrl') :
                     result = JobController(creep, roomJob); // uses JobEnergyAction()
                     break;
-                case jobKey.startsWith('Repair'):
+                case jobKey.startsWith('3Rep'):
                     result = JobRepair(creep, roomJob, jobKey); // uses JobEnergyAction()
                     break;
-                case jobKey.startsWith('Construction'):
+                case jobKey.startsWith('2Constr'):
                     result = JobConstruction(creep, roomJob); // uses JobEnergyAction()
                     break;
-                case jobKey.startsWith('FillSpawnExtension'):
+                case jobKey.startsWith('0FillSpwnEx'):
                     result = JobFillSpawnExtension(creep, roomJob); // uses JobEnergyAction()
                     break;
-                case jobKey.startsWith('FillTower'):
+                case jobKey.startsWith('2FillTwr'):
                     result = JobFillTower(creep, roomJob); // uses JobEnergyAction()
                     break;
-                case jobKey.startsWith('FillStorage'):
+                case jobKey.startsWith('5FillStrg') || jobKey.startsWith('5FillStrgFromRemote') || jobKey.startsWith('4FillStrg-drp'):
                     result = JobFillStorage(creep, roomJob, roomName);
                     break;
-                case jobKey.startsWith('ExtractMineral'):
+                case jobKey.startsWith('5ExtrMin'):
                     result = JobExtractMineral(creep, roomJob);
                     break;
-                case jobKey.startsWith('FillTerminalMineral'):
+                case jobKey.startsWith('5FillTermMin'):
                     result = JobFillTerminalMineral(creep, roomJob);
                     break;
-                case jobKey.startsWith('FillTerminalEnergy'):
+                case jobKey.startsWith('4FillTermE'):
                     result = JobFillTerminalEnergy(creep, roomJob); // uses JobEnergyAction()
                     break;
-                case jobKey.startsWith('FillLabEnergy'):
+                case jobKey.startsWith('3FillLabE'):
                     result = JobFillLabEnergy(creep, roomJob); // uses JobEnergyAction()
                     break;
 
                 // flag jobs
-                case jobKey.startsWith('TagController'):
+                case jobKey.startsWith('4TagCtrl'):
                     result = JobTagController(creep, roomJob);
                     break;
-                case jobKey.startsWith('ScoutPos'):
+                case jobKey.startsWith('5ScoutPos'):
                     result = JobScoutPos(creep, roomJob);
                     break;
-                case jobKey.startsWith('ClaimController'):
+                case jobKey.startsWith('1ClaimCtrl'):
                     result = JobClaimController(creep, roomJob);
                     break;
-                case jobKey.startsWith('ReserveController'):
+                case jobKey.startsWith('4ReserveCtrl'):
                     result = JobReserveController(creep, roomJob);
                     break;
-                case jobKey.startsWith('GuardPos'):
+                case jobKey.startsWith('2GuardPos'):
                     result = JobGuardPos(creep, roomJob);
                     break;
-                case jobKey.startsWith('RemoteHarvest'):
+                case jobKey.startsWith('5RemoteHarvest'):
                     result = JobRemoteHarvest(creep, roomJob);
                     break;
                 default:
