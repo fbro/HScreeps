@@ -179,6 +179,12 @@ const ExecuteJobs = {
                 case jobKey.startsWith('5RemoteHarvest'):
                     result = JobRemoteHarvest(creep, roomJob);
                     break;
+                case jobKey.startsWith('6FillLabMin'):
+                    result = JobFillLabMineral(creep, roomJob, jobKey);
+                    break;
+                case jobKey.startsWith('5EmptyLabMin'):
+                    result = JobEmptyLabMineral(creep, roomJob);
+                    break;
                 default:
                     ErrorLog('ExecuteJobs-JobAction-jobNotFound', 'ExecuteJobs JobAction ERROR! job not found ' + jobKey + ' ' + creep.name);
             }
@@ -655,6 +661,51 @@ const ExecuteJobs = {
                         result = creep.drop(resourceType);
                     }
                 }
+            }
+            return result;
+        }
+
+        /**@return {int}*/
+        function JobFillLabMineral(creep, roomJob, jobKey){
+            let result = ERR_NO_RESULT_FOUND;
+            const flagObj = Game.flags[roomJob.JobId];
+            if (flagObj === undefined) {
+                result = JOB_OBJ_DISAPPEARED;
+            } else if(creep.memory.Transferring) { // check if creep is transferring - if it is then move to lab
+                let lab;
+                if(creep.memory.LabTarget){
+                    lab = Game.getObjectById(creep.memory.LabTarget);
+                }else{
+                    lab = flagObj.pos.findInRange(FIND_MY_STRUCTURES, 0, {filter: function (lab) {return (lab.structureType === STRUCTURE_LAB);}})[0];
+                    if(!lab){ // lab does not exist - delete flag and remove job
+                        flagObj.remove();
+                        ErrorLog('ExecuteJobs-JobFillLabMineral-labGone', 'ExecuteJobs JobFillLabMineral ERROR! no lab ' + jobKey + ' ' + creep.name);
+                        return ERR_NO_RESULT_FOUND;
+                    }
+                    creep.memory.LabTarget = lab.id;
+                }
+                result = creep.transfer(lab, flagObj.name.split('-').pop());
+                if (result === ERR_NOT_IN_RANGE) {
+                    result = Move(creep, lab);
+                }else if(result === OK){
+                    creep.memory.LabTarget = undefined;
+                    creep.memory.Transferring = undefined;
+                }
+            }else{ // get mineral
+                // TODO find mineral in container, storage or terminal
+
+            }
+            return result;
+        }
+
+        /**@return {int}*/
+        function JobEmptyLabMineral(creep, roomJob){
+            let result = ERR_NO_RESULT_FOUND;
+            const flagObj = Game.flags[roomJob.JobId];
+            if (flagObj === undefined) {
+                result = JOB_OBJ_DISAPPEARED;
+            } else {
+                // TODO
             }
             return result;
         }

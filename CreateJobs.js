@@ -98,9 +98,6 @@ const CreateJobs = {
                                     FillTerminalMineralJobs(gameRoom, jobs);
                                     // FillLabEnergy
                                     FillLabEnergyJobs(gameRoom, jobs);
-                                    // TODO FillLabMineral
-                                    //FillLabMineralJobs(gameRoom, jobs);
-                                    // TODO EmptyLabMineral
                                     // if (gameRoom.controller.level === 8) {
                                         // TODO FillPowerSpawnEnergy
                                         // TODO FillPowerSpawnPowerUnits
@@ -177,6 +174,18 @@ const CreateJobs = {
                 } else if (gameFlag.color === COLOR_ORANGE && gameFlag.secondaryColor === COLOR_YELLOW) { // scout at pos
                     jobName = '5ScoutPos';
                     creepType = 'S';
+                }  else if (gameFlag.color === COLOR_RED && gameFlag.secondaryColor === COLOR_RED) { // warrior at pos
+                    jobName = '2GuardPos';
+                    creepType = 'W';
+                } else if (gameFlag.color === COLOR_YELLOW && gameFlag.secondaryColor === COLOR_YELLOW) { // distantHarvester on source at flag pos
+                    jobName = '5RemoteHarvest';
+                    creepType = 'D';
+                } else if (gameFlag.color === COLOR_PURPLE && gameFlag.secondaryColor === COLOR_PURPLE) { // TODO FillLabMineral
+                    jobName = '6FillLabMin'; // flagname rules: GET-L = get lemergium from all rooms, BUY-L = get it from all rooms or then buy it from the terminal
+                    creepType = 'T';
+                } else if (gameFlag.color === COLOR_PURPLE && gameFlag.secondaryColor === COLOR_WHITE) { // TODO EmptyLabMineral
+                    jobName = '5EmptyLabMin'; // flagname rules: CREATE-GH = CREATE the mineral from the nearby lab to this lab
+                    creepType = 'T';
                 } else if (gameFlag.color === COLOR_GREEN && gameFlag.secondaryColor === COLOR_GREEN) { // claimer claim
                     jobName = '1ClaimCtrl';
                     creepType = 'C';
@@ -185,18 +194,10 @@ const CreateJobs = {
                         || !gameFlag.room.controller.reservation
                         || !Memory.MemRooms[gameFlag.pos.roomName]
                         || Memory.MemRooms[gameFlag.pos.roomName].RoomJobs['4ReserveCtrl-' + gameFlagKey + '(' + gameFlag.pos.x + ',' + gameFlag.pos.y + ')' + gameFlag.pos.roomName]
-                        || (gameFlag.room.controller.reservation.ticksToEnd < 2500 && !Memory.MemRooms[gameFlag.pos.roomName].RoomJobs[gameFlagKey])){
+                        || (gameFlag.room.controller.reservation.ticksToEnd < 2500 && !Memory.MemRooms[gameFlag.pos.roomName].RoomJobs[gameFlagKey])){ // extra logic to try and optimize creep not being idle
                         jobName = '4ReserveCtrl';
                         creepType = 'R';
-                        //console.log('CreateJobs CreateFlagJobs ReserveController job created ' + gameFlag.pos.roomName + ' ' + gameFlagKey);
                     }
-                } else if (gameFlag.color === COLOR_RED && gameFlag.secondaryColor === COLOR_RED) { // warrior at pos
-                    jobName = '2GuardPos';
-                    creepType = 'W';
-                } else if (gameFlag.color === COLOR_YELLOW && gameFlag.secondaryColor === COLOR_YELLOW) { // distantHarvester on source at flag pos
-                    jobName = '5RemoteHarvest';
-                    creepType = 'D';
-                    //console.log('CreateJobs CreateFlagJobs RemoteHarvest job created ' + gameFlag.pos.roomName + ' ' + gameFlagKey);
                 } else {
                     ErrorLog('CreateJobs-CreateFlagJobs-flagColorNotFound', 'CreateJobs CreateFlagJobs ERROR! flag color not found ' + gameFlagKey + ' ' + gameFlag.color + ' ' + gameFlag.secondaryColor + ' (' + gameFlag.pos.x + ',' + gameFlag.pos.y + ')');
                 }

@@ -14,7 +14,7 @@ for (const creepName in Memory.creeps) {
         mc.EnergySupplyType = undefined;
         mc.ClosestRoomWithStorage = undefined;
         mc.MoveHome = undefined;
-
+        mc.LabTarget = undefined;
     }
 }
 //gc.suicide(); // total reset
