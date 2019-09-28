@@ -874,7 +874,8 @@ const ExecuteJobs = {
         }
 
         // TODO not done and not used
-        function GenericAction(creep, roomJob, actionFunction, FetchFunction, FindFetchObjectFunction){
+        /**@return {int}*/
+        function GenericAction(creep, roomJob, jobMinRange, actionFunction, actionViableFunction, FetchFunction, FindFetchObjectFunction){
             let result = ERR_NO_RESULT_FOUND;
             const jobObject = Game.getObjectById(roomJob.JobId);
             if (jobObject === null) {
@@ -882,30 +883,42 @@ const ExecuteJobs = {
             }
 
             if(!creep.memory.Fetching){ // action
+                let shouldFetch = false;
+                const range = Math.sqrt(Math.pow(Math.abs(creep.pos.x - jobObject.pos.x), 2) + Math.pow(Math.abs(creep.pos.y - jobObject.pos.y), 2));
 
-                // move to job
-                // if in range then do job
-                result = actionFunction.creepAction(jobObject);
-                if (result === ERR_NOT_IN_RANGE) {
+                if(range > jobMinRange){
                     result = Move(creep, jobObject);
+                }
+                if(range <= jobMinRange + 1){
+                    result = actionFunction.Action(jobObject);
+                    if(result === OK){
+                        shouldFetch = actionViableFunction.ActionViable();
+                        if(shouldFetch){
+                            creep.memory.Fetching = true;
+                        }
+                    }
                 }
             }
 
-            if(creep.memory.Fetching){ // pre action
+            if(creep.memory.Fetching){ // fetch action
                 let fetchObject;
                 if(creep.memory.FetchObjectId){
                     fetchObject = Game.getObjectById(creep.memory.FetchObjectId);
                 }else{
-                    fetchObject = FindFetchObjectFunction.creepAction();
+                    fetchObject = FindFetchObjectFunction.FindFetchObject();
                     creep.memory.FetchObjectId = fetchObject.id;
                 }
-
-                result = FetchFunction.creepAction(fetchObject);
-                if (result === ERR_NOT_IN_RANGE) {
+                const range = Math.sqrt(Math.pow(Math.abs(creep.pos.x - fetchObject.pos.x), 2) + Math.pow(Math.abs(creep.pos.y - fetchObject.pos.y), 2));
+                if(range > 1){
                     result = Move(creep, fetchObject);
                 }
+                if(range <= 2){
+                    result = FetchFunction.Fetch(fetchObject);
+                    if(result === OK){
+                        creep.memory.Fetching = undefined;
+                    }
+                }
             }
-
 
             return result;
         }
