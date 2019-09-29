@@ -17,6 +17,10 @@ for (const creepName in Memory.creeps) {
         mc.LabId = undefined;
         mc.Mineral = undefined;
         mc.SupplyId = undefined;
+
+        mc.Fetching = undefined;
+        mc.Acting = undefined;
+        mc.FetchObjectId = undefined;
     }
 }
 //gc.suicide(); // total reset
