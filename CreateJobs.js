@@ -115,7 +115,7 @@ const CreateJobs = {
                     for (const newJobKey in jobs) { // loop through new jobs
                         if(!Memory.MemRooms[gameRoom.name].RoomJobs[newJobKey]){ // new job does not already exist
                             Memory.MemRooms[gameRoom.name].RoomJobs[newJobKey] = jobs[newJobKey]; // save it
-                            console.log("CreateJobs CreateObjJobs new job added " + newJobKey);
+                            //console.log("CreateJobs CreateObjJobs new job added " + newJobKey);
                             addedNewJob = true;
                         }
                     }
@@ -124,7 +124,7 @@ const CreateJobs = {
                         const oldJob = Memory.MemRooms[gameRoom.name].RoomJobs[oldJobKey];
                         if(oldJob.Creep === 'vacant' && !jobs[oldJobKey]){ // old job is vacant and old job id not en the new job array
                             Memory.MemRooms[gameRoom.name].RoomJobs[oldJobKey] = undefined; // delete old vacant disappeared job
-                            console.log("CreateJobs CreateObjJobs old job deleted " + oldJobKey);
+                            //console.log("CreateJobs CreateObjJobs old job deleted " + oldJobKey);
                         }
                     }
                     if(Memory.MemRooms[gameRoom.name].RoomLevel !== gameRoom.controller.level){ // room level change
