@@ -942,6 +942,7 @@ const ExecuteJobs = {
         // TODO not tested and not used yet
         /**@return {int}*/
         function GenericAction(creep, roomJob, jobMinRange, actionFunctions){
+            let debugTrace = ""; // TODO remove
             let result = ERR_NO_RESULT_FOUND;
             const jobObject = Game.getObjectById(roomJob.JobId);
             if (jobObject === null) {
@@ -961,25 +962,29 @@ const ExecuteJobs = {
             if(result !== JOB_IS_DONE && result !== JOB_OBJ_DISAPPEARED){
                 if(creep.memory.Acting){ // act
                     let jobStatus;
-                    const range = Math.sqrt(Math.pow(Math.abs(creep.pos.x - jobObject.pos.x), 2) + Math.pow(Math.abs(creep.pos.y - jobObject.pos.y), 2));
-
-                    if(range > jobMinRange){
+                    result = actionFunctions.Act(jobObject); // TODO may get -6 NOT ENOUGH ENERGY because it has deposited energy along the way
+                    debugTrace = debugTrace + ", Act " + result; // TODO remove
+                    if(result === ERR_NOT_IN_RANGE){
                         result = Move(creep, jobObject);
-                    }
-                    if(range <= jobMinRange + 1){
-                        result = actionFunctions.Act(jobObject); // TODO may get -6 NOT ENOUGH ENERGY because it has deposited energy along the way
-                        if(result === OK){
-                            jobStatus = actionFunctions.JobStatus(jobObject, result);
-                            if(jobStatus === SHOULD_FETCH){
-                                creep.memory.Fetching = true;
-                                creep.memory.Acting = undefined;
-                            }else if(jobStatus === JOB_IS_DONE){
-                                result = jobStatus;
-                            } // SHOULD_ACT does nothing, the method will just be processed again at next tick
+                        debugTrace = debugTrace + ", A.Move " + result; // TODO remove
+                        if(result === JOB_MOVING){
+                            result = actionFunctions.Act(jobObject); // try again
+                            if(result === ERR_NOT_IN_RANGE){result = JOB_MOVING;}
+                            debugTrace = debugTrace + ", Act2 " + result; // TODO remove
                         }
                     }
+                    if(result !== JOB_MOVING){ // get an update if anything other than moving happens
+                        jobStatus = actionFunctions.JobStatus(jobObject, result);
+                        if(jobStatus === SHOULD_FETCH){
+                            creep.memory.Fetching = true;
+                            creep.memory.Acting = undefined;
+                        }else if(jobStatus === JOB_IS_DONE){
+                            debugTrace = debugTrace + ", set done " + result; // TODO remove
+                            result = jobStatus;
+                        } // SHOULD_ACT does nothing, the method will just be processed again at next tick
+                    }
                 }else if(creep.memory.Fetching){ // fetch
-                    let fetchObject;
+                    let fetchObject; // get fetch object
                     if(creep.memory.FetchObjectId){
                         fetchObject = Game.getObjectById(creep.memory.FetchObjectId);
                     }
@@ -991,23 +996,25 @@ const ExecuteJobs = {
                         creep.memory.FetchObjectId = fetchObject.id;
                     }
                     if(result !== NO_FETCH_FOUND){
-                        const range = Math.sqrt(Math.pow(Math.abs(creep.pos.x - fetchObject.pos.x), 2) + Math.pow(Math.abs(creep.pos.y - fetchObject.pos.y), 2));
-                        if(range > 1){
+                        result = actionFunctions.Fetch(fetchObject);
+                        debugTrace = debugTrace + ", Fetch " + result; // TODO remove
+                        if(result === ERR_NOT_IN_RANGE){
                             result = Move(creep, fetchObject);
-                        }
-                        if(range <= 2){
-                            result = actionFunctions.Fetch(fetchObject);
-                            if(result === OK){
-                                creep.memory.Fetching = undefined;
-                                creep.memory.Acting = true;
+                            debugTrace = debugTrace + ", F.Move " + result; // TODO remove
+                            if(result === JOB_MOVING){
+                                result = actionFunctions.Fetch(fetchObject);
+                                debugTrace = debugTrace + ", Fetch2 " + result; // TODO remove
                             }
+                        }
+                        if(result === OK){
+                            creep.memory.Fetching = undefined;
+                            creep.memory.Acting = true;
                         }
                     }
                 }
             }
-            // TODO may get -11 TIRED because it has moved twice??? WTF that cannot happen ???
-            if(result !== OK && result !== JOB_MOVING && result !== ERR_BUSY){ // job is ending
-                console.log("TEST gen. job is done " + creep.name + " " + creep.memory.JobName + " result: " + result);
+            if(result !== OK && result !== ERR_TIRED && result !== JOB_MOVING && result !== ERR_BUSY){ // job is ending
+                console.log("TEST gen. job is done " + creep.name + " " + creep.memory.JobName + " result: " + result + " " + debugTrace); // TODO remove debugTrace
                 creep.memory.Fetching = undefined;
                 creep.memory.Acting = undefined;
                 creep.memory.FetchObjectId = undefined;
