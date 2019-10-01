@@ -956,6 +956,7 @@ const ExecuteJobs = {
                     creep.memory.Fetching = undefined;
                     creep.memory.Acting = true;
                 }else{
+                    debugTrace = debugTrace + ", set done first " + result; // TODO remove
                     result = jobStatus; // JOB_IS_DONE
                 }
             }
@@ -969,8 +970,8 @@ const ExecuteJobs = {
                         debugTrace = debugTrace + ", A.Move " + result; // TODO remove
                         if(result === JOB_MOVING){
                             result = actionFunctions.Act(jobObject); // try again
-                            if(result === ERR_NOT_IN_RANGE){result = JOB_MOVING;}
                             debugTrace = debugTrace + ", Act2 " + result; // TODO remove
+                            if(result === ERR_NOT_IN_RANGE){result = JOB_MOVING;}
                         }
                     }
                     if(result !== JOB_MOVING){ // get an update if anything other than moving happens
