@@ -55,4 +55,5 @@ module.exports.loop = function () {
 // cache paths to be reused by creeps
 // recycle creeps if there are many idle!
 
-// TODO inefficient problem - creeps can be one tick quicker if I try and do the action after the movement
+// TODO inefficient problem - creeps can be one tick quicker if I try and move to a new action after a finished action
+// TODO ExecuteJobs: move job actions over to use GenericAction

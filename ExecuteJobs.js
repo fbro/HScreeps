@@ -20,6 +20,33 @@ const ExecuteJobs = {
                 const creepMemory = Memory.creeps[creepName];
                 const gameCreep = Game.creeps[creepName];
                 const roomName = creepMemory.JobName.split(')').pop();
+
+                if(!creepMemory.JobName.startsWith('idle')){ // creep is not idle
+                    const job = Memory.MemRooms[roomName].RoomJobs[creepMemory.JobName];
+
+                    if (!job && gameCreep) { // job is outdated and removed from Memory and creep is still alive
+                        creepMemory.JobName = 'idle(' + gameCreep.pos.x + ',' + gameCreep.pos.y + ')' + gameCreep.pos.roomName;
+                    } else if (job && !gameCreep) { // job exists and creep is dead
+                        const jobStillViable = JobStillViableAfterDeath(creepMemory, job, roomName);
+                        if (jobStillViable) {
+                            job.Creep = 'vacant';
+                        } else {
+                            delete Memory.MemRooms[roomName].RoomJobs[creepMemory.JobName];
+                        }
+                        FindAndRemoveMaxCreeps(roomName, creepName);
+                        delete Memory.creeps[creepName];
+                    } else if (job && gameCreep) { // creep is alive and its job is found
+                        const isJobDone = JobAction(gameCreep, job, creepMemory.JobName, roomName);
+                        if (isJobDone) {
+                            delete Memory.MemRooms[roomName].RoomJobs[creepMemory.JobName];
+                            creepMemory.JobName = 'idle(' + gameCreep.pos.x + ',' + gameCreep.pos.y + ')' + gameCreep.pos.roomName;
+                        }
+                    } else { // both job and creep is gone
+                        console.log('ExecuteJobs ExecuteRoomJobs ' + creepName + ' on ' + creepMemory.JobName + ' in ' + roomName + ' has died and the job has disappeared');
+                        FindAndRemoveMaxCreeps(roomName, creepName);
+                        delete Memory.creeps[creepName];
+                    }
+                }
                 if (creepMemory.JobName.startsWith('idle')) { // idle creep
                     if (!gameCreep) { // idle creep is dead
                         FindAndRemoveMaxCreeps(roomName, creepName);
@@ -62,31 +89,6 @@ const ExecuteJobs = {
                                 gameCreep.say('🏠🏃✔');
                             }
                         }
-                    }
-                } else { // creep is not idle
-                    const job = Memory.MemRooms[roomName].RoomJobs[creepMemory.JobName];
-
-                    if (!job && gameCreep) { // job is outdated and removed from Memory and creep is still alive
-                        creepMemory.JobName = 'idle(' + gameCreep.pos.x + ',' + gameCreep.pos.y + ')' + gameCreep.pos.roomName;
-                    } else if (job && !gameCreep) { // job exists and creep is dead
-                        const jobStillViable = JobStillViableAfterDeath(creepMemory, job, roomName);
-                        if (jobStillViable) {
-                            job.Creep = 'vacant';
-                        } else {
-                            delete Memory.MemRooms[roomName].RoomJobs[creepMemory.JobName];
-                        }
-                        FindAndRemoveMaxCreeps(roomName, creepName);
-                        delete Memory.creeps[creepName];
-                    } else if (job && gameCreep) { // creep is alive and its job is found
-                        const isJobDone = JobAction(gameCreep, job, creepMemory.JobName, roomName);
-                        if (isJobDone) {
-                            delete Memory.MemRooms[roomName].RoomJobs[creepMemory.JobName];
-                            creepMemory.JobName = 'idle(' + gameCreep.pos.x + ',' + gameCreep.pos.y + ')' + gameCreep.pos.roomName;
-                        }
-                    } else { // both job and creep is gone
-                        console.log('ExecuteJobs ExecuteRoomJobs ' + creepName + ' on ' + creepMemory.JobName + ' in ' + roomName + ' has died and the job has disappeared');
-                        FindAndRemoveMaxCreeps(roomName, creepName);
-                        delete Memory.creeps[creepName];
                     }
                 }
             }
@@ -337,34 +339,29 @@ const ExecuteJobs = {
         }
 
         /**@return {int}*/
-        /*function JobFillSpawnExtension(creep, roomJob) {
-            const obj = Game.getObjectById(roomJob.JobId);
-            const result = JobEnergyAction(creep, roomJob, obj, {
-                creepAction: function () {
-                    return creep.transfer(obj, RESOURCE_ENERGY);
-                }
-            });
-            return result;
-        }*/
-
-        // TODO TEST
-        /**@return {int}*/
         function JobFillSpawnExtension(creep, roomJob) {
             const result = GenericAction(creep, roomJob, 1, {
                 /**@return {int}*/
-                Act: function (jobObject) {
-                    return creep.transfer(jobObject, RESOURCE_ENERGY);
-                },
-                /**@return {int}*/
-                JobStatus: function (jobObject, result) {
-                    if(jobObject.energy === jobObject.energyCapacity
-                        || (jobObject.energy + creep.carry[RESOURCE_ENERGY]) >= jobObject.energyCapacity && result === OK // predict that the creep will be done
-                    ){ // is job done?
+                JobStatus: function (jobObject) {
+                    if(jobObject.energy === jobObject.energyCapacity){ // is job done?
                         return JOB_IS_DONE;
                     }else if(creep.carry[RESOURCE_ENERGY] === 0){ // fetch
                         return SHOULD_FETCH; //
                     }else{ // action not done yet
                         return SHOULD_ACT;
+                    }
+                },
+                /**@return {int}*/
+                Act: function (jobObject) {
+                    return creep.transfer(jobObject, RESOURCE_ENERGY);
+                },
+                /**@return {int}*/
+                IsJobDone: function (jobObject) {
+                    if((jobObject.energy + creep.carry[RESOURCE_ENERGY]) >= jobObject.energyCapacity){
+                        // predict that the creep will be done
+                        return JOB_IS_DONE;
+                    }else{ // action not done yet
+                        return this.JobStatus(jobObject);
                     }
                 },
                 /**@return {object}
@@ -939,52 +936,25 @@ const ExecuteJobs = {
             }
         }
 
-        // TODO not tested and not used yet
         /**@return {int}*/
         function GenericAction(creep, roomJob, jobMinRange, actionFunctions){
-            let debugTrace = ""; // TODO remove
             let result = ERR_NO_RESULT_FOUND;
             const jobObject = Game.getObjectById(roomJob.JobId);
             if (jobObject === null) {
                 result = JOB_OBJ_DISAPPEARED;
-            }else if(!creep.memory.Acting && !creep.memory.Fetching){ // creep does not know whether to act or fetch
-                const jobStatus = actionFunctions.JobStatus(jobObject, result);
-                if(jobStatus === SHOULD_FETCH){
-                    creep.memory.Fetching = true;
-                    creep.memory.Acting = undefined;
-                }else if(jobStatus === SHOULD_ACT){
-                    creep.memory.Fetching = undefined;
-                    creep.memory.Acting = true;
-                }else{
-                    debugTrace = debugTrace + ", set done first " + result; // TODO remove
-                    result = jobStatus; // JOB_IS_DONE
-                }
-            }
-            if(result !== JOB_IS_DONE && result !== JOB_OBJ_DISAPPEARED){
-                if(creep.memory.Acting){ // act
-                    let jobStatus;
-                    result = actionFunctions.Act(jobObject); // TODO may get -6 NOT ENOUGH ENERGY because it has deposited energy along the way
-                    debugTrace = debugTrace + ", Act " + result; // TODO remove
+            }else{
+                let jobStatus = actionFunctions.JobStatus(jobObject);
+                let didAct = false; // handle specific usecase where a creep has done an action and then immediately after that tries to do a similar action nearby when fetching
+                if(jobStatus === SHOULD_ACT){ // act
+                    result = actionFunctions.Act(jobObject);
                     if(result === ERR_NOT_IN_RANGE){
                         result = Move(creep, jobObject);
-                        debugTrace = debugTrace + ", A.Move " + result; // TODO remove
-                        if(result === JOB_MOVING){
-                            result = actionFunctions.Act(jobObject); // try again
-                            debugTrace = debugTrace + ", Act2 " + result; // TODO remove
-                            if(result === ERR_NOT_IN_RANGE){result = JOB_MOVING;}
-                        }
+                    }else if(result === OK){
+                        jobStatus = actionFunctions.IsJobDone(jobObject); // predict
+                        didAct = true;
                     }
-                    if(result !== JOB_MOVING){ // get an update if anything other than moving happens
-                        jobStatus = actionFunctions.JobStatus(jobObject, result);
-                        if(jobStatus === SHOULD_FETCH){
-                            creep.memory.Fetching = true;
-                            creep.memory.Acting = undefined;
-                        }else if(jobStatus === JOB_IS_DONE){
-                            debugTrace = debugTrace + ", set done " + result; // TODO remove
-                            result = jobStatus;
-                        } // SHOULD_ACT does nothing, the method will just be processed again at next tick
-                    }
-                }else if(creep.memory.Fetching){ // fetch
+                }
+                if(jobStatus === SHOULD_FETCH){ // fetch immediately after maybe a successful Act that is not done
                     let fetchObject; // get fetch object
                     if(creep.memory.FetchObjectId){
                         fetchObject = Game.getObjectById(creep.memory.FetchObjectId);
@@ -997,27 +967,20 @@ const ExecuteJobs = {
                         creep.memory.FetchObjectId = fetchObject.id;
                     }
                     if(result !== NO_FETCH_FOUND){
-                        result = actionFunctions.Fetch(fetchObject);
-                        debugTrace = debugTrace + ", Fetch " + result; // TODO remove
+                        if(!didAct){
+                            result = actionFunctions.Fetch(fetchObject);
+                        }
                         if(result === ERR_NOT_IN_RANGE){
                             result = Move(creep, fetchObject);
-                            debugTrace = debugTrace + ", F.Move " + result; // TODO remove
-                            if(result === JOB_MOVING){
-                                result = actionFunctions.Fetch(fetchObject);
-                                debugTrace = debugTrace + ", Fetch2 " + result; // TODO remove
-                            }
-                        }
-                        if(result === OK){
-                            creep.memory.Fetching = undefined;
-                            creep.memory.Acting = true;
                         }
                     }
+                }else if(jobStatus === JOB_IS_DONE){
+                    result = JOB_IS_DONE;
                 }
             }
+
             if(result !== OK && result !== ERR_TIRED && result !== JOB_MOVING && result !== ERR_BUSY){ // job is ending
-                console.log("TEST gen. job is done " + creep.name + " " + creep.memory.JobName + " result: " + result + " " + debugTrace); // TODO remove debugTrace
-                creep.memory.Fetching = undefined;
-                creep.memory.Acting = undefined;
+                console.log("TEST gen. job is done " + creep.name + " " + creep.memory.JobName + " result: " + result); // TODO remove test log
                 creep.memory.FetchObjectId = undefined;
             }
             return result;
