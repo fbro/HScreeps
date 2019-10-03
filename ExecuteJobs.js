@@ -300,7 +300,7 @@ const ExecuteJobs = {
                     }
                     if(!fetchObject && creep.memory.ContainerId){
                         fetchObject = Game.getObjectById(creep.memory.ContainerId);
-                        if(fetchObject && _sum(fetchObject.store) === fetchObject.storeCapacity){
+                        if(fetchObject && _.sum(fetchObject.store) === fetchObject.storeCapacity){
                             fetchObject = undefined; // do not use the saved container if the container is full
                             containerFull = true;
                         }
