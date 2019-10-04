@@ -146,7 +146,7 @@ const ExecuteJobs = {
                     result = JobFillSpawnExtension(creep, roomJob); // uses JobEnergyAction()
                     break;
                 case jobKey.startsWith('2FillTwr'):
-                    result = JobFillTower(creep, roomJob, jobKey); // uses JobEnergyAction()
+                    result = JobFillTower(creep, roomJob); // uses JobEnergyAction()
                     break;
                 case jobKey.startsWith('5FillStrg') || jobKey.startsWith('5FillStrgFromRemote') || jobKey.startsWith('4FillStrg-drp'):
                     result = JobFillStorage(creep, roomJob, roomName);
@@ -261,13 +261,13 @@ const ExecuteJobs = {
 
         /**@return {int}*/
         function JobSource(creep, roomJob){
-            const result = GenericAction(creep, roomJob, 1, {
+            const result = GenericAction(creep, roomJob, {
                 /**@return {int}*/
                 JobStatus: function (jobObject) {
                     if(jobObject.energy === 0){ // is job done?
                         return JOB_IS_DONE;
                     }else if(_.sum(creep.carry) === creep.carryCapacity){ // fetch
-                        return SHOULD_FETCH; //
+                        return SHOULD_FETCH;
                     }else{ // action not done yet
                         return SHOULD_ACT;
                     }
@@ -278,7 +278,7 @@ const ExecuteJobs = {
                 },
                 /**@return {int}*/
                 IsJobDone: function (jobObject) {
-                    if((jobObject.energy - (creep.getActiveBodyparts(MOVE) * 2)) <= 0){
+                    if((jobObject.energy - (creep.getActiveBodyparts(WORK) * 2)) <= 0){
                         // predict that the creep will be done
                         return JOB_IS_DONE;
                     }else{
@@ -291,22 +291,21 @@ const ExecuteJobs = {
                     let fetchObject;
                     let linkFull = false;
                     let containerFull = false;
-                    if(creep.memory.LinkId){
+                    if(creep.memory.LinkId){ // is link in memory?
                         fetchObject = Game.getObjectById(creep.memory.LinkId);
                         if(fetchObject && fetchObject.energy === fetchObject.energyCapacity){
                             fetchObject = undefined; // do not use the saved link if the link is full
                             linkFull = true
                         }
                     }
-                    if(!fetchObject && creep.memory.ContainerId){
+                    if(!fetchObject && creep.memory.ContainerId){ // then is container in memory?
                         fetchObject = Game.getObjectById(creep.memory.ContainerId);
                         if(fetchObject && _.sum(fetchObject.store) === fetchObject.storeCapacity){
                             fetchObject = undefined; // do not use the saved container if the container is full
                             containerFull = true;
                         }
                     }
-
-                    if(!fetchObject){
+                    if(!fetchObject){ // then find link object?
                         if(!linkFull){
                             fetchObject = jobObject.pos.findInRange(FIND_MY_STRUCTURES, 2, { // link
                                 filter: function (link) {
@@ -314,7 +313,7 @@ const ExecuteJobs = {
                                 }
                             })[0];
                         }
-                        if(!containerFull) {
+                        if(!containerFull) { // then find container object
                             if (!fetchObject) {
                                 fetchObject = jobObject.pos.findInRange(FIND_STRUCTURES, 2, { // container
                                     filter: function (container) {
@@ -329,7 +328,7 @@ const ExecuteJobs = {
                             }
                         }
                     }
-                    if(!fetchObject){ // drop
+                    if(!fetchObject){ // nothing can be found then drop
                         fetchObject = creep;
                     }
                     return fetchObject;
@@ -351,52 +350,122 @@ const ExecuteJobs = {
         }
 
         /**@return {int}*/
-        function JobController(creep, roomJob) {
-            const obj = Game.getObjectById(roomJob.JobId);
-            const result = JobEnergyAction(creep, roomJob, obj, {
-                creepAction: function () {
-                    return creep.upgradeController(obj, RESOURCE_ENERGY);
-                }
+        function JobController(creep, roomJob){
+            const result = GenericAction(creep, roomJob, {
+                /**@return {int}*/
+                JobStatus: function (jobObject) {
+                    if(creep.carry[RESOURCE_ENERGY] === 0){ // fetch
+                        return SHOULD_FETCH;
+                    }else{ // action not done yet
+                        return SHOULD_ACT;
+                    }
+                },
+                /**@return {int}*/
+                Act: function (jobObject) {
+                    return creep.upgradeController(jobObject, RESOURCE_ENERGY);
+                },
+                /**@return {int}*/
+                IsJobDone: function (jobObject) {
+                    return this.JobStatus(jobObject);
+                },
+                /**@return {object}
+                 * @return {undefined}*/
+                FindFetchObject: function (jobObject) {
+                    return FindFetchEnergy(creep, jobObject);
+                },
+                /**@return {int}*/
+                Fetch: function (fetchObject) {
+                    return FetchEnergy(creep, fetchObject);
+                },
             });
             return result;
         }
 
         /**@return {int}*/
-        function JobRepair(creep, roomJob, jobKey) {
-            const obj = Game.getObjectById(roomJob.JobId);
-            if (obj.hits === obj.hitsMax) {
-                console.log('ExecuteJobs JobRepair nothing to repair ' + creep.name + ' on ' + jobKey + ' job is set to done');
-                return JOB_IS_DONE;
-            }
-            const result = JobEnergyAction(creep, roomJob, obj, {
-                creepAction: function () {
-                    return creep.repair(obj, RESOURCE_ENERGY);
-                }
+        function JobRepair(creep, roomJob){
+            const result = GenericAction(creep, roomJob, {
+                /**@return {int}*/
+                JobStatus: function (jobObject) {
+                    if(jobObject.hits === jobObject.hitsMax){
+                        return JOB_IS_DONE;
+                    }else if(creep.carry[RESOURCE_ENERGY] === 0){ // fetch
+                        return SHOULD_FETCH;
+                    }else{ // action not done yet
+                        return SHOULD_ACT;
+                    }
+                },
+                /**@return {int}*/
+                Act: function (jobObject) {
+                    return creep.repair(jobObject);
+                },
+                /**@return {int}*/
+                IsJobDone: function (jobObject) {
+                    if((jobObject.hits + (creep.getActiveBodyparts(WORK) * 100)) >= jobObject.hitsMax){
+                        // predict that the creep will be done
+                        return JOB_IS_DONE;
+                    }else{
+                        return this.JobStatus(jobObject);
+                    }
+                },
+                /**@return {object}
+                 * @return {undefined}*/
+                FindFetchObject: function (jobObject) {
+                    return FindFetchEnergy(creep, jobObject);
+                },
+                /**@return {int}*/
+                Fetch: function (fetchObject) {
+                    return FetchEnergy(creep, fetchObject);
+                },
             });
-
             return result;
         }
 
         /**@return {int}*/
-        function JobConstruction(creep, roomJob) {
-            const obj = Game.getObjectById(roomJob.JobId);
-            const result = JobEnergyAction(creep, roomJob, obj, {
-                creepAction: function () {
-                    return creep.build(obj, RESOURCE_ENERGY);
-                }
+        function JobConstruction(creep, roomJob){
+            const result = GenericAction(creep, roomJob, {
+                /**@return {int}*/
+                JobStatus: function (jobObject) {
+                    if(creep.carry[RESOURCE_ENERGY] === 0){ // fetch
+                        return SHOULD_FETCH;
+                    }else{ // action not done yet
+                        return SHOULD_ACT;
+                    }
+                },
+                /**@return {int}*/
+                Act: function (jobObject) {
+                    return creep.build(jobObject);
+                },
+                /**@return {int}*/
+                IsJobDone: function (jobObject) {
+                    if((jobObject.progress + creep.getActiveBodyparts(WORK)) >= jobObject.progressTotal){
+                        // predict that the creep will be done
+                        return JOB_IS_DONE;
+                    }else{
+                        return this.JobStatus(jobObject);
+                    }
+                },
+                /**@return {object}
+                 * @return {undefined}*/
+                FindFetchObject: function (jobObject) {
+                    return FindFetchEnergy(creep, jobObject);
+                },
+                /**@return {int}*/
+                Fetch: function (fetchObject) {
+                    return FetchEnergy(creep, fetchObject);
+                },
             });
             return result;
         }
 
         /**@return {int}*/
         function JobFillSpawnExtension(creep, roomJob) {
-            const result = GenericAction(creep, roomJob, 1, {
+            const result = GenericAction(creep, roomJob, {
                 /**@return {int}*/
                 JobStatus: function (jobObject) {
                     if(jobObject.energy === jobObject.energyCapacity){ // is job done?
                         return JOB_IS_DONE;
                     }else if(creep.carry[RESOURCE_ENERGY] === 0){ // fetch
-                        return SHOULD_FETCH; //
+                        return SHOULD_FETCH;
                     }else{ // action not done yet
                         return SHOULD_ACT;
                     }
@@ -417,57 +486,52 @@ const ExecuteJobs = {
                 /**@return {object}
                  * @return {undefined}*/
                 FindFetchObject: function (jobObject) {
-                    let energySupply = FindClosestEnergyInRoom(creep, jobObject.room);
-                    if (!energySupply && creep.pos.roomName !== jobObject.pos.roomName) {
-                        energySupply = FindClosestEnergyInRoom(creep, creep.room); // try again but look at the room the creep is in
-                    }
-                    return energySupply;
+                    return FindFetchEnergy(creep, jobObject);
                 },
                 /**@return {int}*/
                 Fetch: function (fetchObject) {
-                    let result;
-                    if (creep.memory.EnergySupplyType === 'DROP') {
-                        result = creep.pickup(fetchObject);
-                    } else {
-                        result = creep.withdraw(fetchObject, RESOURCE_ENERGY);
-                    }
-                    if (result === ERR_FULL) { // creep store is full with anything other than ENERGY - get rid of it asap
-                        if (creep.memory.EnergySupplyType === 'CONTAINER' || creep.memory.EnergySupplyType === 'STORAGE') {
-                            for (const resourceType in creep.carry) {
-                                if (resourceType !== RESOURCE_ENERGY) {
-                                    result = creep.transfer(creep.memory.EnergySupplyType, resourceType);
-                                }
-                            }
-                        } else { // DROP
-                            for (const resourceType in creep.carry) {
-                                if (resourceType !== RESOURCE_ENERGY) {
-                                    result = creep.drop(resourceType);
-                                }
-                            }
-                        }
-                    } else if (result === OK) { // energy withdrawn successfully - now remove creep.memory.EnergySupply
-                        creep.memory.EnergySupply = undefined;
-                        creep.memory.EnergySupplyType = undefined;
-                    }
-                    return result;
+                    return FetchEnergy(creep, fetchObject);
                 },
             });
             return result;
         }
 
-
         /**@return {int}*/
-        function JobFillTower(creep, roomJob, jobKey) {
-            const obj = Game.getObjectById(roomJob.JobId);
-            const result = JobEnergyAction(creep, roomJob, obj, {
-                creepAction: function () {
-                    return creep.transfer(obj, RESOURCE_ENERGY);
-                }
+        function JobFillTower(creep, roomJob) {
+            const result = GenericAction(creep, roomJob, {
+                /**@return {int}*/
+                JobStatus: function (jobObject) {
+                    if(jobObject.energy === jobObject.energyCapacity){
+                        return JOB_IS_DONE;
+                    }else if(creep.carry[RESOURCE_ENERGY] === 0){ // fetch
+                        return SHOULD_FETCH;
+                    }else{ // action not done yet
+                        return SHOULD_ACT;
+                    }
+                },
+                /**@return {int}*/
+                Act: function (jobObject) {
+                    return creep.transfer(jobObject, RESOURCE_ENERGY);
+                },
+                /**@return {int}*/
+                IsJobDone: function (jobObject) {
+                    if(jobObject.energy + creep.carry[RESOURCE_ENERGY] >= jobObject.energyCapacity){
+                        // predict that the creep will be done
+                        return JOB_IS_DONE;
+                    }else{
+                        return this.JobStatus(jobObject);
+                    }
+                },
+                /**@return {object}
+                 * @return {undefined}*/
+                FindFetchObject: function (jobObject) {
+                    return FindFetchEnergy(creep, jobObject);
+                },
+                /**@return {int}*/
+                Fetch: function (fetchObject) {
+                    return FetchEnergy(creep, fetchObject);
+                },
             });
-            if (obj.energy + creep.carry[RESOURCE_ENERGY] >= obj.energyCapacity) {
-                console.log('ExecuteJobs JobFillTower full ' + creep.name + ' on ' + jobKey + ' job is set to done');
-                return JOB_IS_DONE;
-            }
             return result;
         }
 
@@ -519,6 +583,51 @@ const ExecuteJobs = {
                 result = OK;
                 creep.memory.Transferring = undefined; // setting to not be transferring - forcing the creep to go back and withdraw/pickup
             }
+            return result;
+        }
+
+        /**@return {int}*/
+        function TESTJobFillStorage(creep, roomJob) {
+            const result = GenericAction(creep, roomJob, {
+                /**@return {int}*/
+                JobStatus: function (jobObject) {
+                    if ((jobObject.structureType === STRUCTURE_CONTAINER && _.sum(jobObject.store) < 600)
+                        || (jobObject.structureType === STRUCTURE_LINK && jobObject.energy < 600)
+                        || (jobObject.structureType === STRUCTURE_TERMINAL && jobObject.store[RESOURCE_ENERGY] < 120000 && jobObject.room.storage.store[RESOURCE_ENERGY] >= 5000)) {
+                        return JOB_IS_DONE;
+                    }else if(_.sum(creep.carry) ){ // fetch // TODO
+                        return SHOULD_FETCH;
+                    }else{ // action not done yet
+                        return SHOULD_ACT;
+                    }
+                },
+                /**@return {int}*/
+                Act: function (jobObject) {
+                    // TODO
+                },
+                /**@return {int}*/
+                IsJobDone: function (jobObject) {
+                    // TODO
+                },
+                /**@return {object}
+                 * @return {undefined}*/
+                FindFetchObject: function (jobObject) {
+                    if(jobObject.room && jobObject.room.storage){
+                        return jobObject.room.storage;
+                    }else if(creep.room.storage && (jobObject.room && jobObject.room.name !== creep.room.name || !jobObject.room)){
+                        return creep.room.storage;
+                    }
+                },
+                /**@return {int}*/
+                Fetch: function (fetchObject) {
+                    let result;
+                    for (const resourceType in creep.carry) {
+                        result = creep.withdraw(fetchObject, resourceType);
+                        break;
+                    }
+                    return result;
+                },
+            });
             return result;
         }
 
@@ -992,7 +1101,7 @@ const ExecuteJobs = {
         }
 
         /**@return {int}*/
-        function GenericAction(creep, roomJob, jobMinRange, actionFunctions){
+        function GenericAction(creep, roomJob, actionFunctions){
             let result = ERR_NO_RESULT_FOUND;
             let stringDebug = "";
             const jobObject = Game.getObjectById(roomJob.JobId);
@@ -1049,6 +1158,45 @@ const ExecuteJobs = {
             }
             return result;
         }
+
+        function FindFetchEnergy(creep, jobObject){
+            let energySupply = FindClosestEnergyInRoom(creep, jobObject.room);
+            if (!energySupply && creep.pos.roomName !== jobObject.pos.roomName) {
+                energySupply = FindClosestEnergyInRoom(creep, creep.room); // try again but look at the room the creep is in
+            }
+            return energySupply;
+        }
+
+        /**@return {int}*/
+        function FetchEnergy(creep, fetchObject){
+            let result;
+            if (creep.memory.EnergySupplyType === 'DROP') {
+                result = creep.pickup(fetchObject);
+            } else {
+                result = creep.withdraw(fetchObject, RESOURCE_ENERGY);
+            }
+            if (result === ERR_FULL) { // creep store is full with anything other than ENERGY - get rid of it asap
+                if (creep.memory.EnergySupplyType === 'CONTAINER' || creep.memory.EnergySupplyType === 'STORAGE') {
+                    for (const resourceType in creep.carry) {
+                        if (resourceType !== RESOURCE_ENERGY) {
+                            result = creep.transfer(creep.memory.EnergySupplyType, resourceType);
+                        }
+                    }
+                } else { // DROP
+                    for (const resourceType in creep.carry) {
+                        if (resourceType !== RESOURCE_ENERGY) {
+                            result = creep.drop(resourceType);
+                        }
+                    }
+                }
+            } else if (result === OK) { // energy withdrawn successfully - now remove creep.memory.EnergySupply
+                creep.memory.EnergySupply = undefined;
+                creep.memory.EnergySupplyType = undefined;
+            }
+            return result;
+        }
+
+
 
         /**@return {int}*/
         function JobTemplate(creep, roomJob){
