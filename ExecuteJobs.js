@@ -19,6 +19,15 @@ const ExecuteJobs = {
             for (const creepName in Memory.creeps) {
                 const creepMemory = Memory.creeps[creepName];
                 const gameCreep = Game.creeps[creepName];
+                if(!creepMemory.JobName){
+                    ErrorLog("creep JobName is undefined", "ERROR! creep JobName is undefined " + creepName);
+                    if(!gameCreep){
+                        ErrorLog("gameCreep is undefined", "ERROR! gameCreep is undefined " + creepName);
+                    }else{
+                        creepMemory.JobName = 'idle(' + gameCreep.pos.x + ',' + gameCreep.pos.y + ')' + gameCreep.pos.roomName;
+                    }
+                    continue;
+                }
                 const roomName = creepMemory.JobName.split(')').pop();
 
                 if(!creepMemory.JobName.startsWith('idle')){ // creep is not idle
@@ -1159,6 +1168,8 @@ const ExecuteJobs = {
             return result;
         }
 
+        /**@return {object}
+         * @return {undefined}*/
         function FindFetchEnergy(creep, jobObject){
             let energySupply = FindClosestEnergyInRoom(creep, jobObject.room);
             if (!energySupply && creep.pos.roomName !== jobObject.pos.roomName) {
