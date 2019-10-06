@@ -95,7 +95,7 @@ const ExecuteJobs = {
                                 gameCreep.say('🏠🏃');
                             }else{
                                 gameCreep.memory.MoveHome = undefined;
-                                gameCreep.say('🏠🏃✔');
+                                gameCreep.say('🏠🏃✔'); // TODO when idle creep is assigned in the room the MoveHome is not removed
                             }
                         }
                     }
@@ -273,9 +273,7 @@ const ExecuteJobs = {
             const result = GenericAction(creep, roomJob, {
                 /**@return {int}*/
                 JobStatus: function (jobObject) {
-                    if(jobObject.energy === 0){ // is job done?
-                        return JOB_IS_DONE;
-                    }else if(_.sum(creep.carry) === creep.carryCapacity){ // fetch
+                    if(_.sum(creep.carry) === creep.carryCapacity){ // fetch
                         return SHOULD_FETCH;
                     }else{ // action not done yet
                         return SHOULD_ACT;
@@ -283,16 +281,16 @@ const ExecuteJobs = {
                 },
                 /**@return {int}*/
                 Act: function (jobObject) {
-                    return creep.harvest(jobObject);
+                    let result = creep.harvest(jobObject);
+                    if(result === ERR_NOT_ENOUGH_RESOURCES){
+                        console.log('ExecuteJobs JobSource ' + creep.name + ' waiting for replenish (' + jobObject.pos.x + ',' + jobObject.pos.y + ',' + jobObject.pos.roomName + ')');
+                        result = OK;
+                    }
+                    return result;
                 },
                 /**@return {int}*/
                 IsJobDone: function (jobObject) {
-                    if((jobObject.energy - (creep.getActiveBodyparts(WORK) * 2)) <= 0){
-                        // predict that the creep will be done
-                        return JOB_IS_DONE;
-                    }else{
-                        return this.JobStatus(jobObject);
-                    }
+                    return this.JobStatus(jobObject);
                 },
                 /**@return {object}
                  * @return {undefined}*/
