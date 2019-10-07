@@ -589,6 +589,7 @@ const ExecuteJobs = {
                     }else if(creep.room.storage && (jobObject.room && jobObject.room.name !== creep.room.name || !jobObject.room)){
                         return creep.room.storage;
                     }else{
+                        creep.memory.Depositing = undefined;
                         return undefined;
                     }
                 },
@@ -607,6 +608,7 @@ const ExecuteJobs = {
                         || jobObject.structureType === STRUCTURE_LINK && jobObject.energy < 600
                         || jobObject.structureType === STRUCTURE_TERMINAL && (jobObject.store[RESOURCE_ENERGY] <= 120000 || jobObject.room.storage.store[RESOURCE_ENERGY] >= 5000 && jobObject.store[RESOURCE_ENERGY] > 0))
                     ){
+                        creep.memory.Depositing = undefined;
                         result = JOB_IS_DONE;
                     }
                     return result;
