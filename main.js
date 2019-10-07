@@ -29,7 +29,7 @@ module.exports.loop = function () {
                     const memRoom = Memory.MemRooms[memRoomKey];
                     memRoom.AttachedRooms = undefined;
                     memRoom.PrimaryRoom = undefined;
-                    Memory.buyOrdersHistory = {'lastReset':Game.time};
+                    //Memory.buyOrdersHistory = {'lastReset':Game.time};
                     memRoom.links = undefined;
                 }
             }

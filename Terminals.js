@@ -80,6 +80,7 @@ const Terminals = {
                     const dealResult = Game.market.deal(order.id, amountToTransfer, room.name);
                     if (dealResult === 0) {
                         console.log('Terminals SellResources deal success ' + order.resourceType + ' ' + amountToTransfer + ' from ' + room.name + ' to ' + order.roomName);
+                        /*
                         if (!Memory.buyOrdersHistory) {
                             Memory.buyOrdersHistory = {};
                         }
@@ -88,6 +89,7 @@ const Terminals = {
                             'energyUsed': transferEnergyRealCost,
                             'fromRoom': room.name
                         };
+                        */
                         successfulDeal++;
                     } else {
                         console.log('Terminals SellResources deal failed ' + order.resourceType + ' ' + amountToTransfer + ' from ' + room.name + ' to ' + order.roomName + ' code ' + dealResult + ' transfer cost ' + transferEnergyRealCost + ' terminal energy ' + room.terminal.store[RESOURCE_ENERGY]);
