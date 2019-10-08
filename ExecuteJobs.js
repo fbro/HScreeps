@@ -618,81 +618,213 @@ const ExecuteJobs = {
         }
 
         /**@return {int}*/
-        function JobExtractMineral(creep, roomJob) {
-            let result = ERR_NO_RESULT_FOUND;
-            const obj = Game.getObjectById(roomJob.JobId);
-            if (obj === null) {
-                result = JOB_OBJ_DISAPPEARED;
-            } else if (_.sum(creep.carry) < creep.carryCapacity) {
-                result = creep.harvest(obj);
-                if (result === ERR_NOT_IN_RANGE) {
-                    result = Move(creep, obj);
-                }
-            } else {
-                for (const resourceType in creep.carry) {
-                    result = creep.drop(resourceType);
-                }
-            }
+        function JobExtractMineral(creep, roomJob){
+            const result = GenericAction(creep, roomJob, {
+                /**@return {int}*/
+                JobStatus: function (jobObject) {
+                    if(jobObject.mineralAmount === 0){ // is job done?
+                        return JOB_IS_DONE;
+                    }else if(_.sum(creep.carry) === creep.carryCapacity){ // fetch - drop minerals in nearby container
+                        return SHOULD_FETCH; //
+                    }else{ // action not done yet
+                        return SHOULD_ACT;
+                    }
+                },
+                /**@return {int}*/
+                Act: function (jobObject) {
+                    return creep.harvest(jobObject);
+                },
+                /**@return {int}*/
+                IsJobDone: function (jobObject) {
+                    if((jobObject.mineralAmount - (creep.getActiveBodyparts(WORK))) <= 0){
+                        // predict that the creep will be done
+                        return JOB_IS_DONE;
+                    }else{ // action not done yet
+                        return this.JobStatus(jobObject);
+                    }
+                },
+                /**@return {object}
+                 * @return {undefined}*/
+                FindFetchObject: function (jobObject) {
+                    let fetchObject;
+                    let containerFull = false;
+                    if(creep.memory.ContainerId){ // is container in memory?
+                        fetchObject = Game.getObjectById(creep.memory.ContainerId);
+                        if(fetchObject && _.sum(fetchObject.store) === fetchObject.storeCapacity){
+                            fetchObject = undefined; // do not use the saved container if the container is full
+                            containerFull = true;
+                        }
+                    }
+                    if(!fetchObject && !containerFull){ // then find link object?
+                        fetchObject = jobObject.pos.findInRange(FIND_STRUCTURES, 2, { // container
+                            filter: function (container) {
+                                return container.structureType === STRUCTURE_CONTAINER && _.sum(container.store) < container.storeCapacity;
+                            }
+                        })[0];
+                        if (fetchObject) {
+                            creep.memory.ContainerId = fetchObject.id;
+                        }
+                    }
+                    if(!fetchObject){ // nothing can be found then drop
+                        fetchObject = creep;
+                    }
+                    return fetchObject;
+                },
+                /**@return {int}*/
+                Fetch: function (fetchObject, jobObject) {
+                    let result = ERR_NO_RESULT_FOUND;
+                    for (const resourceType in creep.carry) {
+                        if(creep.carry[resourceType] > 0){
+                            if (fetchObject.name !== creep.name) {
+                                result = creep.transfer(fetchObject, resourceType);
+                                break;
+                            }else{
+                                result = creep.drop(resourceType); // if fetchObject is the creep object then drop the mineral on the ground
+                                break;
+                            }
+                        }
+                    }
+                    return result;
+                },
+            });
             return result;
         }
 
         /**@return {int}*/
         function JobFillTerminalMineral(creep, roomJob) {
-            const obj = Game.getObjectById(roomJob.JobId);
-            let result = ERR_NO_RESULT_FOUND;
-            if ((_.sum(obj.store) - obj.store[RESOURCE_ENERGY]) > (obj.storeCapacity - 100000)) {
-                return JOB_IS_DONE;
-            }
-            if (_.sum(creep.carry) === 0) { // creep empty
-                for (const resourceType in obj.room.storage.store) {
-                    if (resourceType !== RESOURCE_ENERGY) {
-                        result = creep.withdraw(obj.room.storage, resourceType);
+            const result = GenericAction(creep, roomJob, {
+                /**@return {int}*/
+                JobStatus: function (jobObject) {
+                    if((_.sum(jobObject.store) - jobObject.store[RESOURCE_ENERGY]) > (jobObject.storeCapacity - 100000)){
+                        return JOB_IS_DONE;
+                    }else if(creep.carry[RESOURCE_ENERGY] === 0){ // fetch from storage
+                        return SHOULD_FETCH;
+                    }else{ // action not done yet - place mineral in terminal
+                        return SHOULD_ACT;
                     }
-                }
-                if (result === ERR_NOT_IN_RANGE) {
-                    result = Move(creep, obj.room.storage);
-                }
-            }
-
-            if (result === ERR_NO_RESULT_FOUND) { // creep is either full or nothing to withdraw
-                for (const resourceType in creep.carry) {
-                    result = creep.transfer(obj, resourceType);
-                }
-                if (result === ERR_NOT_IN_RANGE) {
-                    result = Move(creep, obj);
-                }
-            }
+                },
+                /**@return {int}*/
+                Act: function (jobObject) { // transfer any mineral that is on creep
+                    for(const resourceType in creep.carry){
+                        if(creep.carry[resourceType] > 0 && resourceType !== RESOURCE_ENERGY){
+                            return creep.transfer(jobObject, resourceType);
+                        }
+                    }
+                    return ERR_NO_RESULT_FOUND;
+                },
+                /**@return {int}*/
+                IsJobDone: function (jobObject) {
+                    let countResources = 0;
+                    let resourceAmount = 0;
+                    for (const resourceType in creep.carry) {
+                        if(creep.carry[resourceType] > 0){
+                            countResources++;
+                            resourceAmount = creep.carry[resourceType]
+                        }
+                    }
+                    if((resourceAmount + _.sum(jobObject.store) - jobObject.store[RESOURCE_ENERGY]) > (jobObject.storeCapacity - 100000) && countResources <= 1){
+                        return JOB_IS_DONE;
+                    }else{
+                        return this.JobStatus(jobObject);
+                    }
+                },
+                /**@return {object}
+                 * @return {undefined}*/
+                FindFetchObject: function (jobObject) {
+                    return jobObject.room.storage;
+                },
+                /**@return {int}*/
+                Fetch: function (fetchObject, jobObject) { // withdraw any mineral that is in storage
+                    for(const resourceType in fetchObject.store){
+                        if(fetchObject.store[resourceType] > 0 && resourceType !== RESOURCE_ENERGY){
+                            return creep.withdraw(fetchObject, resourceType);
+                        }
+                    }
+                    return ERR_NO_RESULT_FOUND;
+                },
+            });
             return result;
         }
 
         /**@return {int}*/
-        function JobFillTerminalEnergy(creep, roomJob) {
-            const obj = Game.getObjectById(roomJob.JobId);
-            if(obj.store[RESOURCE_ENERGY] > 100000){
-                return JOB_IS_DONE;
-            }
-            let result = JobEnergyAction(creep, roomJob, obj, {
-                creepAction: function () {
-                    return creep.transfer(obj, RESOURCE_ENERGY);
-                }
+        function JobFillTerminalEnergy(creep, roomJob){
+            const result = GenericAction(creep, roomJob, {
+                /**@return {int}*/
+                JobStatus: function (jobObject) {
+                    if(jobObject.store[RESOURCE_ENERGY] > 100000){
+                        return JOB_IS_DONE;
+                    }else if(creep.carry[RESOURCE_ENERGY] === 0){ // fetch
+                        return SHOULD_FETCH;
+                    }else{ // action not done yet
+                        return SHOULD_ACT;
+                    }
+                },
+                /**@return {int}*/
+                Act: function (jobObject) {
+                    return creep.transfer(jobObject, RESOURCE_ENERGY);
+                },
+                /**@return {int}*/
+                IsJobDone: function (jobObject) {
+                    if(creep.carry[RESOURCE_ENERGY] + jobObject.store[RESOURCE_ENERGY] > 100000){
+                        return JOB_IS_DONE;
+                    }else{
+                        return this.JobStatus(jobObject);
+                    }
+                },
+                /**@return {object}
+                 * @return {undefined}*/
+                FindFetchObject: function (jobObject) {
+                    return FindFetchEnergy(creep, jobObject);
+                },
+                /**@return {int}*/
+                Fetch: function (fetchObject, jobObject) {
+                    return FetchEnergy(creep, fetchObject);
+                },
             });
             return result;
         }
 
         /**@return {int}*/
         function JobFillLabEnergy(creep, roomJob) {
-            const obj = Game.getObjectById(roomJob.JobId);
-            let result = JobEnergyAction(creep, roomJob, obj, {
-                creepAction: function () {
-                    return creep.transfer(obj, RESOURCE_ENERGY);
-                }
+            const result = GenericAction(creep, roomJob, {
+                /**@return {int}*/
+                JobStatus: function (jobObject) {
+                    if(jobObject.energy === jobObject.energyCapacity){
+                        return JOB_IS_DONE;
+                    }else if(creep.carry[RESOURCE_ENERGY] === 0){ // fetch
+                        return SHOULD_FETCH;
+                    }else{ // action not done yet
+                        return SHOULD_ACT;
+                    }
+                },
+                /**@return {int}*/
+                Act: function (jobObject) {
+                    return creep.transfer(jobObject, RESOURCE_ENERGY);
+                },
+                /**@return {int}*/
+                IsJobDone: function (jobObject) {
+                    if(creep.carry[RESOURCE_ENERGY] + jobObject.energy >= jobObject.energyCapacity){
+                        return JOB_IS_DONE;
+                    }else{
+                        return this.JobStatus(jobObject);
+                    }
+                },
+                /**@return {object}
+                 * @return {undefined}*/
+                FindFetchObject: function (jobObject) {
+                    return FindFetchEnergy(creep, jobObject);
+                },
+                /**@return {int}*/
+                Fetch: function (fetchObject, jobObject) {
+                    return FetchEnergy(creep, fetchObject);
+                },
             });
             return result;
         }
 
         // flag jobs:
 
-        /**@return {int}*/
+        /**@return {int}*/ // TODO replace with GenericAction
         function JobTagController(creep, roomJob) {
             let result = ERR_NO_RESULT_FOUND;
             const flagObj = Game.flags[roomJob.JobId];
@@ -713,7 +845,7 @@ const ExecuteJobs = {
             return result;
         }
 
-        /**@return {int}*/
+        /**@return {int}*/ // TODO replace with GenericAction
         function JobScoutPos(creep, roomJob) {
             let result = ERR_NO_RESULT_FOUND;
             const flagObj = Game.flags[roomJob.JobId];
@@ -731,7 +863,7 @@ const ExecuteJobs = {
             return result;
         }
 
-        /**@return {int}*/
+        /**@return {int}*/ // TODO replace with GenericAction
         function JobClaimController(creep, roomJob) {
             let result = ERR_NO_RESULT_FOUND;
             const flagObj = Game.flags[roomJob.JobId];
@@ -751,7 +883,7 @@ const ExecuteJobs = {
             return result;
         }
 
-        /**@return {int}*/
+        /**@return {int}*/ // TODO replace with GenericAction
         function JobReserveController(creep, roomJob) {
             let result = ERR_NO_RESULT_FOUND;
             const flagObj = Game.flags[roomJob.JobId];
@@ -770,7 +902,7 @@ const ExecuteJobs = {
             return result;
         }
 
-        /**@return {int}*/
+        /**@return {int}*/ // TODO replace with GenericAction
         function JobGuardPos(creep, roomJob) {
             let result = ERR_NO_RESULT_FOUND;
             const flagObj = Game.flags[roomJob.JobId];
@@ -781,11 +913,9 @@ const ExecuteJobs = {
             } else {
                 const hostileCreep = creep.room.find(FIND_HOSTILE_CREEPS)[0];
                 if (hostileCreep) {
-                    result = Move(creep, hostileCreep);
-                    result = creep.attack(hostileCreep);
-                    if (result === ERR_NOT_IN_RANGE) {
-                        result = OK;
-                    }
+                    creep.attack(hostileCreep);
+                    Move(creep, hostileCreep);
+                    result = OK;
                 } else if (flagObj.pos.inRangeTo(creep, 1)) {
                     result = creep.say(flagObj.name);
                 } else {
@@ -795,7 +925,7 @@ const ExecuteJobs = {
             return result;
         }
 
-        /**@return {int}*/
+        /**@return {int}*/ // TODO replace with GenericAction
         function JobRemoteHarvest(creep, roomJob) {
             let result = ERR_NO_RESULT_FOUND;
             const flagObj = Game.flags[roomJob.JobId];
@@ -875,7 +1005,7 @@ const ExecuteJobs = {
             return result;
         }
 
-        /**@return {int}*/
+        /**@return {int}*/ // TODO replace with GenericAction
         function JobFillLabMineral(creep, roomJob, jobKey){
             // TODO not tested yet! but should be done
             let result = ERR_NO_RESULT_FOUND;
@@ -932,7 +1062,7 @@ const ExecuteJobs = {
             return result;
         }
 
-        /**@return {int}*/
+        /**@return {int}*/ // TODO replace with GenericAction
         function JobEmptyLabMineral(creep, roomJob){
             // TODO
             let result = ERR_NO_RESULT_FOUND;
@@ -947,59 +1077,6 @@ const ExecuteJobs = {
 
 
         // helper functions:
-
-        // TODO to be removed
-        /**@return {int}*/
-        function JobEnergyAction(creep, roomJob, obj, actionFunction) {
-            let result = ERR_NO_RESULT_FOUND;
-            if (obj === null) {
-                result = JOB_OBJ_DISAPPEARED;
-            } else if (creep.carry[RESOURCE_ENERGY] > 0) { // creep has energy
-                result = actionFunction.creepAction();
-                if (result === ERR_NOT_IN_RANGE) {
-                    result = Move(creep, obj);
-                }
-            } else { // find more energy
-                let energySupply = FindClosestEnergyInRoom(creep, obj.room);
-                const energySupplyType = creep.memory.EnergySupplyType;
-                if (!energySupply) {
-                    result = NO_FETCH_FOUND; // FindClosestEnergyInRoom did not find any energy
-                    if (creep.pos.roomName !== obj.pos.roomName) {
-                        energySupply = FindClosestEnergyInRoom(creep, creep.room); // try again but look at the room the creep is in
-                        if (!energySupply) {
-                            result = NO_FETCH_FOUND; // FindClosestEnergyInRoom did not find any energy
-                        }
-                    }
-                }
-                if (energySupply && energySupplyType === 'DROP') {
-                    result = creep.pickup(energySupply);
-                } else if (energySupply) {
-                    result = creep.withdraw(energySupply, RESOURCE_ENERGY);
-                }
-
-                if (result === ERR_NOT_IN_RANGE) {
-                    result = Move(creep, energySupply);
-                } else if (result === ERR_FULL) { // creep store is full with anything other than ENERGY - get rid of it asap
-                    if (energySupplyType === 'CONTAINER' || energySupplyType === 'STORAGE') {
-                        for (const resourceType in creep.carry) {
-                            if (resourceType !== RESOURCE_ENERGY) {
-                                result = creep.transfer(energySupply, resourceType);
-                            }
-                        }
-                    } else { // DROP
-                        for (const resourceType in creep.carry) {
-                            if (resourceType !== RESOURCE_ENERGY) {
-                                result = creep.drop(resourceType);
-                            }
-                        }
-                    }
-                } else if (result === OK) { // energy withdrawn successfully - now remove creep.memory.EnergySupply
-                    creep.memory.EnergySupply = undefined;
-                    creep.memory.EnergySupplyType = undefined;
-                }
-            }
-            return result;
-        }
 
         /**@return {object}
          * @return {undefined}*/
@@ -1187,52 +1264,6 @@ const ExecuteJobs = {
                 creep.memory.EnergySupply = undefined;
                 creep.memory.EnergySupplyType = undefined;
             }
-            return result;
-        }
-
-        /**@return {int}*/
-        function JobTemplate(creep, roomJob){
-            const result = GenericAction(creep, roomJob, 1, {
-                /**@return {int}*/
-                JobStatus: function (jobObject) {
-                    if(jobObject.energy === jobObject.energyCapacity){ // is job done?
-                        return JOB_IS_DONE;
-                    }else if(creep.carry[RESOURCE_ENERGY] === 0){ // fetch
-                        return SHOULD_FETCH; //
-                    }else{ // action not done yet
-                        return SHOULD_ACT;
-                    }
-                },
-                /**@return {int}*/
-                Act: function (jobObject) {
-                    return creep.transfer(jobObject, RESOURCE_ENERGY);
-                },
-                /**@return {int}*/
-                IsJobDone: function (jobObject) {
-                    if((jobObject.energy + creep.carry[RESOURCE_ENERGY]) >= jobObject.energyCapacity){
-                        // predict that the creep will be done
-                        return JOB_IS_DONE;
-                    }else{ // action not done yet
-                        return this.JobStatus(jobObject);
-                    }
-                },
-                /**@return {object}
-                 * @return {undefined}*/
-                FindFetchObject: function (jobObject) {
-                    const fetchObject = jobObject.room.find(FIND_MY_STRUCTURES, {
-                        filter: (structure) => {
-                            return structure.structureType === STRUCTURE_STORAGE;
-                        }
-                    });
-                    return fetchObject;
-                },
-                /**@return {int}*/
-                Fetch: function (fetchObject, jobObject) {
-                    let result;
-                    result = creep.transfer(fetchObject);
-                    return result;
-                },
-            });
             return result;
         }
 
