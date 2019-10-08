@@ -452,9 +452,13 @@ const CreateJobs = {
                 Memory.ErrorLog = {};
             }
             if(!Memory.ErrorLog[messageId]) {
-                Memory.ErrorLog[messageId] = [];
+                Memory.ErrorLog[messageId] = {};
+                Memory.ErrorLog[messageId][message] = 1;
+            }else if(!Memory.ErrorLog[messageId][message]){
+                Memory.ErrorLog[messageId][message] = 1;
+            }else{
+                Memory.ErrorLog[messageId][message] = Memory.ErrorLog[messageId][message] + 1;
             }
-            Memory.ErrorLog[messageId].push(Game.time + ' ' + message);
         }
     }
 };
