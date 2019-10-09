@@ -51,7 +51,7 @@ const CreateJobs = {
                 let jobs = {};
                 // weave flag jobs into the job array that is in this room object
                 for (const flagJobKey in flagJobs) {
-                    if(flagJobKey.split(')').pop() === gameRoomKey){
+                    if (flagJobKey.split(')').pop() === gameRoomKey) {
                         const flagJob = flagJobs[flagJobKey];
                         jobs[flagJobKey] = flagJob; // add job to this room job array
                         flagJobs[flagJobKey] = undefined;
@@ -86,7 +86,7 @@ const CreateJobs = {
                                 // FillStorage - link, container and resource drops
                                 FillStorageJobs(gameRoom, jobs);
                                 // FillStorageFromRemote
-                                if(Memory.MemRooms[gameRoom.name] && Memory.MemRooms[gameRoom.name].AttachedRooms){
+                                if (Memory.MemRooms[gameRoom.name] && Memory.MemRooms[gameRoom.name].AttachedRooms) {
                                     FillStorageFromRemoteJobs(gameRoom, jobs);
                                 }
                                 if (gameRoom.controller.level >= 6) {
@@ -99,8 +99,8 @@ const CreateJobs = {
                                     // FillLabEnergy
                                     FillLabEnergyJobs(gameRoom, jobs);
                                     // if (gameRoom.controller.level === 8) {
-                                        // TODO FillPowerSpawnEnergy
-                                        // TODO FillPowerSpawnPowerUnits
+                                    // TODO FillPowerSpawnEnergy
+                                    // TODO FillPowerSpawnPowerUnits
                                     // }
                                 }
                             }
@@ -113,7 +113,7 @@ const CreateJobs = {
                     let addedNewJob = false;
                     // add new jobs
                     for (const newJobKey in jobs) { // loop through new jobs
-                        if(!Memory.MemRooms[gameRoom.name].RoomJobs[newJobKey]){ // new job does not already exist
+                        if (!Memory.MemRooms[gameRoom.name].RoomJobs[newJobKey]) { // new job does not already exist
                             Memory.MemRooms[gameRoom.name].RoomJobs[newJobKey] = jobs[newJobKey]; // save it
                             //console.log("CreateJobs CreateObjJobs new job added " + newJobKey);
                             addedNewJob = true;
@@ -122,17 +122,17 @@ const CreateJobs = {
                     // remove only old disappeared vacant jobs
                     for (const oldJobKey in Memory.MemRooms[gameRoom.name].RoomJobs) { // loop through old jobs
                         const oldJob = Memory.MemRooms[gameRoom.name].RoomJobs[oldJobKey];
-                        if(oldJob.Creep === 'vacant' && !jobs[oldJobKey]){ // old job is vacant and old job id not en the new job array
+                        if (oldJob.Creep === 'vacant' && !jobs[oldJobKey]) { // old job is vacant and old job id not en the new job array
                             Memory.MemRooms[gameRoom.name].RoomJobs[oldJobKey] = undefined; // delete old vacant disappeared job
                             //console.log("CreateJobs CreateObjJobs old job deleted " + oldJobKey);
                         }
                     }
-                    if(Memory.MemRooms[gameRoom.name].RoomLevel !== gameRoom.controller.level){ // room level change
+                    if (Memory.MemRooms[gameRoom.name].RoomLevel !== gameRoom.controller.level) { // room level change
                         Memory.MemRooms[gameRoom.name].RoomLevel = gameRoom.controller.level;
                         Memory.MemRooms[gameRoom.name].SourceNumber = gameRoom.find(FIND_SOURCES).length;
                         Memory.MemRooms[gameRoom.name].MaxCreeps = {}; // reset - maybe the MaxCreepsInRoom changes with room level
                     }
-                    if(addedNewJob){ // new jobs have been added, now sort the job array
+                    if (addedNewJob) { // new jobs have been added, now sort the job array
                         Memory.MemRooms[gameRoom.name].RoomJobs = SortObj(Memory.MemRooms[gameRoom.name].RoomJobs);
                     }
                 }
@@ -142,11 +142,11 @@ const CreateJobs = {
             for (const flagJobKey in flagJobs) {
                 const roomName = flagJobKey.split(')').pop();
                 const flagJob = flagJobs[flagJobKey];
-                if(Memory.MemRooms[roomName]){
-                    if(!Memory.MemRooms[roomName].RoomJobs[flagJobKey]){
+                if (Memory.MemRooms[roomName]) {
+                    if (!Memory.MemRooms[roomName].RoomJobs[flagJobKey]) {
                         Memory.MemRooms[roomName].RoomJobs[flagJobKey] = flagJob;
                     }
-                }else{
+                } else {
                     const jobs = {};
                     jobs[flagJobKey] = flagJob;
                     CreateRoom(roomName, jobs);
@@ -154,10 +154,12 @@ const CreateJobs = {
             }
         }
 
-        function SortObj (map) {
-            const keys = _.sortBy(_.keys(map), function(a) { return a; });
+        function SortObj(map) {
+            const keys = _.sortBy(_.keys(map), function (a) {
+                return a;
+            });
             const newmap = {};
-            _.each(keys, function(k) {
+            _.each(keys, function (k) {
                 newmap[k] = map[k];
             });
             return newmap;
@@ -176,25 +178,41 @@ const CreateJobs = {
                 } else if (gameFlag.color === COLOR_ORANGE && gameFlag.secondaryColor === COLOR_YELLOW) { // scout at pos
                     jobName = '5ScoutPos';
                     creepType = 'S';
-                }  else if (gameFlag.color === COLOR_RED && gameFlag.secondaryColor === COLOR_RED) { // warrior at pos
+                } else if (gameFlag.color === COLOR_RED && gameFlag.secondaryColor === COLOR_RED) { // warrior at pos
                     jobName = '2GuardPos';
                     creepType = 'W';
                 } else if (gameFlag.color === COLOR_YELLOW && gameFlag.secondaryColor === COLOR_YELLOW) { // distantHarvester on source at flag pos
                     jobName = '5RemoteHarvest';
                     creepType = 'D';
                 } else if (gameFlag.color === COLOR_PURPLE && gameFlag.secondaryColor === COLOR_PURPLE) { // TODO FillLabMineral
-                    if(!gameFlag.pos.findInRange(FIND_MY_STRUCTURES, 0, { filter: function (s) { return s.structureType === STRUCTURE_LAB;}})){ // flag must be on top of an existing lab!
+                    if (!gameFlag.pos.findInRange(FIND_MY_STRUCTURES, 0, {
+                        filter: function (s) {
+                            return s.structureType === STRUCTURE_LAB;
+                        }
+                    })) { // flag must be on top of an existing lab!
                         gameFlag.remove();
                         ErrorLog('CreateJobs-CreateFlagJobs-labGone', 'CreateJobs CreateFlagJobs ERROR! no lab ' + gameFlagKey);
-                    }else if(gameFlag.pos.findInRange(FIND_MY_STRUCTURES, 0, { filter: function (s) { return s.structureType === STRUCTURE_LAB;}})[0].mineralAmount < LAB_MINERAL_CAPACITY){
+                    } else if (gameFlag.pos.findInRange(FIND_MY_STRUCTURES, 0, {
+                        filter: function (s) {
+                            return s.structureType === STRUCTURE_LAB;
+                        }
+                    })[0].mineralAmount < LAB_MINERAL_CAPACITY) {
                         jobName = '6FillLabMin'; // flagname rules: GET-L = get lemergium from all rooms, BUY-L = get it from all rooms or then buy it from the terminal
                         creepType = 'T';
                     }
                 } else if (gameFlag.color === COLOR_PURPLE && gameFlag.secondaryColor === COLOR_WHITE) { // TODO EmptyLabMineral
-                    if(!gameFlag.pos.findInRange(FIND_MY_STRUCTURES, 0, { filter: function (s) { return s.structureType === STRUCTURE_LAB;}})){ // flag must be on top of an existing lab!
+                    if (!gameFlag.pos.findInRange(FIND_MY_STRUCTURES, 0, {
+                        filter: function (s) {
+                            return s.structureType === STRUCTURE_LAB;
+                        }
+                    })) { // flag must be on top of an existing lab!
                         gameFlag.remove();
                         ErrorLog('CreateJobs-CreateFlagJobs-labGone', 'CreateJobs CreateFlagJobs ERROR! no lab ' + gameFlagKey);
-                    }else if(gameFlag.pos.findInRange(FIND_MY_STRUCTURES, 0, { filter: function (s) { return s.structureType === STRUCTURE_LAB;}})[0].mineralAmount > 0){
+                    } else if (gameFlag.pos.findInRange(FIND_MY_STRUCTURES, 0, {
+                        filter: function (s) {
+                            return s.structureType === STRUCTURE_LAB;
+                        }
+                    })[0].mineralAmount > 0) {
                         jobName = '5EmptyLabMin'; // flagname rules: CREATE-GH = CREATE the mineral from the nearby lab to this lab
                         creepType = 'T';
                     }
@@ -202,11 +220,11 @@ const CreateJobs = {
                     jobName = '1ClaimCtrl';
                     creepType = 'C';
                 } else if (gameFlag.color === COLOR_GREEN && gameFlag.secondaryColor === COLOR_YELLOW) { // claimer reserve
-                    if(!gameFlag.room
+                    if (!gameFlag.room
                         || !gameFlag.room.controller.reservation
                         || !Memory.MemRooms[gameFlag.pos.roomName]
                         || Memory.MemRooms[gameFlag.pos.roomName].RoomJobs['4ReserveCtrl-' + gameFlagKey + '(' + gameFlag.pos.x + ',' + gameFlag.pos.y + ')' + gameFlag.pos.roomName]
-                        || (gameFlag.room.controller.reservation.ticksToEnd < 2500 && !Memory.MemRooms[gameFlag.pos.roomName].RoomJobs[gameFlagKey])){ // extra logic to try and optimize creep not being idle
+                        || (gameFlag.room.controller.reservation.ticksToEnd < 2500 && !Memory.MemRooms[gameFlag.pos.roomName].RoomJobs[gameFlagKey])) { // extra logic to try and optimize creep not being idle
                         jobName = '4ReserveCtrl';
                         creepType = 'R';
                     }
@@ -214,7 +232,7 @@ const CreateJobs = {
                     ErrorLog('CreateJobs-CreateFlagJobs-flagColorNotFound', 'CreateJobs CreateFlagJobs ERROR! flag color not found ' + gameFlagKey + ' ' + gameFlag.color + ' ' + gameFlag.secondaryColor + ' (' + gameFlag.pos.x + ',' + gameFlag.pos.y + ')');
                 }
 
-                if(jobName){
+                if (jobName) {
                     //console.log('CreateJobs CreateFlagJobs AddJob ' + gameFlagKey);
                     AddJob(jobs, jobName + '-' + gameFlagKey + '(' + gameFlag.pos.x + ',' + gameFlag.pos.y + ')' + gameFlag.pos.roomName, gameFlagKey, FLAG_JOB, creepType);
                 }
@@ -300,9 +318,9 @@ const CreateJobs = {
             }
         }
 
-        function FillStorageFromRemoteJobs(gameRoom, roomJobs){
+        function FillStorageFromRemoteJobs(gameRoom, roomJobs) {
             for (const attachedRoomKey in Memory.MemRooms[gameRoom.name].AttachedRooms) {
-                if(Game.rooms[attachedRoomKey]){
+                if (Game.rooms[attachedRoomKey]) {
                     const fillStorageFromRemotes = Game.rooms[attachedRoomKey].find(FIND_STRUCTURES, {
                         filter: (s) => {
                             return s.structureType === STRUCTURE_CONTAINER && _.sum(s.store) >= 600;
@@ -314,7 +332,7 @@ const CreateJobs = {
                         console.log('CreateJobs FillStorageFromRemoteJobs in ' + gameRoom.name + ' add job ' + jobName);
                         AddJob(roomJobs, jobName, fillStorageFromRemote.id, OBJECT_JOB, 'T');
                     }
-                }else{
+                } else {
                     ErrorLog('CreateJobs-FillStorageFromRemoteJobs-roomNotExist', 'CreateJobs FillStorageFromRemoteJobs ERROR! Game.rooms[' + attachedRoomKey + '] is undefined from ' + gameRoom.name);
                 }
             }
@@ -390,7 +408,7 @@ const CreateJobs = {
                         (
                             (
                                 (s.structureType === STRUCTURE_RAMPART || s.structureType === STRUCTURE_WALL)
-                                    && (gameRoom.controller.level < 8 && s.hits < RAMPART_WALL_HITS_U_LVL8 || gameRoom.controller.level === 8 && (s.hits < RAMPART_WALL_HITS_O_LVL8 || gameRoom.storage && gameRoom.storage.store[RESOURCE_ENERGY] > RAMPART_WALL_MAX_HITS_WHEN_STORAGE_ENERGY))
+                                && (gameRoom.controller.level < 8 && s.hits < RAMPART_WALL_HITS_U_LVL8 || gameRoom.controller.level === 8 && (s.hits < RAMPART_WALL_HITS_O_LVL8 || gameRoom.storage && gameRoom.storage.store[RESOURCE_ENERGY] > RAMPART_WALL_MAX_HITS_WHEN_STORAGE_ENERGY))
                                 ||
                                 s.structureType === STRUCTURE_ROAD && s.hits < s.hitsMax / 2
                             )
@@ -413,11 +431,11 @@ const CreateJobs = {
 
         // util:
 
-        function CreateRoom(roomName, jobs){
+        function CreateRoom(roomName, jobs) {
             const gameRoom = Game.rooms[roomName];
             let level = -1;
             let sourceNumber = -1;
-            if(gameRoom){
+            if (gameRoom) {
                 level = gameRoom.controller.level;
                 sourceNumber = gameRoom.find(FIND_SOURCES).length;
             }
@@ -444,19 +462,19 @@ const CreateJobs = {
             };
         }
 
-        function ErrorLog(messageId, message){
+        function ErrorLog(messageId, message) {
             console.log('--------------- ' + messageId + ' ---------------');
             console.log(message);
             console.log('--------------- ' + messageId + ' ---------------');
-            if(!Memory.ErrorLog){
+            if (!Memory.ErrorLog) {
                 Memory.ErrorLog = {};
             }
-            if(!Memory.ErrorLog[messageId]) {
+            if (!Memory.ErrorLog[messageId]) {
                 Memory.ErrorLog[messageId] = {};
                 Memory.ErrorLog[messageId][message] = 1;
-            }else if(!Memory.ErrorLog[messageId][message]){
+            } else if (!Memory.ErrorLog[messageId][message]) {
                 Memory.ErrorLog[messageId][message] = 1;
-            }else{
+            } else {
                 Memory.ErrorLog[messageId][message] = Memory.ErrorLog[messageId][message] + 1;
             }
         }

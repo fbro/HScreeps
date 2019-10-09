@@ -31,7 +31,7 @@ module.exports.loop = function () {
                     memRoom.PrimaryRoom = undefined;
                     //Memory.buyOrdersHistory = {'lastReset':Game.time};
                     memRoom.links = undefined;
-                    if(memRoom.RoomLevel <= 0 && Object.keys(memRoom.RoomJobs).length > 0){
+                    if (memRoom.RoomLevel <= 0 && Object.keys(memRoom.RoomJobs).length === 0) {
                         // room is unowned and there are no jobs in it - remove the room
                         console.log('-------- removing unused room ' + memRoomKey + ' from Memory --------');
                         Memory.MemRooms[memRoomKey] = undefined;
@@ -43,8 +43,6 @@ module.exports.loop = function () {
     }
     ExecuteJobs.run();
 };
-
-
 
 
 // TODO:

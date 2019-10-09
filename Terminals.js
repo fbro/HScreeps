@@ -3,17 +3,18 @@ const Terminals = {
 
         for (const gameRoomKey in Game.rooms) {
             const gameRoom = Game.rooms[gameRoomKey]; // visible room
-            if (gameRoom.terminal && gameRoom.terminal.my  && gameRoom.terminal.cooldown === 0 && gameRoom.terminal.store[RESOURCE_ENERGY] >= 10000) {
+            if (gameRoom.terminal && gameRoom.terminal.my && gameRoom.terminal.cooldown === 0 && gameRoom.terminal.store[RESOURCE_ENERGY] >= 10000) {
                 SellResources(gameRoom);
             }
-            if(gameRoom.terminal && gameRoom.terminal.my  && gameRoom.terminal.store[RESOURCE_ENERGY] < 10000){
+            if (gameRoom.terminal && gameRoom.terminal.my && gameRoom.terminal.store[RESOURCE_ENERGY] < 10000) {
                 GetEnergyFromOtherTerminals(gameRoom);
             }
         }
-        function GetEnergyFromOtherTerminals(room){
+
+        function GetEnergyFromOtherTerminals(room) {
             for (const gameRoomKey in Game.rooms) {
                 const gameRoom = Game.rooms[gameRoomKey];
-                if(gameRoom.name !== room.name && gameRoom.terminal && gameRoom.terminal.my && gameRoom.terminal.cooldown === 0 && gameRoom.terminal.store[RESOURCE_ENERGY] >= 100000){
+                if (gameRoom.name !== room.name && gameRoom.terminal && gameRoom.terminal.my && gameRoom.terminal.cooldown === 0 && gameRoom.terminal.store[RESOURCE_ENERGY] >= 100000) {
                     let result = gameRoom.terminal.send(RESOURCE_ENERGY, 50000, room.name);
                     console.log('Terminals GetEnergyFromOtherTerminals get energy ' + result + ' in ' + room.name + ' from ' + gameRoom.name);
                 }
@@ -65,16 +66,16 @@ const Terminals = {
                 const order = orders[orderCount];
                 const transferEnergyRealCost = Game.market.calcTransactionCost(order.amount, room.name, order.roomName);
                 let amountToTransfer = room.terminal.store[order.resourceType];
-                if(successfulDeal >= 10){
+                if (successfulDeal >= 10) {
                     console.log('Terminals SellResources maximum number of deals in tick reached ' + successfulDeal + ' in ' + room.name);
                     break;
-                }else if (transferEnergyRealCost <= room.terminal.store[RESOURCE_ENERGY] && amountToTransfer > 0) {
-                    if(order.resourceType === RESOURCE_ENERGY){
+                } else if (transferEnergyRealCost <= room.terminal.store[RESOURCE_ENERGY] && amountToTransfer > 0) {
+                    if (order.resourceType === RESOURCE_ENERGY) {
                         amountToTransfer = room.terminal.store[RESOURCE_ENERGY] / 2;
-                        if(amountToTransfer > order.amount){
+                        if (amountToTransfer > order.amount) {
                             amountToTransfer = order.amount;
                         }
-                    }else if(amountToTransfer > order.amount){
+                    } else if (amountToTransfer > order.amount) {
                         amountToTransfer = order.amount;
                     }
                     const dealResult = Game.market.deal(order.id, amountToTransfer, room.name);

@@ -85,15 +85,15 @@ const AssignJobs = {
                                 console.log('AssignJobs SpawnCreeps job in another room, no spawns ' + roomJobKey);
                                 bestLinearDistance = Number.MAX_SAFE_INTEGER;
                             }
-                        }else{
+                        } else {
                             console.log('AssignJobs SpawnCreeps job in another room, not my room ' + roomJobKey);
                             bestLinearDistance = Number.MAX_SAFE_INTEGER;
                         }
-                    }else{
+                    } else {
                         console.log('AssignJobs SpawnCreeps job in another room, no controller ' + roomJobKey);
                         bestLinearDistance = Number.MAX_SAFE_INTEGER;
                     }
-                }else{
+                } else {
                     console.log('AssignJobs SpawnCreeps job in another room, invisible room ' + roomJobKey);
                     bestLinearDistance = Number.MAX_SAFE_INTEGER;
                 }
@@ -402,19 +402,19 @@ const AssignJobs = {
             return creepType + availableCount;
         }
 
-        function ErrorLog(messageId, message){
+        function ErrorLog(messageId, message) {
             console.log('--------------- ' + messageId + ' ---------------');
             console.log(message);
             console.log('--------------- ' + messageId + ' ---------------');
-            if(!Memory.ErrorLog){
+            if (!Memory.ErrorLog) {
                 Memory.ErrorLog = {};
             }
-            if(!Memory.ErrorLog[messageId]) {
+            if (!Memory.ErrorLog[messageId]) {
                 Memory.ErrorLog[messageId] = {};
                 Memory.ErrorLog[messageId][message] = 1;
-            }else if(!Memory.ErrorLog[messageId][message]){
+            } else if (!Memory.ErrorLog[messageId][message]) {
                 Memory.ErrorLog[messageId][message] = 1;
-            }else{
+            } else {
                 Memory.ErrorLog[messageId][message] = Memory.ErrorLog[messageId][message] + 1;
             }
         }
