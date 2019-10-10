@@ -9,10 +9,6 @@ const ExecuteJobs = {
         const SHOULD_FETCH = -25;
         const SHOULD_ACT = -26;
 
-        const RAMPART_WALL_HITS_U_LVL8 = 100000;
-        const RAMPART_WALL_HITS_O_LVL8 = 2000000;
-        const RAMPART_WALL_MAX_HITS_WHEN_STORAGE_ENERGY = 600000;
-
         ExecuteRoomJobs();
 
         function ExecuteRoomJobs() {
@@ -36,16 +32,11 @@ const ExecuteJobs = {
                     if (!job && gameCreep) { // job is outdated and removed from Memory and creep is still alive
                         creepMemory.JobName = 'idle(' + gameCreep.pos.x + ',' + gameCreep.pos.y + ')' + gameCreep.pos.roomName;
                     } else if (job && !gameCreep) { // job exists and creep is dead
-                        const jobStillViable = JobStillViableAfterDeath(creepMemory, job, roomName);
-                        if (jobStillViable) {
-                            job.Creep = 'vacant';
-                        } else {
-                            delete Memory.MemRooms[roomName].RoomJobs[creepMemory.JobName];
-                        }
+                        delete Memory.MemRooms[roomName].RoomJobs[creepMemory.JobName];
                         FindAndRemoveMaxCreeps(roomName, creepName);
                         delete Memory.creeps[creepName];
                     } else if (job && gameCreep) { // creep is alive and its job is found
-                        const isJobDone = JobAction(gameCreep, job, creepMemory.JobName, roomName);
+                        const isJobDone = JobAction(gameCreep, job);
                         if (isJobDone) {
                             delete Memory.MemRooms[roomName].RoomJobs[creepMemory.JobName];
                             creepMemory.JobName = 'idle(' + gameCreep.pos.x + ',' + gameCreep.pos.y + ')' + gameCreep.pos.roomName;
@@ -104,38 +95,8 @@ const ExecuteJobs = {
         }
 
         /**@return {boolean}*/
-        function JobStillViableAfterDeath(creepMemory, roomJob, roomName) {
-            switch (true) {
-                case creepMemory.JobName.startsWith('RemoteHarvest'):
-                    const flagObj = Game.flags[roomJob.JobId];
-                    if (flagObj.room && flagObj.room.controller && flagObj.room.controller.reservation && flagObj.room.controller.reservation.ticksToEnd >= 4999) {
-                        return false;
-                    }
-                    break;
-                case creepMemory.JobName.startsWith('Repair'):
-                    const obj = Game.getObjectById(roomJob.JobId);
-                    const gameRoom = Game.rooms[roomName];
-                    if ((obj.structureType === STRUCTURE_RAMPART || obj.structureType === STRUCTURE_WALL) && (
-                        gameRoom.controller && (
-                            gameRoom.controller.level < 8 && obj.hits > RAMPART_WALL_HITS_U_LVL8
-                            ||
-                            gameRoom.controller.level === 8 && (
-                                obj.hits > RAMPART_WALL_HITS_O_LVL8
-                                ||
-                                gameRoom.storage && gameRoom.storage.store[RESOURCE_ENERGY] < RAMPART_WALL_MAX_HITS_WHEN_STORAGE_ENERGY
-                            )
-                        )
-                    )
-                    ) {
-                        return false;
-                    }
-                    break;
-            }
-            return true;
-        }
-
-        /**@return {boolean}*/
-        function JobAction(creep, roomJob, jobKey, roomName) {
+        function JobAction(creep, roomJob) {
+            const jobKey = creep.memory.JobName;
             let result = ERR_NO_RESULT_FOUND;
             switch (true) {
                 // obj jobs
@@ -344,7 +305,18 @@ const ExecuteJobs = {
                 Fetch: function (fetchObject, jobObject) {
                     let result = ERR_NO_RESULT_FOUND;
                     if (fetchObject.name !== creep.name) { // if fetchObject is the creep object then drop the energy on the ground
-                        result = creep.transfer(fetchObject, RESOURCE_ENERGY);
+                        const toRepair = creep.pos.findInRange(FIND_STRUCTURES, 2, {
+                            filter: (structure) => {
+                                return (structure.structureType !== STRUCTURE_WALL
+                                    && structure.structureType !== STRUCTURE_RAMPART) && structure.hits < structure.hitsMax;
+                            }
+                        })[0];
+                        if (toRepair) { // repair on the road
+                            creep.repair(toRepair);
+                            result = creep.transfer(fetchObject, RESOURCE_ENERGY, creep.carry[RESOURCE_ENERGY] - creep.getActiveBodyparts(WORK));
+                        }else{
+                            result = creep.transfer(fetchObject, RESOURCE_ENERGY);
+                        }
                     } else {
                         for (const resourceType in creep.carry) {
                             result = creep.drop(resourceType);
@@ -1240,9 +1212,9 @@ const ExecuteJobs = {
             }
 
             if (result !== OK && result !== ERR_TIRED && result !== JOB_MOVING && result !== ERR_BUSY) { // job is ending
-                if (creep.memory.JobName.startsWith("5FillTermMin")) {
-                    console.log("TEST gen. job is done " + creep.name + " " + creep.memory.JobName + " result: " + result + " " + stringDebug); // TODO remove test log
-                }
+                //if (creep.memory.JobName.startsWith("5FillTermMin")) {
+                //    console.log("TEST gen. job is done " + creep.name + " " + creep.memory.JobName + " result: " + result + " " + stringDebug); // TODO remove test log
+                //}
                 creep.memory.FetchObjectId = undefined;
             }
             /*else if(creep.memory.JobName.startsWith("5FillStrg")){ // TODO remove test log
