@@ -1155,30 +1155,32 @@ const ExecuteJobs = {
         /**@return {int}*/
         function GenericAction(creep, roomJob, actionFunctions) {
             let result = ERR_NO_RESULT_FOUND;
-            let stringDebug = "";
+            //let stringDebug = "";
             const jobObject = Game.getObjectById(roomJob.JobId);
             if (jobObject === null) {
                 result = JOB_OBJ_DISAPPEARED;
             } else {
                 let jobStatus = actionFunctions.JobStatus(jobObject);
                 let didAct = false; // handle specific usecase where a creep has done an action and then immediately after that tries to do a similar action nearby when fetching
+
                 if (jobStatus === SHOULD_ACT) { // act
                     result = actionFunctions.Act(jobObject);
-                    stringDebug = stringDebug + ", Act: " + result; // TODO remove
+                    //stringDebug = stringDebug + ", Act: " + result; // TODO remove
                     if (result === ERR_NOT_IN_RANGE) {
                         if (creep.pos.x !== jobObject.pos.x || creep.pos.y !== jobObject.pos.y) {
-                            result = Move(creep, jobObject);
-                            stringDebug = stringDebug + ", A.Move: " + result; // TODO remove
+                            result = Move(creep, jobObject, 'transparent', '#fff', 'dotted');
+                            //stringDebug = stringDebug + ", A.Move: " + result; // TODO remove
                         } else {
                             console.log("TEST creep at exact position " + creep.name);
+                            result = OK;
                         }
-
                     } else if (result === OK) {
                         jobStatus = actionFunctions.IsJobDone(jobObject); // predict
-                        stringDebug = stringDebug + ", A.Is jobStatus: " + jobStatus; // TODO remove
+                        //stringDebug = stringDebug + ", A.Is jobStatus: " + jobStatus; // TODO remove
                         didAct = true;
                     }
                 }
+
                 if (jobStatus === SHOULD_FETCH) { // fetch immediately after maybe a successful Act that is not done
                     let fetchObject; // get fetch object
                     if (creep.memory.FetchObjectId) {
@@ -1188,7 +1190,7 @@ const ExecuteJobs = {
                         fetchObject = actionFunctions.FindFetchObject(jobObject);
                         if (!fetchObject) {
                             result = NO_FETCH_FOUND;
-                            stringDebug = stringDebug + ", F.NO_FETCH_FOUND: " + result; // TODO remove
+                            //stringDebug = stringDebug + ", F.NO_FETCH_FOUND: " + result; // TODO remove
                         } else {
                             creep.memory.FetchObjectId = fetchObject.id;
                         }
@@ -1196,17 +1198,17 @@ const ExecuteJobs = {
                     if (result !== NO_FETCH_FOUND) {
                         if (!didAct) {
                             result = actionFunctions.Fetch(fetchObject, jobObject);
-                            stringDebug = stringDebug + ", Fetch: " + result; // TODO remove
+                            //stringDebug = stringDebug + ", Fetch: " + result; // TODO remove
                             if (result === OK) {
                                 creep.memory.FetchObjectId = undefined;
                             }
                         }
                         if (result === ERR_NOT_IN_RANGE) {
-                            result = Move(creep, fetchObject);
-                            stringDebug = stringDebug + ", F.Move: " + result; // TODO remove
+                            result = Move(creep, fetchObject, 'transparent', '#fff', 'undefined');
+                            //stringDebug = stringDebug + ", F.Move: " + result; // TODO remove
                         }
                     }
-                } else if (jobStatus === JOB_IS_DONE) {
+                }else if (jobStatus === JOB_IS_DONE) {
                     result = JOB_IS_DONE;
                 }
             }
@@ -1263,7 +1265,7 @@ const ExecuteJobs = {
         }
 
         /**@return {int}*/
-        function Move(creep, obj, fill = 'transparent', stroke = '#ffe100', lineStyle = 'dashed', strokeWidth = .15, opacity = .1) {
+        function Move(creep, obj, fill = 'transparent', stroke = '#fff', lineStyle = 'dashed', strokeWidth = .15, opacity = .3) {
             // TODO maybe try and reuse move path here?
             let result = creep.moveTo(obj, {
                 visualizePathStyle: {
