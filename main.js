@@ -4,6 +4,7 @@ let ExecuteJobs = require('ExecuteJobs');
 let Towers = require('Towers');
 let Links = require('Links');
 let Terminals = require('Terminals');
+let Logs = require('Logs');
 
 module.exports.loop = function () {
 
@@ -29,12 +30,12 @@ module.exports.loop = function () {
                     const memRoom = Memory.MemRooms[memRoomKey];
                     memRoom.AttachedRooms = undefined;
                     memRoom.PrimaryRoom = undefined;
-                    //Memory.buyOrdersHistory = {'lastReset':Game.time};
                     memRoom.links = undefined;
                     if (memRoom.RoomLevel <= 0 && Object.keys(memRoom.RoomJobs).length === 0) {
                         // room is unowned and there are no jobs in it - remove the room
                         console.log('-------- removing unused room ' + memRoomKey + ' from Memory --------');
                         Memory.MemRooms[memRoomKey] = undefined;
+                        Logs.Info('removed unused room', memRoomKey);
                     }
                 }
             }
@@ -58,5 +59,6 @@ module.exports.loop = function () {
 // cache paths to be reused by creeps
 // recycle creeps if there are many idle!
 
+// to complete below i just need to handle flag jobs
 // TODO inefficient problem - creeps can be one tick quicker if I try and move to a new action after a finished action
 // TODO ExecuteJobs: move job actions over to use GenericAction

@@ -1,3 +1,4 @@
+let Logs = require('Logs');
 const CreateJobs = {
     run: function () {
         // CreateJobs
@@ -191,7 +192,7 @@ const CreateJobs = {
                         }
                     })) { // flag must be on top of an existing lab!
                         gameFlag.remove();
-                        ErrorLog('CreateJobs-CreateFlagJobs-labGone', 'CreateJobs CreateFlagJobs ERROR! no lab ' + gameFlagKey);
+                        Logs.Error('CreateJobs-CreateFlagJobs-labGone', 'CreateJobs CreateFlagJobs ERROR! no lab ' + gameFlagKey);
                     } else if (gameFlag.pos.findInRange(FIND_MY_STRUCTURES, 0, {
                         filter: function (s) {
                             return s.structureType === STRUCTURE_LAB;
@@ -207,7 +208,7 @@ const CreateJobs = {
                         }
                     })) { // flag must be on top of an existing lab!
                         gameFlag.remove();
-                        ErrorLog('CreateJobs-CreateFlagJobs-labGone', 'CreateJobs CreateFlagJobs ERROR! no lab ' + gameFlagKey);
+                        Logs.Error('CreateJobs-CreateFlagJobs-labGone', 'CreateJobs CreateFlagJobs ERROR! no lab ' + gameFlagKey);
                     } else if (gameFlag.pos.findInRange(FIND_MY_STRUCTURES, 0, {
                         filter: function (s) {
                             return s.structureType === STRUCTURE_LAB;
@@ -229,7 +230,7 @@ const CreateJobs = {
                         creepType = 'R';
                     }
                 } else {
-                    ErrorLog('CreateJobs-CreateFlagJobs-flagColorNotFound', 'CreateJobs CreateFlagJobs ERROR! flag color not found ' + gameFlagKey + ' ' + gameFlag.color + ' ' + gameFlag.secondaryColor + ' (' + gameFlag.pos.x + ',' + gameFlag.pos.y + ')');
+                    Logs.Error('CreateJobs-CreateFlagJobs-flagColorNotFound', 'CreateJobs CreateFlagJobs ERROR! flag color not found ' + gameFlagKey + ' ' + gameFlag.color + ' ' + gameFlag.secondaryColor + ' (' + gameFlag.pos.x + ',' + gameFlag.pos.y + ')');
                 }
 
                 if (jobName) {
@@ -333,7 +334,7 @@ const CreateJobs = {
                         AddJob(roomJobs, jobName, fillStorageFromRemote.id, OBJECT_JOB, 'T');
                     }
                 } else {
-                    ErrorLog('CreateJobs-FillStorageFromRemoteJobs-roomNotExist', 'CreateJobs FillStorageFromRemoteJobs ERROR! Game.rooms[' + attachedRoomKey + '] is undefined from ' + gameRoom.name);
+                    Logs.Error('CreateJobs-FillStorageFromRemoteJobs-roomNotExist', 'CreateJobs FillStorageFromRemoteJobs ERROR! Game.rooms[' + attachedRoomKey + '] is undefined from ' + gameRoom.name);
                 }
             }
         }
@@ -460,23 +461,6 @@ const CreateJobs = {
                 'CreepType': creepType,
                 'Creep': 'vacant'
             };
-        }
-
-        function ErrorLog(messageId, message) {
-            console.log('--------------- ' + messageId + ' ---------------');
-            console.log(message);
-            console.log('--------------- ' + messageId + ' ---------------');
-            if (!Memory.ErrorLog) {
-                Memory.ErrorLog = {};
-            }
-            if (!Memory.ErrorLog[messageId]) {
-                Memory.ErrorLog[messageId] = {};
-                Memory.ErrorLog[messageId][message] = 1;
-            } else if (!Memory.ErrorLog[messageId][message]) {
-                Memory.ErrorLog[messageId][message] = 1;
-            } else {
-                Memory.ErrorLog[messageId][message] = Memory.ErrorLog[messageId][message] + 1;
-            }
         }
     }
 };

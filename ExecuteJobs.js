@@ -1,3 +1,4 @@
+let Logs = require('Logs');
 const ExecuteJobs = {
     run: function () {
 
@@ -16,9 +17,9 @@ const ExecuteJobs = {
                 const creepMemory = Memory.creeps[creepName];
                 const gameCreep = Game.creeps[creepName];
                 if (!creepMemory.JobName) {
-                    ErrorLog("creep JobName is undefined", "ERROR! creep JobName is undefined " + creepName);
+                    Logs.Error("creep JobName is undefined", "ERROR! creep JobName is undefined " + creepName);
                     if (!gameCreep) {
-                        ErrorLog("gameCreep is undefined", "ERROR! gameCreep is undefined " + creepName);
+                        Logs.Error("gameCreep is undefined", "ERROR! gameCreep is undefined " + creepName);
                     } else {
                         creepMemory.JobName = 'idle(' + gameCreep.pos.x + ',' + gameCreep.pos.y + ')' + gameCreep.pos.roomName;
                     }
@@ -43,6 +44,7 @@ const ExecuteJobs = {
                         }
                     } else { // both job and creep is gone
                         console.log('ExecuteJobs ExecuteRoomJobs ' + creepName + ' on ' + creepMemory.JobName + ' in ' + roomName + ' has died and the job has disappeared');
+                        Logs.Info('both creep and job gone', creepName + ' on ' + creepMemory.JobName + ' in ' + roomName);
                         FindAndRemoveMaxCreeps(roomName, creepName);
                         delete Memory.creeps[creepName];
                     }
@@ -160,7 +162,7 @@ const ExecuteJobs = {
                     result = JobEmptyLabMineral(creep, roomJob);
                     break;
                 default:
-                    ErrorLog('ExecuteJobs-JobAction-jobNotFound', 'ExecuteJobs JobAction ERROR! job not found ' + jobKey + ' ' + creep.name);
+                    Logs.Error('ExecuteJobs-JobAction-jobNotFound', 'ExecuteJobs JobAction ERROR! job not found ' + jobKey + ' ' + creep.name);
             }
             let isJobDone = false;
             if (result === OK) {
@@ -173,7 +175,7 @@ const ExecuteJobs = {
                 creep.say('🏃'); // The creep is just moving to its target
             } else { // results where anything else than OK - one should end the job!
                 if (result === ERR_NO_RESULT_FOUND) {
-                    ErrorLog('ExecuteJobs-JobAction-noResultGained', 'ExecuteJobs JobAction ERROR! no result gained ' + jobKey + ' ' + result + ' ' + roomJob.Creep);
+                    Logs.Error('ExecuteJobs-JobAction-noResultGained', 'ExecuteJobs JobAction ERROR! no result gained ' + jobKey + ' ' + result + ' ' + roomJob.Creep);
                     creep.say('⚠' + result);
                 } else if (result === JOB_OBJ_DISAPPEARED) {
                     creep.say('🙈' + result);
@@ -231,7 +233,7 @@ const ExecuteJobs = {
 
         /**@return {int}*/
         function JobSource(creep, roomJob) {
-            const result = GenericAction(creep, roomJob, {
+            const result = GenericJobAction(creep, roomJob, {
                 /**@return {int}*/
                 JobStatus: function (jobObject) {
                     if (_.sum(creep.carry) === creep.carryCapacity) { // fetch
@@ -330,7 +332,7 @@ const ExecuteJobs = {
 
         /**@return {int}*/
         function JobController(creep, roomJob) {
-            const result = GenericAction(creep, roomJob, {
+            const result = GenericJobAction(creep, roomJob, {
                 /**@return {int}*/
                 JobStatus: function (jobObject) {
                     if (creep.carry[RESOURCE_ENERGY] === 0) { // fetch
@@ -362,7 +364,7 @@ const ExecuteJobs = {
 
         /**@return {int}*/
         function JobRepair(creep, roomJob) {
-            const result = GenericAction(creep, roomJob, {
+            const result = GenericJobAction(creep, roomJob, {
                 /**@return {int}*/
                 JobStatus: function (jobObject) {
                     if (jobObject.hits === jobObject.hitsMax) {
@@ -401,7 +403,7 @@ const ExecuteJobs = {
 
         /**@return {int}*/
         function JobConstruction(creep, roomJob) {
-            const result = GenericAction(creep, roomJob, {
+            const result = GenericJobAction(creep, roomJob, {
                 /**@return {int}*/
                 JobStatus: function (jobObject) {
                     if (creep.carry[RESOURCE_ENERGY] === 0) { // fetch
@@ -438,7 +440,7 @@ const ExecuteJobs = {
 
         /**@return {int}*/
         function JobFillSpawnExtension(creep, roomJob) {
-            const result = GenericAction(creep, roomJob, {
+            const result = GenericJobAction(creep, roomJob, {
                 /**@return {int}*/
                 JobStatus: function (jobObject) {
                     if (jobObject.energy === jobObject.energyCapacity) { // is job done?
@@ -477,7 +479,7 @@ const ExecuteJobs = {
 
         /**@return {int}*/
         function JobFillTower(creep, roomJob) {
-            const result = GenericAction(creep, roomJob, {
+            const result = GenericJobAction(creep, roomJob, {
                 /**@return {int}*/
                 JobStatus: function (jobObject) {
                     if (jobObject.energy === jobObject.energyCapacity) {
@@ -516,7 +518,7 @@ const ExecuteJobs = {
 
         /**@return {int}*/
         function JobFillStorage(creep, roomJob) {
-            const result = GenericAction(creep, roomJob, {
+            const result = GenericJobAction(creep, roomJob, {
                 /**@return {int}*/
                 JobStatus: function (jobObject) {
                     let creepSum = _.sum(creep.carry);
@@ -591,7 +593,7 @@ const ExecuteJobs = {
 
         /**@return {int}*/
         function JobExtractMineral(creep, roomJob) {
-            const result = GenericAction(creep, roomJob, {
+            const result = GenericJobAction(creep, roomJob, {
                 /**@return {int}*/
                 JobStatus: function (jobObject) {
                     if (jobObject.mineralAmount === 0) { // is job done?
@@ -664,7 +666,7 @@ const ExecuteJobs = {
 
         /**@return {int}*/
         function JobFillTerminalMineral(creep, roomJob) {
-            const result = GenericAction(creep, roomJob, {
+            const result = GenericJobAction(creep, roomJob, {
                 /**@return {int}*/
                 JobStatus: function (jobObject) {
                     let storageHasMinerals = false;
@@ -729,7 +731,7 @@ const ExecuteJobs = {
 
         /**@return {int}*/
         function JobFillTerminalEnergy(creep, roomJob) {
-            const result = GenericAction(creep, roomJob, {
+            const result = GenericJobAction(creep, roomJob, {
                 /**@return {int}*/
                 JobStatus: function (jobObject) {
                     if (jobObject.store[RESOURCE_ENERGY] > 100000) {
@@ -767,7 +769,7 @@ const ExecuteJobs = {
 
         /**@return {int}*/
         function JobFillLabEnergy(creep, roomJob) {
-            const result = GenericAction(creep, roomJob, {
+            const result = GenericJobAction(creep, roomJob, {
                 /**@return {int}*/
                 JobStatus: function (jobObject) {
                     if (jobObject.energy === jobObject.energyCapacity) {
@@ -1009,7 +1011,7 @@ const ExecuteJobs = {
                     })[0];
                     if (!lab) { // lab does not exist - delete flag and remove job
                         flagObj.remove();
-                        ErrorLog('ExecuteJobs-JobFillLabMineral-labGone', 'ExecuteJobs JobFillLabMineral ERROR! no lab ' + jobKey + ' ' + creep.name);
+                        Logs.Error('ExecuteJobs-JobFillLabMineral-labGone', 'ExecuteJobs JobFillLabMineral ERROR! no lab ' + jobKey + ' ' + creep.name);
                         return ERR_NO_RESULT_FOUND;
                     }
                     creep.memory.LabId = lab.id;
@@ -1059,7 +1061,6 @@ const ExecuteJobs = {
             }
             return result;
         }
-
 
         // helper functions:
 
@@ -1120,23 +1121,6 @@ const ExecuteJobs = {
             return energySupply;
         }
 
-        function ErrorLog(messageId, message) {
-            console.log('--------------- ' + messageId + ' ---------------');
-            console.log(message);
-            console.log('--------------- ' + messageId + ' ---------------');
-            if (!Memory.ErrorLog) {
-                Memory.ErrorLog = {};
-            }
-            if (!Memory.ErrorLog[messageId]) {
-                Memory.ErrorLog[messageId] = {};
-                Memory.ErrorLog[messageId][message] = 1;
-            } else if (!Memory.ErrorLog[messageId][message]) {
-                Memory.ErrorLog[messageId][message] = 1;
-            } else {
-                Memory.ErrorLog[messageId][message] = Memory.ErrorLog[messageId][message] + 1;
-            }
-        }
-
         function FindAndRemoveMaxCreeps(roomName, creepName) {
             if (Memory.MemRooms[roomName] && Memory.MemRooms[roomName].MaxCreeps[creepName.substring(0, 1)]
                 && Memory.MemRooms[roomName].MaxCreeps[creepName.substring(0, 1)][creepName]) {
@@ -1153,29 +1137,40 @@ const ExecuteJobs = {
         }
 
         /**@return {int}*/
-        function GenericAction(creep, roomJob, actionFunctions) {
+        function GenericJobAction(creep, roomJob, actionFunctions) {
+            const jobObject = Game.getObjectById(roomJob.JobId);
+            return GenericAction(creep, roomJob, actionFunctions, jobObject);
+        }
+
+        /**@return {int}*/
+        function GenericFlagAction(creep, roomJob, actionFunctions) { // TODO implement on all flag jobs
+            const flagObj = Game.flags[roomJob.JobId];
+            return GenericAction(creep, roomJob, actionFunctions, flagObj);
+        }
+
+        /**@return {int}*/
+        function GenericAction(creep, roomJob, actionFunctions, targetObj) {
             let result = ERR_NO_RESULT_FOUND;
             //let stringDebug = "";
-            const jobObject = Game.getObjectById(roomJob.JobId);
-            if (jobObject === null) {
+            if (targetObj === null) {
                 result = JOB_OBJ_DISAPPEARED;
             } else {
-                let jobStatus = actionFunctions.JobStatus(jobObject);
+                let jobStatus = actionFunctions.JobStatus(targetObj);
                 let didAct = false; // handle specific usecase where a creep has done an action and then immediately after that tries to do a similar action nearby when fetching
 
                 if (jobStatus === SHOULD_ACT) { // act
-                    result = actionFunctions.Act(jobObject);
+                    result = actionFunctions.Act(targetObj);
                     //stringDebug = stringDebug + ", Act: " + result; // TODO remove
                     if (result === ERR_NOT_IN_RANGE) {
-                        if (creep.pos.x !== jobObject.pos.x || creep.pos.y !== jobObject.pos.y) {
-                            result = Move(creep, jobObject, 'transparent', '#fff', 'dotted');
+                        if (creep.pos.x !== targetObj.pos.x || creep.pos.y !== targetObj.pos.y) {
+                            result = Move(creep, targetObj, 'transparent', '#fff', 'dotted');
                             //stringDebug = stringDebug + ", A.Move: " + result; // TODO remove
                         } else {
                             console.log("TEST creep at exact position " + creep.name);
                             result = OK;
                         }
                     } else if (result === OK) {
-                        jobStatus = actionFunctions.IsJobDone(jobObject); // predict
+                        jobStatus = actionFunctions.IsJobDone(targetObj); // predict
                         //stringDebug = stringDebug + ", A.Is jobStatus: " + jobStatus; // TODO remove
                         didAct = true;
                     }
@@ -1187,7 +1182,7 @@ const ExecuteJobs = {
                         fetchObject = Game.getObjectById(creep.memory.FetchObjectId);
                     }
                     if (!fetchObject) {
-                        fetchObject = actionFunctions.FindFetchObject(jobObject);
+                        fetchObject = actionFunctions.FindFetchObject(targetObj);
                         if (!fetchObject) {
                             result = NO_FETCH_FOUND;
                             //stringDebug = stringDebug + ", F.NO_FETCH_FOUND: " + result; // TODO remove
@@ -1197,7 +1192,7 @@ const ExecuteJobs = {
                     }
                     if (result !== NO_FETCH_FOUND) {
                         if (!didAct) {
-                            result = actionFunctions.Fetch(fetchObject, jobObject);
+                            result = actionFunctions.Fetch(fetchObject, targetObj);
                             //stringDebug = stringDebug + ", Fetch: " + result; // TODO remove
                             if (result === OK) {
                                 creep.memory.FetchObjectId = undefined;

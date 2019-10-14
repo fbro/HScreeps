@@ -157,7 +157,7 @@ const AssignJobs = {
                         maxCreepsInRoom = 3;
                         break;
                     default:
-                        ErrorLog('AssignJobs-ShouldSpawnCreep-creepTypeNotFound', 'AssignJobs ShouldSpawnCreep ERROR! creepType not found ' + creepType);
+                        Logs.Error('AssignJobs-ShouldSpawnCreep-creepTypeNotFound', 'AssignJobs ShouldSpawnCreep ERROR! creepType not found ' + creepType);
                 }
                 memRoom.MaxCreeps[creepType] = {
                     'MaxCreepsInRoom': maxCreepsInRoom,
@@ -384,7 +384,7 @@ const AssignJobs = {
                     }
                     break;
                 default:
-                    ErrorLog('AssignJobs-GetCreepBody-creepTypeNotFound', 'AssignJobs GetCreepBody ERROR! creepType not found ' + creepType);
+                    Logs.Error('AssignJobs-GetCreepBody-creepTypeNotFound', 'AssignJobs GetCreepBody ERROR! creepType not found ' + creepType);
             }
             return body;
         }
@@ -400,23 +400,6 @@ const AssignJobs = {
                 }
             }
             return creepType + availableCount;
-        }
-
-        function ErrorLog(messageId, message) {
-            console.log('--------------- ' + messageId + ' ---------------');
-            console.log(message);
-            console.log('--------------- ' + messageId + ' ---------------');
-            if (!Memory.ErrorLog) {
-                Memory.ErrorLog = {};
-            }
-            if (!Memory.ErrorLog[messageId]) {
-                Memory.ErrorLog[messageId] = {};
-                Memory.ErrorLog[messageId][message] = 1;
-            } else if (!Memory.ErrorLog[messageId][message]) {
-                Memory.ErrorLog[messageId][message] = 1;
-            } else {
-                Memory.ErrorLog[messageId][message] = Memory.ErrorLog[messageId][message] + 1;
-            }
         }
     }
 };
