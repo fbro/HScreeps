@@ -2,6 +2,7 @@
 Memory.buyOrdersHistory = {};
 Memory.MemRooms = {};
 Memory.ErrorLog = undefined;
+Memory.InfoLog = undefined;
 for (const creepName in Memory.creeps) {
     const gc = Game.creeps[creepName];
     const mc = Memory.creeps[creepName];

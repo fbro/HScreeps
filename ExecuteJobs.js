@@ -807,42 +807,84 @@ const ExecuteJobs = {
 
         // flag jobs:
 
-        /**@return {int}*/ // TODO replace with GenericAction
+        /**@return {int}*/
         function JobTagController(creep, roomJob) {
-            let result = ERR_NO_RESULT_FOUND;
-            const flagObj = Game.flags[roomJob.JobId];
-            if (flagObj === undefined) {
-                result = JOB_OBJ_DISAPPEARED;
-            } else if (flagObj.room === undefined) { // room is not in Game.rooms
-                result = Move(creep, flagObj);
-            } else {
-                result = creep.signController(flagObj.room.controller, flagObj.name);
-                if (result === ERR_NOT_IN_RANGE) {
-                    result = Move(creep, flagObj.room.controller);
-                } else if (result === OK) {
-                    console.log("ExecuteJobs JobTagController done in " + flagObj.pos.roomName + " with " + creep.name + " tag " + flagObj.name);
-                    result = JOB_IS_DONE;
-                    flagObj.remove();
-                }
-            }
+             const result = GenericFlagAction(creep, roomJob, {
+                /**@return {int}*/
+                JobStatus: function (jobObject) {
+                    if(!jobObject.room){
+                        return SHOULD_ACT;
+                    }else{
+                        return SHOULD_FETCH
+                    }
+                },
+                /**@return {int}*/
+                Act: function (jobObject) {
+                    return ERR_NOT_IN_RANGE;
+                },
+                /**@return {int}*/
+                IsJobDone: function (jobObject) {
+                    return this.JobStatus(jobObject);
+                },
+                /**@return {object}
+                 * @return {undefined}*/
+                FindFetchObject: function (jobObject) {
+                    if(jobObject.room && jobObject.room.controller){
+                        return jobObject.room.controller;
+                    }else{
+                        return undefined;
+                    }
+                },
+                /**@return {int}*/
+                Fetch: function (fetchObject, jobObject) {
+                    let result = creep.signController(fetchObject, fetchObject.name);
+                    if(result === OK){
+                        Logs.Info('JobTagController done', creep.name + ' in ' + jobObject.pos.roomName + ' tag ' + jobObject.name);
+                        jobObject.remove();
+                        return JOB_IS_DONE;
+                    }else{
+                        return result;
+                    }
+                },
+            });
             return result;
         }
 
-        /**@return {int}*/ // TODO replace with GenericAction
+        /**@return {int}*/
         function JobScoutPos(creep, roomJob) {
-            let result = ERR_NO_RESULT_FOUND;
-            const flagObj = Game.flags[roomJob.JobId];
-            if (flagObj === undefined) {
-                result = JOB_OBJ_DISAPPEARED;
-            } else if (flagObj.room === undefined) { // room is not in Game.rooms
-                result = Move(creep, flagObj);
-            } else {
-                if (flagObj.pos.x === creep.pos.x && flagObj.pos.y === creep.pos.y && flagObj.pos.roomName === creep.pos.roomName) {
-                    result = creep.say(flagObj.name, true);
-                } else {
-                    result = Move(creep, flagObj);
-                }
-            }
+            const result = GenericFlagAction(creep, roomJob, {
+                /**@return {int}*/
+                JobStatus: function (jobObject) {
+                    if(!jobObject.room){
+                        return SHOULD_ACT;
+                    }else{
+                        return SHOULD_FETCH
+                    }
+                },
+                /**@return {int}*/
+                Act: function (jobObject) {
+                    return ERR_NOT_IN_RANGE;
+                },
+                /**@return {int}*/
+                IsJobDone: function (jobObject) {
+                    return this.JobStatus(jobObject);
+                },
+                /**@return {object}
+                 * @return {undefined}*/
+                FindFetchObject: function (jobObject) {
+                    return jobObject;
+                },
+                /**@return {int}*/
+                Fetch: function (fetchObject, jobObject) {
+                    if(creep.pos.isNearTo(jobObject)){
+                        creep.say(jobObject.name);
+                        return OK;
+                    }else{
+                        return ERR_NOT_IN_RANGE;
+                    }
+
+                },
+            });
             return result;
         }
 
@@ -1151,8 +1193,7 @@ const ExecuteJobs = {
         /**@return {int}*/
         function GenericAction(creep, roomJob, actionFunctions, targetObj) {
             let result = ERR_NO_RESULT_FOUND;
-            //let stringDebug = "";
-            if (targetObj === null) {
+            if (!targetObj) {
                 result = JOB_OBJ_DISAPPEARED;
             } else {
                 let jobStatus = actionFunctions.JobStatus(targetObj);
@@ -1160,18 +1201,14 @@ const ExecuteJobs = {
 
                 if (jobStatus === SHOULD_ACT) { // act
                     result = actionFunctions.Act(targetObj);
-                    //stringDebug = stringDebug + ", Act: " + result; // TODO remove
                     if (result === ERR_NOT_IN_RANGE) {
-                        if (creep.pos.x !== targetObj.pos.x || creep.pos.y !== targetObj.pos.y) {
+                        if (creep.pos.x !== targetObj.pos.x || creep.pos.y !== targetObj.pos.y || creep.pos.roomName !== targetObj.pos.roomName) {
                             result = Move(creep, targetObj, 'transparent', '#fff', 'dotted');
-                            //stringDebug = stringDebug + ", A.Move: " + result; // TODO remove
                         } else {
-                            console.log("TEST creep at exact position " + creep.name);
                             result = OK;
                         }
                     } else if (result === OK) {
                         jobStatus = actionFunctions.IsJobDone(targetObj); // predict
-                        //stringDebug = stringDebug + ", A.Is jobStatus: " + jobStatus; // TODO remove
                         didAct = true;
                     }
                 }
@@ -1185,7 +1222,6 @@ const ExecuteJobs = {
                         fetchObject = actionFunctions.FindFetchObject(targetObj);
                         if (!fetchObject) {
                             result = NO_FETCH_FOUND;
-                            //stringDebug = stringDebug + ", F.NO_FETCH_FOUND: " + result; // TODO remove
                         } else {
                             creep.memory.FetchObjectId = fetchObject.id;
                         }
@@ -1193,14 +1229,12 @@ const ExecuteJobs = {
                     if (result !== NO_FETCH_FOUND) {
                         if (!didAct) {
                             result = actionFunctions.Fetch(fetchObject, targetObj);
-                            //stringDebug = stringDebug + ", Fetch: " + result; // TODO remove
                             if (result === OK) {
                                 creep.memory.FetchObjectId = undefined;
                             }
                         }
                         if (result === ERR_NOT_IN_RANGE) {
                             result = Move(creep, fetchObject, 'transparent', '#fff', 'undefined');
-                            //stringDebug = stringDebug + ", F.Move: " + result; // TODO remove
                         }
                     }
                 }else if (jobStatus === JOB_IS_DONE) {
@@ -1209,14 +1243,8 @@ const ExecuteJobs = {
             }
 
             if (result !== OK && result !== ERR_TIRED && result !== JOB_MOVING && result !== ERR_BUSY) { // job is ending
-                //if (creep.memory.JobName.startsWith("5FillTermMin")) {
-                //    console.log("TEST gen. job is done " + creep.name + " " + creep.memory.JobName + " result: " + result + " " + stringDebug); // TODO remove test log
-                //}
                 creep.memory.FetchObjectId = undefined;
             }
-            /*else if(creep.memory.JobName.startsWith("5FillStrg")){ // TODO remove test log
-                            console.log("TEST gen. " + creep.name + " " + creep.memory.JobName + " result: " + result + " " + stringDebug);
-                        }*/
             return result;
         }
 
