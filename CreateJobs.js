@@ -252,7 +252,7 @@ const CreateJobs = {
                 });
                 for (const labKey in labs) {
                     const lab = labs[labKey];
-                    if (lab && lab.energy < lab.energyCapacity) {
+                    if (lab && lab.store[RESOURCE_ENERGY] < lab.store.getCapacity(RESOURCE_ENERGY)) {
                         new RoomVisual(gameRoom.name).text('⚡', lab.pos.x, lab.pos.y);
                         AddJob(roomJobs, '3FillLabE(' + lab.pos.x + ',' + lab.pos.y + ')' + gameRoom.name, lab.id, OBJECT_JOB, 'T');
                     }
@@ -267,7 +267,7 @@ const CreateJobs = {
                         return s.structureType === STRUCTURE_TERMINAL;
                     }
                 })[0];
-                if (terminal && terminal.store[RESOURCE_ENERGY] < 100000 && _.sum(terminal.store) < terminal.storeCapacity) {
+                if (terminal && terminal.store[RESOURCE_ENERGY] < 100000 && terminal.store.getUsedCapacity() < terminal.store.getCapacity()) {
                     new RoomVisual(gameRoom.name).text('⚡', terminal.pos.x, terminal.pos.y);
                     AddJob(roomJobs, '4FillTermE(' + terminal.pos.x + ',' + terminal.pos.y + ')' + gameRoom.name, terminal.id, OBJECT_JOB, 'T');
                 }
@@ -281,7 +281,7 @@ const CreateJobs = {
                         return s.structureType === STRUCTURE_TERMINAL;
                     }
                 })[0];
-                if (terminal && (_.sum(terminal.store) - terminal.store[RESOURCE_ENERGY]) < (terminal.storeCapacity - 100000)) {
+                if (terminal && (terminal.store.getUsedCapacity() - terminal.store[RESOURCE_ENERGY]) < (terminal.store.getCapacity() - 100000)) {
                     let storageHasMinerals = false;
                     for (const resourceType in gameRoom.storage.store) {
                         if (gameRoom.storage.store[resourceType] > 0 && resourceType !== RESOURCE_ENERGY) {
@@ -324,7 +324,7 @@ const CreateJobs = {
                 if (Game.rooms[attachedRoomKey]) {
                     const fillStorageFromRemotes = Game.rooms[attachedRoomKey].find(FIND_STRUCTURES, {
                         filter: (s) => {
-                            return s.structureType === STRUCTURE_CONTAINER && _.sum(s.store) >= 600;
+                            return s.structureType === STRUCTURE_CONTAINER && s.store.getUsedCapacity() >= 600;
                         }
                     });
                     for (const fillStorageFromRemoteKey in fillStorageFromRemotes) {
@@ -342,8 +342,8 @@ const CreateJobs = {
         function FillStorageJobs(gameRoom, roomJobs) {
             const fillStorages = gameRoom.find(FIND_STRUCTURES, {
                 filter: (s) => {
-                    return (s.structureType === STRUCTURE_CONTAINER && _.sum(s.store) >= 600)
-                        || (s.structureType === STRUCTURE_LINK && s.energy >= 600 && s.room.storage.pos.inRangeTo(s, 1))
+                    return (s.structureType === STRUCTURE_CONTAINER && s.store.getUsedCapacity() >= 600)
+                        || (s.structureType === STRUCTURE_LINK && s.store[RESOURCE_ENERGY] >= 600 && s.room.storage.pos.inRangeTo(s, 1))
                         || (s.structureType === STRUCTURE_TERMINAL && (s.store[RESOURCE_ENERGY] >= 120000 || gameRoom.storage.store[RESOURCE_ENERGY] < 5000));
                 }
             });
@@ -368,7 +368,7 @@ const CreateJobs = {
         function FillTowerJobs(gameRoom, roomJobs) {
             const fillTowers = gameRoom.find(FIND_MY_STRUCTURES, {
                 filter: (s) => {
-                    return ((s.structureType === STRUCTURE_TOWER) && s.energy < (s.energyCapacity - 100));
+                    return ((s.structureType === STRUCTURE_TOWER) && s.store[RESOURCE_ENERGY] < (s.store.getCapacity(RESOURCE_ENERGY) - 100));
                 }
             });
             for (const fillTowerKey in fillTowers) {
@@ -381,7 +381,7 @@ const CreateJobs = {
         function FillSpawnExtensionJobs(gameRoom, roomJobs) {
             const fillSpawnExtensions = gameRoom.find(FIND_MY_STRUCTURES, {
                 filter: (s) => {
-                    return ((s.structureType === STRUCTURE_SPAWN || s.structureType === STRUCTURE_EXTENSION) && s.energy < s.energyCapacity);
+                    return ((s.structureType === STRUCTURE_SPAWN || s.structureType === STRUCTURE_EXTENSION) && s.store[RESOURCE_ENERGY] < s.store.getCapacity(RESOURCE_ENERGY));
                 }
             });
             for (const fillSpawnExtensionKey in fillSpawnExtensions) {

@@ -5,7 +5,7 @@ const Towers = {
             const gameRoom = Game.rooms[gameRoomKey];
             const towers = gameRoom.find(FIND_MY_STRUCTURES, {
                 filter: function (tower) {
-                    return tower.structureType === STRUCTURE_TOWER && tower.energy > 0;
+                    return tower.structureType === STRUCTURE_TOWER && tower.store[RESOURCE_ENERGY] > 0;
                 }
             });
 
@@ -38,7 +38,7 @@ const Towers = {
                     const val = ((i + 1) % damagedCreeps.length);
                     //console.log('Towers damagedCreeps val ' + val + ' i ' + i + ' num ' + damagedCreeps.length + ' room ' + gameRoom.name);
                     towers[i].heal(damagedCreeps[val]);
-                } else if (damagedStructures.length > 0 && towers[i].energy > 700) {
+                } else if (damagedStructures.length > 0 && towers[i].store[RESOURCE_ENERGY] > 700) {
                     const val = ((i + 1) % damagedStructures.length);
                     //console.log('Towers damagedStructures val ' + val + ' i ' + i + ' num ' + damagedStructures.length + ' room ' + gameRoom.name);
                     towers[i].repair(damagedStructures[val]);
