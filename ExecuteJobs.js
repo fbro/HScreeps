@@ -61,8 +61,7 @@ const ExecuteJobs = {
                             let result;
                             for (const resourceType in gameCreep.store) {
                                 if(gameCreep.store[resourceType] > 0){
-                                    result = gameCreep.transfer(gameCreep.room.storage, resourceType); // TODO does not work - but it should be working!!!
-                                    console.log('TEST resourceType ' + gameCreep.name + ' ' + resourceType + ' ' + gameCreep.store[resourceType] + ' result: ' + result + ' ' + gameCreep.pos.roomName + ' ' + gameCreep.room.storage.store.getUsedCapacity() + ' ' + gameCreep.room.storage.store.getCapacity() + ' ' + gameCreep.room.storage.store.getCapacity(RESOURCE_ENERGY));
+                                    result = gameCreep.transfer(gameCreep.room.storage, resourceType);
                                     break;
                                 }
                             }
@@ -332,6 +331,7 @@ const ExecuteJobs = {
                         for (const resourceType in creep.store) {
                             if(creep.store[resourceType] > 0){
                                 result = creep.drop(resourceType);
+                                break;
                             }
                         }
                     }
@@ -595,8 +595,6 @@ const ExecuteJobs = {
                     ) {
                         creep.memory.Depositing = undefined;
                         result = JOB_IS_DONE;
-                    }else if(result === ERR_NO_RESULT_FOUND ){
-                        console.log('TEST ERROR: ' + creep.name + ' ' + JSON.stringify(creep.store))
                     }
                     return result;
                 },
@@ -714,10 +712,10 @@ const ExecuteJobs = {
                     for (const resourceType in creep.store) {
                         if (creep.store[resourceType] > 0) {
                             countResources++;
-                            resourceAmount = creep.store[resourceType]
+                            resourceAmount = creep.store[resourceType];
                         }
                     }
-                    if ((resourceAmount + jobObject.store.getUsedCapacity() - jobObject.store[RESOURCE_ENERGY]) > (jobObject.store.getCapacity() - 100000) && countResources <= 1) {
+                    if (countResources <= 1 && (resourceAmount + jobObject.store.getUsedCapacity() - jobObject.store[RESOURCE_ENERGY]) > (jobObject.store.getCapacity() - 100000)) {
                         return JOB_IS_DONE;
                     } else if(countResources <= 1){
                         return SHOULD_FETCH;
@@ -1101,6 +1099,7 @@ const ExecuteJobs = {
                     for (const resourceType in creep.store) {
                         if(creep.store[resourceType] > 0) {
                             result = creep.drop(resourceType);
+                            break;
                         }
                     }
                 }
@@ -1349,12 +1348,14 @@ const ExecuteJobs = {
                     for (const resourceType in creep.store) {
                         if (creep.store[resourceType] > 0 && resourceType !== RESOURCE_ENERGY) {
                             result = creep.transfer(creep.memory.EnergySupplyType, resourceType);
+                            break;
                         }
                     }
                 } else { // DROP
                     for (const resourceType in creep.store) {
                         if (creep.store[resourceType] > 0 && resourceType !== RESOURCE_ENERGY) {
                             result = creep.drop(resourceType);
+                            break;
                         }
                     }
                 }

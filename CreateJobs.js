@@ -286,6 +286,7 @@ const CreateJobs = {
                     for (const resourceType in gameRoom.storage.store) {
                         if (gameRoom.storage.store[resourceType] > 0 && resourceType !== RESOURCE_ENERGY) {
                             storageHasMinerals = true;
+                            break;
                         }
                     }
                     if (storageHasMinerals) {
