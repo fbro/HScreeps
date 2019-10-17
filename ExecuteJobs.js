@@ -239,7 +239,7 @@ const ExecuteJobs = {
 
         // obj jobs:
 
-        /**@return {int}*/ // TODO experiment with transferring to container before creep is full to enable constant harvesting without that 1 tick break for when it is transferring
+        /**@return {int}*/
         function JobSource(creep, roomJob) {
             const result = GenericJobAction(creep, roomJob, {
                 /**@return {int}*/
@@ -260,12 +260,18 @@ const ExecuteJobs = {
                     return result;
                 },
                 /**@return {int}*/
-                IsJobDone: function (jobObject) { // TODO still does not work
-                    if(creep.store.getFreeCapacity() < 6){ // predict that creep will be full and make a transfer that wont stop the harvesting flow
-                        return SHOULD_FETCH;
-                    }else{
-                        return this.JobStatus(jobObject);
+                IsJobDone: function (jobObject) {
+                    if(creep.store.getFreeCapacity() <= 6){ // predict that creep will be full and make a transfer that wont stop the harvesting flow
+                        let fetchObject = Game.getObjectById(creep.memory.LinkId);
+                        if(!fetchObject){
+                            fetchObject = Game.getObjectById(creep.memory.ContainerId);
+                        }
+                        if(fetchObject) {
+                            creep.transfer(fetchObject, RESOURCE_ENERGY);
+                            return SHOULD_ACT;
+                        }
                     }
+                    return this.JobStatus(jobObject);
                 },
                 /**@return {object}
                  * @return {undefined}*/

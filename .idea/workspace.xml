@@ -3,7 +3,6 @@
   <component name="ChangeListManager">
     <list default="true" id="7b6f36cb-4298-4902-b6a2-ea3816b3b82c" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/CreateJobs.js" beforeDir="false" afterPath="$PROJECT_DIR$/CreateJobs.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ExecuteJobs.js" beforeDir="false" afterPath="$PROJECT_DIR$/ExecuteJobs.js" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -31,14 +30,13 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/ExecuteJobs.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="499">
-              <caret line="533" column="83" selection-start-line="533" selection-start-column="83" selection-end-line="533" selection-end-column="83" />
+            <state relative-caret-position="357">
+              <caret line="241" column="26" selection-start-line="241" selection-start-column="26" selection-end-line="241" selection-end-column="26" />
               <folding>
                 <element signature="e#646#6563#0" />
                 <element signature="e#6573#6595#0" />
                 <element signature="e#6639#14680#0" />
                 <element signature="e#14712#14730#0" />
-                <element signature="e#14929#20615#0" />
                 <element signature="e#20625#20643#0" />
                 <element signature="e#20691#21867#0" />
                 <element signature="e#21877#21895#0" />
@@ -83,7 +81,6 @@
                 <element signature="e#64726#64744#0" />
                 <element signature="e#64813#64990#0" />
                 <element signature="e#65000#65018#0" />
-                <element signature="e#65094#67839#0" />
                 <element signature="e#67849#67901#0" />
                 <element signature="e#67953#68297#0" />
                 <element signature="e#68307#68325#0" />
@@ -198,8 +195,8 @@
         <option value="$PROJECT_DIR$/AssignJobs.js" />
         <option value="$PROJECT_DIR$/Terminals.js" />
         <option value="$PROJECT_DIR$/QuickCommands.js" />
-        <option value="$PROJECT_DIR$/ExecuteJobs.js" />
         <option value="$PROJECT_DIR$/CreateJobs.js" />
+        <option value="$PROJECT_DIR$/ExecuteJobs.js" />
       </list>
     </option>
   </component>
@@ -238,7 +235,7 @@
   <component name="PropertiesComponent">
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
-    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1571341967011" />
+    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1571345944262" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
@@ -288,14 +285,7 @@
       <workItem from="1568465357798" duration="2931000" />
       <workItem from="1568922383343" duration="24477000" />
       <workItem from="1570204224762" duration="13740000" />
-      <workItem from="1570740997734" duration="16934000" />
-    </task>
-    <task id="LOCAL-00010" summary="minerals are now placed in terminal from storage">
-      <created>1557524788944</created>
-      <option name="number" value="00010" />
-      <option name="presentableId" value="LOCAL-00010" />
-      <option name="project" value="LOCAL" />
-      <updated>1557524788944</updated>
+      <workItem from="1570740997734" duration="19742000" />
     </task>
     <task id="LOCAL-00011" summary="minerals are now placed in terminal from storage">
       <created>1557524805059</created>
@@ -633,11 +623,18 @@
       <option name="project" value="LOCAL" />
       <updated>1571089800789</updated>
     </task>
-    <option name="localTasksCounter" value="59" />
+    <task id="LOCAL-00059" summary="small update">
+      <created>1571341997092</created>
+      <option name="number" value="00059" />
+      <option name="presentableId" value="LOCAL-00059" />
+      <option name="project" value="LOCAL" />
+      <updated>1571341997092</updated>
+    </task>
+    <option name="localTasksCounter" value="60" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="419889000" />
+    <option name="totallyTimeSpent" value="422697000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -863,14 +860,13 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/ExecuteJobs.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="499">
-          <caret line="533" column="83" selection-start-line="533" selection-start-column="83" selection-end-line="533" selection-end-column="83" />
+        <state relative-caret-position="357">
+          <caret line="241" column="26" selection-start-line="241" selection-start-column="26" selection-end-line="241" selection-end-column="26" />
           <folding>
             <element signature="e#646#6563#0" />
             <element signature="e#6573#6595#0" />
             <element signature="e#6639#14680#0" />
             <element signature="e#14712#14730#0" />
-            <element signature="e#14929#20615#0" />
             <element signature="e#20625#20643#0" />
             <element signature="e#20691#21867#0" />
             <element signature="e#21877#21895#0" />
@@ -915,7 +911,6 @@
             <element signature="e#64726#64744#0" />
             <element signature="e#64813#64990#0" />
             <element signature="e#65000#65018#0" />
-            <element signature="e#65094#67839#0" />
             <element signature="e#67849#67901#0" />
             <element signature="e#67953#68297#0" />
             <element signature="e#68307#68325#0" />
