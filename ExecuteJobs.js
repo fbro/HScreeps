@@ -531,7 +531,7 @@ const ExecuteJobs = {
             return result;
         }
 
-        /**@return {int}*/
+        /**@return {int}*/ // TODO remote err job fails when getting from container
         function JobFillStorage(creep, roomJob) {
             const result = GenericJobAction(creep, roomJob, {
                 /**@return {int}*/

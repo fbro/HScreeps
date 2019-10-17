@@ -320,7 +320,7 @@ const CreateJobs = {
             }
         }
 
-        function FillStorageFromRemoteJobs(gameRoom, roomJobs) {
+        function FillStorageFromRemoteJobs(gameRoom, roomJobs) { // TODO err when creating job when room is invvisible which it may be sometimes!
             for (const attachedRoomKey in Memory.MemRooms[gameRoom.name].AttachedRooms) {
                 if (Game.rooms[attachedRoomKey]) {
                     const fillStorageFromRemotes = Game.rooms[attachedRoomKey].find(FIND_STRUCTURES, {
