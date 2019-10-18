@@ -320,7 +320,8 @@ const CreateJobs = {
             }
         }
 
-        function FillStorageFromRemoteJobs(gameRoom, roomJobs) { // TODO err when creating job when room is invvisible which it may be sometimes!
+        // TODO err when creating job when room is invvisible which it may be sometimes!
+        function FillStorageFromRemoteJobs(gameRoom, roomJobs) {
             for (const attachedRoomKey in Memory.MemRooms[gameRoom.name].AttachedRooms) {
                 if (Game.rooms[attachedRoomKey]) {
                     const fillStorageFromRemotes = Game.rooms[attachedRoomKey].find(FIND_STRUCTURES, {
@@ -334,8 +335,6 @@ const CreateJobs = {
                         console.log('CreateJobs FillStorageFromRemoteJobs in ' + gameRoom.name + ' add job ' + jobName);
                         AddJob(roomJobs, jobName, fillStorageFromRemote.id, OBJECT_JOB, 'T');
                     }
-                } else {
-                    Logs.Error('CreateJobs-FillStorageFromRemoteJobs-roomNotExist', 'CreateJobs FillStorageFromRemoteJobs ERROR! Game.rooms[' + attachedRoomKey + '] is undefined from ' + gameRoom.name);
                 }
             }
         }

@@ -335,7 +335,7 @@ const AssignJobs = {
                 case 'W':
                     switch (true) { // TODO optimize
                         case (energyAvailable >= 2200): // energyCapacityAvailable: 12900
-                            body = [ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE];
+                            body = [ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE];
                             break;
                         case (energyAvailable >= 2050): // energyCapacityAvailable: 5600
                             body = [ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE];
@@ -357,26 +357,26 @@ const AssignJobs = {
                             break;
                     }
                     break;
-                // transporter
+                // distant transporter
                 case 'D':
                     switch (true) {
                         case (energyAvailable >= 1500): // energyCapacityAvailable: 12900
-                            body = [WORK, WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];
+                            body = [WORK, WORK, WORK, WORK, WORK, WORK, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];
                             break;
                         case (energyAvailable >= 1250): // energyCapacityAvailable: 5600
-                            body = [WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];
+                            body = [WORK, WORK, WORK, WORK, WORK, WORK, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];
                             break;
                         case (energyAvailable >= 1000): // energyCapacityAvailable: 2300
-                            body = [WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];
+                            body = [WORK, WORK, WORK, WORK, WORK, WORK, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];
                             break;
                         case (energyAvailable >= 750): // energyCapacityAvailable: 1800
-                            body = [WORK, WORK, WORK, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];
+                            body = [WORK, WORK, WORK, CARRY, MOVE, MOVE, MOVE];
                             break;
                         case (energyAvailable >= 500): // energyCapacityAvailable: 1300
-                            body = [WORK, WORK, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE];
+                            body = [WORK, WORK, WORK, CARRY, MOVE, MOVE, MOVE];
                             break;
                         case (energyAvailable >= 300): // energyCapacityAvailable: 550
-                            body = [WORK, CARRY, MOVE, MOVE];
+                            body = [WORK, CARRY, MOVE];
                             break;
                         case (energyAvailable >= 200): // energyCapacityAvailable: 300
                             body = [WORK, CARRY, MOVE];

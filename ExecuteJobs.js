@@ -185,7 +185,7 @@ const ExecuteJobs = {
                 } else if (result === JOB_OBJ_DISAPPEARED) {
                     creep.say('🙈' + result);
                 } else if (result === NO_FETCH_FOUND) {
-                    console.log('ExecuteJobs JobAction WARNING! not enough energy ' + jobKey + ' ' + result + ' ' + roomJob.Creep);
+                    console.log('ExecuteJobs JobAction WARNING! no fetch object found ' + jobKey + ' ' + result + ' ' + roomJob.Creep);
                     creep.say('⚠⚡' + result);
                 } else {
                     if(!result){
@@ -254,7 +254,7 @@ const ExecuteJobs = {
                 Act: function (jobObject) {
                     let result = creep.harvest(jobObject);
                     if (result === ERR_NOT_ENOUGH_RESOURCES) {
-                        console.log('ExecuteJobs JobSource ' + creep.name + ' waiting for replenish (' + jobObject.pos.x + ',' + jobObject.pos.y + ',' + jobObject.pos.roomName + ')');
+                        //console.log('ExecuteJobs JobSource ' + creep.name + ' waiting for replenish (' + jobObject.pos.x + ',' + jobObject.pos.y + ',' + jobObject.pos.roomName + ')');
                         result = OK;
                     }
                     return result;
@@ -537,13 +537,13 @@ const ExecuteJobs = {
             return result;
         }
 
-        /**@return {int}*/ // TODO remote err job fails when getting from container
+        /**@return {int}*/
         function JobFillStorage(creep, roomJob) {
             const result = GenericJobAction(creep, roomJob, {
                 /**@return {int}*/
                 JobStatus: function (jobObject) {
                     let creepSum = creep.store.getUsedCapacity();
-                    if (!creepSum || !creep.memory.Depositing && creepSum < creep.store.getCapacity() && creep.pos.getRangeTo(jobObject) <= 1
+                    if (creepSum === 0 || !creep.memory.Depositing && creepSum < creep.store.getCapacity() && creep.pos.getRangeTo(jobObject) <= 1
                         && (jobObject.structureType === STRUCTURE_CONTAINER && jobObject.store.getUsedCapacity() > 0
                             || jobObject.structureType === STRUCTURE_LINK && jobObject.store[RESOURCE_ENERGY] > 0
                             || jobObject.structureType === STRUCTURE_TERMINAL && (jobObject.store[RESOURCE_ENERGY] > 120000 || jobObject.room.storage.store[RESOURCE_ENERGY] < 5000 && jobObject.store[RESOURCE_ENERGY] > 0))
@@ -583,6 +583,8 @@ const ExecuteJobs = {
                         return jobObject.room.storage;
                     } else if (creep.room.storage && (jobObject.room && jobObject.room.name !== creep.room.name || !jobObject.room)) {
                         return creep.room.storage;
+                    } else if(Memory.MemRooms[jobObject.pos.roomName].PrimaryRoom) {
+                        return Game.rooms[Memory.MemRooms[jobObject.pos.roomName].PrimaryRoom].storage;
                     } else {
                         creep.memory.Depositing = undefined;
                         return undefined;
@@ -860,7 +862,7 @@ const ExecuteJobs = {
                 },
                 /**@return {int}*/
                 Fetch: function (fetchObject, jobObject) {
-                    let result = creep.signController(fetchObject, fetchObject.name);
+                    let result = creep.signController(fetchObject, jobObject.name);
                     if(result === OK){
                         Logs.Info('JobTagController done', creep.name + ' in ' + jobObject.pos.roomName + ' tag ' + jobObject.name);
                         jobObject.remove();
@@ -1083,23 +1085,38 @@ const ExecuteJobs = {
                                 return JOB_IS_DONE; // flag is supposed to be on top of source!
                             }
                         }
-                        return creep.harvest(source);
+                        let result = creep.harvest(source);
+                        if (result === ERR_NOT_ENOUGH_RESOURCES) {
+                            console.log('ExecuteJobs JobRemoteHarvest ' + creep.name + ' waiting for replenish (' + jobObject.pos.x + ',' + jobObject.pos.y + ',' + jobObject.pos.roomName + ')');
+                            result = OK;
+                        }
+                        return result;
                     }
                 },
                 /**@return {int}*/
                 IsJobDone: function (jobObject) {
+                    if(creep.store.getFreeCapacity() <= 6){ // predict that creep will be full and make a transfer that wont stop the harvesting flow
+                        let fetchObject = Game.getObjectById(creep.memory.ContainerId);
+                        if(fetchObject) {
+                            creep.transfer(fetchObject, RESOURCE_ENERGY);
+                            return SHOULD_ACT;
+                        }
+                    }
                     return this.JobStatus(jobObject);
                 },
                 /**@return {object}
                  * @return {undefined}*/
                 FindFetchObject: function (jobObject) { // find free container at source or a storage in another room
                     let container = Game.getObjectById(creep.memory.ContainerId);
-                    if(!container || container.getFreeCapacity() === 0){
+                    if(!container || container.store.getFreeCapacity() === 0){
                         container = jobObject.pos.findInRange(FIND_STRUCTURES, 1, {
                             filter: function (container) {
                                 return container.structureType === STRUCTURE_CONTAINER && container.store.getFreeCapacity() > 0;
                             }
                         })[0];
+                        if(container){
+                            creep.memory.ContainerId = container.id;
+                        }
                     }
                     if (container) { // container found now transfer to container
                         return container;
@@ -1126,7 +1143,7 @@ const ExecuteJobs = {
                             Memory.MemRooms[jobObject.pos.roomName].PrimaryRoom = closestRoomWithStorage;
                         }
                     }
-                    return Memory.MemRooms[closestRoomWithStorage].storage;
+                    return Game.rooms[closestRoomWithStorage].storage;
                 },
                 /**@return {int}*/
                 Fetch: function (fetchObject, jobObject) {

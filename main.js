@@ -63,4 +63,4 @@ module.exports.loop = function () {
 // TODO inefficient problem - creeps can be one tick quicker if I try and move to a new action after a finished action
 // TODO ExecuteJobs: move job actions over to use GenericAction
 
-// TODO ERROR idle store resource seems to be locked
+// TODO assigncreeps for flag jobs
