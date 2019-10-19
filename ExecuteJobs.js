@@ -1049,7 +1049,7 @@ const ExecuteJobs = {
                     // SHOULD_FETCH
                         // if full try and deposit in nearby container
                         // else go back to PrimaryRoom and unload to storage
-                    if(creep.store.getFreeCapacity() === 0 || creep.memory.FetchObjectId){
+                    if(creep.store.getFreeCapacity() === 0 || creep.memory.FetchObjectId && creep.store.getUsedCapacity > 0){
                         return SHOULD_FETCH;
                     }else{
                         return SHOULD_ACT;

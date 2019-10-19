@@ -66,6 +66,8 @@ const AssignJobs = {
                     return true;
                 }
             }
+            // TODO look for adjacent rooms
+
             return false;
         }
 
