@@ -2,6 +2,7 @@ const AssignJobs = {
     run: function () {
 
         const MINIMUM_ENERGY_REQUIRED = 200; // the smallest creep that a spawn can create
+        const FLAG_JOB = 2;
 
         // assign jobs to creeps or create the creeps like this:
         // look for idle creep with correct type in room
@@ -44,9 +45,12 @@ const AssignJobs = {
                 for (const roomJobKey in memRoom.RoomJobs) {
                     const roomJob = memRoom.RoomJobs[roomJobKey];
                     if (roomJob && roomJob.Creep === 'vacant') {
-                        let creepFound = AssignCreeps(roomJob, idleCreepsInRoom, roomJobKey);
+                        let creepFound = AssignCreep(roomJob, idleCreepsInRoom, roomJobKey);
                         if (!creepFound) {
-                            SpawnCreeps(roomJob, availableSpawns, roomJobKey);
+                            creepFound = AssignCreepOtherRoom(roomJob, idleCreeps, roomJobKey);
+                            if(!creepFound){
+                                SpawnCreep(roomJob, availableSpawns, roomJobKey);
+                            }
                         }
                     }
                 }
@@ -54,7 +58,7 @@ const AssignJobs = {
         }
 
         /**@return {boolean}*/
-        function AssignCreeps(roomJob, idleCreepsInRoom, roomJobKey) {
+        function AssignCreep(roomJob, idleCreepsInRoom, roomJobKey) {
             for (const idleCreepInRoomCounter in idleCreepsInRoom) {
                 const idleCreepInRoom = idleCreepsInRoom[idleCreepInRoomCounter];
                 if (idleCreepInRoom.name.startsWith(roomJob.CreepType)) {
@@ -66,12 +70,20 @@ const AssignJobs = {
                     return true;
                 }
             }
-            // TODO look for adjacent rooms
-
             return false;
         }
 
-        function SpawnCreeps(roomJob, availableSpawns, roomJobKey) {
+        /**@return {boolean}*/
+        function AssignCreepOtherRoom(roomJob, idleCreeps, roomJobKey){
+            if(roomJob.JobType === FLAG_JOB){
+                // TODO
+                return true;
+            }else{
+                return false; // for now, do not assign creeps of type OBJECT_JOB to other rooms
+            }
+        }
+
+        function SpawnCreep(roomJob, availableSpawns, roomJobKey) {
             const memRoomKey = roomJobKey.split(')').pop();
 
             // if idle creep not found for vacant job then look if spawn is possible

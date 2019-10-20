@@ -4,8 +4,6 @@
     <list default="true" id="7b6f36cb-4298-4902-b6a2-ea3816b3b82c" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/AssignJobs.js" beforeDir="false" afterPath="$PROJECT_DIR$/AssignJobs.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/CreateJobs.js" beforeDir="false" afterPath="$PROJECT_DIR$/CreateJobs.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ExecuteJobs.js" beforeDir="false" afterPath="$PROJECT_DIR$/ExecuteJobs.js" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -98,12 +96,11 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/AssignJobs.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="595">
-              <caret line="69" column="12" selection-start-line="69" selection-start-column="12" selection-end-line="69" selection-end-column="12" />
+            <state relative-caret-position="813">
+              <caret line="85" column="27" lean-forward="true" selection-start-line="85" selection-start-column="27" selection-end-line="85" selection-end-column="27" />
               <folding>
                 <element signature="e#145#201#0" />
                 <element signature="e#473#1093#0" />
-                <element signature="e#2666#2688#0" />
                 <element signature="e#7369#7391#0" />
                 <element signature="e#7446#9651#0" />
                 <element signature="e#9661#9681#0" />
@@ -127,13 +124,12 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/CreateJobs.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="206">
-              <caret line="169" column="35" lean-forward="true" selection-start-line="169" selection-start-column="35" selection-end-line="169" selection-end-column="35" />
+            <state relative-caret-position="629">
+              <caret line="37" column="24" selection-start-line="37" selection-start-column="14" selection-end-line="37" selection-end-column="24" />
               <folding>
-                <element signature="e#80#93#0" />
-                <element signature="e#471#924#0" />
                 <element signature="e#1349#8372#0" />
                 <element signature="e#8404#8669#0" />
+                <element signature="e#8809#13659#0" />
                 <element signature="e#13734#14509#0" />
                 <element signature="e#14571#15304#0" />
                 <element signature="e#15367#16501#0" />
@@ -145,7 +141,6 @@
                 <element signature="e#23163#24739#0" />
                 <element signature="e#24803#25493#0" />
                 <element signature="e#25565#25646#0" />
-                <element signature="e#25702#25891#0" />
               </folding>
             </state>
           </provider>
@@ -275,7 +270,7 @@
   <component name="PropertiesComponent">
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
-    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1571523296537" />
+    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1571595612120" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
@@ -326,14 +321,7 @@
       <workItem from="1568922383343" duration="24477000" />
       <workItem from="1570204224762" duration="13740000" />
       <workItem from="1570740997734" duration="19792000" />
-      <workItem from="1571429278693" duration="15198000" />
-    </task>
-    <task id="LOCAL-00013" summary="minerals are now placed in terminal from storage">
-      <created>1557782956828</created>
-      <option name="number" value="00013" />
-      <option name="presentableId" value="LOCAL-00013" />
-      <option name="project" value="LOCAL" />
-      <updated>1557782956828</updated>
+      <workItem from="1571429278693" duration="17351000" />
     </task>
     <task id="LOCAL-00014" summary="minerals are now placed in terminal from storage">
       <created>1557867176963</created>
@@ -671,11 +659,18 @@
       <option name="project" value="LOCAL" />
       <updated>1571438670356</updated>
     </task>
-    <option name="localTasksCounter" value="62" />
+    <task id="LOCAL-00062" summary="small update">
+      <created>1571525485663</created>
+      <option name="number" value="00062" />
+      <option name="presentableId" value="LOCAL-00062" />
+      <option name="project" value="LOCAL" />
+      <updated>1571525485663</updated>
+    </task>
+    <option name="localTasksCounter" value="63" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="437945000" />
+    <option name="totallyTimeSpent" value="440098000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -925,13 +920,12 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/CreateJobs.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="206">
-          <caret line="169" column="35" lean-forward="true" selection-start-line="169" selection-start-column="35" selection-end-line="169" selection-end-column="35" />
+        <state relative-caret-position="629">
+          <caret line="37" column="24" selection-start-line="37" selection-start-column="14" selection-end-line="37" selection-end-column="24" />
           <folding>
-            <element signature="e#80#93#0" />
-            <element signature="e#471#924#0" />
             <element signature="e#1349#8372#0" />
             <element signature="e#8404#8669#0" />
+            <element signature="e#8809#13659#0" />
             <element signature="e#13734#14509#0" />
             <element signature="e#14571#15304#0" />
             <element signature="e#15367#16501#0" />
@@ -943,19 +937,17 @@
             <element signature="e#23163#24739#0" />
             <element signature="e#24803#25493#0" />
             <element signature="e#25565#25646#0" />
-            <element signature="e#25702#25891#0" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/AssignJobs.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="595">
-          <caret line="69" column="12" selection-start-line="69" selection-start-column="12" selection-end-line="69" selection-end-column="12" />
+        <state relative-caret-position="813">
+          <caret line="85" column="27" lean-forward="true" selection-start-line="85" selection-start-column="27" selection-end-line="85" selection-end-column="27" />
           <folding>
             <element signature="e#145#201#0" />
             <element signature="e#473#1093#0" />
-            <element signature="e#2666#2688#0" />
             <element signature="e#7369#7391#0" />
             <element signature="e#7446#9651#0" />
             <element signature="e#9661#9681#0" />
