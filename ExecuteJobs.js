@@ -161,7 +161,7 @@ const ExecuteJobs = {
                     result = JobRemoteHarvest(creep, roomJob);
                     break;
                 case jobKey.startsWith('6FillLabMin'):
-                    result = JobFillLabMineral(creep, roomJob, jobKey);
+                    result = JobFillLabMineral(creep, roomJob);
                     break;
                 case jobKey.startsWith('5EmptyLabMin'):
                     result = JobEmptyLabMineral(creep, roomJob);
@@ -1200,16 +1200,49 @@ const ExecuteJobs = {
             return result;
         }
 
-        /**@return {int}*/ // TODO replace with GenericAction
+        /**@return {int}*/
         function JobEmptyLabMineral(creep, roomJob) {
-            // TODO
-            let result = ERR_NO_RESULT_FOUND;
-            const flagObj = Game.flags[roomJob.JobId];
-            if (flagObj === undefined) {
-                result = JOB_OBJ_DISAPPEARED;
-            } else {
-                // TODO
-            }
+            let lab = Game.getObjectById(creep.memory.LabId);
+            const result = GenericFlagAction(creep, roomJob, {
+                /**@return {int}*/
+                JobStatus: function (jobObject) {
+                    if (!creep.memory.Mineral) {
+                        creep.memory.Mineral = jobObject.name.split('-').pop();
+                        lab = jobObject.pos.findInRange(FIND_MY_STRUCTURES, 0, {
+                            filter: function (lab) {
+                                return (lab.structureType === STRUCTURE_LAB);
+                            }})[0];
+                        if (!lab) { // lab does not exist - delete flag and remove job
+                            jobObject.remove();
+                            Logs.Error('ExecuteJobs-JobEmptyLabMineral-labGone', 'ExecuteJobs JobEmptyLabMineral ERROR! no lab ' + jobObject.pos.roomName + ' ' + creep.name);
+                            return ERR_NO_RESULT_FOUND;
+                        }
+                        creep.memory.LabId = lab.id;
+                    }
+                    if(creep.store.getFreeCapacity() > 0){
+                        return SHOULD_ACT;
+                    }else{
+                        return SHOULD_FETCH
+                    }
+                },
+                /**@return {int}*/
+                Act: function (jobObject) {
+                    return creep.withdraw(lab, creep.memory.Mineral);
+                },
+                /**@return {int}*/
+                IsJobDone: function (jobObject) {
+                    return this.JobStatus(jobObject);
+                },
+                /**@return {object}
+                 * @return {undefined}*/
+                FindFetchObject: function (jobObject) {
+                    return jobObject.room.storage;
+                },
+                /**@return {int}*/
+                Fetch: function (fetchObject, jobObject) {
+                    return creep.transfer(fetchObject, creep.memory.Mineral);
+                },
+            });
             return result;
         }
 

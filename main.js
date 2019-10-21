@@ -49,16 +49,12 @@ module.exports.loop = function () {
 // TODO:
 
 // add more jobs:
-// TODO FillLabMineral
-// TODO EmptyLabMineral
 // TODO FillPowerSpawnEnergy
 // TODO FillPowerSpawnPowerUnits
+// TODO HarvestDeposit
 
 // add constructions
 // add renewCreep functionality
 // cache paths to be reused by creeps
 // recycle creeps if there are many idle!
-
-// to complete below i just need to handle flag jobs
-// TODO inefficient problem - creeps can be one tick quicker if I try and move to a new action after a finished action
-// TODO ExecuteJobs: move job actions over to use GenericAction
+// monitor creeps and see if they can work more quickly by optimizing its actions - remove "pausing" ticks
