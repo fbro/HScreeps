@@ -185,7 +185,7 @@ const CreateJobs = {
                 } else if (gameFlag.color === COLOR_YELLOW && gameFlag.secondaryColor === COLOR_YELLOW) { // distantHarvester on source at flag pos
                     jobName = '5RemoteHarvest';
                     creepType = 'D';
-                } else if (gameFlag.color === COLOR_PURPLE && gameFlag.secondaryColor === COLOR_PURPLE) { // TODO FillLabMineral
+                } else if (gameFlag.color === COLOR_PURPLE && gameFlag.secondaryColor === COLOR_PURPLE) { // FillLabMineral
                     if (!gameFlag.pos.findInRange(FIND_MY_STRUCTURES, 0, {
                         filter: function (s) {
                             return s.structureType === STRUCTURE_LAB;
@@ -201,7 +201,7 @@ const CreateJobs = {
                         jobName = '6FillLabMin'; // flagname rules: GET-L = get lemergium from all rooms, BUY-L = get it from all rooms or then buy it from the terminal
                         creepType = 'T';
                     }
-                } else if (gameFlag.color === COLOR_PURPLE && gameFlag.secondaryColor === COLOR_WHITE) { // TODO EmptyLabMineral
+                } else if (gameFlag.color === COLOR_PURPLE && gameFlag.secondaryColor === COLOR_WHITE) { // EmptyLabMineral
                     if (!gameFlag.pos.findInRange(FIND_MY_STRUCTURES, 0, {
                         filter: function (s) {
                             return s.structureType === STRUCTURE_LAB;

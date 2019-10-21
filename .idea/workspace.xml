@@ -3,7 +3,8 @@
   <component name="ChangeListManager">
     <list default="true" id="7b6f36cb-4298-4902-b6a2-ea3816b3b82c" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.js" beforeDir="false" afterPath="$PROJECT_DIR$/main.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/CreateJobs.js" beforeDir="false" afterPath="$PROJECT_DIR$/CreateJobs.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ExecuteJobs.js" beforeDir="false" afterPath="$PROJECT_DIR$/ExecuteJobs.js" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -30,8 +31,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/ExecuteJobs.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="459">
-              <caret line="1401" column="84" selection-start-line="1401" selection-start-column="84" selection-end-line="1401" selection-end-column="84" />
+            <state relative-caret-position="257">
+              <caret line="1148" column="51" selection-start-line="1148" selection-start-column="51" selection-end-line="1148" selection-end-column="51" />
               <folding>
                 <element signature="e#646#6563#0" />
                 <element signature="e#6573#6595#0" />
@@ -68,26 +69,60 @@
                 <element signature="e#48082#49329#0" />
                 <element signature="e#49339#49357#0" />
                 <element signature="e#49403#51122#0" />
-                <element signature="e#51132#51150#0" />
                 <element signature="e#51201#57040#0" />
-                <element signature="e#57050#57068#0" />
-                <element signature="e#57163#60048#0" />
+                <element signature="e#57780#59022#0" />
                 <element signature="e#60058#60076#0" />
-                <element signature="e#60164#60469#0" />
                 <element signature="e#60509#60561#0" />
                 <element signature="e#60616#63710#0" />
                 <element signature="e#63773#64693#0" />
                 <element signature="e#64703#64721#0" />
-                <element signature="e#64789#64943#0" />
                 <element signature="e#64953#64971#0" />
-                <element signature="e#65040#65217#0" />
                 <element signature="e#65227#65245#0" />
                 <element signature="e#65321#68066#0" />
                 <element signature="e#68076#68128#0" />
                 <element signature="e#68180#68524#0" />
                 <element signature="e#68534#68552#0" />
+                <element signature="e#68602#70049#0" />
                 <element signature="e#70211#70229#0" />
+                <element signature="e#70358#70846#0" />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/CreateJobs.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="220">
+              <caret line="203" column="103" lean-forward="true" selection-start-line="203" selection-start-column="103" selection-end-line="203" selection-end-column="103" />
+              <folding>
+                <element signature="e#80#93#0" />
+                <element signature="e#471#924#0" />
+                <element signature="e#1349#8372#0" />
+                <element signature="e#8404#8669#0" />
+                <element signature="e#13734#14509#0" />
+                <element signature="e#14571#15304#0" />
+                <element signature="e#15367#16501#0" />
+                <element signature="e#16559#17688#0" />
+                <element signature="e#17753#18744#0" />
+                <element signature="e#18799#20567#0" />
+                <element signature="e#20620#21269#0" />
+                <element signature="e#21331#22117#0" />
+                <element signature="e#22173#22683#0" />
+                <element signature="e#22733#24309#0" />
+                <element signature="e#24373#25063#0" />
+                <element signature="e#25135#25216#0" />
+                <element signature="e#25272#25461#0" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/Labs.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="221">
+              <caret line="13" column="46" selection-start-line="13" selection-start-column="31" selection-end-line="13" selection-end-column="46" />
             </state>
           </provider>
         </entry>
@@ -131,8 +166,8 @@
       <find>MoveHome</find>
       <find>not enough energy</find>
       <find>CreateJobs FillStorageFromRemoteJobs</find>
-      <find>NO_FETCH_FOUND</find>
       <find>max</find>
+      <find>NO_FETCH_FOUND</find>
     </findStrings>
     <replaceStrings>
       <replace>const</replace>
@@ -165,10 +200,10 @@
         <option value="$PROJECT_DIR$/Towers.js" />
         <option value="$PROJECT_DIR$/Terminals.js" />
         <option value="$PROJECT_DIR$/QuickCommands.js" />
-        <option value="$PROJECT_DIR$/CreateJobs.js" />
-        <option value="$PROJECT_DIR$/ExecuteJobs.js" />
         <option value="$PROJECT_DIR$/AssignJobs.js" />
         <option value="$PROJECT_DIR$/main.js" />
+        <option value="$PROJECT_DIR$/CreateJobs.js" />
+        <option value="$PROJECT_DIR$/ExecuteJobs.js" />
       </list>
     </option>
   </component>
@@ -207,7 +242,7 @@
   <component name="PropertiesComponent">
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
-    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1571666221337" />
+    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1571679120736" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
@@ -258,14 +293,7 @@
       <workItem from="1568922383343" duration="24477000" />
       <workItem from="1570204224762" duration="13740000" />
       <workItem from="1570740997734" duration="19792000" />
-      <workItem from="1571429278693" duration="24126000" />
-    </task>
-    <task id="LOCAL-00016" summary="minerals are now placed in terminal from storage">
-      <created>1558201074939</created>
-      <option name="number" value="00016" />
-      <option name="presentableId" value="LOCAL-00016" />
-      <option name="project" value="LOCAL" />
-      <updated>1558201074939</updated>
+      <workItem from="1571429278693" duration="27768000" />
     </task>
     <task id="LOCAL-00017" summary="small fixes">
       <created>1558292040450</created>
@@ -603,11 +631,18 @@
       <option name="project" value="LOCAL" />
       <updated>1571661057167</updated>
     </task>
-    <option name="localTasksCounter" value="65" />
+    <task id="LOCAL-00065" summary="small update">
+      <created>1571666234582</created>
+      <option name="number" value="00065" />
+      <option name="presentableId" value="LOCAL-00065" />
+      <option name="project" value="LOCAL" />
+      <updated>1571666234582</updated>
+    </task>
+    <option name="localTasksCounter" value="66" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="446873000" />
+    <option name="totallyTimeSpent" value="450515000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -639,7 +674,7 @@
       <window_info anchor="bottom" id="Inspection" order="6" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="7" weight="0.32983193" />
       <window_info anchor="bottom" id="Docker" order="8" show_stripe_button="false" />
-      <window_info anchor="bottom" id="Version Control" order="9" sideWeight="0.49573562" visible="true" weight="0.211838" />
+      <window_info anchor="bottom" id="Version Control" order="9" sideWeight="0.49573562" visible="true" weight="0.15680166" />
       <window_info anchor="bottom" id="Database Changes" order="10" />
       <window_info anchor="bottom" id="Terminal" order="11" weight="0.32983193" />
       <window_info anchor="bottom" id="Event Log" order="12" sideWeight="0.5042644" side_tool="true" weight="0.15264797" />
@@ -763,13 +798,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Labs.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="153">
-          <caret line="9" column="19" lean-forward="true" selection-start-line="9" selection-start-column="19" selection-end-line="9" selection-end-column="19" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/Terminals.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="425">
@@ -781,29 +809,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="51">
           <caret line="3" selection-start-line="3" selection-end-line="4" selection-end-column="27" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/CreateJobs.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="629">
-          <caret line="37" column="24" selection-start-line="37" selection-start-column="14" selection-end-line="37" selection-end-column="24" />
-          <folding>
-            <element signature="e#1349#8372#0" />
-            <element signature="e#8404#8669#0" />
-            <element signature="e#8809#13659#0" />
-            <element signature="e#13734#14509#0" />
-            <element signature="e#14571#15304#0" />
-            <element signature="e#15367#16501#0" />
-            <element signature="e#16559#17688#0" />
-            <element signature="e#19229#20997#0" />
-            <element signature="e#21050#21699#0" />
-            <element signature="e#21761#22547#0" />
-            <element signature="e#22603#23113#0" />
-            <element signature="e#23163#24739#0" />
-            <element signature="e#24803#25493#0" />
-            <element signature="e#25565#25646#0" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -829,10 +834,43 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/Labs.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="221">
+          <caret line="13" column="46" selection-start-line="13" selection-start-column="31" selection-end-line="13" selection-end-column="46" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/CreateJobs.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="220">
+          <caret line="203" column="103" lean-forward="true" selection-start-line="203" selection-start-column="103" selection-end-line="203" selection-end-column="103" />
+          <folding>
+            <element signature="e#80#93#0" />
+            <element signature="e#471#924#0" />
+            <element signature="e#1349#8372#0" />
+            <element signature="e#8404#8669#0" />
+            <element signature="e#13734#14509#0" />
+            <element signature="e#14571#15304#0" />
+            <element signature="e#15367#16501#0" />
+            <element signature="e#16559#17688#0" />
+            <element signature="e#17753#18744#0" />
+            <element signature="e#18799#20567#0" />
+            <element signature="e#20620#21269#0" />
+            <element signature="e#21331#22117#0" />
+            <element signature="e#22173#22683#0" />
+            <element signature="e#22733#24309#0" />
+            <element signature="e#24373#25063#0" />
+            <element signature="e#25135#25216#0" />
+            <element signature="e#25272#25461#0" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/ExecuteJobs.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="459">
-          <caret line="1401" column="84" selection-start-line="1401" selection-start-column="84" selection-end-line="1401" selection-end-column="84" />
+        <state relative-caret-position="257">
+          <caret line="1148" column="51" selection-start-line="1148" selection-start-column="51" selection-end-line="1148" selection-end-column="51" />
           <folding>
             <element signature="e#646#6563#0" />
             <element signature="e#6573#6595#0" />
@@ -869,25 +907,22 @@
             <element signature="e#48082#49329#0" />
             <element signature="e#49339#49357#0" />
             <element signature="e#49403#51122#0" />
-            <element signature="e#51132#51150#0" />
             <element signature="e#51201#57040#0" />
-            <element signature="e#57050#57068#0" />
-            <element signature="e#57163#60048#0" />
+            <element signature="e#57780#59022#0" />
             <element signature="e#60058#60076#0" />
-            <element signature="e#60164#60469#0" />
             <element signature="e#60509#60561#0" />
             <element signature="e#60616#63710#0" />
             <element signature="e#63773#64693#0" />
             <element signature="e#64703#64721#0" />
-            <element signature="e#64789#64943#0" />
             <element signature="e#64953#64971#0" />
-            <element signature="e#65040#65217#0" />
             <element signature="e#65227#65245#0" />
             <element signature="e#65321#68066#0" />
             <element signature="e#68076#68128#0" />
             <element signature="e#68180#68524#0" />
             <element signature="e#68534#68552#0" />
+            <element signature="e#68602#70049#0" />
             <element signature="e#70211#70229#0" />
+            <element signature="e#70358#70846#0" />
           </folding>
         </state>
       </provider>
