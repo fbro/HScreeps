@@ -47,9 +47,9 @@ const AssignJobs = {
                     if (roomJob && roomJob.Creep === 'vacant') {
                         let creepFound = AssignCreep(roomJob, idleCreepsInRoom, roomJobKey);
                         if (!creepFound) {
-                            creepFound = AssignCreepOtherRoom(roomJob, idleCreeps, roomJobKey);
+                            creepFound = AssignCreepOtherRoom(roomJob, idleCreeps, roomJobKey, memRoomKey);
                             if(!creepFound){
-                                SpawnCreep(roomJob, availableSpawns, roomJobKey);
+                                creepFound = SpawnCreep(roomJob, availableSpawns, roomJobKey);
                             }
                         }
                     }
@@ -74,15 +74,34 @@ const AssignJobs = {
         }
 
         /**@return {boolean}*/
-        function AssignCreepOtherRoom(roomJob, idleCreeps, roomJobKey){
+        function AssignCreepOtherRoom(roomJob, idleCreeps, roomJobKey, memRoomKey){
             if(roomJob.JobType === FLAG_JOB){
-                // TODO
-                return true;
-            }else{
-                return false; // for now, do not assign creeps of type OBJECT_JOB to other rooms
+                // loop through all creeps of desired creepType and assign the nearest one to the job
+                let nearestCreep;
+                let bestRange = Number.MAX_SAFE_INTEGER;
+                let bestIdleCreepCounter;
+                for (const idleCreepCounter in idleCreeps) {
+                    const idleCreep = idleCreeps[idleCreepCounter];
+                    if(idleCreep.name.startsWith(roomJob.CreepType)){
+                        const linearDistance = Game.map.getRoomLinearDistance(memRoomKey, idleCreep.pos.roomName);
+                        if(bestRange > linearDistance){
+                            bestRange = linearDistance;
+                            nearestCreep = idleCreep;
+                            bestIdleCreepCounter = idleCreepCounter;
+                        }
+                    }
+                }
+                if(nearestCreep){
+                    nearestCreep.memory.JobName = roomJobKey;
+                    roomJob.Creep = nearestCreep.name;
+                    delete idleCreeps[bestIdleCreepCounter];
+                    return true;
+                }
             }
+            return false; // for now, do not assign creeps of type OBJECT_JOB to other rooms
         }
 
+        /**@return {boolean}*/
         function SpawnCreep(roomJob, availableSpawns, roomJobKey) {
             const memRoomKey = roomJobKey.split(')').pop();
 
@@ -127,7 +146,6 @@ const AssignJobs = {
                         break;
                     }
                 }
-
                 if (bestAvailableSpawn) { // the closest spawn is found
                     const spawnResult = bestAvailableSpawn.spawnCreep(GetCreepBody(roomJob.CreepType, Game.rooms[bestAvailableSpawn.pos.roomName].energyAvailable), availableName);
                     if (spawnResult === OK) {
@@ -136,9 +154,13 @@ const AssignJobs = {
                         if (Memory.MemRooms[memRoomKey].MaxCreeps[availableName.substring(0, 1)]) {
                             Memory.MemRooms[memRoomKey].MaxCreeps[availableName.substring(0, 1)][availableName] = availableName;
                         }
+                        console.log('AssignJobs SpawnCreeps OK ' + availableName + ' assigned to ' + roomJobKey + ' in ' + memRoomKey + ' spawn ' + bestAvailableSpawn.name);
+                        delete availableSpawns[bestAvailableSpawnCounter];
+                        return true;
+                    }else{
+                        console.log('AssignJobs SpawnCreeps failed ' + availableName + ' assigned to ' + roomJobKey + ' in ' + memRoomKey + ' spawnResult ' + spawnResult + ' spawn ' + bestAvailableSpawn.name + ' room energy: ' + Game.rooms[bestAvailableSpawn.pos.roomName].energyAvailable);
+                        return false;
                     }
-                    console.log('AssignJobs SpawnCreeps ' + availableName + ' assigned to ' + roomJobKey + ' in ' + memRoomKey + ' spawnResult ' + spawnResult + ' spawn ' + bestAvailableSpawn.name);
-                    delete availableSpawns[bestAvailableSpawnCounter];
                 }
             }
         }
