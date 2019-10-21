@@ -62,5 +62,3 @@ module.exports.loop = function () {
 // to complete below i just need to handle flag jobs
 // TODO inefficient problem - creeps can be one tick quicker if I try and move to a new action after a finished action
 // TODO ExecuteJobs: move job actions over to use GenericAction
-
-// TODO assigncreeps for flag jobs
