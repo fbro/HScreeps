@@ -179,6 +179,8 @@ const CreateJobs = {
                 } else if (gameFlag.color === COLOR_ORANGE && gameFlag.secondaryColor === COLOR_YELLOW) { // scout at pos
                     jobName = '5ScoutPos';
                     creepType = 'S';
+                } else if (gameFlag.color === COLOR_ORANGE && gameFlag.secondaryColor === COLOR_RED) {
+                    // observers handle this flag
                 } else if (gameFlag.color === COLOR_RED && gameFlag.secondaryColor === COLOR_RED) { // warrior at pos
                     jobName = '2GuardPos';
                     creepType = 'W';

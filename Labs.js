@@ -22,6 +22,9 @@ const Labs = {
                 //    TODO move utrium
                 // after ghodium hydride is created it should be distributed to all the other rooms
 
+
+                // Z+K + U+L = G
+                // G + H = GH --> ghodium hydride
             }
         }
     }

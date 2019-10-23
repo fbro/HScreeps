@@ -5,6 +5,7 @@ let Towers = require('Towers');
 let Links = require('Links');
 let Terminals = require('Terminals');
 let Logs = require('Logs');
+let Observers = require('Observers');
 
 module.exports.loop = function () {
 
@@ -39,10 +40,12 @@ module.exports.loop = function () {
                     }
                 }
             }
+
         }
         AssignJobs.run();
     }
     ExecuteJobs.run();
+    Observers.run();
 };
 
 

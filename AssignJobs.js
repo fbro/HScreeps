@@ -38,7 +38,7 @@ const AssignJobs = {
             for (const memRoomKey in Memory.MemRooms) {
                 const memRoom = Memory.MemRooms[memRoomKey];
                 const idleCreepsInRoom = _.filter(idleCreeps, function (creep) {
-                    return creep.pos.roomName === memRoomKey;
+                    return creep && creep.pos.roomName === memRoomKey;
                 });
                 // TODO what about many idle creeps in one room that could be moved to another room
                 // TODO what about idle creeps that could take a job in another neutral room so that one does not need to spawn a new creep
