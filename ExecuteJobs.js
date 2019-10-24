@@ -111,19 +111,19 @@ const ExecuteJobs = {
                     result = JobSource(creep, roomJob);
                     break;
                 case jobKey.startsWith('0Ctrl') || jobKey.startsWith('9Ctrl') :
-                    result = JobController(creep, roomJob); // uses JobEnergyAction()
+                    result = JobController(creep, roomJob);
                     break;
                 case jobKey.startsWith('3Rep'):
-                    result = JobRepair(creep, roomJob); // uses JobEnergyAction()
+                    result = JobRepair(creep, roomJob);
                     break;
                 case jobKey.startsWith('2Constr'):
-                    result = JobConstruction(creep, roomJob); // uses JobEnergyAction()
+                    result = JobConstruction(creep, roomJob);
                     break;
                 case jobKey.startsWith('0FillSpwnEx'):
-                    result = JobFillSpawnExtension(creep, roomJob); // uses JobEnergyAction()
+                    result = JobFillSpawnExtension(creep, roomJob);
                     break;
                 case jobKey.startsWith('2FillTwr'):
-                    result = JobFillTower(creep, roomJob); // uses JobEnergyAction()
+                    result = JobFillTower(creep, roomJob);
                     break;
                 case jobKey.startsWith('5FillStrg') || jobKey.startsWith('5FillStrgFromRemote') || jobKey.startsWith('4FillStrg-drp'):
                     result = JobFillStorage(creep, roomJob);
@@ -135,10 +135,13 @@ const ExecuteJobs = {
                     result = JobFillTerminalMineral(creep, roomJob);
                     break;
                 case jobKey.startsWith('4FillTermE'):
-                    result = JobFillTerminalEnergy(creep, roomJob); // uses JobEnergyAction()
+                    result = JobFillTerminalEnergy(creep, roomJob);
                     break;
                 case jobKey.startsWith('3FillLabE'):
-                    result = JobFillLabEnergy(creep, roomJob); // uses JobEnergyAction()
+                    result = JobFillLabEnergy(creep, roomJob);
+                    break;
+                case jobKey.startsWith('5FillPSpwnE'):
+                    result = JobFillPowerSpawnEnergy(creep, roomJob);
                     break;
 
                 // flag jobs
@@ -794,6 +797,44 @@ const ExecuteJobs = {
 
         /**@return {int}*/
         function JobFillLabEnergy(creep, roomJob) {
+            const result = GenericJobAction(creep, roomJob, {
+                /**@return {int}*/
+                JobStatus: function (jobObject) {
+                    if (jobObject.store[RESOURCE_ENERGY] === jobObject.store.getCapacity(RESOURCE_ENERGY)) {
+                        return JOB_IS_DONE;
+                    } else if (creep.store[RESOURCE_ENERGY] === 0) { // fetch
+                        return SHOULD_FETCH;
+                    } else { // action not done yet
+                        return SHOULD_ACT;
+                    }
+                },
+                /**@return {int}*/
+                Act: function (jobObject) {
+                    return creep.transfer(jobObject, RESOURCE_ENERGY);
+                },
+                /**@return {int}*/
+                IsJobDone: function (jobObject) {
+                    if (creep.store[RESOURCE_ENERGY] + jobObject.store[RESOURCE_ENERGY] >= jobObject.store.getCapacity(RESOURCE_ENERGY)) {
+                        return JOB_IS_DONE;
+                    } else {
+                        return this.JobStatus(jobObject);
+                    }
+                },
+                /**@return {object}
+                 * @return {undefined}*/
+                FindFetchObject: function (jobObject) {
+                    return FindFetchEnergy(creep, jobObject);
+                },
+                /**@return {int}*/
+                Fetch: function (fetchObject, jobObject) {
+                    return FetchEnergy(creep, fetchObject);
+                },
+            });
+            return result;
+        }
+
+        /**@return {int}*/
+        function JobFillPowerSpawnEnergy(creep, roomJob) {
             const result = GenericJobAction(creep, roomJob, {
                 /**@return {int}*/
                 JobStatus: function (jobObject) {

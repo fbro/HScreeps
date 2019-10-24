@@ -46,126 +46,6 @@ const CreateJobs = {
         let flagJobs = CreateFlagJobs();
         CreateObjJobs(flagJobs);
 
-        function CreateObjJobs(flagJobs) {
-            for (const gameRoomKey in Game.rooms) {
-                const gameRoom = Game.rooms[gameRoomKey]; // visible room
-                let jobs = {};
-                // weave flag jobs into the job array that is in this room object
-                for (const flagJobKey in flagJobs) {
-                    if (flagJobKey.split(')').pop() === gameRoomKey) {
-                        const flagJob = flagJobs[flagJobKey];
-                        jobs[flagJobKey] = flagJob; // add job to this room job array
-                        flagJobs[flagJobKey] = undefined;
-                        // console.log('CreateJobs CreateObjJobs flagJobs found in ' + gameRoomKey + ' ' + flagJobKey + ' ' + JSON.stringify(jobs[flagJobKey]) + ' length ' + Object.keys(jobs).length);
-                    }
-                }
-                if (gameRoom.controller && gameRoom.controller.my) { // create all the jobs in this room
-                    // Source
-                    const sources = gameRoom.find(FIND_SOURCES);
-                    for (const sourceKey in sources) {
-                        const source = sources[sourceKey];
-                        new RoomVisual(gameRoom.name).text('🏭', source.pos.x, source.pos.y);
-                        AddJob(jobs, '1Src(' + source.pos.x + ',' + source.pos.y + ')' + gameRoom.name, source.id, OBJECT_JOB, 'H');
-                    }
-                    // Controller
-                    new RoomVisual(gameRoom.name).text('🧠', gameRoom.controller.pos.x, gameRoom.controller.pos.y);
-                    AddJob(jobs, '0Ctrl(' + gameRoom.controller.pos.x + ',' + gameRoom.controller.pos.y + ')' + gameRoom.name, gameRoom.controller.id, OBJECT_JOB, 'B');
-                    // FillSpawnExtension
-                    FillSpawnExtensionJobs(gameRoom, jobs);
-                    // Construction
-                    ConstructionJobs(gameRoom, jobs);
-                    // Repair
-                    RepairJobs(gameRoom, jobs);
-                    if (gameRoom.controller.level < 8 && gameRoom.storage && gameRoom.storage.store[RESOURCE_ENERGY] > 100000) { // not at max level - more creeps on the controller job
-                        AddJob(jobs, '9Ctrl(' + gameRoom.controller.pos.x + ',' + gameRoom.controller.pos.y + ')' + gameRoom.name, gameRoom.controller.id, OBJECT_JOB, 'B');
-                    }
-                    if (gameRoom.controller.level >= 3) {
-                        // FillTower
-                        FillTowerJobs(gameRoom, jobs);
-                        if (gameRoom.controller.level >= 4) {
-                            if (gameRoom.storage !== undefined) {
-                                // FillStorage - link, container and resource drops
-                                FillStorageJobs(gameRoom, jobs);
-                                // FillStorageFromRemote
-                                if (Memory.MemRooms[gameRoom.name] && Memory.MemRooms[gameRoom.name].AttachedRooms) {
-                                    FillStorageFromRemoteJobs(gameRoom, jobs);
-                                }
-                                if (gameRoom.controller.level >= 6) {
-                                    // ExtractMineral
-                                    ExtractMineralJobs(gameRoom, jobs);
-                                    // FillTerminalEnergy
-                                    FillTerminalEnergyJobs(gameRoom, jobs);
-                                    // FillTerminalMineral
-                                    FillTerminalMineralJobs(gameRoom, jobs);
-                                    // FillLabEnergy
-                                    FillLabEnergyJobs(gameRoom, jobs);
-                                    // if (gameRoom.controller.level === 8) {
-                                    // TODO FillPowerSpawnEnergy
-                                    // TODO FillPowerSpawnPowerUnits
-                                    // }
-                                }
-                            }
-                        }
-                    }
-                }
-                if (!Memory.MemRooms[gameRoom.name] && Object.keys(jobs).length > 0) { // room not found and there are jobs in it - create it
-                    CreateRoom(gameRoom.name, jobs);
-                } else if (Memory.MemRooms[gameRoom.name]) { // update jobs in memRoom
-                    let addedNewJob = false;
-                    // add new jobs
-                    for (const newJobKey in jobs) { // loop through new jobs
-                        if (!Memory.MemRooms[gameRoom.name].RoomJobs[newJobKey]) { // new job does not already exist
-                            Memory.MemRooms[gameRoom.name].RoomJobs[newJobKey] = jobs[newJobKey]; // save it
-                            //console.log("CreateJobs CreateObjJobs new job added " + newJobKey);
-                            addedNewJob = true;
-                        }
-                    }
-                    // remove only old disappeared vacant jobs
-                    for (const oldJobKey in Memory.MemRooms[gameRoom.name].RoomJobs) { // loop through old jobs
-                        const oldJob = Memory.MemRooms[gameRoom.name].RoomJobs[oldJobKey];
-                        if (oldJob.Creep === 'vacant' && !jobs[oldJobKey]) { // old job is vacant and old job id not en the new job array
-                            Memory.MemRooms[gameRoom.name].RoomJobs[oldJobKey] = undefined; // delete old vacant disappeared job
-                            //console.log("CreateJobs CreateObjJobs old job deleted " + oldJobKey);
-                        }
-                    }
-                    if (Memory.MemRooms[gameRoom.name].RoomLevel !== gameRoom.controller.level) { // room level change
-                        Memory.MemRooms[gameRoom.name].RoomLevel = gameRoom.controller.level;
-                        Memory.MemRooms[gameRoom.name].SourceNumber = gameRoom.find(FIND_SOURCES).length;
-                        Memory.MemRooms[gameRoom.name].MaxCreeps = {}; // reset - maybe the MaxCreepsInRoom changes with room level
-                    }
-                    if (addedNewJob) { // new jobs have been added, now sort the job array
-                        Memory.MemRooms[gameRoom.name].RoomJobs = SortObj(Memory.MemRooms[gameRoom.name].RoomJobs);
-                    }
-                }
-            }
-
-            // now some flag jobs might still be unplaced, loop trough them and add them maybe also create the room object
-            for (const flagJobKey in flagJobs) {
-                const roomName = flagJobKey.split(')').pop();
-                const flagJob = flagJobs[flagJobKey];
-                if (Memory.MemRooms[roomName]) {
-                    if (!Memory.MemRooms[roomName].RoomJobs[flagJobKey]) {
-                        Memory.MemRooms[roomName].RoomJobs[flagJobKey] = flagJob;
-                    }
-                } else {
-                    const jobs = {};
-                    jobs[flagJobKey] = flagJob;
-                    CreateRoom(roomName, jobs);
-                }
-            }
-        }
-
-        function SortObj(map) {
-            const keys = _.sortBy(_.keys(map), function (a) {
-                return a;
-            });
-            const newmap = {};
-            _.each(keys, function (k) {
-                newmap[k] = map[k];
-            });
-            return newmap;
-        }
-
         // this method is not just run in the Game.rooms loop because flags may be in "invisible" rooms
         function CreateFlagJobs() {
             let jobs = {};
@@ -243,10 +123,162 @@ const CreateJobs = {
             return jobs;
         }
 
+        function CreateObjJobs(flagJobs) {
+            for (const gameRoomKey in Game.rooms) {
+                const gameRoom = Game.rooms[gameRoomKey]; // visible room
+                let jobs = {};
+                // weave flag jobs into the job array that is in this room object
+                for (const flagJobKey in flagJobs) {
+                    if (flagJobKey.split(')').pop() === gameRoomKey) {
+                        const flagJob = flagJobs[flagJobKey];
+                        jobs[flagJobKey] = flagJob; // add job to this room job array
+                        flagJobs[flagJobKey] = undefined;
+                        // console.log('CreateJobs CreateObjJobs flagJobs found in ' + gameRoomKey + ' ' + flagJobKey + ' ' + JSON.stringify(jobs[flagJobKey]) + ' length ' + Object.keys(jobs).length);
+                    }
+                }
+                if (gameRoom.controller && gameRoom.controller.my) { // create all the jobs in this room
+                    // Source
+                    const sources = gameRoom.find(FIND_SOURCES);
+                    for (const sourceKey in sources) {
+                        const source = sources[sourceKey];
+                        new RoomVisual(gameRoom.name).text('🏭', source.pos.x, source.pos.y);
+                        AddJob(jobs, '1Src(' + source.pos.x + ',' + source.pos.y + ')' + gameRoom.name, source.id, OBJECT_JOB, 'H');
+                    }
+                    // Controller
+                    new RoomVisual(gameRoom.name).text('🧠', gameRoom.controller.pos.x, gameRoom.controller.pos.y);
+                    AddJob(jobs, '0Ctrl(' + gameRoom.controller.pos.x + ',' + gameRoom.controller.pos.y + ')' + gameRoom.name, gameRoom.controller.id, OBJECT_JOB, 'B');
+                    // FillSpawnExtension
+                    FillSpawnExtensionJobs(gameRoom, jobs);
+                    // Construction
+                    ConstructionJobs(gameRoom, jobs);
+                    // Repair
+                    RepairJobs(gameRoom, jobs);
+                    if (gameRoom.controller.level < 8 && gameRoom.storage && gameRoom.storage.store[RESOURCE_ENERGY] > 100000) { // not at max level - more creeps on the controller job
+                        AddJob(jobs, '9Ctrl(' + gameRoom.controller.pos.x + ',' + gameRoom.controller.pos.y + ')' + gameRoom.name, gameRoom.controller.id, OBJECT_JOB, 'B');
+                    }
+                    if (gameRoom.controller.level >= 3) {
+                        // FillTower
+                        FillTowerJobs(gameRoom, jobs);
+                        if (gameRoom.controller.level >= 4) {
+                            if (gameRoom.storage !== undefined) {
+                                // FillStorage - link, container and resource drops
+                                FillStorageJobs(gameRoom, jobs);
+                                // FillStorageFromRemote
+                                if (Memory.MemRooms[gameRoom.name] && Memory.MemRooms[gameRoom.name].AttachedRooms) {
+                                    FillStorageFromRemoteJobs(gameRoom, jobs);
+                                }
+                                if (gameRoom.controller.level >= 6) {
+                                    // ExtractMineral
+                                    ExtractMineralJobs(gameRoom, jobs);
+                                    // FillTerminalEnergy
+                                    FillTerminalEnergyJobs(gameRoom, jobs);
+                                    // FillTerminalMineral
+                                    FillTerminalMineralJobs(gameRoom, jobs);
+                                    // FillLabEnergy
+                                    FillLabEnergyJobs(gameRoom, jobs);
+                                    if (gameRoom.controller.level === 8) {
+                                        FillPowerSpawnEnergyJobs(gameRoom, jobs);
+                                        // TODO FillPowerSpawnPowerJobs
+                                        HarvestPowerJobs(gameRoom, jobs);
+                                        // TODO HarvestDepositJobs
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                if (!Memory.MemRooms[gameRoom.name] && Object.keys(jobs).length > 0) { // room not found and there are jobs in it - create it
+                    CreateRoom(gameRoom.name, jobs);
+                } else if (Memory.MemRooms[gameRoom.name]) { // update jobs in memRoom
+                    let addedNewJob = false;
+                    // add new jobs
+                    for (const newJobKey in jobs) { // loop through new jobs
+                        if (!Memory.MemRooms[gameRoom.name].RoomJobs[newJobKey]) { // new job does not already exist
+                            Memory.MemRooms[gameRoom.name].RoomJobs[newJobKey] = jobs[newJobKey]; // save it
+                            //console.log("CreateJobs CreateObjJobs new job added " + newJobKey);
+                            addedNewJob = true;
+                        }
+                    }
+                    // remove only old disappeared vacant jobs
+                    for (const oldJobKey in Memory.MemRooms[gameRoom.name].RoomJobs) { // loop through old jobs
+                        const oldJob = Memory.MemRooms[gameRoom.name].RoomJobs[oldJobKey];
+                        if (oldJob.Creep === 'vacant' && !jobs[oldJobKey]) { // old job is vacant and old job id not en the new job array
+                            Memory.MemRooms[gameRoom.name].RoomJobs[oldJobKey] = undefined; // delete old vacant disappeared job
+                            //console.log("CreateJobs CreateObjJobs old job deleted " + oldJobKey);
+                        }
+                    }
+                    if (Memory.MemRooms[gameRoom.name].RoomLevel !== gameRoom.controller.level) { // room level change
+                        Memory.MemRooms[gameRoom.name].RoomLevel = gameRoom.controller.level;
+                        Memory.MemRooms[gameRoom.name].SourceNumber = gameRoom.find(FIND_SOURCES).length;
+                        Memory.MemRooms[gameRoom.name].MaxCreeps = {}; // reset - maybe the MaxCreepsInRoom changes with room level
+                    }
+                    if (addedNewJob) { // new jobs have been added, now sort the job array
+                        Memory.MemRooms[gameRoom.name].RoomJobs = SortObj(Memory.MemRooms[gameRoom.name].RoomJobs);
+                    }
+                }
+            }
+
+            // now some flag jobs might still be unplaced, loop trough them and add them maybe also create the room object
+            for (const flagJobKey in flagJobs) {
+                const roomName = flagJobKey.split(')').pop();
+                const flagJob = flagJobs[flagJobKey];
+                if (Memory.MemRooms[roomName]) {
+                    if (!Memory.MemRooms[roomName].RoomJobs[flagJobKey]) {
+                        Memory.MemRooms[roomName].RoomJobs[flagJobKey] = flagJob;
+                    }
+                } else {
+                    const jobs = {};
+                    jobs[flagJobKey] = flagJob;
+                    CreateRoom(roomName, jobs);
+                }
+            }
+        }
+
+        function SortObj(map) {
+            const keys = _.sortBy(_.keys(map), function (a) {
+                return a;
+            });
+            const newmap = {};
+            _.each(keys, function (k) {
+                newmap[k] = map[k];
+            });
+            return newmap;
+        }
+
         // jobs:
 
+        function HarvestPowerJobs(gameRoom, roomJobs){
+            for(const roomKey in Memory.MemRooms[gameRoom.name].MapScan){
+                const scan = Memory.MemRooms[gameRoom.name].MapScan[roomKey];
+                if(scan && scan.type === 'powerBank'){
+                    // power bank found
+                    console.log('CreateJobs HarvestPowerJobs found power in ' + roomKey);
+                    // TODO i am doing something new here - i am creating a job in a room that is actually happening in another room - this has not been tested before
+                    // TODO one could dynamically create new flags on scan and remove when deadline is reached - that flag can then be used in the flag flow as we all know and lovev
+                    // AddJob(roomJobs, '4HrvstP(' + scan.pos.x + ',' + scan.pos.y + ')' + roomKey, scan.id, OBJECT_JOB, 'P');
+                }
+            }
+        }
+
+        function FillPowerSpawnEnergyJobs(gameRoom, roomJobs) {
+            if (gameRoom.storage && gameRoom.storage.store[RESOURCE_ENERGY] > 5000) {
+                const powerSpawns = gameRoom.find(FIND_MY_STRUCTURES, {
+                    filter: (s) => {
+                        return s.structureType === STRUCTURE_POWER_SPAWN;
+                    }
+                });
+                for (const powerSpawnKey in powerSpawns) {
+                    const powerSpawn = powerSpawns[powerSpawnKey];
+                    if (powerSpawn && powerSpawn.store[RESOURCE_ENERGY] < powerSpawn.store.getCapacity(RESOURCE_ENERGY)) {
+                        new RoomVisual(gameRoom.name).text('⚡', powerSpawn.pos.x, powerSpawn.pos.y);
+                        AddJob(roomJobs, '5FillPSpwnE(' + powerSpawn.pos.x + ',' + powerSpawn.pos.y + ')' + gameRoom.name, powerSpawn.id, OBJECT_JOB, 'T');
+                    }
+                }
+            }
+        }
+
         function FillLabEnergyJobs(gameRoom, roomJobs) {
-            if (gameRoom.storage && gameRoom.storage.store[RESOURCE_ENERGY] > 50000) {
+            if (gameRoom.storage && gameRoom.storage.store[RESOURCE_ENERGY] > 5000) {
                 const labs = gameRoom.find(FIND_MY_STRUCTURES, {
                     filter: (s) => {
                         return s.structureType === STRUCTURE_LAB;
