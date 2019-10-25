@@ -59,9 +59,12 @@ const CreateJobs = {
                 } else if (gameFlag.color === COLOR_ORANGE && gameFlag.secondaryColor === COLOR_YELLOW) { // scout at pos
                     jobName = '5ScoutPos';
                     creepType = 'S';
-                } else if (gameFlag.color === COLOR_ORANGE && gameFlag.secondaryColor === COLOR_RED) {
+                } else if (gameFlag.color === COLOR_ORANGE && gameFlag.secondaryColor === COLOR_RED) { // flag to be placed on an observer that enables it to scan for power banks and deposits
                     // observers handle this flag
-                } else if (gameFlag.color === COLOR_RED && gameFlag.secondaryColor === COLOR_RED) { // warrior at pos
+                } else if (gameFlag.color === COLOR_ORANGE && gameFlag.secondaryColor === COLOR_PURPLE) { // flag that observers create and put on found power banks and deposits and deletes again when deadline is reached
+                    jobName = '3HrvstPwrBnk';
+                    creepType = 'P';
+                }else if (gameFlag.color === COLOR_RED && gameFlag.secondaryColor === COLOR_RED) { // warrior at pos
                     jobName = '2GuardPos';
                     creepType = 'W';
                 } else if (gameFlag.color === COLOR_YELLOW && gameFlag.secondaryColor === COLOR_YELLOW) { // distantHarvester on source at flag pos
@@ -179,8 +182,6 @@ const CreateJobs = {
                                     if (gameRoom.controller.level === 8) {
                                         FillPowerSpawnEnergyJobs(gameRoom, jobs);
                                         // TODO FillPowerSpawnPowerJobs
-                                        HarvestPowerJobs(gameRoom, jobs);
-                                        // TODO HarvestDepositJobs
                                     }
                                 }
                             }
@@ -246,19 +247,6 @@ const CreateJobs = {
         }
 
         // jobs:
-
-        function HarvestPowerJobs(gameRoom, roomJobs){
-            for(const roomKey in Memory.MemRooms[gameRoom.name].MapScan){
-                const scan = Memory.MemRooms[gameRoom.name].MapScan[roomKey];
-                if(scan && scan.type === 'powerBank'){
-                    // power bank found
-                    console.log('CreateJobs HarvestPowerJobs found power in ' + roomKey);
-                    // TODO i am doing something new here - i am creating a job in a room that is actually happening in another room - this has not been tested before
-                    // TODO one could dynamically create new flags on scan and remove when deadline is reached - that flag can then be used in the flag flow as we all know and lovev
-                    // AddJob(roomJobs, '4HrvstP(' + scan.pos.x + ',' + scan.pos.y + ')' + roomKey, scan.id, OBJECT_JOB, 'P');
-                }
-            }
-        }
 
         function FillPowerSpawnEnergyJobs(gameRoom, roomJobs) {
             if (gameRoom.storage && gameRoom.storage.store[RESOURCE_ENERGY] > 5000) {

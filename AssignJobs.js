@@ -424,6 +424,29 @@ const AssignJobs = {
                             break;
                     }
                     break;
+                // power harvester
+                case 'P':
+                    switch (true) {
+                        case (energyAvailable >= 3080): // energyCapacityAvailable: 12900
+                            body = [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, HEAL, HEAL, HEAL, HEAL];
+                            break;
+                        case (energyAvailable >= 2650): // energyCapacityAvailable: 5600
+                            body = [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, HEAL, HEAL, HEAL];
+                            break;
+                        case (energyAvailable >= 2220): // energyCapacityAvailable: 2300
+                            body = [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, ATTACK, ATTACK, ATTACK, ATTACK, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, HEAL, HEAL];
+                            break;
+                        case (energyAvailable >= 1790): // energyCapacityAvailable: 1800
+                            body = [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, ATTACK, ATTACK, ATTACK, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, HEAL, HEAL];
+                            break;
+                        case (energyAvailable >= 1260): // energyCapacityAvailable: 1300
+                            body = [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, ATTACK, ATTACK, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, HEAL];
+                            break;
+                        case (energyAvailable >= 530): // energyCapacityAvailable: 550
+                            body = [MOVE, MOVE, MOVE, ATTACK, CARRY, HEAL];
+                            break;
+                    }
+                    break;
                 default:
                     Logs.Error('AssignJobs-GetCreepBody-creepTypeNotFound', 'AssignJobs GetCreepBody ERROR! creepType not found ' + creepType);
             }

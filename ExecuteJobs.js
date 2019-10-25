@@ -169,6 +169,9 @@ const ExecuteJobs = {
                 case jobKey.startsWith('5EmptyLabMin'):
                     result = JobEmptyLabMineral(creep, roomJob);
                     break;
+                case jobKey.startsWith('3HrvstPwrBnk'):
+                    result = JobHarvestPowerBank(creep, roomJob);
+                    break;
                 default:
                     Logs.Error('ExecuteJobs-JobAction-jobNotFound', 'ExecuteJobs JobAction ERROR! job not found ' + jobKey + ' ' + creep.name);
             }
@@ -1286,6 +1289,39 @@ const ExecuteJobs = {
             return result;
         }
 
+        /**@return {int}*/
+        function JobHarvestPowerBank(creep, roomJob){
+            // TODO
+            const result = GenericFlagAction(creep, roomJob, {
+                /**@return {int}*/
+                JobStatus: function (jobObject) {
+                    if(creep.store.getFreeCapacity() > 0){
+                        return SHOULD_ACT;
+                    }else{
+                        return SHOULD_FETCH
+                    }
+                },
+                /**@return {int}*/
+                Act: function (jobObject) {
+                    if(!jobObject.room){ // invisible
+                        return ERR_NOT_IN_RANGE;
+                    }else if(creep.memory.PowerBankId){
+                        //Game.getObjectById(creep.memory.PowerBankId);
+                    }
+                },
+                /**@return {int}*/
+                IsJobDone: function (jobObject) {
+                },
+                /**@return {object}
+                 * @return {undefined}*/
+                FindFetchObject: function (jobObject) {
+                },
+                /**@return {int}*/
+                Fetch: function (fetchObject, jobObject) {
+                },
+            });
+            return result;
+        }
 
         // helper functions:
 
