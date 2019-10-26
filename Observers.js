@@ -80,15 +80,17 @@ const Observers = {
                                     }
                                 })[0];
                                 if(powerBank){
-                                    console.log('Observers power bank found! in ' + roomKey);
+                                    const freeSpaces = FreeSpaces(powerBank.pos);
+                                    console.log('Observers power bank found! in ' + roomKey + ' freeSpaces ' + freeSpaces);
                                     //scanStatus = {'type' : 'powerBank', 'id' : powerBank.id, 'pos' : powerBank.pos, 'deadline' : powerBank.ticksToDecay + Game.time}; // TODO reactivate
-                                    //Game.rooms[roomKey].createFlag(powerBank.pos, 'powerBank-' + powerBank.pos.roomName, COLOR_ORANGE, COLOR_PURPLE); // TODO reactivate
+                                    //Game.rooms[roomKey].createFlag(powerBank.pos, powerBank.pos.roomName + '-' + freeSpaces, COLOR_ORANGE, COLOR_PURPLE); // TODO reactivate
                                 }else{
                                     const deposit = Game.rooms[roomKey].find(FIND_DEPOSITS)[0];
                                     if(deposit){
-                                        console.log('Observers deposit found! in ' + roomKey);
+                                        const freeSpaces = FreeSpaces(powerBank.pos);
+                                        console.log('Observers deposit found! in ' + roomKey + ' freeSpaces ' + freeSpaces);
                                         //scanStatus = {'type' : 'deposit', 'id' : deposit.id, 'pos' : deposit.pos, 'deadline' : deposit.ticksToDecay + Game.time, 'depositType' : deposit.depositType}; // TODO reactivate
-                                        //Game.rooms[roomKey].createFlag(powerBank.pos, 'deposit-' + powerBank.pos.roomName, COLOR_ORANGE, COLOR_PURPLE); // TODO reactivate
+                                        //Game.rooms[roomKey].createFlag(deposit.pos, deposit.pos.roomName + '-' + freeSpaces, COLOR_ORANGE, COLOR_CYAN); // TODO reactivate
                                     }else{
                                         deleteScan = true;
                                     }
@@ -108,6 +110,21 @@ const Observers = {
                     }
                 }
             }
+        }
+
+        /**@return {number}*/
+        function FreeSpaces(pos){ // get the number of free spaces around the power bank or deposit
+            let freeSpaces = 0;
+            const terrain = Game.map.getRoomTerrain(pos.roomName);
+            for(let x = pos.x - 1; x <= pos.x + 1; x++){
+                for(let y = pos.y - 1; y <= pos.y + 1; y++){
+                    const t = terrain.get(x, y);
+                    if(t === 0 && (pos.x !== x || pos.y !== y)){
+                        freeSpaces++;
+                    }
+                }
+            }
+            return freeSpaces;
         }
     }
 };

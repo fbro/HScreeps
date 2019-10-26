@@ -54,22 +54,26 @@ const CreateJobs = {
                 let jobName;
                 let creepType;
                 if (gameFlag.color === COLOR_ORANGE && gameFlag.secondaryColor === COLOR_ORANGE) { // scout tag
-                    jobName = '4TagCtrl';
-                    creepType = 'S';
+                    CreateFlagJob(jobs, '4TagCtrl', gameFlagKey, gameFlag, 'S');
                 } else if (gameFlag.color === COLOR_ORANGE && gameFlag.secondaryColor === COLOR_YELLOW) { // scout at pos
-                    jobName = '5ScoutPos';
-                    creepType = 'S';
+                    CreateFlagJob(jobs, '5ScoutPos', gameFlagKey, gameFlag, 'S');
                 } else if (gameFlag.color === COLOR_ORANGE && gameFlag.secondaryColor === COLOR_RED) { // flag to be placed on an observer that enables it to scan for power banks and deposits
                     // observers handle this flag
-                } else if (gameFlag.color === COLOR_ORANGE && gameFlag.secondaryColor === COLOR_PURPLE) { // flag that observers create and put on found power banks and deposits and deletes again when deadline is reached
-                    jobName = '3HrvstP';
-                    creepType = 'P';
+                } else if (gameFlag.color === COLOR_ORANGE && gameFlag.secondaryColor === COLOR_PURPLE) { // flag that observers create and put on found power banks and deletes again when deadline is reached
+                    let freeSpaces = gameFlagKey.split('-').pop();
+                    if(freeSpaces > 3){freeSpaces = 3;} // no more than 3 power harvesters should be available
+                    for(let e = 0; e < freeSpaces; e++){
+                        CreateFlagJob(jobs, '3HrvstP' + e, gameFlagKey, gameFlag, 'P');
+                    }
+                    // TODO create a job here that only gets created when power bank is visible and low on health - this job will activate one or more priority 1 transporter jobs
+                } else if (gameFlag.color === COLOR_ORANGE && gameFlag.secondaryColor === COLOR_CYAN) { // flag that observers create and put on deposits and deletes again when deadline is reached
+                    // TODO not using deposits yet
                 }else if (gameFlag.color === COLOR_RED && gameFlag.secondaryColor === COLOR_RED) { // warrior at pos
                     jobName = '2GuardPos';
                     creepType = 'W';
+                    CreateFlagJob(jobs, jobName, gameFlagKey, gameFlag, creepType)
                 } else if (gameFlag.color === COLOR_YELLOW && gameFlag.secondaryColor === COLOR_YELLOW) { // distantHarvester on source at flag pos
-                    jobName = '5RemoteHarvest';
-                    creepType = 'D';
+                    CreateFlagJob(jobs, '5RemoteHarvest', gameFlagKey, gameFlag, 'D');
                 } else if (gameFlag.color === COLOR_PURPLE && gameFlag.secondaryColor === COLOR_PURPLE) { // FillLabMineral
                     if (!gameFlag.pos.findInRange(FIND_MY_STRUCTURES, 0, {
                         filter: function (s) {
@@ -83,8 +87,8 @@ const CreateJobs = {
                             return s.structureType === STRUCTURE_LAB;
                         }
                     })[0].mineralAmount < LAB_MINERAL_CAPACITY) {
-                        jobName = '6FillLabMin'; // flagname rules: GET-L = get lemergium from all rooms, BUY-L = get it from all rooms or then buy it from the terminal
-                        creepType = 'T';
+                        // flagname rules: GET-L = get lemergium from all rooms, BUY-L = get it from all rooms or then buy it from the terminal
+                        CreateFlagJob(jobs, '6FillLabMin', gameFlagKey, gameFlag, 'T');
                     }
                 } else if (gameFlag.color === COLOR_PURPLE && gameFlag.secondaryColor === COLOR_WHITE) { // EmptyLabMineral
                     if (!gameFlag.pos.findInRange(FIND_MY_STRUCTURES, 0, {
@@ -99,31 +103,29 @@ const CreateJobs = {
                             return s.structureType === STRUCTURE_LAB;
                         }
                     })[0].mineralAmount > 0) {
-                        jobName = '5EmptyLabMin'; // flagname rules: CREATE-GH = CREATE the mineral from the nearby lab to this lab
-                        creepType = 'T';
+                        // flagname rules: CREATE-GH = CREATE the mineral from the nearby lab to this lab
+                        CreateFlagJob(jobs, '5EmptyLabMin', gameFlagKey, gameFlag, 'T');
                     }
                 } else if (gameFlag.color === COLOR_GREEN && gameFlag.secondaryColor === COLOR_GREEN) { // claimer claim
-                    jobName = '1ClaimCtrl';
-                    creepType = 'C';
+                    CreateFlagJob(jobs, '1ClaimCtrl', gameFlagKey, gameFlag, 'C');
                 } else if (gameFlag.color === COLOR_GREEN && gameFlag.secondaryColor === COLOR_YELLOW) { // claimer reserve
                     if (!gameFlag.room
                         || !gameFlag.room.controller.reservation
                         || !Memory.MemRooms[gameFlag.pos.roomName]
                         || Memory.MemRooms[gameFlag.pos.roomName].RoomJobs['4ReserveCtrl-' + gameFlagKey + '(' + gameFlag.pos.x + ',' + gameFlag.pos.y + ')' + gameFlag.pos.roomName]
                         || (gameFlag.room.controller.reservation.ticksToEnd < 2500 && !Memory.MemRooms[gameFlag.pos.roomName].RoomJobs[gameFlagKey])) { // extra logic to try and optimize creep not being idle
-                        jobName = '4ReserveCtrl';
-                        creepType = 'R';
+                        CreateFlagJob(jobs, '4ReserveCtrl', gameFlagKey, gameFlag, 'R');
                     }
                 } else {
                     Logs.Error('CreateJobs-CreateFlagJobs-flagColorNotFound', 'CreateJobs CreateFlagJobs ERROR! flag color not found ' + gameFlagKey + ' ' + gameFlag.color + ' ' + gameFlag.secondaryColor + ' (' + gameFlag.pos.x + ',' + gameFlag.pos.y + ')');
                 }
-
-                if (jobName) {
-                    //console.log('CreateJobs CreateFlagJobs AddJob ' + gameFlagKey);
-                    AddJob(jobs, jobName + '-' + gameFlagKey + '(' + gameFlag.pos.x + ',' + gameFlag.pos.y + ')' + gameFlag.pos.roomName, gameFlagKey, FLAG_JOB, creepType);
-                }
             }
             return jobs;
+        }
+
+        function CreateFlagJob(jobs, jobName, gameFlagKey, gameFlag, creepType){
+            //console.log('CreateJobs CreateFlagJobs AddJob ' + gameFlagKey);
+            return AddJob(jobs, jobName + '-' + gameFlagKey + '(' + gameFlag.pos.x + ',' + gameFlag.pos.y + ')' + gameFlag.pos.roomName, gameFlagKey, FLAG_JOB, creepType);
         }
 
         function CreateObjJobs(flagJobs) {
