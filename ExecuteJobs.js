@@ -74,7 +74,7 @@ const ExecuteJobs = {
                             if (!gameCreep.memory.MoveHome) {
                                 let bestDistance = Number.MAX_SAFE_INTEGER;
                                 for (const memRoomKey in Memory.MemRooms) { // search for best storage
-                                    if (Game.rooms[memRoomKey] && Game.rooms[memRoomKey].controller.my) { // exist and has room
+                                    if (Game.rooms[memRoomKey] && Game.rooms[memRoomKey].controller && Game.rooms[memRoomKey].controller.my) { // exist and has room
                                         const distance = Game.map.getRoomLinearDistance(gameCreep.pos.roomName, memRoomKey);
                                         if (distance < bestDistance) {
                                             closestOwnedRoom = memRoomKey;
@@ -169,7 +169,7 @@ const ExecuteJobs = {
                 case jobKey.startsWith('5EmptyLabMin'):
                     result = JobEmptyLabMineral(creep, roomJob);
                     break;
-                case jobKey.startsWith('3HrvstPwrBnk'):
+                case jobKey.startsWith('3HrvstP'):
                     result = JobHarvestPowerBank(creep, roomJob);
                     break;
                 default:
@@ -1161,7 +1161,7 @@ const ExecuteJobs = {
                     if (!closestRoomWithStorage) {
                         let bestDistance = Number.MAX_SAFE_INTEGER;
                         for (const memRoomKey in Memory.MemRooms) { // search for best storage
-                            if (Game.rooms[memRoomKey].storage && Game.rooms[memRoomKey].storage.store.getFreeCapacity() > 0) { // exist and has room
+                            if (Game.rooms[memRoomKey] && Game.rooms[memRoomKey].storage && Game.rooms[memRoomKey].storage.store.getFreeCapacity() > 0) { // exist and has room
                                 const distance = Game.map.getRoomLinearDistance(jobObject.pos.roomName, memRoomKey);
                                 if (distance < bestDistance) {
                                     closestRoomWithStorage = memRoomKey;
@@ -1291,33 +1291,67 @@ const ExecuteJobs = {
 
         /**@return {int}*/
         function JobHarvestPowerBank(creep, roomJob){
-            // TODO
             const result = GenericFlagAction(creep, roomJob, {
                 /**@return {int}*/
                 JobStatus: function (jobObject) {
                     if(creep.store.getFreeCapacity() > 0){
                         return SHOULD_ACT;
                     }else{
-                        return SHOULD_FETCH
+                        return SHOULD_FETCH;
                     }
                 },
                 /**@return {int}*/
                 Act: function (jobObject) {
                     if(!jobObject.room){ // invisible
                         return ERR_NOT_IN_RANGE;
-                    }else if(creep.memory.PowerBankId){
-                        //Game.getObjectById(creep.memory.PowerBankId);
                     }
+                    let powerBank;
+                    if(creep.memory.PowerBankId){
+                        powerBank = Game.getObjectById(creep.memory.PowerBankId);
+                    }
+                    if(!powerBank){
+                        powerBank = jobObject.pos.lookFor(LOOK_STRUCTURES)[0];
+                        creep.memory.PowerBankId = powerBank.id;
+                    }
+                    let result;
+                    if(creep.hits < creep.hitsMax){
+                        result = creep.heal(creep);
+                    }else{
+                        result = creep.attack(powerBank);
+                    }
+                    return result;
                 },
                 /**@return {int}*/
                 IsJobDone: function (jobObject) {
+                    if(jobObject.hits < (creep.getActiveBodyparts(ATTACK) * 30)){
+                        console.log('ExecuteJobs JobHarvestPowerBank power bank is destroyed ' + jobObject.pos.roomName + ' ' + creep.name);
+                        creep.pickup(creep.pos.findInRange(FIND_DROPPED_RESOURCES,1)[0]);
+                    }
+                    return this.JobStatus(jobObject);
                 },
                 /**@return {object}
                  * @return {undefined}*/
                 FindFetchObject: function (jobObject) {
+                    // container was not an option - now transfer to storage
+                    let closestRoomWithStorage = creep.memory.ClosestRoomWithStorage;
+                    if (!closestRoomWithStorage) {
+                        let bestDistance = Number.MAX_SAFE_INTEGER;
+                        for (const memRoomKey in Memory.MemRooms) { // search for best storage
+                            if (Game.rooms[memRoomKey].storage && Game.rooms[memRoomKey].storage.store.getFreeCapacity() > 0) { // exist and has room
+                                const distance = Game.map.getRoomLinearDistance(jobObject.pos.roomName, memRoomKey);
+                                if (distance < bestDistance) {
+                                    closestRoomWithStorage = memRoomKey;
+                                    bestDistance = distance;
+                                }
+                            }
+                        }
+                        creep.memory.ClosestRoomWithStorage = closestRoomWithStorage; // save in creep memory
+                    }
+                    return Game.rooms[closestRoomWithStorage].storage;
                 },
                 /**@return {int}*/
                 Fetch: function (fetchObject, jobObject) {
+                    return creep.transfer(fetchObject, RESOURCE_POWER);
                 },
             });
             return result;

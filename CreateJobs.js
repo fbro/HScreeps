@@ -62,7 +62,7 @@ const CreateJobs = {
                 } else if (gameFlag.color === COLOR_ORANGE && gameFlag.secondaryColor === COLOR_RED) { // flag to be placed on an observer that enables it to scan for power banks and deposits
                     // observers handle this flag
                 } else if (gameFlag.color === COLOR_ORANGE && gameFlag.secondaryColor === COLOR_PURPLE) { // flag that observers create and put on found power banks and deposits and deletes again when deadline is reached
-                    jobName = '3HrvstPwrBnk';
+                    jobName = '3HrvstP';
                     creepType = 'P';
                 }else if (gameFlag.color === COLOR_RED && gameFlag.secondaryColor === COLOR_RED) { // warrior at pos
                     jobName = '2GuardPos';
@@ -208,7 +208,7 @@ const CreateJobs = {
                             //console.log("CreateJobs CreateObjJobs old job deleted " + oldJobKey);
                         }
                     }
-                    if (Memory.MemRooms[gameRoom.name].RoomLevel !== gameRoom.controller.level) { // room level change
+                    if (gameRoom.controller && Memory.MemRooms[gameRoom.name].RoomLevel !== gameRoom.controller.level) { // room level change
                         Memory.MemRooms[gameRoom.name].RoomLevel = gameRoom.controller.level;
                         Memory.MemRooms[gameRoom.name].SourceNumber = gameRoom.find(FIND_SOURCES).length;
                         Memory.MemRooms[gameRoom.name].MaxCreeps = {}; // reset - maybe the MaxCreepsInRoom changes with room level

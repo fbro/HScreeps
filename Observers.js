@@ -23,8 +23,8 @@ const Observers = {
                             const lon = parseInt(lonLat[0], 10);
                             const lat = parseInt(lonLat[1], 10);
                             let numOfScansFound = 0;
-                            for (let o =( -7 + lon); o <= (7 + lon); o++){
-                                for (let a = (-7 + lat); a <= (7 + lat); a++){
+                            for (let o =( -5 + lon); o <= (5 + lon); o++){
+                                for (let a = (-5 + lat); a <= (5 + lat); a++){
                                     let modLonQ = lonLatQuadrant[0];
                                     let modLatQ = lonLatQuadrant[1];
                                     let modLon = o;
@@ -81,14 +81,14 @@ const Observers = {
                                 })[0];
                                 if(powerBank){
                                     console.log('Observers power bank found! in ' + roomKey);
-                                    scanStatus = {'type' : 'powerBank', 'id' : powerBank.id, 'pos' : powerBank.pos, 'deadline' : powerBank.ticksToDecay + Game.time};
-                                    Game.rooms[roomKey].createFlag(powerBank.pos, 'powerBank-' + powerBank.pos.roomName, COLOR_ORANGE, COLOR_PURPLE);
+                                    //scanStatus = {'type' : 'powerBank', 'id' : powerBank.id, 'pos' : powerBank.pos, 'deadline' : powerBank.ticksToDecay + Game.time}; // TODO reactivate
+                                    //Game.rooms[roomKey].createFlag(powerBank.pos, 'powerBank-' + powerBank.pos.roomName, COLOR_ORANGE, COLOR_PURPLE); // TODO reactivate
                                 }else{
                                     const deposit = Game.rooms[roomKey].find(FIND_DEPOSITS)[0];
                                     if(deposit){
                                         console.log('Observers deposit found! in ' + roomKey);
-                                        scanStatus = {'type' : 'deposit', 'id' : deposit.id, 'pos' : deposit.pos, 'deadline' : deposit.ticksToDecay + Game.time, 'depositType' : deposit.depositType};
-                                        Game.rooms[roomKey].createFlag(powerBank.pos, 'deposit-' + powerBank.pos.roomName, COLOR_ORANGE, COLOR_PURPLE);
+                                        //scanStatus = {'type' : 'deposit', 'id' : deposit.id, 'pos' : deposit.pos, 'deadline' : deposit.ticksToDecay + Game.time, 'depositType' : deposit.depositType}; // TODO reactivate
+                                        //Game.rooms[roomKey].createFlag(powerBank.pos, 'deposit-' + powerBank.pos.roomName, COLOR_ORANGE, COLOR_PURPLE); // TODO reactivate
                                     }else{
                                         deleteScan = true;
                                     }
