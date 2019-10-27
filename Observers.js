@@ -62,10 +62,10 @@ const Observers = {
                                 if(scanStatus.deadline <= Game.time){ // power bank or deposit has reached its deadline and is to be removed from memory
                                     deleteScan = true;
                                     let flagToRemove;
-                                    if(scanStatus.type === "powerBank"){
-                                        flagToRemove = Game.flags["powerBank-" + roomKey];
-                                    }else if(scanStatus.type === "deposit"){
-                                        flagToRemove = Game.flags["deposit-" + roomKey];
+                                    if(scanStatus.type === 'powerBank'){
+                                        flagToRemove = Game.flags['powerBank_' + roomKey + '-' + scanStatus.freeSpaces];
+                                    }else if(scanStatus.type === 'deposit'){
+                                        flagToRemove = Game.flags['deposit_' + roomKey + '-' + scanStatus.freeSpaces];
                                     }
 
                                     if(flagToRemove && flagToRemove.color === COLOR_ORANGE && flagToRemove.secondaryColor === COLOR_PURPLE){
@@ -82,15 +82,15 @@ const Observers = {
                                 if(powerBank){
                                     const freeSpaces = FreeSpaces(powerBank.pos);
                                     console.log('Observers power bank found! in ' + roomKey + ' freeSpaces ' + freeSpaces);
-                                    //scanStatus = {'type' : 'powerBank', 'id' : powerBank.id, 'pos' : powerBank.pos, 'deadline' : powerBank.ticksToDecay + Game.time}; // TODO reactivate
-                                    //Game.rooms[roomKey].createFlag(powerBank.pos, powerBank.pos.roomName + '-' + freeSpaces, COLOR_ORANGE, COLOR_PURPLE); // TODO reactivate
+                                    scanStatus = {'type' : 'powerBank', 'id' : powerBank.id, 'pos' : powerBank.pos, 'deadline' : powerBank.ticksToDecay + Game.time, 'freeSpaces' : freeSpaces};
+                                    //Game.rooms[roomKey].createFlag(powerBank.pos, 'powerBank_' + powerBank.pos.roomName + '-' + freeSpaces, COLOR_ORANGE, COLOR_PURPLE); // TODO reactivate
                                 }else{
                                     const deposit = Game.rooms[roomKey].find(FIND_DEPOSITS)[0];
                                     if(deposit){
                                         const freeSpaces = FreeSpaces(powerBank.pos);
                                         console.log('Observers deposit found! in ' + roomKey + ' freeSpaces ' + freeSpaces);
-                                        //scanStatus = {'type' : 'deposit', 'id' : deposit.id, 'pos' : deposit.pos, 'deadline' : deposit.ticksToDecay + Game.time, 'depositType' : deposit.depositType}; // TODO reactivate
-                                        //Game.rooms[roomKey].createFlag(deposit.pos, deposit.pos.roomName + '-' + freeSpaces, COLOR_ORANGE, COLOR_CYAN); // TODO reactivate
+                                        scanStatus = {'type' : 'deposit', 'id' : deposit.id, 'pos' : deposit.pos, 'deadline' : deposit.ticksToDecay + Game.time, 'depositType' : deposit.depositType, 'freeSpaces' : freeSpaces};
+                                        //Game.rooms[roomKey].createFlag(deposit.pos, 'deposit_' + deposit.pos.roomName + '-' + freeSpaces, COLOR_ORANGE, COLOR_CYAN); // TODO reactivate
                                     }else{
                                         deleteScan = true;
                                     }

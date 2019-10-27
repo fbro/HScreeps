@@ -63,9 +63,23 @@ const CreateJobs = {
                     let freeSpaces = gameFlagKey.split('-').pop();
                     if(freeSpaces > 3){freeSpaces = 3;} // no more than 3 power harvesters should be available
                     for(let e = 0; e < freeSpaces; e++){
-                        CreateFlagJob(jobs, '3HrvstP' + e, gameFlagKey, gameFlag, 'P');
+                        CreateFlagJob(jobs, '3AtkP' + e, gameFlagKey, gameFlag, 'P');
                     }
-                    // TODO create a job here that only gets created when power bank is visible and low on health - this job will activate one or more priority 1 transporter jobs
+                    if(gameFlag.room){ // power bank on low health - get transporters over to the power bank
+                        const powerBank = gameFlag.pos.lookFor(LOOK_STRUCTURES)[0];
+                        if(powerBank.hits < 90000){
+                            CreateFlagJob(jobs, '1TrnsprtP1', gameFlagKey, gameFlag, 'T');
+                            if(powerBank.power > 1500){
+                                CreateFlagJob(jobs, '1TrnsprtP2', gameFlagKey, gameFlag, 'T');
+                                if(powerBank.power > 3000){
+                                    CreateFlagJob(jobs, '1TrnsprtP3', gameFlagKey, gameFlag, 'T');
+                                    if(powerBank.power > 4500){
+                                        CreateFlagJob(jobs, '1TrnsprtP4', gameFlagKey, gameFlag, 'T');
+                                    }
+                                }
+                            }
+                        }
+                    }
                 } else if (gameFlag.color === COLOR_ORANGE && gameFlag.secondaryColor === COLOR_CYAN) { // flag that observers create and put on deposits and deletes again when deadline is reached
                     // TODO not using deposits yet
                 }else if (gameFlag.color === COLOR_RED && gameFlag.secondaryColor === COLOR_RED) { // warrior at pos

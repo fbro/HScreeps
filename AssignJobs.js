@@ -21,7 +21,7 @@ const AssignJobs = {
         * [R] reserver          CLAIM - many CLAIM when reserving
         * [W] warrior           ATTACK and MOVE
         * [D] distantHarvester  equal WORK and CARRY
-        * [P] powerHarvester    ATTACK HEAL CARRY
+        * [P] powerBankAttacker ATTACK HEAL
         * TODO not in first version
         * [G] gunner            RANGED_ATTACK and MOVE
         * [M] medic             HEAL
@@ -187,7 +187,7 @@ const AssignJobs = {
                     case 'E': // extractor
                         maxCreepsInRoom = 1;
                         break;
-                    case 'P': // powerHarvester
+                    case 'P': // powerBankAttacker
                         maxCreepsInRoom = 1;
                         break;
                     case 'W': // warrior
@@ -375,26 +375,26 @@ const AssignJobs = {
                 // warrior
                 case 'W':
                     switch (true) { // TODO optimize
-                        case (energyAvailable >= 2200): // energyCapacityAvailable: 12900
-                            body = [ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE];
+                        case (energyAvailable >= 2730): // energyCapacityAvailable: 12900
+                            body = [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK];
                             break;
-                        case (energyAvailable >= 2050): // energyCapacityAvailable: 5600
-                            body = [ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE];
+                        case (energyAvailable >= 2600): // energyCapacityAvailable: 5600
+                            body = [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK];
                             break;
-                        case (energyAvailable >= 1800): // energyCapacityAvailable: 2300
-                            body = [ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE];
+                        case (energyAvailable >= 2210): // energyCapacityAvailable: 2300
+                            body = [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK];
                             break;
-                        case (energyAvailable >= 1300): // energyCapacityAvailable: 1800
-                            body = [ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE];
+                        case (energyAvailable >= 1690): // energyCapacityAvailable: 1800
+                            body = [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK];
                             break;
-                        case (energyAvailable >= 800): // energyCapacityAvailable: 1300
-                            body = [ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE];
+                        case (energyAvailable >= 1300): // energyCapacityAvailable: 1300
+                            body = [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK];
                             break;
-                        case (energyAvailable >= 300): // energyCapacityAvailable: 550
-                            body = [ATTACK, MOVE, ATTACK, MOVE];
+                        case (energyAvailable >= 520): // energyCapacityAvailable: 550
+                            body = [MOVE, MOVE, MOVE, MOVE, ATTACK, ATTACK, ATTACK, ATTACK];
                             break;
-                        case (energyAvailable >= 200): // energyCapacityAvailable: 300
-                            body = [TOUGH, MOVE, ATTACK, MOVE];
+                        case (energyAvailable >= 260): // energyCapacityAvailable: 300
+                            body = [MOVE, MOVE, ATTACK, ATTACK];
                             break;
                     }
                     break;
@@ -424,26 +424,23 @@ const AssignJobs = {
                             break;
                     }
                     break;
-                // power harvester
+                // power bank attacker
                 case 'P':
                     switch (true) {
-                        case (energyAvailable >= 4520): // energyCapacityAvailable: 12900
-                            body = [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, CARRY, CARRY, CARRY, HEAL, HEAL, HEAL, HEAL, HEAL, HEAL, HEAL, HEAL];
-                            break;
-                        case (energyAvailable >= 2650): // energyCapacityAvailable: 5600
-                            body = [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, HEAL, HEAL, HEAL];
-                            break;
-                        case (energyAvailable >= 2220): // energyCapacityAvailable: 2300
-                            body = [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, ATTACK, ATTACK, ATTACK, ATTACK, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, HEAL, HEAL];
-                            break;
-                        case (energyAvailable >= 1790): // energyCapacityAvailable: 1800
-                            body = [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, ATTACK, ATTACK, ATTACK, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, HEAL, HEAL];
-                            break;
-                        case (energyAvailable >= 1260): // energyCapacityAvailable: 1300
-                            body = [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, ATTACK, ATTACK, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, HEAL];
-                            break;
-                        case (energyAvailable >= 530): // energyCapacityAvailable: 550
-                            body = [MOVE, MOVE, MOVE, ATTACK, CARRY, HEAL];
+                        case (energyAvailable >= 5630): // energyCapacityAvailable: 12900
+                            body = [
+                                MOVE, MOVE, MOVE, MOVE, MOVE, // 250
+                                MOVE, MOVE, MOVE, MOVE, MOVE, // 250
+                                MOVE, MOVE, MOVE, MOVE, MOVE, // 250
+                                MOVE, MOVE, MOVE, MOVE, MOVE, // 250
+                                MOVE, MOVE, MOVE, MOVE, MOVE, // 250
+                                ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, // 400
+                                ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, // 400
+                                ATTACK, // 80
+                                HEAL, HEAL, HEAL, HEAL, HEAL, // 1250
+                                HEAL, HEAL, HEAL, HEAL, HEAL, // 1250
+                                HEAL, HEAL, HEAL, HEAL // 1000
+                            ];
                             break;
                     }
                     break;
