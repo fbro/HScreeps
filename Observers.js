@@ -67,8 +67,7 @@ const Observers = {
                                     }else if(scanStatus.type === 'deposit'){
                                         flagToRemove = Game.flags['deposit_' + roomKey + '-' + scanStatus.freeSpaces];
                                     }
-
-                                    if(flagToRemove && flagToRemove.color === COLOR_ORANGE && flagToRemove.secondaryColor === COLOR_PURPLE){
+                                    if(flagToRemove && flagToRemove.color === COLOR_ORANGE && (flagToRemove.secondaryColor === COLOR_PURPLE || flagToRemove.secondaryColor === COLOR_CYAN)){
                                         flagToRemove.remove();
                                     }
                                     console.log('Observers item gone, removing ' + roomKey + ' ' + JSON.stringify(scanStatus) + ' flag removal status ');

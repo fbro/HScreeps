@@ -553,8 +553,7 @@ const ExecuteJobs = {
                 JobStatus: function (jobObject) {
                     let creepSum = creep.store.getUsedCapacity();
                     if (creepSum === 0 || !creep.memory.Depositing && creepSum < creep.store.getCapacity() && creep.pos.getRangeTo(jobObject) <= 1
-                        && (jobObject.structureType === STRUCTURE_CONTAINER && jobObject.store.getUsedCapacity() > 0
-                            || jobObject.structureType === STRUCTURE_LINK && jobObject.store[RESOURCE_ENERGY] > 0
+                        && (jobObject.store.getUsedCapacity() > 0
                             || jobObject.structureType === STRUCTURE_TERMINAL && (jobObject.store[RESOURCE_ENERGY] > 120000 || jobObject.room.storage.store[RESOURCE_ENERGY] < 5000 && jobObject.store[RESOURCE_ENERGY] > 0))
                     ) {
                         creep.memory.Depositing = undefined;
@@ -1407,8 +1406,7 @@ const ExecuteJobs = {
                 energySupply = Game.getObjectById(creep.memory.EnergySupply);// closest link then container then droppedRes then storage
                 energySupplyType = creep.memory.EnergySupplyType;
                 // if the saved energySupply does not have any energy then remove it to make way for a new search
-                if (energySupply && (energySupplyType === 'LINK' && energySupply.store[RESOURCE_ENERGY] === 0)
-                    || ((energySupplyType === 'CONTAINER' || energySupplyType === 'STORAGE') && energySupply.store[RESOURCE_ENERGY] === 0)) {
+                if (energySupply && energySupply.store[RESOURCE_ENERGY] === 0) {
                     energySupply = undefined;
                     energySupplyType = undefined;
                     creep.memory.EnergySupply = undefined;
@@ -1419,9 +1417,7 @@ const ExecuteJobs = {
             if (!energySupply) { // creep memory had nothing stored
                 let energySupplies = room.find(FIND_STRUCTURES, {
                     filter: function (s) {
-                        return ((s.structureType === STRUCTURE_STORAGE
-                            || s.structureType === STRUCTURE_CONTAINER) && s.store[RESOURCE_ENERGY] >= 100
-                            || s.structureType === STRUCTURE_LINK && s.store[RESOURCE_ENERGY] >= 100);
+                        return s.store[RESOURCE_ENERGY] >= 100;
                     }
                 });
                 energySupplies = energySupplies.concat(room.find(FIND_DROPPED_RESOURCES, {

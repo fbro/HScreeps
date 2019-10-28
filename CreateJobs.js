@@ -60,26 +60,7 @@ const CreateJobs = {
                 } else if (gameFlag.color === COLOR_ORANGE && gameFlag.secondaryColor === COLOR_RED) { // flag to be placed on an observer that enables it to scan for power banks and deposits
                     // observers handle this flag
                 } else if (gameFlag.color === COLOR_ORANGE && gameFlag.secondaryColor === COLOR_PURPLE) { // flag that observers create and put on found power banks and deletes again when deadline is reached
-                    let freeSpaces = gameFlagKey.split('-').pop();
-                    if(freeSpaces > 3){freeSpaces = 3;} // no more than 3 power harvesters should be available
-                    for(let e = 0; e < freeSpaces; e++){
-                        CreateFlagJob(jobs, '3AtkP' + e, gameFlagKey, gameFlag, 'P');
-                    }
-                    if(gameFlag.room){ // power bank on low health - get transporters over to the power bank
-                        const powerBank = gameFlag.pos.lookFor(LOOK_STRUCTURES)[0];
-                        if(powerBank.hits < 90000){
-                            CreateFlagJob(jobs, '1TrnsprtP1', gameFlagKey, gameFlag, 'T');
-                            if(powerBank.power > 1500){
-                                CreateFlagJob(jobs, '1TrnsprtP2', gameFlagKey, gameFlag, 'T');
-                                if(powerBank.power > 3000){
-                                    CreateFlagJob(jobs, '1TrnsprtP3', gameFlagKey, gameFlag, 'T');
-                                    if(powerBank.power > 4500){
-                                        CreateFlagJob(jobs, '1TrnsprtP4', gameFlagKey, gameFlag, 'T');
-                                    }
-                                }
-                            }
-                        }
-                    }
+                    jobs = TransportPowerBankJobs(jobs, gameFlagKey, gameFlag);
                 } else if (gameFlag.color === COLOR_ORANGE && gameFlag.secondaryColor === COLOR_CYAN) { // flag that observers create and put on deposits and deletes again when deadline is reached
                     // TODO not using deposits yet
                 }else if (gameFlag.color === COLOR_RED && gameFlag.secondaryColor === COLOR_RED) { // warrior at pos
@@ -105,21 +86,7 @@ const CreateJobs = {
                         CreateFlagJob(jobs, '6FillLabMin', gameFlagKey, gameFlag, 'T');
                     }
                 } else if (gameFlag.color === COLOR_PURPLE && gameFlag.secondaryColor === COLOR_WHITE) { // EmptyLabMineral
-                    if (!gameFlag.pos.findInRange(FIND_MY_STRUCTURES, 0, {
-                        filter: function (s) {
-                            return s.structureType === STRUCTURE_LAB;
-                        }
-                    })) { // flag must be on top of an existing lab!
-                        gameFlag.remove();
-                        Logs.Error('CreateJobs-CreateFlagJobs-labGone', 'CreateJobs CreateFlagJobs ERROR! no lab ' + gameFlagKey);
-                    } else if (gameFlag.pos.findInRange(FIND_MY_STRUCTURES, 0, {
-                        filter: function (s) {
-                            return s.structureType === STRUCTURE_LAB;
-                        }
-                    })[0].mineralAmount > 0) {
-                        // flagname rules: CREATE-GH = CREATE the mineral from the nearby lab to this lab
-                        CreateFlagJob(jobs, '5EmptyLabMin', gameFlagKey, gameFlag, 'T');
-                    }
+                    jobs = EmptyLabMineralJobs(jobs, gameFlagKey, gameFlag);
                 } else if (gameFlag.color === COLOR_GREEN && gameFlag.secondaryColor === COLOR_GREEN) { // claimer claim
                     CreateFlagJob(jobs, '1ClaimCtrl', gameFlagKey, gameFlag, 'C');
                 } else if (gameFlag.color === COLOR_GREEN && gameFlag.secondaryColor === COLOR_YELLOW) { // claimer reserve
@@ -262,7 +229,52 @@ const CreateJobs = {
             return newmap;
         }
 
-        // jobs:
+        // flag jobs:
+
+        function TransportPowerBankJobs(jobs, gameFlagKey, gameFlag){
+            let freeSpaces = gameFlagKey.split('-').pop();
+            if(freeSpaces > 3){freeSpaces = 3;} // no more than 3 power harvesters should be available
+            for(let e = 0; e < freeSpaces; e++){
+                jobs = CreateFlagJob(jobs, '3AtkP' + e, gameFlagKey, gameFlag, 'P');
+            }
+            if(gameFlag.room){ // power bank on low health - get transporters over to the power bank
+                const powerBank = gameFlag.pos.lookFor(LOOK_STRUCTURES)[0];
+                if(powerBank.hits < 90000){
+                    jobs = CreateFlagJob(jobs, '1TrnsprtP1', gameFlagKey, gameFlag, 'T');
+                    if(powerBank.power > 1500){
+                        jobs = CreateFlagJob(jobs, '1TrnsprtP2', gameFlagKey, gameFlag, 'T');
+                        if(powerBank.power > 3000){
+                            jobs = CreateFlagJob(jobs, '1TrnsprtP3', gameFlagKey, gameFlag, 'T');
+                            if(powerBank.power > 4500){
+                                jobs = CreateFlagJob(jobs, '1TrnsprtP4', gameFlagKey, gameFlag, 'T');
+                            }
+                        }
+                    }
+                }
+            }
+            return jobs;
+        }
+
+        function EmptyLabMineralJobs(jobs, gameFlagKey, gameFlag){
+            if (!gameFlag.pos.findInRange(FIND_MY_STRUCTURES, 0, {
+                filter: function (s) {
+                    return s.structureType === STRUCTURE_LAB;
+                }
+            })) { // flag must be on top of an existing lab!
+                gameFlag.remove();
+                Logs.Error('CreateJobs-CreateFlagJobs-labGone', 'CreateJobs CreateFlagJobs ERROR! no lab ' + gameFlagKey);
+            } else if (gameFlag.pos.findInRange(FIND_MY_STRUCTURES, 0, {
+                filter: function (s) {
+                    return s.structureType === STRUCTURE_LAB;
+                }
+            })[0].mineralAmount > 0) {
+                // flagname rules: CREATE-GH = CREATE the mineral from the nearby lab to this lab
+                CreateFlagJob(jobs, '5EmptyLabMin', gameFlagKey, gameFlag, 'T');
+            }
+            return jobs;
+        }
+
+        // in-room jobs:
 
         function FillPowerSpawnEnergyJobs(gameRoom, roomJobs) {
             if (gameRoom.storage && gameRoom.storage.store[RESOURCE_ENERGY] > 5000) {
@@ -488,6 +500,7 @@ const CreateJobs = {
 
         function AddJob(roomJobs, jobName, jobId, jobType, creepType) {
             roomJobs[jobName] = CreateJob(jobId, jobType, creepType);
+            return roomJobs;
         }
 
         function CreateJob(jobId, jobType, creepType) {
