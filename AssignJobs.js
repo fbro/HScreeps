@@ -308,12 +308,6 @@ const AssignJobs = {
                         case (energyAvailable >= 800): // energyCapacityAvailable: 1300
                             body = [WORK, WORK, WORK, WORK, WORK, WORK, CARRY, MOVE, MOVE, MOVE];
                             break;
-                        case (energyAvailable >= 300): // energyCapacityAvailable: 550
-                            body = [];
-                            break;
-                        case (energyAvailable >= 200): // energyCapacityAvailable: 300
-                            body = [];
-                            break;
                     }
                     break;
                 // scout
@@ -338,12 +332,6 @@ const AssignJobs = {
                         case (energyAvailable >= 800): // energyCapacityAvailable: 1300
                             body = [TOUGH, MOVE, MOVE, CLAIM];
                             break;
-                        case (energyAvailable >= 300): // energyCapacityAvailable: 550
-                            body = [];
-                            break;
-                        case (energyAvailable >= 200): // energyCapacityAvailable: 300
-                            body = [];
-                            break;
                     }
                     break;
                 // reserver
@@ -363,12 +351,6 @@ const AssignJobs = {
                             break;
                         case (energyAvailable >= 800): // energyCapacityAvailable: 1300
                             body = [MOVE, CLAIM];
-                            break;
-                        case (energyAvailable >= 300): // energyCapacityAvailable: 550
-                            body = [];
-                            break;
-                        case (energyAvailable >= 200): // energyCapacityAvailable: 300
-                            body = [];
                             break;
                     }
                     break;
