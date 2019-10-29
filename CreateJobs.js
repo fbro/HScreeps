@@ -64,27 +64,11 @@ const CreateJobs = {
                 } else if (gameFlag.color === COLOR_ORANGE && gameFlag.secondaryColor === COLOR_CYAN) { // flag that observers create and put on deposits and deletes again when deadline is reached
                     // TODO not using deposits yet
                 }else if (gameFlag.color === COLOR_RED && gameFlag.secondaryColor === COLOR_RED) { // warrior at pos
-                    jobName = '2GuardPos';
-                    creepType = 'W';
-                    CreateFlagJob(jobs, jobName, gameFlagKey, gameFlag, creepType)
+                    CreateFlagJob(jobs, '2GuardPos', gameFlagKey, gameFlag, 'W')
                 } else if (gameFlag.color === COLOR_YELLOW && gameFlag.secondaryColor === COLOR_YELLOW) { // distantHarvester on source at flag pos
                     CreateFlagJob(jobs, '5RemoteHarvest', gameFlagKey, gameFlag, 'D');
                 } else if (gameFlag.color === COLOR_PURPLE && gameFlag.secondaryColor === COLOR_PURPLE) { // FillLabMineral
-                    if (!gameFlag.pos.findInRange(FIND_MY_STRUCTURES, 0, {
-                        filter: function (s) {
-                            return s.structureType === STRUCTURE_LAB;
-                        }
-                    })) { // flag must be on top of an existing lab!
-                        gameFlag.remove();
-                        Logs.Error('CreateJobs-CreateFlagJobs-labGone', 'CreateJobs CreateFlagJobs ERROR! no lab ' + gameFlagKey);
-                    } else if (gameFlag.pos.findInRange(FIND_MY_STRUCTURES, 0, {
-                        filter: function (s) {
-                            return s.structureType === STRUCTURE_LAB;
-                        }
-                    })[0].mineralAmount < LAB_MINERAL_CAPACITY) {
-                        // flagname rules: GET-L = get lemergium from all rooms, BUY-L = get it from all rooms or then buy it from the terminal
-                        CreateFlagJob(jobs, '6FillLabMin', gameFlagKey, gameFlag, 'T');
-                    }
+                    jobs = FillLabMineralJobs(jobs, gameFlagKey, gameFlag);
                 } else if (gameFlag.color === COLOR_PURPLE && gameFlag.secondaryColor === COLOR_WHITE) { // EmptyLabMineral
                     jobs = EmptyLabMineralJobs(jobs, gameFlagKey, gameFlag);
                 } else if (gameFlag.color === COLOR_GREEN && gameFlag.secondaryColor === COLOR_GREEN) { // claimer claim
@@ -270,6 +254,25 @@ const CreateJobs = {
             })[0].mineralAmount > 0) {
                 // flagname rules: CREATE-GH = CREATE the mineral from the nearby lab to this lab
                 CreateFlagJob(jobs, '5EmptyLabMin', gameFlagKey, gameFlag, 'T');
+            }
+            return jobs;
+        }
+
+        function FillLabMineralJobs(jobs, gameFlagKey, gameFlag){
+            if (!gameFlag.pos.findInRange(FIND_MY_STRUCTURES, 0, {
+                filter: function (s) {
+                    return s.structureType === STRUCTURE_LAB;
+                }
+            })) { // flag must be on top of an existing lab!
+                gameFlag.remove();
+                Logs.Error('CreateJobs-CreateFlagJobs-labGone', 'CreateJobs CreateFlagJobs ERROR! no lab ' + gameFlagKey);
+            } else if (gameFlag.pos.findInRange(FIND_MY_STRUCTURES, 0, {
+                filter: function (s) {
+                    return s.structureType === STRUCTURE_LAB;
+                }
+            })[0].mineralAmount < LAB_MINERAL_CAPACITY) {
+                // flagname rules: GET-L = get lemergium from all rooms, BUY-L = get it from all rooms or then buy it from the terminal
+                jobs = CreateFlagJob(jobs, '6FillLabMin', gameFlagKey, gameFlag, 'T');
             }
             return jobs;
         }
