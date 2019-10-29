@@ -1417,7 +1417,7 @@ const ExecuteJobs = {
             if (!energySupply) { // creep memory had nothing stored
                 let energySupplies = room.find(FIND_STRUCTURES, {
                     filter: function (s) {
-                        return s.store[RESOURCE_ENERGY] >= 100;
+                        return (s.structureType === STRUCTURE_CONTAINER || s.structureType === STRUCTURE_STORAGE || s.structureType === STRUCTURE_LINK) && s.store[RESOURCE_ENERGY] >= 100;
                     }
                 });
                 energySupplies = energySupplies.concat(room.find(FIND_DROPPED_RESOURCES, {
