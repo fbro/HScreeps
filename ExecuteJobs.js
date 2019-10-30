@@ -553,7 +553,6 @@ const ExecuteJobs = {
                 JobStatus: function (jobObject) {
                     let creepSum = creep.store.getUsedCapacity();
                     if(!jobObject || !jobObject.store){ // if the target is a dropped resource it may just disappear because it was picked up
-                        Logs.Info('ExecuteJobs JobFillStorage job gone', creep.name + ' ' + jobKey + ' gone');
                         return JOB_IS_DONE;
                     }else if (creepSum === 0 || !creep.memory.Depositing && creepSum < creep.store.getCapacity() && creep.pos.getRangeTo(jobObject) <= 1
                         && (jobObject.store.getUsedCapacity() > 0

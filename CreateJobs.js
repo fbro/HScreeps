@@ -149,7 +149,7 @@ const CreateJobs = {
                     // remove only old disappeared vacant jobs
                     for (const oldJobKey in Memory.MemRooms[gameRoom.name].RoomJobs) { // loop through old jobs
                         const oldJob = Memory.MemRooms[gameRoom.name].RoomJobs[oldJobKey];
-                        if (oldJob.Creep === 'vacant' && !jobs[oldJobKey]) { // old job is vacant and old job id not en the new job array
+                        if (oldJob.Creep === 'vacant' && !jobs[oldJobKey]) { // old job is vacant and old job id not in the new job array
                             Memory.MemRooms[gameRoom.name].RoomJobs[oldJobKey] = undefined; // delete old vacant disappeared job
                             //console.log("CreateJobs CreateObjJobs old job deleted " + oldJobKey);
                         }
