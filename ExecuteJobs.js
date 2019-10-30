@@ -126,7 +126,7 @@ const ExecuteJobs = {
                     result = JobFillTower(creep, roomJob);
                     break;
                 case jobKey.startsWith('5FillStrg') || jobKey.startsWith('5FillStrgFromRemote') || jobKey.startsWith('4FillStrg-drp'):
-                    result = JobFillStorage(creep, roomJob);
+                    result = JobFillStorage(creep, roomJob, jobKey);
                     break;
                 case jobKey.startsWith('5ExtrMin'):
                     result = JobExtractMineral(creep, roomJob);
@@ -547,12 +547,15 @@ const ExecuteJobs = {
         }
 
         /**@return {int}*/
-        function JobFillStorage(creep, roomJob) {
+        function JobFillStorage(creep, roomJob, jobKey) {
             const result = GenericJobAction(creep, roomJob, {
                 /**@return {int}*/
                 JobStatus: function (jobObject) {
                     let creepSum = creep.store.getUsedCapacity();
-                    if (creepSum === 0 || !creep.memory.Depositing && creepSum < creep.store.getCapacity() && creep.pos.getRangeTo(jobObject) <= 1
+                    if(!jobObject || !jobObject.store){ // if the target is a dropped resource it may just disappear because it was picked up
+                        Logs.Info('ExecuteJobs JobFillStorage job gone', creep.name + ' ' + jobKey + ' gone');
+                        return JOB_IS_DONE;
+                    }else if (creepSum === 0 || !creep.memory.Depositing && creepSum < creep.store.getCapacity() && creep.pos.getRangeTo(jobObject) <= 1
                         && (jobObject.store.getUsedCapacity() > 0
                             || jobObject.structureType === STRUCTURE_TERMINAL && (jobObject.store[RESOURCE_ENERGY] > 120000 || jobObject.room.storage.store[RESOURCE_ENERGY] < 5000 && jobObject.store[RESOURCE_ENERGY] > 0))
                     ) {
@@ -1406,7 +1409,7 @@ const ExecuteJobs = {
                 energySupply = Game.getObjectById(creep.memory.EnergySupply);// closest link then container then droppedRes then storage
                 energySupplyType = creep.memory.EnergySupplyType;
                 // if the saved energySupply does not have any energy then remove it to make way for a new search
-                if (energySupply && energySupply.store[RESOURCE_ENERGY] === 0) {
+                if (!energySupply || !energySupply.store || energySupply.store[RESOURCE_ENERGY] === 0) {
                     energySupply = undefined;
                     energySupplyType = undefined;
                     creep.memory.EnergySupply = undefined;
