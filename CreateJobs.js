@@ -11,29 +11,6 @@ const CreateJobs = {
         //       CreepType - T, H, B...
         //       Creep - CreepName
 
-        /* jobs:
-        * Source
-        * Controller
-        * Repair
-        * Construction
-        * FillSpawnExtension
-        *
-        * FillTower
-        *
-        * ResourceDrop
-        * FillStorage
-        *
-        * FillTerminalMineral
-        * FillTerminalEnergy
-        * EmptyLabMineral
-        * FillLabMineral
-        * FillLabEnergy
-        * Extractor
-        *
-        * FillPowerSpawnPowerUnits
-        * FillPowerSpawnEnergy
-        * */
-
         // job type int enum
         const OBJECT_JOB = 1;
         const FLAG_JOB = 2;
@@ -49,31 +26,41 @@ const CreateJobs = {
         // this method is not just run in the Game.rooms loop because flags may be in "invisible" rooms
         function CreateFlagJobs() {
             let jobs = {};
+            let notFound =false;
             for (const gameFlagKey in Game.flags) {
                 const gameFlag = Game.flags[gameFlagKey];
-                if (gameFlag.color === COLOR_ORANGE && gameFlag.secondaryColor === COLOR_ORANGE) { // scout tag
-                    jobs = CreateFlagJob(jobs, '4TagCtrl', gameFlagKey, gameFlag, 'S');
-                } else if (gameFlag.color === COLOR_ORANGE && gameFlag.secondaryColor === COLOR_YELLOW) { // scout at pos
-                    jobs = CreateFlagJob(jobs, '5ScoutPos', gameFlagKey, gameFlag, 'S');
-                } else if (gameFlag.color === COLOR_ORANGE && gameFlag.secondaryColor === COLOR_RED) { // flag to be placed on an observer that enables it to scan for power banks and deposits
-                    // observers handle this flag
-                } else if (gameFlag.color === COLOR_ORANGE && gameFlag.secondaryColor === COLOR_PURPLE) { // flag that observers create and put on found power banks and deletes again when deadline is reached
-                    jobs = PowerBankJobs(jobs, gameFlagKey, gameFlag);
-                } else if (gameFlag.color === COLOR_ORANGE && gameFlag.secondaryColor === COLOR_CYAN) { // flag that observers create and put on deposits and deletes again when deadline is reached
-                    // TODO not using deposits yet
-                }else if (gameFlag.color === COLOR_RED && gameFlag.secondaryColor === COLOR_RED) { // warrior at pos
+                const color = gameFlag.color;
+                const secColor = gameFlag.secondaryColor;
+                if(color === COLOR_ORANGE){
+                    if (secColor === COLOR_ORANGE) { // scout tag
+                        jobs = CreateFlagJob(jobs, '4TagCtrl', gameFlagKey, gameFlag, 'S');
+                    } else if (secColor === COLOR_YELLOW) { // scout at pos
+                        jobs = CreateFlagJob(jobs, '5ScoutPos', gameFlagKey, gameFlag, 'S');
+                    } else if (secColor === COLOR_RED) { // flag to be placed on an observer that enables it to scan for power banks and deposits
+                        // observers handle this flag
+                    } else if (secColor === COLOR_PURPLE) { // flag that observers create and put on found power banks and deletes again when deadline is reached
+                        jobs = PowerBankJobs(jobs, gameFlagKey, gameFlag);
+                    } else if (secColor === COLOR_CYAN) { // flag that observers create and put on deposits and deletes again when deadline is reached
+                        // TODO not using deposits yet
+                    }else{notFound = true;}
+                }else if (color === COLOR_RED && gameFlag.secondaryColor === COLOR_RED) { // warrior at pos
                     jobs = CreateFlagJob(jobs, '2GuardPos', gameFlagKey, gameFlag, 'W')
-                } else if (gameFlag.color === COLOR_YELLOW && gameFlag.secondaryColor === COLOR_YELLOW) { // distantHarvester on source at flag pos
+                } else if (color === COLOR_YELLOW && gameFlag.secondaryColor === COLOR_YELLOW) { // distantHarvester on source at flag pos
                     jobs = CreateFlagJob(jobs, '5RemoteHarvest', gameFlagKey, gameFlag, 'D');
-                } else if (gameFlag.color === COLOR_PURPLE && gameFlag.secondaryColor === COLOR_PURPLE) { // FillLabMineral
-                    jobs = FillLabMineralJobs(jobs, gameFlagKey, gameFlag);
-                } else if (gameFlag.color === COLOR_PURPLE && gameFlag.secondaryColor === COLOR_WHITE) { // EmptyLabMineral
-                    jobs = EmptyLabMineralJobs(jobs, gameFlagKey, gameFlag);
-                } else if (gameFlag.color === COLOR_GREEN && gameFlag.secondaryColor === COLOR_GREEN) { // claimer claim
-                    jobs = CreateFlagJob(jobs, '1ClaimCtrl', gameFlagKey, gameFlag, 'C');
-                } else if (gameFlag.color === COLOR_GREEN && gameFlag.secondaryColor === COLOR_YELLOW) { // claimer reserve
-                    jobs = ReserveRoomJobs(jobs, gameFlagKey, gameFlag);
-                } else {
+                } else if (color === COLOR_PURPLE){
+                    if(secColor === COLOR_PURPLE) { // FillLabMineral
+                        jobs = FillLabMineralJobs(jobs, gameFlagKey, gameFlag);
+                    } else if (secColor === COLOR_WHITE) { // EmptyLabMineral
+                        jobs = EmptyLabMineralJobs(jobs, gameFlagKey, gameFlag);
+                    }else{notFound = true;}
+                }else if (color === COLOR_GREEN){
+                    if(secColor === COLOR_GREEN) { // claimer claim
+                        jobs = CreateFlagJob(jobs, '1ClaimCtrl', gameFlagKey, gameFlag, 'C');
+                    } else if (secColor === COLOR_YELLOW) { // claimer reserve
+                        jobs = ReserveRoomJobs(jobs, gameFlagKey, gameFlag);
+                    }else{notFound = true;}
+                }else{notFound = true;}
+                if(notFound) {
                     Logs.Error('CreateJobs-CreateFlagJobs-flagColorNotFound', 'CreateJobs CreateFlagJobs ERROR! flag color not found ' + gameFlagKey + ' ' + gameFlag.color + ' ' + gameFlag.secondaryColor + ' (' + gameFlag.pos.x + ',' + gameFlag.pos.y + ')');
                 }
             }
