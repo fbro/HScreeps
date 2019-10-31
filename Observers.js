@@ -11,7 +11,7 @@ const Observers = {
                 if(observer){
                     const flagAtObserver = observer.pos.lookFor(LOOK_FLAGS)[0];
                     // observer is dedicated to scanning for power banks or deposits
-                    if(flagAtObserver && flagAtObserver.color === COLOR_ORANGE && flagAtObserver.secondaryColor === COLOR_RED){
+                    if(Memory.MemRooms[gameRoomKey] && flagAtObserver && flagAtObserver.color === COLOR_ORANGE && flagAtObserver.secondaryColor === COLOR_RED){
                         if(!Memory.MemRooms[gameRoomKey].MapScan || Memory.MemRooms[gameRoomKey].MapReScan){
                             if(!Memory.MemRooms[gameRoomKey].MapScan){
                                 Memory.MemRooms[gameRoomKey].MapScan = {};
@@ -63,14 +63,14 @@ const Observers = {
                                     deleteScan = true;
                                     let flagToRemove;
                                     if(scanStatus.type === 'powerBank'){
+                                        Memory.MemRooms[gameRoomKey].powerBankFlag = undefined;
                                         flagToRemove = Game.flags['powerBank_' + roomKey + '-' + scanStatus.freeSpaces];
                                     }else if(scanStatus.type === 'deposit'){
+                                        Memory.MemRooms[gameRoomKey].depositFlag = undefined;
                                         flagToRemove = Game.flags['deposit_' + roomKey + '-' + scanStatus.freeSpaces];
                                     }
                                     if(flagToRemove && flagToRemove.color === COLOR_ORANGE && (flagToRemove.secondaryColor === COLOR_PURPLE || flagToRemove.secondaryColor === COLOR_CYAN)){
                                         flagToRemove.remove();
-                                        Memory.MemRooms[gameRoomKey].powerBankFlagv = undefined;
-                                        Memory.MemRooms[gameRoomKey].depositFlag = undefined;
                                     }
                                     console.log('Observers item gone, removing ' + roomKey + ' ' + JSON.stringify(scanStatus) + ' flag removal status ');
                                 }

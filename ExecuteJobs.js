@@ -160,6 +160,9 @@ const ExecuteJobs = {
                 case jobKey.startsWith('2GuardPos'):
                     result = JobGuardPos(creep, roomJob);
                     break;
+                case jobKey.startsWith('2GuardGunPos'):
+                    result = JobGuardGunnerPos(creep, roomJob);
+                    break;
                 case jobKey.startsWith('5RemoteHarvest'):
                     result = JobRemoteHarvest(creep, roomJob);
                     break;
@@ -1071,7 +1074,56 @@ const ExecuteJobs = {
                 /**@return {int}*/
                 Fetch: function (fetchObject, jobObject) {
                     if(jobObject !== fetchObject){ // hostileCreep
-                        return creep.attack(fetchObject);
+                        if(Math.abs(creep.pos.x - fetchObject.pos.x) > 1 || Math.abs(creep.pos.y - fetchObject.pos.y) > 1 ){
+                            creep.rangedAttack(fetchObject);
+                            return ERR_NOT_IN_RANGE;
+                        }else{
+                            return creep.attack(fetchObject);
+                        }
+                    }else if(creep.pos.isNearTo(jobObject)){
+                        creep.say(jobObject.name);
+                        return OK; // when OK is returned FindFetchObject is checking each tick for new hostileCreeps
+                    }else if(jobObject === fetchObject){ // move to flag
+                        return ERR_NOT_IN_RANGE;
+                    }
+                },
+            });
+            return result;
+        }
+
+        /**@return {int}*/
+        function JobGuardGunnerPos(creep, roomJob) {
+            const result = GenericFlagAction(creep, roomJob, {
+                /**@return {int}*/
+                JobStatus: function (jobObject) {
+                    if(!jobObject.room){
+                        return SHOULD_ACT;
+                    }else{
+                        return SHOULD_FETCH
+                    }
+                },
+                /**@return {int}*/
+                Act: function (jobObject) {
+                    return ERR_NOT_IN_RANGE;
+                },
+                /**@return {int}*/
+                IsJobDone: function (jobObject) {
+                    return this.JobStatus(jobObject);
+                },
+                /**@return {object}
+                 * @return {undefined}*/
+                FindFetchObject: function (jobObject) {
+                    const hostileCreep = creep.room.find(FIND_HOSTILE_CREEPS)[0];
+                    if(hostileCreep){
+                        return hostileCreep;
+                    }else{
+                        return jobObject;
+                    }
+                },
+                /**@return {int}*/
+                Fetch: function (fetchObject, jobObject) {
+                    if(jobObject !== fetchObject){ // hostileCreep
+                        return creep.rangedAttack(fetchObject);
                     }else if(creep.pos.isNearTo(jobObject)){
                         creep.say(jobObject.name);
                         return OK; // when OK is returned FindFetchObject is checking each tick for new hostileCreeps

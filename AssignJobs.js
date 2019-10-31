@@ -22,8 +22,8 @@ const AssignJobs = {
         * [W] warrior           ATTACK and MOVE
         * [D] distantHarvester  equal WORK and CARRY
         * [P] powerBankAttacker ATTACK HEAL
-        * TODO not in first version
         * [G] gunner            RANGED_ATTACK and MOVE - needs clever attack pattern to avoid creeps with ATTACK body parts
+        * TODO not in first version
         * [M] medic             HEAL
         */
 
@@ -191,6 +191,7 @@ const AssignJobs = {
                         maxCreepsInRoom = 1;
                         break;
                     case 'W': // warrior
+                    case 'G': // gunner
                     case 'S': // scout
                     case 'C': // claimer
                     case 'R': // reserver
@@ -357,10 +358,10 @@ const AssignJobs = {
                 // warrior
                 case 'W':
                     switch (true) {
-                        case (energyAvailable >= 3080): // energyCapacityAvailable: 12900
-                            body = [ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK,
-                                MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,
-                                RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK];
+                        case (energyAvailable >= 3740): // energyCapacityAvailable: 12900
+                            body = [ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK,
+                                MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,
+                                RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK];
                             break;
                         case (energyAvailable >= 2880): // energyCapacityAvailable: 5600
                             body = [ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK,
@@ -385,6 +386,44 @@ const AssignJobs = {
                             break;
                         case (energyAvailable >= 260): // energyCapacityAvailable: 300
                             body = [ATTACK, MOVE, MOVE, ATTACK];
+                            break;
+                    }
+                    break;
+                // gunner
+                case 'G':
+                    switch (true) {
+                        case (energyAvailable >= 5000): // energyCapacityAvailable: 12900
+                            body = [
+                                RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK,
+                                RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK,
+                                RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK,
+                                RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK,
+                                RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK,
+                                MOVE, MOVE, MOVE, MOVE, MOVE,
+                                MOVE, MOVE, MOVE, MOVE, MOVE,
+                                MOVE, MOVE, MOVE, MOVE, MOVE,
+                                MOVE, MOVE, MOVE, MOVE, MOVE,
+                                MOVE, MOVE, MOVE, MOVE, MOVE, RANGED_ATTACK];
+                            break;
+                        case (energyAvailable >= 3000): // energyCapacityAvailable: 5600
+                            body = [RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK,
+                                MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, RANGED_ATTACK];
+                            break;
+                        case (energyAvailable >= 2000): // energyCapacityAvailable: 2300
+                            body = [RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK,
+                                MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, RANGED_ATTACK];
+                            break;
+                        case (energyAvailable >= 1400): // energyCapacityAvailable: 1800
+                            body = [RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, RANGED_ATTACK];
+                            break;
+                        case (energyAvailable >= 1000): // energyCapacityAvailable: 1300
+                            body = [RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, MOVE, MOVE, MOVE, MOVE, MOVE, RANGED_ATTACK];
+                            break;
+                        case (energyAvailable >= 400): // energyCapacityAvailable: 550
+                            body = [RANGED_ATTACK, MOVE, MOVE, RANGED_ATTACK];
+                            break;
+                        case (energyAvailable >= 200): // energyCapacityAvailable: 300
+                            body = [MOVE, RANGED_ATTACK];
                             break;
                     }
                     break;

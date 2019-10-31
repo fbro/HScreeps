@@ -1,5 +1,4 @@
 // reset
-Memory.buyOrdersHistory = {};
 Memory.MemRooms = {};
 Memory.ErrorLog = undefined;
 Memory.InfoLog = undefined;

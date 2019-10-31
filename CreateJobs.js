@@ -43,8 +43,12 @@ const CreateJobs = {
                     } else if (secColor === COLOR_CYAN) { // flag that observers create and put on deposits and deletes again when deadline is reached
                         // TODO not using deposits yet
                     }else{notFound = true;}
-                }else if (color === COLOR_RED && gameFlag.secondaryColor === COLOR_RED) { // warrior at pos
-                    jobs = CreateFlagJob(jobs, '2GuardPos', gameFlagKey, gameFlag, 'W')
+                }else if (color === COLOR_RED){
+                    if(gameFlag.secondaryColor === COLOR_RED) { // warrior at pos
+                        jobs = CreateFlagJob(jobs, '2GuardPos', gameFlagKey, gameFlag, 'W')
+                    }else if(gameFlag.secondaryColor === COLOR_BLUE) { // gunner at pos
+                        jobs = CreateFlagJob(jobs, '2GuardGunPos', gameFlagKey, gameFlag, 'G')
+                    }else{notFound = true;}
                 } else if (color === COLOR_YELLOW && gameFlag.secondaryColor === COLOR_YELLOW) { // distantHarvester on source at flag pos
                     jobs = CreateFlagJob(jobs, '5RemoteHarvest', gameFlagKey, gameFlag, 'D');
                 } else if (color === COLOR_PURPLE){
