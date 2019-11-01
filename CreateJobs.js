@@ -200,7 +200,7 @@ const CreateJobs = {
 
         function PowerBankJobs(jobs, gameFlagKey, gameFlag){
             let freeSpaces = gameFlagKey.split('-').pop();
-            if(freeSpaces > 3){freeSpaces = 3;} // no more than 3 power harvesters should be available
+            if(freeSpaces > 4){freeSpaces = 4;} // no more than 4 power harvesters should be available
             for(let e = 0; e < freeSpaces; e++){
                 jobs = CreateFlagJob(jobs, '3AtkP' + e, gameFlagKey, gameFlag, 'P');
             }

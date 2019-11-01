@@ -188,7 +188,7 @@ const AssignJobs = {
                         maxCreepsInRoom = 1;
                         break;
                     case 'P': // powerBankAttacker
-                        maxCreepsInRoom = 1;
+                        maxCreepsInRoom = 4;
                         break;
                     case 'W': // warrior
                     case 'G': // gunner

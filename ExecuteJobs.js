@@ -1370,7 +1370,6 @@ const ExecuteJobs = {
                 },
                 /**@return {int}*/
                 Act: function (jobObject) {
-                    console.log('ExecuteJobs JobAttackPowerBank acting ' + creep.name + ' ' + JSON.stringify(jobObject.pos));
                     if (!jobObject.room) { // invisible
                         return ERR_NOT_IN_RANGE;
                     }
