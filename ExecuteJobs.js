@@ -1379,21 +1379,22 @@ const ExecuteJobs = {
                     }
                     if (!powerBank) {
                         powerBank = jobObject.pos.lookFor(LOOK_STRUCTURES)[0];
-                        creep.memory.PowerBankId = powerBank.id;
+                        if(powerBank){
+                            creep.memory.PowerBankId = powerBank.id;
+                        }
                     }
-                    let result;
+                    let result = ERR_NO_RESULT_FOUND;
                     if (creep.hits < creep.hitsMax) {
                         result = creep.heal(creep);
-                    } else {
+                    } else if(powerBank){
                         result = creep.attack(powerBank);
+                    }else{
+                        result = JOB_IS_DONE;
                     }
                     return result;
                 },
                 /**@return {int}*/
                 IsJobDone: function (jobObject) {
-                    if (jobObject.hits < (creep.getActiveBodyparts(ATTACK) * 30)) {
-                        console.log('ExecuteJobs JobHarvestPowerBank power bank is destroyed ' + jobObject.pos.roomName + ' ' + creep.name);
-                    }
                     return this.JobStatus(jobObject);
                 },
                 /**@return {object} @return {undefined}*/
@@ -1413,7 +1414,7 @@ const ExecuteJobs = {
             const result = GenericFlagAction(creep, roomJob, {
                 /**@return {int}*/
                 JobStatus: function (jobObject) {
-                    if (creep.store.getFreeCapacity() === 0) {
+                    if (creep.store.getFreeCapacity() > 0) {
                         return SHOULD_ACT;
                     } else {
                         return SHOULD_FETCH;
@@ -1468,6 +1469,7 @@ const ExecuteJobs = {
                     return creep.transfer(fetchObject, RESOURCE_POWER);
                 },
             });
+            console.log('ExecuteJobs JobTransportPowerBank ' + result);
             return result;
         }
 

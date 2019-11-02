@@ -39,6 +39,10 @@ const AssignJobs = {
             });
             for (const memRoomKey in Memory.MemRooms) {
                 const memRoom = Memory.MemRooms[memRoomKey];
+                if(!memRoom){
+                    Logs.Error('RoomJobs object gone!', memRoomKey);
+                    continue;
+                }
                 const idleCreepsInRoom = _.filter(idleCreeps, function (creep) {
                     return creep && creep.pos.roomName === memRoomKey;
                 });
@@ -138,7 +142,25 @@ const AssignJobs = {
                 for (const availableSpawnCounter in availableSpawns) { // find closest spawn
                     const availableSpawn = availableSpawns[availableSpawnCounter];
                     const linearDistance = Game.map.getRoomLinearDistance(availableSpawn.pos.roomName, roomOnJobKey);
-                    if (linearDistance < bestLinearDistance || Memory.MemRooms[roomOnJobKey].PrimaryRoom === availableSpawn.pos.roomName) {
+                    let energyAvailableModifier = 0;
+                    switch (true) {
+                        case availableSpawn.room.energyAvailable < 500:
+                            energyAvailableModifier = -1;
+                            break;
+                        case availableSpawn.room.energyAvailable < 1000:
+                            energyAvailableModifier = -2;
+                            break;
+                        case availableSpawn.room.energyAvailable < 2000:
+                            energyAvailableModifier = -3;
+                            break;
+                        case availableSpawn.room.energyAvailable < 4000:
+                            energyAvailableModifier = -4;
+                            break;
+                        case availableSpawn.room.energyAvailable > 4000:
+                            energyAvailableModifier = -5;
+                            break;
+                    }
+                    if ((energyAvailableModifier + linearDistance) < bestLinearDistance || Memory.MemRooms[roomOnJobKey].PrimaryRoom === availableSpawn.pos.roomName) {
                         bestLinearDistance = linearDistance;
                         bestAvailableSpawn = availableSpawn;
                         bestAvailableSpawnCounter = availableSpawnCounter;

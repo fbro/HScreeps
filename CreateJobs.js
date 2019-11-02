@@ -201,19 +201,26 @@ const CreateJobs = {
         function PowerBankJobs(jobs, gameFlagKey, gameFlag){
             let freeSpaces = gameFlagKey.split('-').pop();
             if(freeSpaces > 4){freeSpaces = 4;} // no more than 4 power harvesters should be available
-            for(let e = 0; e < freeSpaces; e++){
-                jobs = CreateFlagJob(jobs, '3AtkP' + e, gameFlagKey, gameFlag, 'P');
+            if(gameFlag.room && gameFlag.pos.lookFor(LOOK_STRUCTURES)[0] || !gameFlag.room) {
+                for (let e = 0; e < freeSpaces; e++) {
+                    jobs = CreateFlagJob(jobs, '3AtkP' + e, gameFlagKey, gameFlag, 'P');
+                }
             }
             if(gameFlag.room){ // power bank on low health - get transporters over to the power bank
                 const powerBank = gameFlag.pos.lookFor(LOOK_STRUCTURES)[0];
-                if(powerBank.hits < 90000){
+                const droppedPower = gameFlag.pos.lookFor(LOOK_RESOURCES)[0];
+                if((powerBank && powerBank.hits < 100000) || droppedPower){
                     jobs = CreateFlagJob(jobs, '1TrnsprtP1', gameFlagKey, gameFlag, 'T');
-                    if(powerBank.power > 1500){
+                    console.log('CreateJobs PowerBankJobs 1TrnsprtP1 ' + gameFlag.room.name);
+                    if((powerBank && powerBank.hits > 1500) || (droppedPower && droppedPower.amount > 2000)){
                         jobs = CreateFlagJob(jobs, '1TrnsprtP2', gameFlagKey, gameFlag, 'T');
-                        if(powerBank.power > 3000){
+                        console.log('CreateJobs PowerBankJobs 1TrnsprtP2 ' + gameFlag.room.name);
+                        if((powerBank && powerBank.hits > 3000) || (droppedPower && droppedPower.amount > 4000)){
                             jobs = CreateFlagJob(jobs, '1TrnsprtP3', gameFlagKey, gameFlag, 'T');
-                            if(powerBank.power > 4500){
+                            console.log('CreateJobs PowerBankJobs 1TrnsprtP3 ' + gameFlag.room.name);
+                            if((powerBank && powerBank.hits > 4500) || (droppedPower && droppedPower.amount > 5000)){
                                 jobs = CreateFlagJob(jobs, '1TrnsprtP4', gameFlagKey, gameFlag, 'T');
+                                console.log('CreateJobs PowerBankJobs 1TrnsprtP4 ' + gameFlag.room.name);
                             }
                         }
                     }
