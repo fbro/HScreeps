@@ -56,6 +56,12 @@ module.exports.loop = function () {
 // TODO FillPowerSpawnPowerUnits
 // TODO HarvestDeposit
 
+// TODO create healer creep
+// TODO create job 2GuardPosHeal
+
+// TODO JobAttackPowerBank Heal
+// TODO JobAttackPowerBank focus on just attacking now that there is a healer - use W and delete P
+
 // add constructions
 // add renewCreep functionality
 // cache paths to be reused by creeps

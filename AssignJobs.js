@@ -40,7 +40,6 @@ const AssignJobs = {
             for (const memRoomKey in Memory.MemRooms) {
                 const memRoom = Memory.MemRooms[memRoomKey];
                 if(!memRoom){
-                    Logs.Error('RoomJobs object gone!', memRoomKey);
                     continue;
                 }
                 const idleCreepsInRoom = _.filter(idleCreeps, function (creep) {

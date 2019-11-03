@@ -104,7 +104,7 @@ const Observers = {
                                         }
                                     })[0];
                                     if(deposit){
-                                        const freeSpaces = FreeSpaces(powerBank.pos);
+                                        const freeSpaces = FreeSpaces(deposit.pos);
                                         console.log('Observers deposit found! in ' + roomKey + ' freeSpaces ' + freeSpaces);
                                         scanStatus = {'type' : 'deposit', 'id' : deposit.id, 'pos' : deposit.pos, 'deadline' : deposit.ticksToDecay + Game.time, 'depositType' : deposit.depositType, 'freeSpaces' : freeSpaces, 'observerId' : observer.id};
                                         if(!Memory.MemRooms[gameRoomKey].depositFlag){

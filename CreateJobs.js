@@ -489,7 +489,9 @@ const CreateJobs = {
             let level = -1;
             let sourceNumber = -1;
             if (gameRoom) {
-                level = gameRoom.controller.level;
+                if(gameRoom.controller){
+                    level = gameRoom.controller.level;
+                }
                 sourceNumber = gameRoom.find(FIND_SOURCES).length;
             }
             Memory.MemRooms[roomName] = {

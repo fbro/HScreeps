@@ -1389,6 +1389,17 @@ const ExecuteJobs = {
                     } else if(powerBank){
                         result = creep.attack(powerBank);
                     }else{
+                        const powerResource = jobObject.pos.findInRange(FIND_DROPPED_RESOURCES, 1, {
+                            filter: function (power) {
+                                return (power.resourceType === RESOURCE_POWER);
+                            }
+                        })[0]
+                        if(powerResource){
+                            Logs.Info('ExecuteJobs JobAttackPowerBank done', creep.name + ' ' + jobObject.name + ' powerBank ' + powerBank + ' power ' + powerResource.amount);
+                        }else{
+                            Logs.Info('ExecuteJobs JobAttackPowerBank done', creep.name + ' ' + jobObject.name + ' powerBank ' + powerBank);
+                        }
+
                         result = JOB_IS_DONE;
                     }
                     return result;
