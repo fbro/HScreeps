@@ -3,9 +3,8 @@
   <component name="ChangeListManager">
     <list default="true" id="7b6f36cb-4298-4902-b6a2-ea3816b3b82c" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/AssignJobs.js" beforeDir="false" afterPath="$PROJECT_DIR$/AssignJobs.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/CreateJobs.js" beforeDir="false" afterPath="$PROJECT_DIR$/CreateJobs.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ExecuteJobs.js" beforeDir="false" afterPath="$PROJECT_DIR$/ExecuteJobs.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Observers.js" beforeDir="false" afterPath="$PROJECT_DIR$/Observers.js" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -32,8 +31,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/ExecuteJobs.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="273">
-              <caret line="1479" column="62" lean-forward="true" selection-start-line="1479" selection-start-column="62" selection-end-line="1479" selection-end-column="62" />
+            <state relative-caret-position="171">
+              <caret line="1486" column="88" selection-start-line="1486" selection-start-column="88" selection-end-line="1486" selection-end-column="88" />
               <folding>
                 <element signature="e#646#6604#0" />
                 <element signature="e#6614#6636#0" />
@@ -79,7 +78,6 @@
                 <element signature="e#64329#66955#0" />
                 <element signature="e#66965#66983#0" />
                 <element signature="e#67036#69088#0" />
-                <element signature="e#69169#71210#0" />
                 <element signature="e#71220#71238#0" />
                 <element signature="e#71294#74318#0" />
                 <element signature="e#74358#74410#0" />
@@ -159,8 +157,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Observers.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="442">
-              <caret line="86" column="61" selection-start-line="86" selection-start-column="61" selection-end-line="86" selection-end-column="61" />
+            <state relative-caret-position="340">
+              <caret line="95" column="99" lean-forward="true" selection-start-line="95" selection-start-column="99" selection-end-line="95" selection-end-column="99" />
             </state>
           </provider>
         </entry>
@@ -215,7 +213,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>say</find>
       <find>job gone</find>
       <find>MIN_RESOURCE_AMOUNT</find>
       <find>transfer cost</find>
@@ -245,6 +242,7 @@
       <find>MemRooms</find>
       <find>RoomJobs object gone</find>
       <find>3AtkP</find>
+      <find>body</find>
     </findStrings>
     <replaceStrings>
       <replace>const</replace>
@@ -279,10 +277,10 @@
         <option value="$PROJECT_DIR$/QuickCommands.js" />
         <option value="$PROJECT_DIR$/Labs.js" />
         <option value="$PROJECT_DIR$/README.md" />
-        <option value="$PROJECT_DIR$/Observers.js" />
         <option value="$PROJECT_DIR$/main.js" />
         <option value="$PROJECT_DIR$/AssignJobs.js" />
         <option value="$PROJECT_DIR$/CreateJobs.js" />
+        <option value="$PROJECT_DIR$/Observers.js" />
         <option value="$PROJECT_DIR$/ExecuteJobs.js" />
       </list>
     </option>
@@ -322,7 +320,7 @@
   <component name="PropertiesComponent">
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
-    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1572901479120" />
+    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1572904381649" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
@@ -377,14 +375,7 @@
       <workItem from="1571764888799" duration="7951000" />
       <workItem from="1571772934947" duration="2948000" />
       <workItem from="1571816966459" duration="24889000" />
-      <workItem from="1572031181365" duration="67577000" />
-    </task>
-    <task id="LOCAL-00034" summary="v2 update add terminals">
-      <created>1564693438663</created>
-      <option name="number" value="00034" />
-      <option name="presentableId" value="LOCAL-00034" />
-      <option name="project" value="LOCAL" />
-      <updated>1564693438663</updated>
+      <workItem from="1572031181365" duration="69309000" />
     </task>
     <task id="LOCAL-00035" summary="v2 update sort">
       <created>1565035243725</created>
@@ -722,11 +713,18 @@
       <option name="project" value="LOCAL" />
       <updated>1572786511648</updated>
     </task>
-    <option name="localTasksCounter" value="83" />
+    <task id="LOCAL-00083" summary="small update">
+      <created>1572902654148</created>
+      <option name="number" value="00083" />
+      <option name="presentableId" value="LOCAL-00083" />
+      <option name="project" value="LOCAL" />
+      <updated>1572902654148</updated>
+    </task>
+    <option name="localTasksCounter" value="84" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="559301000" />
+    <option name="totallyTimeSpent" value="561033000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -926,13 +924,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Observers.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="442">
-          <caret line="86" column="61" selection-start-line="86" selection-start-column="61" selection-end-line="86" selection-end-column="61" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/main.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="270">
@@ -991,10 +982,17 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/Observers.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="340">
+          <caret line="95" column="99" lean-forward="true" selection-start-line="95" selection-start-column="99" selection-end-line="95" selection-end-column="99" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/ExecuteJobs.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="273">
-          <caret line="1479" column="62" lean-forward="true" selection-start-line="1479" selection-start-column="62" selection-end-line="1479" selection-end-column="62" />
+        <state relative-caret-position="171">
+          <caret line="1486" column="88" selection-start-line="1486" selection-start-column="88" selection-end-line="1486" selection-end-column="88" />
           <folding>
             <element signature="e#646#6604#0" />
             <element signature="e#6614#6636#0" />
@@ -1040,7 +1038,6 @@
             <element signature="e#64329#66955#0" />
             <element signature="e#66965#66983#0" />
             <element signature="e#67036#69088#0" />
-            <element signature="e#69169#71210#0" />
             <element signature="e#71220#71238#0" />
             <element signature="e#71294#74318#0" />
             <element signature="e#74358#74410#0" />

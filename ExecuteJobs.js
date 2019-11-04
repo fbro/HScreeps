@@ -1442,6 +1442,10 @@ const ExecuteJobs = {
                         }
                     }
                     let result = ERR_NO_RESULT_FOUND;
+                    if(creep.hits < creep.hitsMax && creep.getActiveBodyparts(HEAL) > 0){ // TODO remove
+                        creep.heal(creep);
+
+                    }
                     if(powerBank){
                         result = creep.attack(powerBank);
                     }else{
@@ -1480,7 +1484,7 @@ const ExecuteJobs = {
             const result = GenericFlagAction(creep, roomJob, {
                 /**@return {int}*/
                 JobStatus: function (jobObject) {
-                    if (!jobObject.room) { // invisible
+                    if (!jobObject.room || jobObject.pos.roomName !== creep.pos.roomName) { // invisible
                         return SHOULD_ACT;
                     }else{
                         let powerBank;

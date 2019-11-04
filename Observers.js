@@ -92,10 +92,10 @@ const Observers = {
                                     const freeSpaces = FreeSpaces(powerBank.pos);
                                     console.log('Observers power bank found! in ' + roomKey + ' freeSpaces ' + freeSpaces);
                                     scanStatus = {'type' : 'powerBank', 'id' : powerBank.id, 'pos' : powerBank.pos, 'deadline' : powerBank.ticksToDecay + Game.time, 'freeSpaces' : freeSpaces, 'observerId' : observer.id};
-                                    if(!Memory.MemRooms[gameRoomKey].powerBankFlag && freeSpaces > 3 && powerBank.ticksToDecay > 4800) {
+                                    if(!Memory.MemRooms[gameRoomKey].powerBankFlag && freeSpaces >= 2 && powerBank.ticksToDecay > 4800) {
                                         Memory.MemRooms[gameRoomKey].powerBankFlag = powerBank.pos;
                                         console.log('Observers powerBank flag placed in ' + roomKey);
-                                        Game.rooms[roomKey].createFlag(powerBank.pos, 'powerBank_' + powerBank.pos.roomName + '-' + freeSpaces, COLOR_ORANGE, COLOR_PURPLE);
+                                        //Game.rooms[roomKey].createFlag(powerBank.pos, 'powerBank_' + powerBank.pos.roomName + '-' + freeSpaces, COLOR_ORANGE, COLOR_PURPLE); // TODO reactivate
                                     }
                                 }else{
                                     const deposit = Game.rooms[roomKey].find(FIND_DEPOSITS, {
@@ -110,7 +110,7 @@ const Observers = {
                                         if(!Memory.MemRooms[gameRoomKey].depositFlag){
                                             Memory.MemRooms[gameRoomKey].depositFlag = deposit.pos;
                                             console.log('Observers deposit flag placed in ' + roomKey);
-                                            Game.rooms[roomKey].createFlag(deposit.pos, 'deposit_' + deposit.pos.roomName + '-' + freeSpaces, COLOR_ORANGE, COLOR_CYAN);
+                                            //Game.rooms[roomKey].createFlag(deposit.pos, 'deposit_' + deposit.pos.roomName + '-' + freeSpaces, COLOR_ORANGE, COLOR_CYAN); // TODO reactivate
                                         }
                                     }else{
                                         deleteScan = true;
