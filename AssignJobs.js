@@ -21,7 +21,6 @@ const AssignJobs = {
         * [R] reserver          CLAIM - many CLAIM when reserving
         * [W] warrior           ATTACK and MOVE
         * [D] distantHarvester  equal WORK and CARRY
-        * [P] powerBankAttacker ATTACK HEAL
         * [G] gunner            RANGED_ATTACK and MOVE - needs clever attack pattern to avoid creeps with ATTACK body parts
         * [M] medic             HEAL
         */
@@ -190,7 +189,7 @@ const AssignJobs = {
         /**@return {boolean}*/
         function ShouldSpawnCreep(creepType, roomKey) {
             const memRoom = Memory.MemRooms[roomKey];
-            let maxCreepsInRoom = 0;
+            let maxCreepsInRoom = 3;
             if (memRoom.MaxCreeps[creepType]) {
                 maxCreepsInRoom = memRoom.MaxCreeps[creepType].MaxCreepsInRoom;
             } else {
@@ -206,9 +205,6 @@ const AssignJobs = {
                         break;
                     case 'E': // extractor
                         maxCreepsInRoom = 1;
-                        break;
-                    case 'P': // powerBankAttacker
-                        maxCreepsInRoom = 4;
                         break;
                     case 'W': // warrior
                     case 'G': // gunner
@@ -481,26 +477,6 @@ const AssignJobs = {
                             break;
                         case (energyAvailable >= 200): // energyCapacityAvailable: 300
                             body = [WORK, CARRY, MOVE];
-                            break;
-                    }
-                    break;
-                // power bank attacker
-                case 'P':
-                    switch (true) {
-                        case (energyAvailable >= 5630): // energyCapacityAvailable: 12900
-                            body = [
-                                MOVE, MOVE, MOVE, MOVE, MOVE, // 250
-                                MOVE, MOVE, MOVE, MOVE, MOVE, // 250
-                                MOVE, MOVE, MOVE, MOVE, MOVE, // 250
-                                MOVE, MOVE, MOVE, MOVE, MOVE, // 250
-                                MOVE, MOVE, MOVE, MOVE, MOVE, // 250
-                                ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, // 400
-                                ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, // 400
-                                ATTACK, // 80
-                                HEAL, HEAL, HEAL, HEAL, HEAL, // 1250
-                                HEAL, HEAL, HEAL, HEAL, HEAL, // 1250
-                                HEAL, HEAL, HEAL, HEAL // 1000
-                            ];
                             break;
                     }
                     break;

@@ -201,13 +201,10 @@ const CreateJobs = {
         // flag jobs:
 
         function PowerBankJobs(jobs, gameFlagKey, gameFlag){
-            let freeSpaces = gameFlagKey.split('-').pop();
-            if(freeSpaces > 4){freeSpaces = 4;} // no more than 4 power harvesters should be available
-            if(gameFlag.room && gameFlag.pos.lookFor(LOOK_STRUCTURES)[0] || !gameFlag.room) {
-                for (let e = 0; e < freeSpaces; e++) {
-                    jobs = CreateFlagJob(jobs, '3AtkP' + e, gameFlagKey, gameFlag, 'P');
-                }
-            }
+            jobs = CreateFlagJob(jobs, '3AtkP1', gameFlagKey, gameFlag, 'W');
+            jobs = CreateFlagJob(jobs, '3AtkP2', gameFlagKey, gameFlag, 'W');
+            jobs = CreateFlagJob(jobs, '3MedP1', gameFlagKey, gameFlag, 'M');
+            jobs = CreateFlagJob(jobs, '3MedP2', gameFlagKey, gameFlag, 'M');
             if(gameFlag.room){ // power bank on low health - get transporters over to the power bank
                 const powerBank = gameFlag.pos.lookFor(LOOK_STRUCTURES)[0];
                 const droppedPower = gameFlag.pos.lookFor(LOOK_RESOURCES)[0];

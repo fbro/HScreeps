@@ -178,6 +178,9 @@ const ExecuteJobs = {
                 case jobKey.startsWith('3AtkP'):
                     result = JobAttackPowerBank(creep, roomJob);
                     break;
+                case jobKey.startsWith('3MedP'):
+                    result = JobMedicPowerBank(creep, roomJob);
+                    break;
                 case jobKey.startsWith('1TrnsprtP'):
                     result = JobTransportPowerBank(creep, roomJob);
                     break;
@@ -1439,22 +1442,19 @@ const ExecuteJobs = {
                         }
                     }
                     let result = ERR_NO_RESULT_FOUND;
-                    if (creep.hits < creep.hitsMax) {
-                        result = creep.heal(creep);
-                    } else if(powerBank){
+                    if(powerBank){
                         result = creep.attack(powerBank);
                     }else{
                         const powerResource = jobObject.pos.findInRange(FIND_DROPPED_RESOURCES, 1, {
                             filter: function (power) {
                                 return (power.resourceType === RESOURCE_POWER);
                             }
-                        })[0]
+                        })[0];
                         if(powerResource){
                             Logs.Info('ExecuteJobs JobAttackPowerBank done', creep.name + ' ' + jobObject.name + ' powerBank ' + powerBank + ' power ' + powerResource.amount);
                         }else{
                             Logs.Info('ExecuteJobs JobAttackPowerBank done', creep.name + ' ' + jobObject.name + ' powerBank ' + powerBank);
                         }
-
                         result = JOB_IS_DONE;
                     }
                     return result;
@@ -1470,6 +1470,69 @@ const ExecuteJobs = {
                 /**@return {int}*/
                 Fetch: function (fetchObject, jobObject) {
                     return JOB_IS_DONE; // not used
+                },
+            });
+            return result;
+        }
+
+        /**@return {int}*/
+        function JobMedicPowerBank(creep, roomJob) {
+            const result = GenericFlagAction(creep, roomJob, {
+                /**@return {int}*/
+                JobStatus: function (jobObject) {
+                    if (!jobObject.room) { // invisible
+                        return SHOULD_ACT;
+                    }else{
+                        let powerBank;
+                        if (creep.memory.PowerBankId) {
+                            powerBank = Game.getObjectById(creep.memory.PowerBankId);
+                        }
+                        if (!powerBank) {
+                            powerBank = jobObject.pos.lookFor(LOOK_STRUCTURES)[0];
+                            if(powerBank){
+                                creep.memory.PowerBankId = powerBank.id;
+                            }
+                        }
+                        if(!powerBank){
+                            return JOB_IS_DONE;
+                        }else{
+                            return SHOULD_FETCH;
+                        }
+                    }
+                },
+                /**@return {int}*/
+                Act: function (jobObject) {
+                    return ERR_NOT_IN_RANGE;
+                },
+                /**@return {int}*/
+                IsJobDone: function (jobObject) {
+                    return this.JobStatus(jobObject); // not used
+                },
+                /**@return {object} @return {undefined}*/
+                FindFetchObject: function (jobObject) {
+                    const woundedCreep = creep.pos.findClosestByRange(FIND_MY_CREEPS, {
+                        filter: function(creep) {
+                            return creep.hits < creep.hitsMax;
+                        }
+                    });
+                    if(woundedCreep){
+                        return woundedCreep
+                    }else{
+                        return jobObject;
+                    }
+                },
+                /**@return {int}*/
+                Fetch: function (fetchObject, jobObject) {
+                    if(fetchObject === jobObject){
+                        return OK;
+                    }else{
+                        let result = creep.heal(fetchObject);
+                        if(result !== OK || creep.getActiveBodyparts(HEAL) * 12 + fetchObject.hits >= fetchObject.hitsMax){
+                            return result;
+                        }else{
+                            return ERR_BUSY;
+                        }
+                    }
                 },
             });
             return result;
