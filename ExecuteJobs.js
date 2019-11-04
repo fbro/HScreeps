@@ -163,6 +163,9 @@ const ExecuteJobs = {
                 case jobKey.startsWith('2GuardGunPos'):
                     result = JobGuardGunnerPos(creep, roomJob);
                     break;
+                case jobKey.startsWith('2GuardMedPos'):
+                    result = JobGuardMedicPos(creep, roomJob);
+                    break;
                 case jobKey.startsWith('5RemoteHarvest'):
                     result = JobRemoteHarvest(creep, roomJob);
                     break;
@@ -1144,6 +1147,58 @@ const ExecuteJobs = {
                     } else if (creep.pos.isNearTo(jobObject)) {
                         creep.say(jobObject.name);
                         return OK; // when OK is returned FindFetchObject is checking each tick for new hostileCreeps
+                    } else if (jobObject === fetchObject) { // move to flag
+                        return ERR_NOT_IN_RANGE;
+                    }
+                },
+            });
+            return result;
+        }
+
+        /**@return {int}*/
+        function JobGuardMedicPos(creep, roomJob){
+            const result = GenericFlagAction(creep, roomJob, {
+                /**@return {int}*/
+                JobStatus: function (jobObject) {
+                    if (!jobObject.room) {
+                        return SHOULD_ACT;
+                    } else {
+                        return SHOULD_FETCH
+                    }
+                },
+                /**@return {int}*/
+                Act: function (jobObject) {
+                    return ERR_NOT_IN_RANGE;
+                },
+                /**@return {int}*/
+                IsJobDone: function (jobObject) {
+                    return this.JobStatus(jobObject);
+                },
+                /**@return {object} @return {undefined}*/
+                FindFetchObject: function (jobObject) {
+                    const woundedCreep = creep.pos.findClosestByPath(FIND_MY_CREEPS, {
+                        filter: function(creep) {
+                            return creep.hits < creep.hitsMax;
+                        }
+                    });
+                    if (woundedCreep) {
+                        return woundedCreep;
+                    } else {
+                        return jobObject;
+                    }
+                },
+                /**@return {int}*/
+                Fetch: function (fetchObject, jobObject) {
+                    if (jobObject !== fetchObject) { // woundedCreep
+                        if (Math.abs(creep.pos.x - fetchObject.pos.x) > 1 || Math.abs(creep.pos.y - fetchObject.pos.y) > 1) {
+                            creep.heal(fetchObject);
+                            return ERR_NOT_IN_RANGE;
+                        } else {
+                            return creep.heal(fetchObject);
+                        }
+                    } else if (creep.pos.isNearTo(jobObject)) {
+                        creep.say(jobObject.name);
+                        return OK; // when OK is returned FindFetchObject is checking each tick for new woundedCreeps
                     } else if (jobObject === fetchObject) { // move to flag
                         return ERR_NOT_IN_RANGE;
                     }

@@ -48,6 +48,8 @@ const CreateJobs = {
                         jobs = CreateFlagJob(jobs, '2GuardPos', gameFlagKey, gameFlag, 'W')
                     }else if(gameFlag.secondaryColor === COLOR_BLUE) { // gunner at pos
                         jobs = CreateFlagJob(jobs, '2GuardGunPos', gameFlagKey, gameFlag, 'G')
+                    }else if(gameFlag.secondaryColor === COLOR_GREEN) { // medic at pos
+                        jobs = CreateFlagJob(jobs, '2GuardMedPos', gameFlagKey, gameFlag, 'M')
                     }else{notFound = true;}
                 } else if (color === COLOR_YELLOW && gameFlag.secondaryColor === COLOR_YELLOW) { // distantHarvester on source at flag pos
                     jobs = CreateFlagJob(jobs, '5RemoteHarvest', gameFlagKey, gameFlag, 'D');

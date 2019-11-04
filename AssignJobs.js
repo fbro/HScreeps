@@ -23,7 +23,6 @@ const AssignJobs = {
         * [D] distantHarvester  equal WORK and CARRY
         * [P] powerBankAttacker ATTACK HEAL
         * [G] gunner            RANGED_ATTACK and MOVE - needs clever attack pattern to avoid creeps with ATTACK body parts
-        * TODO not in first version
         * [M] medic             HEAL
         */
 
@@ -213,6 +212,7 @@ const AssignJobs = {
                         break;
                     case 'W': // warrior
                     case 'G': // gunner
+                    case 'M': // medic
                     case 'S': // scout
                     case 'C': // claimer
                     case 'R': // reserver
@@ -379,10 +379,20 @@ const AssignJobs = {
                 // warrior
                 case 'W':
                     switch (true) {
-                        case (energyAvailable >= 3740): // energyCapacityAvailable: 12900
-                            body = [ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK,
-                                MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,
-                                RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK];
+                        case (energyAvailable >= 3810): // energyCapacityAvailable: 12900
+                            body = [
+                                ATTACK, ATTACK, ATTACK, ATTACK, ATTACK,
+                                ATTACK, ATTACK, ATTACK, ATTACK, ATTACK,
+                                ATTACK, ATTACK, ATTACK, ATTACK, ATTACK,
+                                ATTACK, ATTACK, // 17*30 = 510 damage per tick
+                                MOVE, MOVE, MOVE, MOVE, MOVE,
+                                MOVE, MOVE, MOVE, MOVE, MOVE,
+                                MOVE, MOVE, MOVE, MOVE, MOVE,
+                                MOVE, MOVE, MOVE, MOVE, MOVE,
+                                MOVE, MOVE, MOVE, MOVE, MOVE,
+                                RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK,
+                                RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK // 90 damage per tick in close range
+                            ]; // 590 damage per tick - powerbank return damage is 295 /12 = 25 HEAL parts needed
                             break;
                         case (energyAvailable >= 2880): // energyCapacityAvailable: 5600
                             body = [ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK,
@@ -491,6 +501,43 @@ const AssignJobs = {
                                 HEAL, HEAL, HEAL, HEAL, HEAL, // 1250
                                 HEAL, HEAL, HEAL, HEAL // 1000
                             ];
+                            break;
+                    }
+                    break;
+                // medic
+                case 'M':
+                    switch (true) {
+                        case (energyAvailable >= 7500): // energyCapacityAvailable: 12900
+                            body = [
+                                HEAL, HEAL, HEAL, HEAL, HEAL,
+                                HEAL, HEAL, HEAL, HEAL, HEAL,
+                                HEAL, HEAL, HEAL, HEAL, HEAL,
+                                HEAL, HEAL, HEAL, HEAL, HEAL,
+                                HEAL, HEAL, HEAL, HEAL,
+                                MOVE, MOVE, MOVE, MOVE, MOVE,
+                                MOVE, MOVE, MOVE, MOVE, MOVE,
+                                MOVE, MOVE, MOVE, MOVE, MOVE,
+                                MOVE, MOVE, MOVE, MOVE, MOVE,
+                                MOVE, MOVE, MOVE, MOVE, MOVE, HEAL];
+                            break;
+                        case (energyAvailable >= 4800): // energyCapacityAvailable: 5600
+                            body = [HEAL, HEAL, HEAL, HEAL, HEAL, HEAL, HEAL, HEAL, HEAL, HEAL, HEAL, HEAL, HEAL, HEAL, HEAL,
+                                MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, HEAL];
+                            break;
+                        case (energyAvailable >= 2100): // energyCapacityAvailable: 2300
+                            body = [HEAL, HEAL, HEAL, HEAL, HEAL, HEAL, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, HEAL];
+                            break;
+                        case (energyAvailable >= 1500): // energyCapacityAvailable: 1800
+                            body = [HEAL, HEAL, HEAL, HEAL, MOVE, MOVE, MOVE, MOVE, MOVE, HEAL];
+                            break;
+                        case (energyAvailable >= 1200): // energyCapacityAvailable: 1300
+                            body = [HEAL, HEAL, HEAL, MOVE, MOVE, MOVE, MOVE, HEAL];
+                            break;
+                        case (energyAvailable >= 480): // energyCapacityAvailable: 550
+                            body = [TOUGH, TOUGH, TOUGH, MOVE, MOVE, MOVE, MOVE, HEAL];
+                            break;
+                        case (energyAvailable >= 300): // energyCapacityAvailable: 300
+                            body = [MOVE, HEAL];
                             break;
                     }
                     break;
