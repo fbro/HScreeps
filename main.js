@@ -56,11 +56,9 @@ module.exports.loop = function () {
 // TODO FillPowerSpawnPowerUnits
 // TODO HarvestDeposit
 
-// TODO JobAttackPowerBank Heal
-// TODO JobAttackPowerBank focus on just attacking now that there is a healer - use W and delete P
 // TODO power bank harvesting - avoid enemy rooms and avoid powerbanks and deposits that are unreachable
 
-// TODO add max to what should be placed in the terminal
+// TODO handle links at room exits for remote harvests
 
 // add constructions
 // add renewCreep functionality

@@ -10,8 +10,8 @@ for (const creepName in Memory.creeps) {
     } else {
         mc.Transferring = undefined;
         mc.JobName = 'idle(' + gc.pos.x + ',' + gc.pos.y + ')' + gc.pos.roomName;
-        mc.EnergySupply = undefined;
-        mc.EnergySupplyType = undefined;
+        mc.ResourceSupply = undefined;
+        mc.ResourceSupplyType = undefined;
         mc.ClosestRoomWithStorage = undefined;
         mc.MoveHome = undefined;
         mc.LabId = undefined;

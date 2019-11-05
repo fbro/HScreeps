@@ -125,15 +125,13 @@ const CreateJobs = {
                                 if (gameRoom.controller.level >= 6) {
                                     // ExtractMineral
                                     ExtractMineralJobs(gameRoom, jobs);
-                                    // FillTerminalEnergy
-                                    FillTerminalEnergyJobs(gameRoom, jobs);
-                                    // FillTerminalMineral
-                                    FillTerminalMineralJobs(gameRoom, jobs);
+                                    // FillTerminal
+                                    FillTerminalJobs(gameRoom, jobs);
                                     // FillLabEnergy
                                     FillLabEnergyJobs(gameRoom, jobs);
                                     if (gameRoom.controller.level === 8) {
                                         FillPowerSpawnEnergyJobs(gameRoom, jobs);
-                                        // TODO FillPowerSpawnPowerJobs
+                                        FillPowerSpawnPowerJobs(gameRoom, jobs);
                                     }
                                 }
                             }
@@ -296,6 +294,23 @@ const CreateJobs = {
             }
         }
 
+        function FillPowerSpawnPowerJobs(gameRoom, roomJobs) {
+            if (gameRoom.storage && gameRoom.storage.store[RESOURCE_POWER] > 0) {
+                const powerSpawns = gameRoom.find(FIND_MY_STRUCTURES, {
+                    filter: (s) => {
+                        return s.structureType === STRUCTURE_POWER_SPAWN;
+                    }
+                });
+                for (const powerSpawnKey in powerSpawns) {
+                    const powerSpawn = powerSpawns[powerSpawnKey];
+                    if (powerSpawn && powerSpawn.store[RESOURCE_POWER] < powerSpawn.store.getCapacity(RESOURCE_POWER)) {
+                        new RoomVisual(gameRoom.name).text('⚡', powerSpawn.pos.x, powerSpawn.pos.y);
+                        AddJob(roomJobs, '5FillPSpwnP(' + powerSpawn.pos.x + ',' + powerSpawn.pos.y + ')' + gameRoom.name, powerSpawn.id, OBJECT_JOB, 'T');
+                    }
+                }
+            }
+        }
+
         function FillLabEnergyJobs(gameRoom, roomJobs) {
             if (gameRoom.storage && gameRoom.storage.store[RESOURCE_ENERGY] > 5000) {
                 const labs = gameRoom.find(FIND_MY_STRUCTURES, {
@@ -313,38 +328,21 @@ const CreateJobs = {
             }
         }
 
-        function FillTerminalEnergyJobs(gameRoom, roomJobs) {
-            if (gameRoom.storage && gameRoom.storage.store[RESOURCE_ENERGY] > 50000) {
-                const terminal = gameRoom.find(FIND_MY_STRUCTURES, {
-                    filter: (s) => {
-                        return s.structureType === STRUCTURE_TERMINAL;
-                    }
-                })[0];
-                if (terminal && terminal.store[RESOURCE_ENERGY] < 100000 && terminal.store.getUsedCapacity() < terminal.store.getCapacity()) {
-                    new RoomVisual(gameRoom.name).text('⚡', terminal.pos.x, terminal.pos.y);
-                    AddJob(roomJobs, '4FillTermE(' + terminal.pos.x + ',' + terminal.pos.y + ')' + gameRoom.name, terminal.id, OBJECT_JOB, 'T');
-                }
-            }
-        }
-
-        function FillTerminalMineralJobs(gameRoom, roomJobs) {
+        function FillTerminalJobs(gameRoom, roomJobs) {
             if (gameRoom.storage) {
-                const terminal = gameRoom.find(FIND_MY_STRUCTURES, {
-                    filter: (s) => {
-                        return s.structureType === STRUCTURE_TERMINAL;
-                    }
-                })[0];
-                if (terminal && (terminal.store.getUsedCapacity() - terminal.store[RESOURCE_ENERGY]) < (terminal.store.getCapacity() - 100000)) {
-                    let storageHasMinerals = false;
+                const terminal = gameRoom.find(FIND_MY_STRUCTURES, {filter: (s) => {return s.structureType === STRUCTURE_TERMINAL;}})[0];
+                if (terminal) {
                     for (const resourceType in gameRoom.storage.store) {
-                        if (gameRoom.storage.store[resourceType] > 0 && resourceType !== RESOURCE_ENERGY) {
-                            storageHasMinerals = true;
-                            break;
+                        const storageResourceAmount = gameRoom.storage.store[resourceType];
+                        if (storageResourceAmount > 0){
+                            let maxResources = 5000;
+                            if(resourceType === RESOURCE_ENERGY){
+                                maxResources = 100000;
+                            }
+                            if(terminal.store[resourceType] < maxResources){
+                                AddJob(roomJobs, '5FillTerm(' + resourceType + ')' + gameRoom.name, terminal.id, OBJECT_JOB, 'T');
+                            }
                         }
-                    }
-                    if (storageHasMinerals) {
-                        new RoomVisual(gameRoom.name).text('⛏', terminal.pos.x, terminal.pos.y);
-                        AddJob(roomJobs, '5FillTermMin(' + terminal.pos.x + ',' + terminal.pos.y + ')' + gameRoom.name, terminal.id, OBJECT_JOB, 'T');
                     }
                 }
             }
