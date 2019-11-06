@@ -4,6 +4,7 @@ let ExecuteJobs = require('ExecuteJobs');
 let Towers = require('Towers');
 let Links = require('Links');
 let Terminals = require('Terminals');
+let PowerSpawns = require('PowerSpawns');
 let Logs = require('Logs');
 let Observers = require('Observers');
 
@@ -44,6 +45,7 @@ module.exports.loop = function () {
         }
         AssignJobs.run();
     }
+    PowerSpawns.run();
     ExecuteJobs.run();
     Observers.run();
 };
@@ -59,6 +61,8 @@ module.exports.loop = function () {
 // TODO handle links at room exits for remote harvests
 // TODO powerSpawn process power
 
+
+// TODO gather all the special buildings in one room loop ?
 // add constructions
 // add renewCreep functionality
 // cache paths to be reused by creeps

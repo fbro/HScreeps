@@ -860,7 +860,7 @@ const ExecuteJobs = {
                 },
                 /**@return {int}*/
                 Fetch: function (fetchObject, jobObject) {
-                    return FetchResource(creep, fetchObject, RESOURCE_POWER);
+                    return FetchResource(creep, fetchObject, RESOURCE_POWER, jobObject.store.getFreeCapacity(RESOURCE_POWER));
                 },
             });
             return result;
@@ -1538,7 +1538,9 @@ const ExecuteJobs = {
             const result = GenericFlagAction(creep, roomJob, {
                 /**@return {int}*/
                 JobStatus: function (jobObject) {
-                    if (creep.store.getFreeCapacity() > 0) {
+                    if(jobObject.store.getFreeCapacity === 0){
+                        return JOB_IS_DONE;
+                    }else if (creep.store.getFreeCapacity() > 0) {
                         return SHOULD_ACT;
                     } else {
                         return SHOULD_FETCH;
@@ -1685,7 +1687,7 @@ const ExecuteJobs = {
         }
 
         /**@return {object} @return {undefined}*/
-        function FindClosestResourceInRoom(creep, room, resourceToFetch) {
+        function FindClosestResourceInRoom(creep, room, resourceToFetch, jobObject) {
             // set ResourceSupply and ResourceSupplyType on creep memory
             let resourceSupply = undefined;
             let resourceSupplyType = undefined;
@@ -1702,21 +1704,26 @@ const ExecuteJobs = {
             }
 
             if (!resourceSupply) { // creep memory had nothing stored
-                let energySupplies = room.find(FIND_STRUCTURES, {
+                let resourceSupplies = room.find(FIND_STRUCTURES, {
                     filter: function (s) {
-                        return (s.structureType === STRUCTURE_CONTAINER || s.structureType === STRUCTURE_STORAGE || s.structureType === STRUCTURE_LINK) && s.store[resourceToFetch] >= 100;
+                        return (s.structureType === STRUCTURE_CONTAINER
+                            || s.structureType === STRUCTURE_STORAGE
+                            || s.structureType === STRUCTURE_LINK
+                            || (jobObject.structureType !== STRUCTURE_TERMINAL && s.structureType === STRUCTURE_TERMINAL)
+                            )
+                            && (s.store[resourceToFetch] >= 200 || resourceToFetch !== RESOURCE_ENERGY && s.store[resourceToFetch] > 0);
                     }
                 });
-                energySupplies = energySupplies.concat(room.find(FIND_DROPPED_RESOURCES, {
+                resourceSupplies = resourceSupplies.concat(room.find(FIND_DROPPED_RESOURCES, {
                     filter: function (d) {
                         return (d.resourceType === resourceToFetch && d.amount >= 50);
                     }
                 }));
                 let bestDistance = Number.MAX_SAFE_INTEGER;
-                for (let i = 0; i < energySupplies.length; i++) {
-                    const distance = Math.sqrt(Math.pow(energySupplies[i].pos.x - creep.pos.x, 2) + Math.pow(energySupplies[i].pos.y - creep.pos.y, 2));
+                for (let i = 0; i < resourceSupplies.length; i++) {
+                    const distance = Math.sqrt(Math.pow(resourceSupplies[i].pos.x - creep.pos.x, 2) + Math.pow(resourceSupplies[i].pos.y - creep.pos.y, 2));
                     if (distance < bestDistance) {
-                        resourceSupply = energySupplies[i];
+                        resourceSupply = resourceSupplies[i];
                         bestDistance = distance;
                     }
                 }
@@ -1739,20 +1746,28 @@ const ExecuteJobs = {
 
         /**@return {object} @return {undefined}*/
         function FindFetchResource(creep, jobObject, resourceToFetch) {
-            let energySupply = FindClosestResourceInRoom(creep, jobObject.room, resourceToFetch);
+            let energySupply = FindClosestResourceInRoom(creep, jobObject.room, resourceToFetch, jobObject);
             if (!energySupply && creep.pos.roomName !== jobObject.pos.roomName) {
-                energySupply = FindClosestResourceInRoom(creep, creep.room, resourceToFetch); // try again but look at the room the creep is in
+                energySupply = FindClosestResourceInRoom(creep, creep.room, resourceToFetch, jobObject); // try again but look at the room the creep is in
             }
             return energySupply;
         }
 
         /**@return {int}*/
-        function FetchResource(creep, fetchObject, resourceToFetch) {
+        function FetchResource(creep, fetchObject, resourceToFetch, max = -1) {
             let result;
             if (creep.memory.ResourceSupplyType === 'DROP') {
-                result = creep.pickup(fetchObject);
+                if(max === -1){
+                    result = creep.pickup(fetchObject);
+                }else{
+                    result = creep.pickup(fetchObject, max);
+                }
             } else {
-                result = creep.withdraw(fetchObject, resourceToFetch);
+                if(max === -1){
+                    result = creep.withdraw(fetchObject, resourceToFetch);
+                }else{
+                    result = creep.withdraw(fetchObject, resourceToFetch, max);
+                }
             }
             if (result === ERR_FULL) { // creep store is full with anything other than resourceToFetch - get rid of it asap
                 if ((creep.memory.ResourceSupplyType === 'CONTAINER' || creep.memory.ResourceSupplyType === 'STORAGE') && fetchObject.store.getFreeCapacity() > 0) {
