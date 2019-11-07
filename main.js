@@ -7,6 +7,7 @@ let Terminals = require('Terminals');
 let PowerSpawns = require('PowerSpawns');
 let Logs = require('Logs');
 let Observers = require('Observers');
+let PowerCreeps = require('PowerCreeps');
 
 module.exports.loop = function () {
 
@@ -20,7 +21,7 @@ module.exports.loop = function () {
     if (!Memory.MemRooms) {
         Memory.MemRooms = new Object();
     }
-    Towers.run();
+
     if (Game.time % 10 === 0) {
         if (Game.time % 30 === 0) { // tick burst from https://docs.screeps.com/cpu-limit.html#Bucket
             CreateJobs.run();
@@ -41,13 +42,17 @@ module.exports.loop = function () {
                     }
                 }
             }
-
         }
         AssignJobs.run();
     }
-    PowerSpawns.run();
     ExecuteJobs.run();
-    Observers.run();
+    for (const gameRoomKey in Game.rooms) {
+        const gameRoom = Game.rooms[gameRoomKey];
+        Towers.run(gameRoom);
+        Observers.run(gameRoom, gameRoomKey);
+        PowerSpawns.run(gameRoom);
+    }
+    PowerCreeps.run();
 };
 
 
@@ -61,8 +66,6 @@ module.exports.loop = function () {
 // TODO handle links at room exits for remote harvests
 // TODO powerSpawn process power
 
-
-// TODO gather all the special buildings in one room loop ?
 // add constructions
 // add renewCreep functionality
 // cache paths to be reused by creeps

@@ -325,19 +325,16 @@ const CreateJobs = {
         }
 
         function FillTerminalJobs(gameRoom, roomJobs) {
-            if (gameRoom.storage) {
-                const terminal = gameRoom.find(FIND_MY_STRUCTURES, {filter: (s) => {return s.structureType === STRUCTURE_TERMINAL;}})[0];
-                if (terminal) {
-                    for (const resourceType in gameRoom.storage.store) {
-                        const storageResourceAmount = gameRoom.storage.store[resourceType];
-                        if (storageResourceAmount > 0){
-                            let maxResources = 5000;
-                            if(resourceType === RESOURCE_ENERGY){
-                                maxResources = 100000;
-                            }
-                            if(terminal.store[resourceType] < maxResources){
-                                AddJob(roomJobs, '5FillTerm(' + resourceType + ')' + gameRoom.name, terminal.id, OBJECT_JOB, 'T');
-                            }
+            if (gameRoom.storage && gameRoom.terminal) {
+                for (const resourceType in gameRoom.storage.store) {
+                    const storageResourceAmount = gameRoom.storage.store[resourceType];
+                    if (storageResourceAmount > 0){
+                        let maxResources = 5000;
+                        if(resourceType === RESOURCE_ENERGY){
+                            maxResources = 100000;
+                        }
+                        if(gameRoom.terminal.store[resourceType] < maxResources){
+                            AddJob(roomJobs, '5FillTerm(' + resourceType + ')' + gameRoom.name, gameRoom.terminal.id, OBJECT_JOB, 'T');
                         }
                     }
                 }
