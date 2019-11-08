@@ -16,7 +16,7 @@ const PowerCreeps = {
                     result = GenerateOps(powerCreep);
                 }
             }else{
-                console.log('PowerCreep ' + powerCreep.name + ' hours left ' + ((((powerCreep.spawnCooldownTime - Date.now()) / 1000) / 60) / 60));
+                //console.log('PowerCreep ' + powerCreep.name + ' hours left ' + ((((powerCreep.spawnCooldownTime - Date.now()) / 1000) / 60) / 60));
             }
         }
 

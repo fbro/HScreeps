@@ -61,10 +61,10 @@ module.exports.loop = function () {
 // add more jobs:
 // TODO HarvestDeposit
 
-// TODO power bank harvesting - avoid enemy rooms and avoid powerbanks and deposits that are unreachable
+// TODO power bank harvesting - avoid enemy rooms
 
 // TODO handle links at room exits for remote harvests
-// TODO powerSpawn process power
+
 
 // add constructions
 // add renewCreep functionality
