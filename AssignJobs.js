@@ -375,35 +375,54 @@ const AssignJobs = {
                 // warrior
                 case 'W':
                     switch (true) {
-                        case (energyAvailable >= 3810): // energyCapacityAvailable: 12900
+                        case (energyAvailable >= 2600): // energyCapacityAvailable: 12900
                             body = [
                                 ATTACK, ATTACK, ATTACK, ATTACK, ATTACK,
                                 ATTACK, ATTACK, ATTACK, ATTACK, ATTACK,
                                 ATTACK, ATTACK, ATTACK, ATTACK, ATTACK,
-                                ATTACK, ATTACK, // 17*30 = 510 damage per tick
+                                ATTACK, ATTACK, ATTACK, ATTACK,
                                 MOVE, MOVE, MOVE, MOVE, MOVE,
                                 MOVE, MOVE, MOVE, MOVE, MOVE,
                                 MOVE, MOVE, MOVE, MOVE, MOVE,
                                 MOVE, MOVE, MOVE, MOVE, MOVE,
-                                MOVE, MOVE, MOVE, MOVE, MOVE,
-                                RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK,
-                                RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK // 90 damage per tick in close range
-                            ]; // 590 damage per tick - powerbank return damage is 295 /12 = 25 HEAL parts needed
+                                ATTACK
+                            ];
                             break;
-                        case (energyAvailable >= 2880): // energyCapacityAvailable: 5600
-                            body = [ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK,
-                                MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,
-                                RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK];
+                        case (energyAvailable >= 2340): // energyCapacityAvailable: 5600
+                            body = [
+                                ATTACK, ATTACK, ATTACK, ATTACK, ATTACK,
+                                ATTACK, ATTACK, ATTACK, ATTACK, ATTACK,
+                                ATTACK, ATTACK, ATTACK, ATTACK, ATTACK,
+                                ATTACK, ATTACK,
+                                MOVE, MOVE, MOVE, MOVE, MOVE,
+                                MOVE, MOVE, MOVE, MOVE, MOVE,
+                                MOVE, MOVE, MOVE, MOVE, MOVE,
+                                MOVE, MOVE, MOVE,
+                                ATTACK
+                            ];
                             break;
-                        case (energyAvailable >= 2280): // energyCapacityAvailable: 2300
-                            body = [ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK,
-                                MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,
-                                RANGED_ATTACK];
+                        case (energyAvailable >= 2080): // energyCapacityAvailable: 2300
+                            body = [
+                                ATTACK, ATTACK, ATTACK, ATTACK, ATTACK,
+                                ATTACK, ATTACK, ATTACK, ATTACK, ATTACK,
+                                ATTACK, ATTACK, ATTACK, ATTACK, ATTACK,
+                                MOVE, MOVE, MOVE, MOVE, MOVE,
+                                MOVE, MOVE, MOVE, MOVE, MOVE,
+                                MOVE, MOVE, MOVE, MOVE, MOVE,
+                                MOVE,
+                                ATTACK
+                            ];
                             break;
-                        case (energyAvailable >= 1760): // energyCapacityAvailable: 1800
-                            body = [ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK,
-                                MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,
-                                RANGED_ATTACK];
+                        case (energyAvailable >= 1690): // energyCapacityAvailable: 1800
+                            body = [
+                                ATTACK, ATTACK, ATTACK, ATTACK, ATTACK,
+                                ATTACK, ATTACK, ATTACK, ATTACK, ATTACK,
+                                ATTACK, ATTACK,
+                                MOVE, MOVE, MOVE, MOVE, MOVE,
+                                MOVE, MOVE, MOVE, MOVE, MOVE,
+                                MOVE, MOVE, MOVE,
+                                ATTACK
+                            ];
                             break;
                         case (energyAvailable >= 1300): // energyCapacityAvailable: 1300
                             body = [ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, ATTACK];

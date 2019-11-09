@@ -24,7 +24,7 @@ const PowerCreeps = {
             let result;
             if(powerCreep.powers[PWR_GENERATE_OPS].cooldown === 0){
                 result = powerCreep.usePower(PWR_GENERATE_OPS);
-                console.log('PowerCreeps ' + powerCreep.name + ' generating OPS ' + powerCreep.name + ' ' + powerCreep.memory.JobName + ' ' + result + ' in ' + powerCreep.pos.roomName);
+                console.log('PowerCreeps ' + powerCreep.name + ' generating OPS ' + powerCreep.name + ' result ' + result + ' in ' + powerCreep.pos.roomName);
             }
             if(powerCreep.store.getUsedCapacity() > 0){
                 for (const resourceType in powerCreep.store) {

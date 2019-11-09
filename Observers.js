@@ -102,7 +102,7 @@ const Observers = {
                                     if(!Memory.MemRooms[gameRoomKey].powerBankFlag && freeSpaces >= 2 && powerBank.ticksToDecay > 4800) {
                                         Memory.MemRooms[gameRoomKey].powerBankFlag = powerBank.pos;
                                         console.log('Observers powerBank flag placed in ' + roomKey);
-                                        Game.rooms[roomKey].createFlag(powerBank.pos, 'powerBank_' + powerBank.pos.roomName + '-' + freeSpaces, COLOR_ORANGE, COLOR_PURPLE); // TODO reactivate
+                                        Game.rooms[roomKey].createFlag(powerBank.pos, 'powerBank_' + powerBank.pos.roomName + '-' + freeSpaces, COLOR_ORANGE, COLOR_PURPLE);
                                     }
                                 }else{
                                     const deposit = Game.rooms[roomKey].find(FIND_DEPOSITS, {

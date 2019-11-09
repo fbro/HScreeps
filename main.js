@@ -10,18 +10,9 @@ let Observers = require('Observers');
 let PowerCreeps = require('PowerCreeps');
 
 module.exports.loop = function () {
-
-    /*for(const creepName in Memory.creeps) {
-        const gameCreep = Game.creeps[creepName];
-        if(gameCreep === undefined){
-            console.log('debug-cleanup creep removed ' + creepName);
-            delete Memory.creeps[creepName];
-        }
-    }*/
     if (!Memory.MemRooms) {
         Memory.MemRooms = new Object();
     }
-
     if (Game.time % 10 === 0) {
         if (Game.time % 30 === 0) { // tick burst from https://docs.screeps.com/cpu-limit.html#Bucket
             CreateJobs.run();
@@ -55,7 +46,6 @@ module.exports.loop = function () {
     PowerCreeps.run();
 };
 
-
 // TODO:
 
 // add more jobs:
@@ -63,9 +53,7 @@ module.exports.loop = function () {
 
 // TODO power bank harvesting - avoid enemy rooms
 
-// TODO handle links at room exits for remote harvests
-
-
+// handle links at room exits for remote harvests
 // add constructions
 // add renewCreep functionality
 // cache paths to be reused by creeps
