@@ -1551,7 +1551,7 @@ const ExecuteJobs = {
             const result = GenericFlagAction(creep, roomJob, {
                 /**@return {int}*/
                 JobStatus: function (jobObject) {
-                    if(!jobObject || jobObject.store.getFreeCapacity === 0){
+                    if(!jobObject){
                         return JOB_IS_DONE;
                     }else if (creep.store.getFreeCapacity() > 0) {
                         return SHOULD_ACT;

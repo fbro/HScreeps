@@ -30,8 +30,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/ExecuteJobs.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="220">
-              <caret line="1618" column="56" lean-forward="true" selection-start-line="1618" selection-start-column="56" selection-end-line="1618" selection-end-column="56" />
+            <state relative-caret-position="-38">
+              <caret line="1567" column="39" selection-start-line="1567" selection-start-column="26" selection-end-line="1567" selection-end-column="39" />
               <folding>
                 <element signature="e#6614#6636#0" />
                 <element signature="e#6680#15411#0" />
@@ -83,11 +83,8 @@
                 <element signature="e#71396#74013#0" />
                 <element signature="e#74023#74041#0" />
                 <element signature="e#74093#76658#0" />
-                <element signature="e#76742#79949#0" />
                 <element signature="e#80972#80990#0" />
-                <element signature="e#81058#81212#0" />
                 <element signature="e#81222#81240#0" />
-                <element signature="e#81309#81451#0" />
                 <element signature="e#81461#81479#0" />
                 <element signature="e#81555#84301#0" />
                 <element signature="e#84311#84352#0" />
@@ -286,7 +283,7 @@
   <component name="PropertiesComponent">
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
-    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1573343892903" />
+    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1573344201782" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
@@ -341,14 +338,7 @@
       <workItem from="1571764888799" duration="7951000" />
       <workItem from="1571772934947" duration="2948000" />
       <workItem from="1571816966459" duration="24889000" />
-      <workItem from="1572031181365" duration="88043000" />
-    </task>
-    <task id="LOCAL-00039" summary="minor fix">
-      <created>1565208988320</created>
-      <option name="number" value="00039" />
-      <option name="presentableId" value="LOCAL-00039" />
-      <option name="project" value="LOCAL" />
-      <updated>1565208988320</updated>
+      <workItem from="1572031181365" duration="88277000" />
     </task>
     <task id="LOCAL-00040" summary="terminal fix and save ShouldSpawnCreep res in mem">
       <created>1565295696674</created>
@@ -686,11 +676,18 @@
       <option name="project" value="LOCAL" />
       <updated>1573331182736</updated>
     </task>
-    <option name="localTasksCounter" value="88" />
+    <task id="LOCAL-00088" summary="small changes">
+      <created>1573343973920</created>
+      <option name="number" value="00088" />
+      <option name="presentableId" value="LOCAL-00088" />
+      <option name="project" value="LOCAL" />
+      <updated>1573343973920</updated>
+    </task>
+    <option name="localTasksCounter" value="89" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="579767000" />
+    <option name="totallyTimeSpent" value="580001000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -966,8 +963,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/ExecuteJobs.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="220">
-          <caret line="1618" column="56" lean-forward="true" selection-start-line="1618" selection-start-column="56" selection-end-line="1618" selection-end-column="56" />
+        <state relative-caret-position="-38">
+          <caret line="1567" column="39" selection-start-line="1567" selection-start-column="26" selection-end-line="1567" selection-end-column="39" />
           <folding>
             <element signature="e#6614#6636#0" />
             <element signature="e#6680#15411#0" />
@@ -1019,11 +1016,8 @@
             <element signature="e#71396#74013#0" />
             <element signature="e#74023#74041#0" />
             <element signature="e#74093#76658#0" />
-            <element signature="e#76742#79949#0" />
             <element signature="e#80972#80990#0" />
-            <element signature="e#81058#81212#0" />
             <element signature="e#81222#81240#0" />
-            <element signature="e#81309#81451#0" />
             <element signature="e#81461#81479#0" />
             <element signature="e#81555#84301#0" />
             <element signature="e#84311#84352#0" />
