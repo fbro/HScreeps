@@ -53,6 +53,12 @@ module.exports.loop = function () {
 
 // TODO power bank harvesting - avoid enemy rooms
 
+// TODO add ruin as alternate resource pickup
+
+// TODO teminals should destribute its power to all the rooms - just like energy
+    // TODO implement and test DistributeResources
+
+// if doing long distance work creep should make sure it has enough timeToLive to do the job
 // handle links at room exits for remote harvests
 // add constructions
 // add renewCreep functionality

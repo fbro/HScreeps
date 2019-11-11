@@ -131,8 +131,8 @@ const ExecuteJobs = {
                 case jobKey.startsWith('2FillTwr'):
                     result = JobFillTower(creep, roomJob);
                     break;
-                case jobKey.startsWith('5FillStrg') || jobKey.startsWith('5FillStrgFromRemote') || jobKey.startsWith('4FillStrg-drp'):
-                    result = JobFillStorage(creep, roomJob, jobKey);
+                case jobKey.startsWith('5FillStrg') || jobKey.startsWith('5FillStrgFromRemote') || jobKey.startsWith('4FillStrg-drp') || jobKey.startsWith('4FillStrg-tmb'):
+                    result = JobFillStorage(creep, roomJob);
                     break;
                 case jobKey.startsWith('5ExtrMin'):
                     result = JobExtractMineral(creep, roomJob);
@@ -556,16 +556,16 @@ const ExecuteJobs = {
         }
 
         /**@return {int}*/
-        function JobFillStorage(creep, roomJob, jobKey) {
+        function JobFillStorage(creep, roomJob) {
             const result = GenericJobAction(creep, roomJob, {
                 /**@return {int}*/
                 JobStatus: function (jobObject) {
                     let creepSum = creep.store.getUsedCapacity();
-                    if (!jobObject || !jobObject.store) { // if the target is a dropped resource it may just disappear because it was picked up
+                    if (!jobObject && creepSum === 0) { // if the target is a dropped resource it may just disappear because it was picked up
                         return JOB_IS_DONE;
-                    } else if (creepSum === 0 || !creep.memory.Depositing && creepSum < creep.store.getCapacity() && creep.pos.getRangeTo(jobObject) <= 1
-                        && (jobObject.store.getUsedCapacity() > 0
-                            || jobObject.structureType === STRUCTURE_TERMINAL && (jobObject.store[RESOURCE_ENERGY] > 120000 || jobObject.room.storage.store[RESOURCE_ENERGY] < 5000 && jobObject.store[RESOURCE_ENERGY] > 0))
+                    } else if (jobObject && (creepSum === 0 || !creep.memory.Depositing && creepSum < creep.store.getCapacity() && creep.pos.getRangeTo(jobObject) <= 1
+                        && (jobObject.resourceType || (jobObject.store.getUsedCapacity() > 0
+                            || jobObject.structureType === STRUCTURE_TERMINAL && (jobObject.store[RESOURCE_ENERGY] > 120000 || jobObject.room.storage.store[RESOURCE_ENERGY] < 5000 && jobObject.store[RESOURCE_ENERGY] > 0))))
                     ) {
                         creep.memory.Depositing = undefined;
                         return SHOULD_ACT; // get resources from target
@@ -576,7 +576,7 @@ const ExecuteJobs = {
                 },
                 /**@return {int}*/
                 Act: function (jobObject) {
-                    if (jobObject.structureType === STRUCTURE_CONTAINER) {
+                    if (jobObject.structureType === STRUCTURE_CONTAINER || jobObject.creep) { // tombstone
                         for (const resourceType in jobObject.store) {
                             if (jobObject.store[resourceType] > 0) {
                                 return creep.withdraw(jobObject, resourceType);
@@ -585,7 +585,7 @@ const ExecuteJobs = {
                         return ERR_NOT_ENOUGH_RESOURCES;
                     } else if (jobObject.structureType === STRUCTURE_LINK || jobObject.structureType === STRUCTURE_TERMINAL) {
                         return creep.withdraw(jobObject, RESOURCE_ENERGY);
-                    } else if (jobObject.resourceType !== undefined) { // drop
+                    } else if (jobObject.resourceType) { // drop
                         return creep.pickup(jobObject);
                     } else {
                         return ERR_NO_RESULT_FOUND;
@@ -620,9 +620,11 @@ const ExecuteJobs = {
                     if (result === OK && countResources === 1
                         && (jobObject.structureType === STRUCTURE_CONTAINER && jobObject.store.getUsedCapacity() < 600
                             || jobObject.structureType === STRUCTURE_LINK && jobObject.store[RESOURCE_ENERGY] < 600
-                            || jobObject.structureType === STRUCTURE_TERMINAL && (jobObject.store[RESOURCE_ENERGY] <= 120000 || jobObject.room.storage.store[RESOURCE_ENERGY] >= 5000 && jobObject.store[RESOURCE_ENERGY] > 0))
+                            || jobObject.structureType === STRUCTURE_TERMINAL && (jobObject.store[RESOURCE_ENERGY] <= 120000 && jobObject.room.storage.store[RESOURCE_ENERGY] >= 5000))
                     ) {
                         result = JOB_IS_DONE;
+                    }else if(result === OK && countResources > 1){ // if there are more to be transferred then set creep to busy
+                        result = ERR_BUSY;
                     }
                     return result;
                 },
@@ -719,7 +721,8 @@ const ExecuteJobs = {
                 /**@return {int}*/
                 JobStatus: function (jobObject) {
                     if (resourceType === RESOURCE_ENERGY && jobObject.store[resourceType] >= 100000
-                        || resourceType !== RESOURCE_ENERGY && jobObject.store[resourceType] >= 5000) {
+                        || resourceType !== RESOURCE_ENERGY && jobObject.store[resourceType] >= 5000
+                        || resourceType === RESOURCE_ENERGY && jobObject.room.storage.store[RESOURCE_ENERGY] < 50000) {
                         return JOB_IS_DONE;
                     } else if (creep.store[resourceType] === 0) { // fetch
                         return SHOULD_FETCH;
@@ -813,7 +816,11 @@ const ExecuteJobs = {
                 },
                 /**@return {int}*/
                 Act: function (jobObject) {
-                    return creep.transfer(jobObject, RESOURCE_ENERGY);
+                    let result = creep.transfer(jobObject, RESOURCE_ENERGY);
+                    if(result === OK && jobObject.store[RESOURCE_ENERGY] > 4000){
+                        return JOB_IS_DONE;
+                    }
+                    return result;
                 },
                 /**@return {int}*/
                 IsJobDone: function (jobObject) {
@@ -850,7 +857,12 @@ const ExecuteJobs = {
                 },
                 /**@return {int}*/
                 Act: function (jobObject) {
-                    return creep.transfer(jobObject, RESOURCE_POWER);
+                    let result = creep.transfer(jobObject, RESOURCE_POWER);
+                    if(result === OK){
+                        return JOB_IS_DONE;
+                    }else{
+                        return result;
+                    }
                 },
                 /**@return {int}*/
                 IsJobDone: function (jobObject) {
@@ -1449,13 +1461,13 @@ const ExecuteJobs = {
                     }else{
                         const powerResource = jobObject.pos.findInRange(FIND_DROPPED_RESOURCES, 1, {
                             filter: function (power) {
-                                return (power.resourceType === RESOURCE_POWER);
+                                return power.resourceType === RESOURCE_POWER;
                             }
                         })[0];
                         if(powerResource){
-                            Logs.Info('ExecuteJobs JobAttackPowerBank done', creep.name + ' ' + jobObject.name + ' powerBank ' + powerBank + ' power ' + powerResource.amount);
+                            Logs.Info('ExecuteJobs JobAttackPowerBank done', creep.name + ' ' + jobObject.name + ' power ' + powerResource.amount);
                         }else{
-                            Logs.Info('ExecuteJobs JobAttackPowerBank done', creep.name + ' ' + jobObject.name + ' powerBank ' + powerBank);
+                            Logs.Info('ExecuteJobs JobAttackPowerBank done', creep.name + ' ' + jobObject.name);
                         }
                         result = JOB_IS_DONE;
                     }
@@ -1512,21 +1524,47 @@ const ExecuteJobs = {
                 },
                 /**@return {object} @return {undefined}*/
                 FindFetchObject: function (jobObject) {
-                    const woundedCreeps = creep.room.find(FIND_MY_CREEPS, {
-                        filter: function(creep) {
-                            return creep.hits < creep.hitsMax;
-                        }
-                    });
-                    for(const woundedCreepKey in woundedCreeps){
-                        const woundedCreep = woundedCreeps[woundedCreepKey];
-                        if(woundedCreep.name.endsWith(creep.name.charAt(1))){
-                            return woundedCreep;
-                        }
-                    }
-                    if(woundedCreeps[0]){
-                        return woundedCreeps[0];
+                    if(creep.memory.PrimaryHealerTarget && Game.creeps[creep.memory.PrimaryHealerTarget] && Game.creeps[creep.memory.PrimaryHealerTarget].hits < Game.creeps[creep.memory.PrimaryHealerTarget].hitsMax){
+                        return Game.creeps[creep.memory.PrimaryHealerTarget];
                     }else{
-                        return jobObject;
+                        let selectedWoundedCreep;
+                        let mostWoundedCreep;
+                        const woundedCreeps = creep.room.find(FIND_MY_CREEPS, {
+                            filter: function(creep) {
+                                return creep.hits < creep.hitsMax;
+                            }
+                        });
+                        const healerCreeps = creep.room.find(FIND_MY_CREEPS, {
+                            filter: function(creep) {
+                                return creep.getActiveBodyparts(HEAL) > 0;
+                            }
+                        });
+                        for(const woundedCreepKey in woundedCreeps){
+                            const woundedCreep = woundedCreeps[woundedCreepKey];
+                            let isAnyoneHealingWoundedCreep = false;
+                            for(const healerCreepKey in healerCreeps){
+                                const healerCreep = healerCreeps[healerCreepKey];
+                                if(healerCreep.memory.PrimaryHealerTarget === woundedCreep.name){
+                                    isAnyoneHealingWoundedCreep = true;
+                                    break;
+                                }
+                            }
+                            if(!isAnyoneHealingWoundedCreep){
+                                creep.memory.PrimaryHealerTarget = woundedCreep.name;
+                                selectedWoundedCreep = woundedCreep;
+                                break;
+                            }
+                            if(!mostWoundedCreep || (mostWoundedCreep.hitsMax - mostWoundedCreep.hits) < (woundedCreep.hitsMax - woundedCreep.hits)){
+                                mostWoundedCreep = woundedCreep;
+                            }
+                        }
+                        if(selectedWoundedCreep){
+                            return selectedWoundedCreep;
+                        }else if(mostWoundedCreep){
+                            return mostWoundedCreep;
+                        }else{
+                            return jobObject;
+                        }
                     }
                 },
                 /**@return {int}*/
@@ -1565,16 +1603,19 @@ const ExecuteJobs = {
                     if (!jobObject.room) { // invisible
                         return ERR_NOT_IN_RANGE;
                     }
-                    const powerResource = jobObject.pos.findInRange(FIND_DROPPED_RESOURCES, 1, {
-                        filter: function (power) {
-                            return (power.resourceType === RESOURCE_POWER);
-                        }
-                    })[0];
+                    const powerResource = jobObject.pos.lookFor(LOOK_RESOURCES)[0];
                     if(powerResource){
                         return creep.pickup(powerResource);
-                    }else if(creep.pos.isNearTo(jobObject)){
-                        creep.say('W8');
-                        return OK;
+                    }else if(!powerResource && creep.pos.isNearTo(jobObject)){
+                        const powerBank = jobObject.pos.lookFor(LOOK_STRUCTURES)[0];
+                        if(powerBank){
+                            creep.say('W8');
+                            return OK;
+                        }else{ // no powerResource and no powerBank - remove flag and end the job
+                            jobObject.remove();
+                            return JOB_IS_DONE;
+                        }
+
                     }else{
                         return ERR_NOT_IN_RANGE;
                     }
@@ -1601,14 +1642,24 @@ const ExecuteJobs = {
                             creep.memory.ClosestRoomWithStorage = closestRoomWithStorage;
                         }
                     }
-                    return Game.rooms[closestRoomWithStorage].storage;
+                    if(closestRoomWithStorage){
+                        return Game.rooms[closestRoomWithStorage].storage;
+                    }else{
+                        Logs.Info('ExecuteJobs JobTransportPowerBank WARNING storage not found!', creep.name + ' could not find storage from ' + jobObject.pos.roomName);
+                        return undefined;
+                    }
+
                 },
                 /**@return {int}*/
                 Fetch: function (fetchObject, jobObject) {
-                    return creep.transfer(fetchObject, RESOURCE_POWER);
+                    const result = creep.transfer(fetchObject, RESOURCE_POWER);
+                    if(result === OK){
+                        Logs.Info('ExecuteJobs JobTransportPowerBank transfer power', creep.name + ' ' + creep.store[RESOURCE_POWER] + ' to (' + fetchObject.pos.x + ',' + fetchObject.pos.y + ','  + fetchObject.pos.roomName + ')');
+                    }
+                    return result;
                 },
             });
-            console.log('ExecuteJobs JobTransportPowerBank ' + result);
+            console.log('ExecuteJobs JobTransportPowerBank ' + result + ' ' + creep.name);
             return result;
         }
 

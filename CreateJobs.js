@@ -199,29 +199,37 @@ const CreateJobs = {
         // flag jobs:
 
         function PowerBankJobs(jobs, gameFlagKey, gameFlag){
-            jobs = CreateFlagJob(jobs, '3AtkP1', gameFlagKey, gameFlag, 'W');
-            jobs = CreateFlagJob(jobs, '3AtkP2', gameFlagKey, gameFlag, 'W');
-            jobs = CreateFlagJob(jobs, '3MedP1', gameFlagKey, gameFlag, 'M');
-            jobs = CreateFlagJob(jobs, '3MedP2', gameFlagKey, gameFlag, 'M');
+
             if(gameFlag.room){ // power bank on low health - get transporters over to the power bank
                 const powerBank = gameFlag.pos.lookFor(LOOK_STRUCTURES)[0];
                 const droppedPower = gameFlag.pos.lookFor(LOOK_RESOURCES)[0];
-                if((powerBank && powerBank.hits < 100000) || droppedPower){
+                if(powerBank){
+                    jobs = CreateFlagJob(jobs, '3AtkP1', gameFlagKey, gameFlag, 'W');
+                    jobs = CreateFlagJob(jobs, '3AtkP2', gameFlagKey, gameFlag, 'W');
+                    jobs = CreateFlagJob(jobs, '3MedP1', gameFlagKey, gameFlag, 'M');
+                    jobs = CreateFlagJob(jobs, '3MedP2', gameFlagKey, gameFlag, 'M');
+                }
+                if((powerBank && powerBank.hits < 200000) || droppedPower){
                     jobs = CreateFlagJob(jobs, '1TrnsprtP1', gameFlagKey, gameFlag, 'T');
                     console.log('CreateJobs PowerBankJobs 1TrnsprtP1 ' + gameFlag.room.name);
-                    if((powerBank && powerBank.hits > 1500) || (droppedPower && droppedPower.amount > 2000)){
+                    if((powerBank && powerBank.hits > 1000) || (droppedPower && droppedPower.amount > 800)){
                         jobs = CreateFlagJob(jobs, '1TrnsprtP2', gameFlagKey, gameFlag, 'T');
                         console.log('CreateJobs PowerBankJobs 1TrnsprtP2 ' + gameFlag.room.name);
-                        if((powerBank && powerBank.hits > 3000) || (droppedPower && droppedPower.amount > 4000)){
+                        if((powerBank && powerBank.hits > 2000) || (droppedPower && droppedPower.amount > 1500)){
                             jobs = CreateFlagJob(jobs, '1TrnsprtP3', gameFlagKey, gameFlag, 'T');
                             console.log('CreateJobs PowerBankJobs 1TrnsprtP3 ' + gameFlag.room.name);
-                            if((powerBank && powerBank.hits > 4500) || (droppedPower && droppedPower.amount > 5000)){
+                            if((powerBank && powerBank.hits > 3000) || (droppedPower && droppedPower.amount > 2900)){
                                 jobs = CreateFlagJob(jobs, '1TrnsprtP4', gameFlagKey, gameFlag, 'T');
                                 console.log('CreateJobs PowerBankJobs 1TrnsprtP4 ' + gameFlag.room.name);
                             }
                         }
                     }
                 }
+            }else{ // create the jobs if the room is invisible - not needed if the observer is looking at the room at all ticks
+                jobs = CreateFlagJob(jobs, '3AtkP1', gameFlagKey, gameFlag, 'W');
+                jobs = CreateFlagJob(jobs, '3AtkP2', gameFlagKey, gameFlag, 'W');
+                jobs = CreateFlagJob(jobs, '3MedP1', gameFlagKey, gameFlag, 'M');
+                jobs = CreateFlagJob(jobs, '3MedP2', gameFlagKey, gameFlag, 'M');
             }
             return jobs;
         }
@@ -328,7 +336,7 @@ const CreateJobs = {
             if (gameRoom.storage && gameRoom.terminal) {
                 for (const resourceType in gameRoom.storage.store) {
                     const storageResourceAmount = gameRoom.storage.store[resourceType];
-                    if (storageResourceAmount > 0){
+                    if (resourceType !== RESOURCE_ENERGY && storageResourceAmount > 0 || storageResourceAmount >= 50000){
                         let maxResources = 5000;
                         if(resourceType === RESOURCE_ENERGY){
                             maxResources = 100000;
@@ -404,6 +412,17 @@ const CreateJobs = {
                 const resourceDrop = resourceDrops[resourceDropKey];
                 new RoomVisual(gameRoom.name).text('💰', resourceDrop.pos.x, resourceDrop.pos.y);
                 AddJob(roomJobs, '4FillStrg-drp' + '(' + resourceDrop.pos.x + ',' + resourceDrop.pos.y + ',' + resourceDrop.resourceType + ')' + gameRoom.name, resourceDrop.id, OBJECT_JOB, 'T');
+            }
+            // Tombstone is also a little bit different - but same kind of job as above
+            const tombstoneDrops = gameRoom.find(FIND_TOMBSTONES, {
+                filter: (tombstone) => {
+                    return tombstone.store.getUsedCapacity() > 0;
+                }
+            });
+            for (const tombstoneDropKey in tombstoneDrops) {
+                const tombstoneDrop = tombstoneDrops[tombstoneDropKey];
+                new RoomVisual(gameRoom.name).text('⚰', tombstoneDrop.pos.x, tombstoneDrop.pos.y);
+                AddJob(roomJobs, '4FillStrg-tmb' + '(' + tombstoneDrop.pos.x + ',' + tombstoneDrop.pos.y + ')' + gameRoom.name, tombstoneDrop.id, OBJECT_JOB, 'T');
             }
         }
 

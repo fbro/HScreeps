@@ -1,5 +1,7 @@
 const Terminals = {
     run: function () {
+        const TARGET_ENERGY = 50000;
+        const TARGET_RESOURCE = 2000;
 
         for (const gameRoomKey in Game.rooms) {
             const gameRoom = Game.rooms[gameRoomKey]; // visible room
@@ -100,6 +102,40 @@ const Terminals = {
                 }
             }
 
+        }
+
+        // TODO implement and test DistributeResources
+        // distribute ALL available resources to all terminals 2k each and only to 5k - except with energy 50k each and only to 100k
+        function DistributeResources(fromGameRoom){
+            let successfulSend = 0;
+            const fromTerminal = fromGameRoom.terminal;
+            for(const resourceType in fromTerminal.store){
+                const fromAmount = fromTerminal.store[resourceType];
+                if(successfulSend < 10 && (fromAmount > TARGET_RESOURCE || resourceType === RESOURCE_ENERGY && fromAmount > TARGET_ENERGY)){
+                    for (const toGameRoomKey in Game.rooms) {
+                        const toGameRoom = Game.rooms[toGameRoomKey];
+                        const toTerminal = toGameRoom.terminal;
+                        if(toTerminal && toTerminal.my){
+                            const toAmount = toTerminal.store[resourceType];
+                            let target;
+                            if(resourceType === RESOURCE_ENERGY && toAmount < TARGET_ENERGY){
+                                target = TARGET_ENERGY;
+                            }else if(toAmount < TARGET_RESOURCE){
+                                target = TARGET_RESOURCE;
+                            }
+                            if(target){
+                                let sendAmount = fromAmount - target; // possible send amount
+                                if(sendAmount > (toAmount - target) * -1){
+                                    sendAmount = (toAmount - target) * -1; // does not need more resources than this
+                                }
+                                let result = fromTerminal.send(resourceType, sendAmount, toTerminal.pos.roomName);
+                                console.log('Terminals DistributeResources result ' + result + ' resource ' + resourceType + ' amount ' + sendAmount + ' from ' + fromTerminal.pos.roomName + ' to ' + toTerminal.pos.roomName + ' successfulSend ' + successfulSend);
+                                successfulSend++;
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 };
