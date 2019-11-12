@@ -88,13 +88,12 @@ const Terminals = {
                             sendAmount = order.remainingAmount; // does not need more resources than this
                         }
                         const result = Game.market.deal(order.id, sendAmount, fromTerminal.pos.roomName);
-                        console.log('Terminals SellExcessResource result ' + result + ' resource ' + resourceType + ' sendAmount ' + sendAmount + ' from ' + fromTerminal.pos.roomName + ' to ' + order.roomName + ' terminalSendCount ' + terminalSendCount + ' order.remainingAmount ' + order.remainingAmount + ' price ' + order.price + ' total price ' + order.price * sendAmount);
-                        console.log('Terminals SellExcessResource resourceHistory ' + JSON.stringify(resourceHistory));
+                        console.log('Terminals SellExcessResource result ' + result + ' resource ' + resourceType + ' sendAmount ' + sendAmount + ' from ' + fromTerminal.pos.roomName + ' to ' + order.roomName + ' terminalSendCount ' + terminalSendCount + ' order.remainingAmount ' + order.remainingAmount + ' price ' + order.price + ' total price ' + order.price * sendAmount + ' fromAmount ' + fromAmount);
                         // the terminals may try and sell to the same order - I will ignore this error
                         fromTerminal.store[resourceType] -= sendAmount;
                         fromAmount -= sendAmount;
                         terminalSendCount++;
-                        if (terminalSendCount >= 10 && fromAmount <= max) {
+                        if (terminalSendCount >= 10 || fromAmount <= max) {
                             break;
                         }
                     }
