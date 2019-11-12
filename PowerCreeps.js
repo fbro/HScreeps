@@ -19,7 +19,10 @@ const PowerCreeps = {
                         if(powerCreep.powers[PWR_GENERATE_OPS].cooldown === 0){
                             result = powerCreep.usePower(PWR_GENERATE_OPS); // if power creep is an operator - always use this power when available
                         }
-                        if(powerCreep.powers[PWR_OPERATE_TERMINAL].cooldown === 0 && powerCreep.room.terminal && powerCreep.room.terminal.my && !powerCreep.room.terminal.effects[PWR_OPERATE_TERMINAL]){
+                        if(powerCreep.store.getUsedCapacity(RESOURCE_POWER) >= 100
+                            && powerCreep.powers[PWR_OPERATE_TERMINAL].cooldown === 0
+                            && powerCreep.room.terminal && powerCreep.room.terminal.my
+                            && (!powerCreep.room.terminal.effects || powerCreep.room.terminal.effects && !powerCreep.room.terminal.effects[PWR_OPERATE_TERMINAL])){
                             result = OperateTerminal(powerCreep);
                         }
                         if(powerCreep.store.getUsedCapacity(RESOURCE_POWER) > 400) {
@@ -32,6 +35,8 @@ const PowerCreeps = {
             }
         }
 
+        // TODO add withdraw ops
+
         function DepositOps(powerCreep){
             let result = powerCreep.transfer(powerCreep.room.storage, RESOURCE_POWER, powerCreep.store[RESOURCE_POWER] - 300);
             if(result === ERR_NOT_IN_RANGE){
@@ -43,6 +48,7 @@ const PowerCreeps = {
         function OperateTerminal(powerCreep){
             let result;
             result = powerCreep.usePower(PWR_OPERATE_TERMINAL, powerCreep.room.terminal);
+            console.log('PowerCreeps OperateTerminal ' + powerCreep.name + ' on terminal in ' + powerCreep.room.terminal.pos.roomName);
             if(result === ERR_NOT_IN_RANGE){
                 result = powerCreep.moveTo(powerCreep.room.terminal);
             }
