@@ -57,17 +57,22 @@ const Observers = {
                             scanStatus = 's';
                             numOfScansLeft++;
                         }else if(scanStatus !== 's' && scanStatus !== '?'){ // check if item is gone
-                            if(scanStatus.deadline <= Game.time){ // power bank or deposit has reached its deadline and is to be removed from memory
+                            let flagName;
+                            if(scanStatus.type === 'powerBank'){
+                                flagName = 'powerBank_' + roomKey + '-' + scanStatus.freeSpaces;
+                            }else if(scanStatus.type === 'deposit'){
+                                flagName = 'deposit_' + roomKey + '-' + scanStatus.freeSpaces;
+                            }
+                            if(scanStatus.deadline <= Game.time
+                                && (Game.rooms[roomKey] && !Game.rooms[roomKey].find(FIND_DROPPED_RESOURCES, {filter: function (r) {return r.resourceType === RESOURCE_POWER;}})[0]
+                                    || !Game.rooms[roomKey])
+                            ){ // power bank or deposit has reached its deadline and is to be removed from memory
                                 deleteScan = true;
                                 let flagToRemove;
-                                let flagName;
                                 if(scanStatus.type === 'powerBank'){
                                     Memory.MemRooms[gameRoomKey].powerBankFlag = undefined;
-                                    flagName = 'powerBank_' + roomKey + '-' + scanStatus.freeSpaces;
-
                                 }else if(scanStatus.type === 'deposit'){
                                     Memory.MemRooms[gameRoomKey].depositFlag = undefined;
-                                    flagName = 'deposit_' + roomKey + '-' + scanStatus.freeSpaces;
                                 }
                                 flagToRemove = Game.flags[flagName];
                                 console.log('Observers deadline ' + scanStatus.deadline + ', time ' + Game.time + ' removing flag ' + flagName);
@@ -75,7 +80,7 @@ const Observers = {
                                     flagToRemove.remove();
                                 }
                                 console.log('Observers item gone, removing ' + roomKey + ' ' + JSON.stringify(scanStatus) + ' flag removal status ');
-                            }else if(!hasScanned && Game.flags['powerBank_' + roomKey + '-' + scanStatus.freeSpaces]){ // if flag is in this room then keep scanning it
+                            }else if(!hasScanned && Game.flags[flagName]){ // if flag is in this room then keep scanning it
                                 //console.log('Observers scanning ' + roomKey + ' flag ' + 'powerBank_' + roomKey + '-' + scanStatus.freeSpaces);
                                 observer.observeRoom(roomKey);
                                 hasScanned = true;

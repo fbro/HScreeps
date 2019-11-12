@@ -20,13 +20,14 @@ const ExecuteJobs = {
                     Logs.Error("creep JobName is undefined", "ERROR! creep JobName is undefined " + creepName);
                     if (!gameCreep) {
                         Logs.Error("gameCreep is undefined", "ERROR! gameCreep is undefined " + creepName);
+                        delete Memory.creeps[creepName];
                     } else {
                         creepMemory.JobName = 'idle(' + gameCreep.pos.x + ',' + gameCreep.pos.y + ')' + gameCreep.pos.roomName;
                     }
                     continue;
                 }
                 const roomName = creepMemory.JobName.split(')').pop();
-                if (!creepMemory.JobName.startsWith('idle')) { // creep is not idle
+                if (!creepMemory.JobName.startsWith('idle') && Memory.MemRooms[roomName]) { // creep is not idle
                     const job = Memory.MemRooms[roomName].RoomJobs[creepMemory.JobName];
                     if (!job && gameCreep) { // job is outdated and removed from Memory and creep is still alive
                         creepMemory.JobName = 'idle(' + gameCreep.pos.x + ',' + gameCreep.pos.y + ')' + gameCreep.pos.roomName;
@@ -1586,7 +1587,7 @@ const ExecuteJobs = {
 
         /**@return {int}*/
         function JobTransportPowerBank(creep, roomJob) {
-            const result = GenericFlagAction(creep, roomJob, {
+            let result = GenericFlagAction(creep, roomJob, {
                 /**@return {int}*/
                 JobStatus: function (jobObject) {
                     if(!jobObject){
@@ -1612,10 +1613,10 @@ const ExecuteJobs = {
                             creep.say('W8');
                             return OK;
                         }else{ // no powerResource and no powerBank - remove flag and end the job
-                            jobObject.remove();
-                            return JOB_IS_DONE;
+                            Logs.Info('ExecuteJobs JobTransportPowerBank waiting at powerbank flag', creep.name + ' flag in room ' + jobObject.pos.roomName);
+                            creep.say('W8');
+                            return OK;
                         }
-
                     }else{
                         return ERR_NOT_IN_RANGE;
                     }
@@ -1660,6 +1661,9 @@ const ExecuteJobs = {
                 },
             });
             console.log('ExecuteJobs JobTransportPowerBank ' + result + ' ' + creep.name);
+            if(result === ERR_NO_PATH){
+                result = OK;
+            }
             return result;
         }
 
@@ -1795,7 +1799,10 @@ const ExecuteJobs = {
                 }));
                 let bestDistance = Number.MAX_SAFE_INTEGER;
                 for (let i = 0; i < resourceSupplies.length; i++) {
-                    const distance = Math.sqrt(Math.pow(resourceSupplies[i].pos.x - creep.pos.x, 2) + Math.pow(resourceSupplies[i].pos.y - creep.pos.y, 2));
+                    let distance = Math.sqrt(Math.pow(resourceSupplies[i].pos.x - creep.pos.x, 2) + Math.pow(resourceSupplies[i].pos.y - creep.pos.y, 2));
+                    if(resourceSupplies.structureType === STRUCTURE_TERMINAL){
+                        distance += 1000;
+                    }
                     if (distance < bestDistance) {
                         resourceSupply = resourceSupplies[i];
                         bestDistance = distance;

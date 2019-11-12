@@ -40,15 +40,12 @@ const AssignJobs = {
                 if(!memRoom){
                     continue;
                 }
-                const idleCreepsInRoom = _.filter(idleCreeps, function (creep) {
-                    return creep && creep.pos.roomName === memRoomKey;
-                });
                 // TODO what about many idle creeps in one room that could be moved to another room
                 // TODO what about idle creeps that could take a job in another neutral room so that one does not need to spawn a new creep
                 for (const roomJobKey in memRoom.RoomJobs) {
                     const roomJob = memRoom.RoomJobs[roomJobKey];
                     if (roomJob && roomJob.Creep === 'vacant') {
-                        let creepFound = AssignCreep(roomJob, idleCreepsInRoom, roomJobKey);
+                        let creepFound = AssignCreep(roomJob, idleCreeps, roomJobKey, memRoomKey);
                         if (!creepFound) {
                             creepFound = AssignCreepOtherRoom(roomJob, idleCreeps, roomJobKey, memRoomKey);
                             if(!creepFound){
@@ -61,15 +58,15 @@ const AssignJobs = {
         }
 
         /**@return {boolean}*/
-        function AssignCreep(roomJob, idleCreepsInRoom, roomJobKey) {
-            for (const idleCreepInRoomCounter in idleCreepsInRoom) {
-                const idleCreepInRoom = idleCreepsInRoom[idleCreepInRoomCounter];
-                if (idleCreepInRoom.name.startsWith(roomJob.CreepType)) {
+        function AssignCreep(roomJob, idleCreeps, roomJobKey, memRoomKey) {
+            for (const idleCreepCounter in idleCreeps) {
+                const idleCreep = idleCreeps[idleCreepCounter];
+                if (idleCreep.pos.roomName === memRoomKey && idleCreep.name.startsWith(roomJob.CreepType)) {
                     // idle creep is in memory room with vacant job and matching job type
-                    idleCreepInRoom.memory.JobName = roomJobKey;
-                    roomJob.Creep = idleCreepInRoom.name;
-                    //console.log('AssignJobs AssignCreeps ' + idleCreepInRoom.name + ' assigned to ' + roomJobKey + ' in ' + memRoomKey);
-                    delete idleCreepsInRoom[idleCreepInRoomCounter];
+                    idleCreep.memory.JobName = roomJobKey;
+                    roomJob.Creep = idleCreep.name;
+                    //console.log('AssignJobs AssignCreeps ' + idleCreep.name + ' assigned to ' + roomJobKey + ' in ' + memRoomKey);
+                    delete idleCreeps[idleCreepCounter];
                     return true;
                 }
             }
@@ -192,7 +189,7 @@ const AssignJobs = {
             let maxCreepsInRoom = 3;
             if (memRoom.MaxCreeps[creepType]) {
                 maxCreepsInRoom = memRoom.MaxCreeps[creepType].MaxCreepsInRoom;
-            } else {
+            } else { // this code should only run when a reset happens
                 switch (creepType) {
                     case 'T': // transporter
                         maxCreepsInRoom = memRoom.SourceNumber;
@@ -221,21 +218,20 @@ const AssignJobs = {
                 memRoom.MaxCreeps[creepType] = {
                     'MaxCreepsInRoom': maxCreepsInRoom,
                 };
-                // loop through all creeps - take those with job in room or idle and placed in room - count
+                // loop through all creeps
+                let addedCreeps = '';
                 for (const creepName in Game.creeps) {
                     const gameCreep = Game.creeps[creepName];
                     if (gameCreep.name.substring(0, 1) === creepType) {
-                        if (gameCreep.memory.JobName.split(')').pop() === roomKey) { // employed creep that is employed in this room
+                        if (gameCreep.memory.JobName.split(')').pop() === roomKey) { // creep that is employed in this room
                             memRoom.MaxCreeps[creepType][gameCreep.name] = gameCreep.name;
+                            addedCreeps += gameCreep.name + ' '
                         }
                     }
                 }
+                Logs.Info('new MaxCreeps', creepType + ' ' + roomKey + ' maxCreepsInRoom ' + maxCreepsInRoom + ' addedCreeps ' + addedCreeps);
             }
-            if ((Object.keys(memRoom.MaxCreeps[creepType]).length - 1) < maxCreepsInRoom) {
-                return true;
-            } else {
-                return false;
-            }
+            return (Object.keys(memRoom.MaxCreeps[creepType]).length - 1) < maxCreepsInRoom;
         }
 
         /**@return {array}*/

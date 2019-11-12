@@ -2,140 +2,105 @@ const Terminals = {
     run: function () {
         const TARGET_ENERGY = 50000;
         const TARGET_RESOURCE = 2000;
-
-        for (const gameRoomKey in Game.rooms) {
-            const gameRoom = Game.rooms[gameRoomKey]; // visible room
-            if (gameRoom.terminal && gameRoom.terminal.my && gameRoom.terminal.cooldown === 0 && gameRoom.terminal.store[RESOURCE_ENERGY] >= 10000) {
-                SellResources(gameRoom);
-            }
-            if (gameRoom.terminal && gameRoom.terminal.my && gameRoom.terminal.store[RESOURCE_ENERGY] < 10000) {
-                GetEnergyFromOtherTerminals(gameRoom);
+        const MAX_ENERGY = 100000;
+        const MAX_RESOURCE = 5000;
+        const terminals = LoadMyTerminals();
+        for (const terminalKey in terminals) {
+            const terminal = terminals[terminalKey];
+            if (terminal.cooldown === 0) {
+                let terminalSendCount = 0;
+                terminalSendCount = DistributeResources(terminal, terminals, terminalSendCount);
+                terminalSendCount = SellExcessResource(terminal, terminals, terminalSendCount);
             }
         }
 
-        function GetEnergyFromOtherTerminals(room) {
+        function LoadMyTerminals() {
+            let terminals = [];
             for (const gameRoomKey in Game.rooms) {
                 const gameRoom = Game.rooms[gameRoomKey];
-                if (gameRoom.name !== room.name && gameRoom.terminal && gameRoom.terminal.my && gameRoom.terminal.cooldown === 0 && gameRoom.terminal.store[RESOURCE_ENERGY] >= 100000) {
-                    let result = gameRoom.terminal.send(RESOURCE_ENERGY, 50000, room.name);
-                    console.log('Terminals GetEnergyFromOtherTerminals get energy ' + result + ' in ' + room.name + ' from ' + gameRoom.name);
+                if (gameRoom.terminal && gameRoom.terminal.my) {
+                    terminals.push(gameRoom.terminal);
                 }
             }
+            return terminals;
         }
 
-        function SellResources(room) {
-            // try to sell stuff
-            const MIN_RESOURCE_AMOUNT = 500;
-            const MAX_TRANSFER_ENERGY_COST = 500;
-            let MIN_PRICE_E = 0.1;
-            if (room.storage && room.storage.store[RESOURCE_ENERGY] > 500000) {
-                MIN_PRICE_E = 0.007;
-            }
-            const MIN_PRICE_U = 0.07;
-            const MIN_PRICE_O = 0.09;
-            const MIN_PRICE_H = 0.1;
-            const MIN_PRICE_K = 0.05;
-
-            const MIN_PRICE_GO = 0.2;
-            const MIN_PRICE_UH = 0.2;
-            const MIN_PRICE_KO = 0.2;
-            const MIN_PRICE_LO = 0.2;
-            const MIN_PRICE_ZH = 0.2;
-            const orders = [];
-            for (const resourceType in room.terminal.store) {
-                if (room.terminal.store[resourceType] > 0) {
-                    orders.push(...Game.market.getAllOrders(order => order.resourceType === resourceType
-                        && order.type === ORDER_BUY
-                        && Game.market.calcTransactionCost(MIN_RESOURCE_AMOUNT, room.name, order.roomName) <= MAX_TRANSFER_ENERGY_COST
-                        && (
-                            (order.price >= MIN_PRICE_E && resourceType === RESOURCE_ENERGY)
-                            // my raw resources
-                            || (order.price >= MIN_PRICE_U && resourceType === RESOURCE_UTRIUM)
-                            || (order.price >= MIN_PRICE_O && resourceType === RESOURCE_OXYGEN)
-                            || (order.price >= MIN_PRICE_H && resourceType === RESOURCE_HYDROGEN)
-                            || (order.price >= MIN_PRICE_K && resourceType === RESOURCE_KEANIUM)
-
-                            || (order.price >= MIN_PRICE_GO && resourceType === RESOURCE_GHODIUM_OXIDE)
-                            || (order.price >= MIN_PRICE_UH && resourceType === RESOURCE_UTRIUM_HYDRIDE)
-                            || (order.price >= MIN_PRICE_KO && resourceType === RESOURCE_KEANIUM_OXIDE)
-                            || (order.price >= MIN_PRICE_LO && resourceType === RESOURCE_LEMERGIUM_OXIDE)
-                            || (order.price >= MIN_PRICE_ZH && resourceType === RESOURCE_ZYNTHIUM_HYDRIDE)
-                        )));
-                }
-            }
-            let successfulDeal = 0;
-            for (const orderCount in orders) {
-                const order = orders[orderCount];
-                const transferEnergyRealCost = Game.market.calcTransactionCost(order.amount, room.name, order.roomName);
-                let amountToTransfer = room.terminal.store[order.resourceType];
-                if (successfulDeal >= 10) {
-                    console.log('Terminals SellResources maximum number of deals in tick reached ' + successfulDeal + ' in ' + room.name);
-                    break;
-                } else if (transferEnergyRealCost <= room.terminal.store[RESOURCE_ENERGY] && amountToTransfer > 0) {
-                    if (order.resourceType === RESOURCE_ENERGY) {
-                        amountToTransfer = room.terminal.store[RESOURCE_ENERGY] / 2;
-                        if (amountToTransfer > order.amount) {
-                            amountToTransfer = order.amount;
-                        }
-                    } else if (amountToTransfer > order.amount) {
-                        amountToTransfer = order.amount;
-                    }
-                    const dealResult = Game.market.deal(order.id, amountToTransfer, room.name);
-                    if (dealResult === 0) {
-                        console.log('Terminals SellResources deal success ' + order.resourceType + ' ' + amountToTransfer + ' from ' + room.name + ' to ' + order.roomName);
-                        /*
-                        if (!Memory.buyOrdersHistory) {
-                            Memory.buyOrdersHistory = {};
-                        }
-                        Memory.buyOrdersHistory['(' + amountToTransfer + ',' + order.resourceType + ',' + (order.price * amountToTransfer) + ')' + room.name + '-' + order.roomName + '_' + order.id] = {
-                            order: order,
-                            'energyUsed': transferEnergyRealCost,
-                            'fromRoom': room.name
-                        };
-                        */
-                        successfulDeal++;
-                    } else {
-                        console.log('Terminals SellResources deal failed ' + order.resourceType + ' ' + amountToTransfer + ' from ' + room.name + ' to ' + order.roomName + ' code ' + dealResult + ' transfer cost ' + transferEnergyRealCost + ' terminal energy ' + room.terminal.store[RESOURCE_ENERGY]);
-                    }
-                } else {
-                    console.log('Terminals SellResources not enough energy ' + order.resourceType + ' ' + order.amount + ' from ' + room.name + ' to ' + order.roomName + ' transfer cost ' + transferEnergyRealCost + ' terminal energy ' + room.terminal.store[RESOURCE_ENERGY]);
-                }
-            }
-
-        }
-
-        // TODO implement and test DistributeResources
         // distribute ALL available resources to all terminals 2k each and only to 5k - except with energy 50k each and only to 100k
-        function DistributeResources(fromGameRoom){
-            let successfulSend = 0;
-            const fromTerminal = fromGameRoom.terminal;
-            for(const resourceType in fromTerminal.store){
-                const fromAmount = fromTerminal.store[resourceType];
-                if(successfulSend < 10 && (fromAmount > TARGET_RESOURCE || resourceType === RESOURCE_ENERGY && fromAmount > TARGET_ENERGY)){
-                    for (const toGameRoomKey in Game.rooms) {
-                        const toGameRoom = Game.rooms[toGameRoomKey];
-                        const toTerminal = toGameRoom.terminal;
-                        if(toTerminal && toTerminal.my){
-                            const toAmount = toTerminal.store[resourceType];
-                            let target;
-                            if(resourceType === RESOURCE_ENERGY && toAmount < TARGET_ENERGY){
-                                target = TARGET_ENERGY;
-                            }else if(toAmount < TARGET_RESOURCE){
-                                target = TARGET_RESOURCE;
+        /**@return {number}*/
+        function DistributeResources(fromTerminal, terminals, terminalSendCount) {
+            for (const resourceType in fromTerminal.store) { // for each resource type
+                let fromAmount = fromTerminal.store[resourceType];
+                let target;
+                if (resourceType === RESOURCE_ENERGY) {
+                    target = TARGET_ENERGY;
+                } else {
+                    target = TARGET_RESOURCE;
+                }
+                for (const toTerminalKey in terminals) {
+                    if (terminalSendCount < 10 && fromAmount > target) { // is allowed to send this resource to another terminal
+                        const toTerminal = terminals[toTerminalKey];
+                        const toAmount = toTerminal.store[resourceType];
+                        let shouldSend = false;
+                        if (toAmount < target && toTerminal.id !== fromTerminal.id) {
+                            shouldSend = true;
+                        }
+                        if (shouldSend) {
+                            let sendAmount = fromAmount - target; // possible send amount
+                            const resourcesNeeded = (toAmount - target) * -1;
+                            if (sendAmount > resourcesNeeded) {
+                                sendAmount = resourcesNeeded; // does not need more resources than this
                             }
-                            if(target){
-                                let sendAmount = fromAmount - target; // possible send amount
-                                if(sendAmount > (toAmount - target) * -1){
-                                    sendAmount = (toAmount - target) * -1; // does not need more resources than this
-                                }
-                                let result = fromTerminal.send(resourceType, sendAmount, toTerminal.pos.roomName);
-                                console.log('Terminals DistributeResources result ' + result + ' resource ' + resourceType + ' amount ' + sendAmount + ' from ' + fromTerminal.pos.roomName + ' to ' + toTerminal.pos.roomName + ' successfulSend ' + successfulSend);
-                                successfulSend++;
-                            }
+                            let result = fromTerminal.send(resourceType, sendAmount, toTerminal.pos.roomName);
+                            console.log('Terminals DistributeResources result ' + result + ' resource ' + resourceType + ' sendAmount ' + sendAmount + ' from ' + fromTerminal.pos.roomName + ' to ' + toTerminal.pos.roomName + ' terminalSendCount ' + terminalSendCount + ' resourcesNeeded ' + resourcesNeeded);
+                            toTerminal.store[resourceType] += sendAmount;
+                            fromTerminal.store[resourceType] -= sendAmount;
+                            fromAmount -= sendAmount;
+                            terminalSendCount++;
                         }
                     }
                 }
             }
+            return terminalSendCount;
+        }
+
+        /**@return {number}*/
+        function SellExcessResource(fromTerminal, terminals, terminalSendCount) {
+            for (const resourceType in fromTerminal.store) { // for each resource type
+                let fromAmount = fromTerminal.store[resourceType];
+                let max;
+                if (resourceType === RESOURCE_ENERGY) {
+                    max = MAX_ENERGY;
+                } else {
+                    max = MAX_RESOURCE;
+                }
+                if (terminalSendCount < 10 && fromAmount > max) { // is allowed to sell this resource
+                    const resourceHistory = Game.market.getHistory(resourceType);
+                    const orders = Game.market.getAllOrders(order => order.resourceType === resourceType
+                        && order.type === ORDER_BUY
+                        && Game.market.calcTransactionCost(500, fromTerminal.pos.roomName, order.roomName) <= 500
+                        && resourceHistory[0].avgPrice <= order.price
+                        && order.remainingAmount > 0
+                    );
+                    for (const orderKey in orders) {
+                        const order = orders[orderKey];
+                        let sendAmount = fromAmount - max; // possible send amount
+                        if (sendAmount > order.remainingAmount) {
+                            sendAmount = order.remainingAmount; // does not need more resources than this
+                        }
+                        const result = Game.market.deal(order.id, sendAmount, fromTerminal.pos.roomName);
+                        console.log('Terminals SellExcessResource result ' + result + ' resource ' + resourceType + ' sendAmount ' + sendAmount + ' from ' + fromTerminal.pos.roomName + ' to ' + order.roomName + ' terminalSendCount ' + terminalSendCount + ' order.remainingAmount ' + order.remainingAmount + ' price ' + order.price + ' total price ' + order.price * sendAmount);
+                        console.log('Terminals SellExcessResource resourceHistory ' + JSON.stringify(resourceHistory));
+                        // the terminals may try and sell to the same order - I will ignore this error
+                        fromTerminal.store[resourceType] -= sendAmount;
+                        fromAmount -= sendAmount;
+                        terminalSendCount++;
+                        if (terminalSendCount >= 10 && fromAmount <= max) {
+                            break;
+                        }
+                    }
+                }
+            }
+            return terminalSendCount;
         }
     }
 };

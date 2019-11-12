@@ -199,7 +199,6 @@ const CreateJobs = {
         // flag jobs:
 
         function PowerBankJobs(jobs, gameFlagKey, gameFlag){
-
             if(gameFlag.room){ // power bank on low health - get transporters over to the power bank
                 const powerBank = gameFlag.pos.lookFor(LOOK_STRUCTURES)[0];
                 const droppedPower = gameFlag.pos.lookFor(LOOK_RESOURCES)[0];

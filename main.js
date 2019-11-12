@@ -55,8 +55,8 @@ module.exports.loop = function () {
 
 // TODO add ruin as alternate resource pickup
 
-// TODO teminals should destribute its power to all the rooms - just like energy
-    // TODO implement and test DistributeResources
+// TODO remake selling in terminals - the old mechanic was not that good
+    // TODO get avg price and sell it for that if terminal is over 5k or 100k for each resource
 
 // if doing long distance work creep should make sure it has enough timeToLive to do the job
 // handle links at room exits for remote harvests
