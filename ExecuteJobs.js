@@ -1797,7 +1797,7 @@ const ExecuteJobs = {
                 let bestDistance = Number.MAX_SAFE_INTEGER;
                 for (let i = 0; i < resourceSupplies.length; i++) {
                     let distance = Math.sqrt(Math.pow(resourceSupplies[i].pos.x - creep.pos.x, 2) + Math.pow(resourceSupplies[i].pos.y - creep.pos.y, 2));
-                    if(resourceSupplies.structureType === STRUCTURE_TERMINAL){
+                    if(resourceSupplies[i].structureType === STRUCTURE_TERMINAL){
                         distance += 1000;
                     }
                     if (distance < bestDistance) {
