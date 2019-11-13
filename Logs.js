@@ -1,7 +1,7 @@
 const Logs = {
     Error: function (messageId, message) {
         console.log('!!--------------- ' + messageId + ' ---------------!!');
-        console.log(message);
+        console.log('Logs Error ' + message);
         console.log('!!--------------- ' + messageId + ' ---------------!!');
         if (!Memory.ErrorLog) {
             Memory.ErrorLog = {};
@@ -16,7 +16,7 @@ const Logs = {
         }
     },
     Info: function (messageId, message) {
-        console.log('info ' + message);
+        console.log('Logs Info ' + messageId + ' | ' + message);
         if (!Memory.InfoLog) {
             Memory.InfoLog = {};
         }

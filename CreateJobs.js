@@ -295,21 +295,18 @@ const CreateJobs = {
                     const powerSpawn = powerSpawns[powerSpawnKey];
                     if (powerSpawn && powerSpawn.store[RESOURCE_ENERGY] < powerSpawn.store.getCapacity(RESOURCE_ENERGY)) {
                         new RoomVisual(gameRoom.name).text('⚡', powerSpawn.pos.x, powerSpawn.pos.y);
-                        AddJob(roomJobs, '5FillPSpwnE(' + powerSpawn.pos.x + ',' + powerSpawn.pos.y + ')' + gameRoom.name, powerSpawn.id, OBJECT_JOB, 'T');
+                        AddJob(roomJobs, '3FillPSpwnE(' + powerSpawn.pos.x + ',' + powerSpawn.pos.y + ')' + gameRoom.name, powerSpawn.id, OBJECT_JOB, 'T');
                     }
                 }
             }
         }
 
         function FillPowerSpawnPowerJobs(gameRoom, roomJobs) {
-            if (gameRoom.storage) {
-                const terminal = gameRoom.find(FIND_MY_STRUCTURES, {filter: (s) => {return s.structureType === STRUCTURE_TERMINAL;}})[0];
-                if(gameRoom.storage.store[RESOURCE_POWER] > 0 || terminal && terminal.store[RESOURCE_POWER] > 0){
-                    const powerSpawn = gameRoom.find(FIND_MY_STRUCTURES, {filter: (s) => {return s.structureType === STRUCTURE_POWER_SPAWN;}})[0];
-                    if (powerSpawn && powerSpawn.store.getFreeCapacity(RESOURCE_POWER) > 0) {
-                        new RoomVisual(gameRoom.name).text('🌪️', powerSpawn.pos.x, powerSpawn.pos.y);
-                        AddJob(roomJobs, '5FillPSpwnP(' + powerSpawn.pos.x + ',' + powerSpawn.pos.y + ')' + gameRoom.name, powerSpawn.id, OBJECT_JOB, 'T');
-                    }
+            if(gameRoom.storage && gameRoom.storage.store[RESOURCE_POWER] > 0 || gameRoom.terminal && gameRoom.terminal.store[RESOURCE_POWER] > 0){
+                const powerSpawn = gameRoom.find(FIND_MY_STRUCTURES, {filter: (s) => {return s.structureType === STRUCTURE_POWER_SPAWN;}})[0];
+                if (powerSpawn && powerSpawn.store.getFreeCapacity(RESOURCE_POWER) > 0) {
+                    new RoomVisual(gameRoom.name).text('🌪️', powerSpawn.pos.x, powerSpawn.pos.y);
+                    AddJob(roomJobs, '3FillPSpwnP(' + powerSpawn.pos.x + ',' + powerSpawn.pos.y + ')' + gameRoom.name, powerSpawn.id, OBJECT_JOB, 'T');
                 }
             }
         }
@@ -336,7 +333,7 @@ const CreateJobs = {
                 for (const resourceType in gameRoom.storage.store) {
                     const storageResourceAmount = gameRoom.storage.store[resourceType];
                     if (resourceType !== RESOURCE_ENERGY && storageResourceAmount > 0 || storageResourceAmount >= 50000){
-                        let maxResources = 5000;
+                        let maxResources = 6000;
                         if(resourceType === RESOURCE_ENERGY){
                             maxResources = 100000;
                         }
