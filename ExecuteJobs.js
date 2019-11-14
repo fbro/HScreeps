@@ -721,9 +721,29 @@ const ExecuteJobs = {
             const result = GenericJobAction(creep, roomJob, {
                 /**@return {int}*/
                 JobStatus: function (jobObject) { // terminal
-                    if (resourceType === RESOURCE_ENERGY && jobObject.store[resourceType] >= 100000
-                        || resourceType !== RESOURCE_ENERGY && jobObject.store[resourceType] >= 6000
-                        || resourceType === RESOURCE_ENERGY && jobObject.room.storage.store[RESOURCE_ENERGY] < 50000) {
+                    if (
+                           resourceType !== RESOURCE_ENERGY && jobObject.room.storage.store[resourceType] < 3000 // low resource in storage abort other
+
+                        || resourceType !== RESOURCE_ENERGY && jobObject.room.storage.store[resourceType] < 5000
+                            && resourceType !== RESOURCE_ENERGY && jobObject.store[resourceType] >= 3000
+
+                        || resourceType !== RESOURCE_ENERGY && jobObject.room.storage.store[resourceType] >= 5000
+                            && resourceType !== RESOURCE_ENERGY && jobObject.store[resourceType] >= 5000
+
+
+                        || resourceType === RESOURCE_ENERGY && jobObject.room.storage.store[RESOURCE_ENERGY] < 50000 // low resource in storage abort energy
+
+                        || resourceType === RESOURCE_ENERGY && jobObject.room.storage.store[RESOURCE_ENERGY] >= 50000
+                            && resourceType === RESOURCE_ENERGY && jobObject.store[RESOURCE_ENERGY] >= 50000
+
+                        || resourceType === RESOURCE_ENERGY && jobObject.room.storage.store[RESOURCE_ENERGY] >= 100000
+                            && resourceType === RESOURCE_ENERGY && jobObject.store[RESOURCE_ENERGY] >= 80000
+
+                        || resourceType === RESOURCE_ENERGY && jobObject.room.storage.store[RESOURCE_ENERGY] >= 200000
+                            && resourceType === RESOURCE_ENERGY && jobObject.store[RESOURCE_ENERGY] >= 100000
+
+
+                    ) {
                         return JOB_IS_DONE;
                     } else if (creep.store[resourceType] === 0) { // fetch
                         return SHOULD_FETCH;

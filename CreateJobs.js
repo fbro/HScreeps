@@ -332,14 +332,20 @@ const CreateJobs = {
             if (gameRoom.storage && gameRoom.terminal) {
                 for (const resourceType in gameRoom.storage.store) {
                     const storageResourceAmount = gameRoom.storage.store[resourceType];
-                    if (resourceType !== RESOURCE_ENERGY && storageResourceAmount > 0 || storageResourceAmount >= 50000){
-                        let maxResources = 6000;
-                        if(resourceType === RESOURCE_ENERGY){
+                    let maxResources = 3000;
+                    if(resourceType === RESOURCE_ENERGY){
+                        if(storageResourceAmount >= 200000){
                             maxResources = 100000;
+                        }else if(storageResourceAmount >= 100000){
+                            maxResources = 80000;
+                        }else if(storageResourceAmount >= 50000){
+                            maxResources = 50000;
                         }
-                        if(gameRoom.terminal.store[resourceType] < maxResources){
-                            AddJob(roomJobs, '5FillTerm(' + resourceType + ')' + gameRoom.name, gameRoom.terminal.id, OBJECT_JOB, 'T');
-                        }
+                    }else if(storageResourceAmount >= 5000){
+                        maxResources = 5000;
+                    }
+                    if(gameRoom.terminal.store[resourceType] < maxResources){
+                        AddJob(roomJobs, '5FillTerm(' + resourceType + ')' + gameRoom.name, gameRoom.terminal.id, OBJECT_JOB, 'T');
                     }
                 }
             }

@@ -1,6 +1,6 @@
 const Terminals = {
     run: function () {
-        const TARGET_ENERGY = 50000;
+        const TARGET_ENERGY = 30000;
         const TARGET_RESOURCE = 2000;
         const MAX_ENERGY = 90000;
         const MAX_RESOURCE = 4000;
@@ -84,13 +84,6 @@ const Terminals = {
                     for (const orderKey in orders) {
                         const order = orders[orderKey];
                         let sendAmount = fromAmount - max; // possible send amount
-                        if(resourceType === RESOURCE_ENERGY){
-                            console.log('TEST sendAmount ' + sendAmount
-                                + ' calcTransactionCost ' + Game.market.calcTransactionCost(sendAmount, fromTerminal.pos.roomName, order.roomName));
-                            sendAmount -= Game.market.calcTransactionCost(sendAmount, fromTerminal.pos.roomName, order.roomName) * 1.2;
-                            console.log('TEST sendAmount ' + sendAmount
-                                + ' calcTransactionCost ' + Game.market.calcTransactionCost(sendAmount, fromTerminal.pos.roomName, order.roomName));
-                        }
                         if (sendAmount > order.remainingAmount) {
                             sendAmount = order.remainingAmount; // does not need more resources than this
                         }
