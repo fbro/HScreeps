@@ -12,17 +12,17 @@ const AssignJobs = {
 
         // different creep types for different jobs
         /*creep types:
-        * [T] transporter       no WORK
         * [H] harvester         only one CARRY
+        * [T] transporter       no WORK
         * [B] builder           equal WORK and CARRY
         * [E] extractor         only one CARRY and maxed out WORK
         * [S] scout             just a MOVE
         * [C] claimer           CLAIM - one CLAIM
         * [R] reserver          CLAIM - many CLAIM when reserving
         * [W] warrior           ATTACK and MOVE
-        * [D] distantHarvester  equal WORK and CARRY
         * [G] gunner            RANGED_ATTACK and MOVE - needs clever attack pattern to avoid creeps with ATTACK body parts
         * [M] medic             HEAL
+        * [D] distantHarvester  equal WORK and MOVE
         */
 
         AssignOrSpawnCreeps();
@@ -30,7 +30,11 @@ const AssignJobs = {
         // loop through vacant jobs per room and see if an idle creep could be assigned or a new creep should be spawned
         function AssignOrSpawnCreeps() {
             const idleCreeps = _.filter(Game.creeps, function (creep) {
-                return creep.memory.JobName.startsWith('idle');
+                if(creep.memory.JobName){
+                    return creep.memory.JobName.startsWith('idle');
+                }else{
+                    return false;
+                }
             });
             const availableSpawns = _.filter(Game.spawns, function (spawn) {
                 return spawn.spawning === null && spawn.room.energyAvailable >= MINIMUM_ENERGY_REQUIRED;
@@ -192,10 +196,18 @@ const AssignJobs = {
             } else { // this code should only run when a reset happens
                 switch (creepType) {
                     case 'T': // transporter
-                        maxCreepsInRoom = memRoom.SourceNumber;
+                        if(memRoom.SourceNumber === -1){
+                            maxCreepsInRoom = 3;
+                        }else{
+                            maxCreepsInRoom = memRoom.SourceNumber;
+                        }
                         break;
                     case 'H': // harvester
-                        maxCreepsInRoom = memRoom.SourceNumber;
+                        if(memRoom.SourceNumber === -1){
+                            maxCreepsInRoom = 3;
+                        }else{
+                            maxCreepsInRoom = memRoom.SourceNumber;
+                        }
                         break;
                     case 'B': // builder
                         maxCreepsInRoom = 2;
@@ -255,8 +267,15 @@ const AssignJobs = {
                 // transporter
                 case 'T':
                     switch (true) {
-                        case (energyAvailable >= 1350): // energyCapacityAvailable: 12900
-                            body = [CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];
+                        case (energyAvailable >= 1500): // energyCapacityAvailable: 12900
+                            body = [
+                                CARRY, CARRY, CARRY, CARRY, CARRY,
+                                CARRY, CARRY, CARRY, CARRY, CARRY,
+                                CARRY, CARRY, CARRY, CARRY, CARRY,
+                                CARRY, CARRY, CARRY, CARRY, CARRY,
+                                MOVE, MOVE, MOVE, MOVE, MOVE,
+                                MOVE, MOVE, MOVE, MOVE, MOVE
+                            ];
                             break;
                         case (energyAvailable >= 1200): // energyCapacityAvailable: 5600
                             body = [CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];
@@ -469,32 +488,6 @@ const AssignJobs = {
                             break;
                     }
                     break;
-                // distant transporter
-                case 'D':
-                    switch (true) {
-                        case (energyAvailable >= 1500): // energyCapacityAvailable: 12900
-                            body = [WORK, WORK, WORK, WORK, WORK, WORK, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];
-                            break;
-                        case (energyAvailable >= 1250): // energyCapacityAvailable: 5600
-                            body = [WORK, WORK, WORK, WORK, WORK, WORK, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];
-                            break;
-                        case (energyAvailable >= 1000): // energyCapacityAvailable: 2300
-                            body = [WORK, WORK, WORK, WORK, WORK, WORK, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];
-                            break;
-                        case (energyAvailable >= 750): // energyCapacityAvailable: 1800
-                            body = [WORK, WORK, WORK, CARRY, MOVE, MOVE, MOVE];
-                            break;
-                        case (energyAvailable >= 500): // energyCapacityAvailable: 1300
-                            body = [WORK, WORK, WORK, CARRY, MOVE, MOVE, MOVE];
-                            break;
-                        case (energyAvailable >= 300): // energyCapacityAvailable: 550
-                            body = [WORK, CARRY, MOVE];
-                            break;
-                        case (energyAvailable >= 200): // energyCapacityAvailable: 300
-                            body = [WORK, CARRY, MOVE];
-                            break;
-                    }
-                    break;
                 // medic
                 case 'M':
                     switch (true) {
@@ -529,6 +522,32 @@ const AssignJobs = {
                             break;
                         case (energyAvailable >= 300): // energyCapacityAvailable: 300
                             body = [MOVE, HEAL];
+                            break;
+                    }
+                    break;
+                // distant transporter
+                case 'D':
+                    switch (true) {
+                        case (energyAvailable >= 1500): // energyCapacityAvailable: 12900
+                            body = [WORK, WORK, WORK, WORK, WORK, WORK, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];
+                            break;
+                        case (energyAvailable >= 1250): // energyCapacityAvailable: 5600
+                            body = [WORK, WORK, WORK, WORK, WORK, WORK, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];
+                            break;
+                        case (energyAvailable >= 1000): // energyCapacityAvailable: 2300
+                            body = [WORK, WORK, WORK, WORK, WORK, WORK, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];
+                            break;
+                        case (energyAvailable >= 750): // energyCapacityAvailable: 1800
+                            body = [WORK, WORK, WORK, CARRY, MOVE, MOVE, MOVE];
+                            break;
+                        case (energyAvailable >= 500): // energyCapacityAvailable: 1300
+                            body = [WORK, WORK, WORK, CARRY, MOVE, MOVE, MOVE];
+                            break;
+                        case (energyAvailable >= 300): // energyCapacityAvailable: 550
+                            body = [WORK, CARRY, MOVE];
+                            break;
+                        case (energyAvailable >= 200): // energyCapacityAvailable: 300
+                            body = [WORK, CARRY, MOVE];
                             break;
                     }
                     break;

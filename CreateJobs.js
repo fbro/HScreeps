@@ -41,18 +41,24 @@ const CreateJobs = {
                     } else if (secColor === COLOR_PURPLE) { // flag that observers create and put on found power banks and deletes again when deadline is reached
                         jobs = PowerBankJobs(jobs, gameFlagKey, gameFlag);
                     } else if (secColor === COLOR_CYAN) { // flag that observers create and put on deposits and deletes again when deadline is reached
-                        // TODO not using deposits yet
+                        // TODO not harvesting deposits yet
                     }else{notFound = true;}
                 }else if (color === COLOR_RED){
-                    if(gameFlag.secondaryColor === COLOR_RED) { // warrior at pos
+                    if(secColor === COLOR_RED) { // warrior at pos
                         jobs = CreateFlagJob(jobs, '2GuardPos', gameFlagKey, gameFlag, 'W')
-                    }else if(gameFlag.secondaryColor === COLOR_BLUE) { // gunner at pos
+                    }else if(secColor === COLOR_BLUE) { // gunner at pos
                         jobs = CreateFlagJob(jobs, '2GuardGunPos', gameFlagKey, gameFlag, 'G')
-                    }else if(gameFlag.secondaryColor === COLOR_GREEN) { // medic at pos
+                    }else if(secColor === COLOR_GREEN) { // medic at pos
                         jobs = CreateFlagJob(jobs, '2GuardMedPos', gameFlagKey, gameFlag, 'M')
                     }else{notFound = true;}
-                } else if (color === COLOR_YELLOW && gameFlag.secondaryColor === COLOR_YELLOW) { // distantHarvester on source at flag pos
-                    jobs = CreateFlagJob(jobs, '5RemoteHarvest', gameFlagKey, gameFlag, 'D');
+                } else if (color === COLOR_YELLOW) {
+                    if (secColor === COLOR_YELLOW) { // distantHarvester on source at flag pos
+                        jobs = CreateFlagJob(jobs, '5RemoteHarvest', gameFlagKey, gameFlag, 'D');
+                    }else if (secColor === COLOR_GREEN) { // harvester move to pos
+                        jobs = CreateFlagJob(jobs, '2HarvestPos', gameFlagKey, gameFlag, 'H');
+                        jobs = CreateFlagJob(jobs, '2TransPos', gameFlagKey, gameFlag, 'T');
+                        jobs = CreateFlagJob(jobs, '2BuildPos', gameFlagKey, gameFlag, 'B');
+                    }
                 } else if (color === COLOR_PURPLE){
                     if(secColor === COLOR_PURPLE) { // FillLabMineral
                         jobs = FillLabMineralJobs(jobs, gameFlagKey, gameFlag);
@@ -64,6 +70,8 @@ const CreateJobs = {
                         jobs = CreateFlagJob(jobs, '1ClaimCtrl', gameFlagKey, gameFlag, 'C');
                     } else if (secColor === COLOR_YELLOW) { // claimer reserve
                         jobs = ReserveRoomJobs(jobs, gameFlagKey, gameFlag);
+                    } else if (secColor === COLOR_ORANGE) { // claimer move to pos - used when one wants to enter a portal
+                        jobs = CreateFlagJob(jobs, '2ClaimPos', gameFlagKey, gameFlag, 'C');
                     }else{notFound = true;}
                 }else{notFound = true;}
                 if(notFound) {
@@ -201,7 +209,7 @@ const CreateJobs = {
         function PowerBankJobs(jobs, gameFlagKey, gameFlag){
             if(gameFlag.room){ // power bank on low health - get transporters over to the power bank
                 const powerBank = gameFlag.pos.lookFor(LOOK_STRUCTURES)[0];
-                const droppedPower = gameFlag.pos.lookFor(LOOK_RESOURCES)[0];
+                const droppedPower = gameFlag.room.find(FIND_DROPPED_RESOURCES, {filter: (d) => {return d.resourceType === RESOURCE_POWER;}})[0];
                 if(powerBank){
                     jobs = CreateFlagJob(jobs, '3AtkP1', gameFlagKey, gameFlag, 'W');
                     jobs = CreateFlagJob(jobs, '3AtkP2', gameFlagKey, gameFlag, 'W');
