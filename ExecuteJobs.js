@@ -114,10 +114,10 @@ const ExecuteJobs = {
             let result = ERR_NO_RESULT_FOUND;
             switch (true) {
                 // obj jobs
-                case jobKey.startsWith('1Src'):
+                case jobKey.startsWith('1Src') || jobKey.startsWith('5Src'):
                     result = JobSource(creep, roomJob);
                     break;
-                case jobKey.startsWith('0Ctrl') || jobKey.startsWith('9Ctrl') :
+                case jobKey.startsWith('0Ctrl') || jobKey.startsWith('8Ctrl') || jobKey.startsWith('9Ctrl') :
                     result = JobController(creep, roomJob);
                     break;
                 case jobKey.startsWith('3Rep'):
@@ -2064,7 +2064,9 @@ const ExecuteJobs = {
                     result = creep.pickup(fetchObject, max);
                 }
             } else {
-                if(max === -1){
+                if(creep.store[resourceToFetch] !== creep.store.getUsedCapacity()){
+                    result = ERR_FULL
+                }else if(max === -1){
                     result = creep.withdraw(fetchObject, resourceToFetch);
                 }else{
                     result = creep.withdraw(fetchObject, resourceToFetch, max);

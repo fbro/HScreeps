@@ -193,17 +193,22 @@ const AssignJobs = {
             let maxCreepsInRoom = 3;
             if (memRoom.MaxCreeps[creepType]) {
                 maxCreepsInRoom = memRoom.MaxCreeps[creepType].MaxCreepsInRoom;
+                if(creepType === 'H' && memRoom.RoomLevel < 3){
+                    maxCreepsInRoom += memRoom.SourceNumber;
+                }else if(creepType === 'B' && memRoom.RoomLevel < 8){
+                    maxCreepsInRoom++;
+                }
             } else { // this code should only run when a reset happens
                 switch (creepType) {
                     case 'T': // transporter
-                        if(memRoom.SourceNumber === -1){
-                            maxCreepsInRoom = 3;
+                        if(memRoom.SourceNumber === -1 || memRoom.SourceNumber === 0){
+                            maxCreepsInRoom = 4;
                         }else{
                             maxCreepsInRoom = memRoom.SourceNumber;
                         }
                         break;
                     case 'H': // harvester
-                        if(memRoom.SourceNumber === -1){
+                        if(memRoom.SourceNumber === -1 || memRoom.SourceNumber === 0){
                             maxCreepsInRoom = 3;
                         }else{
                             maxCreepsInRoom = memRoom.SourceNumber;
@@ -235,7 +240,7 @@ const AssignJobs = {
                 for (const creepName in Game.creeps) {
                     const gameCreep = Game.creeps[creepName];
                     if (gameCreep.name.substring(0, 1) === creepType) {
-                        if (gameCreep.memory.JobName.split(')').pop() === roomKey) { // creep that is employed in this room
+                        if (gameCreep.memory.JobName && gameCreep.memory.JobName.split(')').pop() === roomKey) { // creep that is employed in this room
                             memRoom.MaxCreeps[creepType][gameCreep.name] = gameCreep.name;
                             addedCreeps += gameCreep.name + ' '
                         }

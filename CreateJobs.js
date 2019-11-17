@@ -106,10 +106,16 @@ const CreateJobs = {
                         const source = sources[sourceKey];
                         new RoomVisual(gameRoom.name).text('🏭', source.pos.x, source.pos.y);
                         AddJob(jobs, '1Src(' + source.pos.x + ',' + source.pos.y + ')' + gameRoom.name, source.id, OBJECT_JOB, 'H');
+                        if(gameRoom.controller.level < 3){
+                            AddJob(jobs, '5Src(' + source.pos.x + ',' + source.pos.y + ')' + gameRoom.name, source.id, OBJECT_JOB, 'H');
+                        }
                     }
                     // Controller
                     new RoomVisual(gameRoom.name).text('🧠', gameRoom.controller.pos.x, gameRoom.controller.pos.y);
                     AddJob(jobs, '0Ctrl(' + gameRoom.controller.pos.x + ',' + gameRoom.controller.pos.y + ')' + gameRoom.name, gameRoom.controller.id, OBJECT_JOB, 'B');
+                    if(gameRoom.controller.level < 8){
+                        AddJob(jobs, '8Ctrl(' + gameRoom.controller.pos.x + ',' + gameRoom.controller.pos.y + ')' + gameRoom.name, gameRoom.controller.id, OBJECT_JOB, 'B');
+                    }
                     // FillSpawnExtension
                     FillSpawnExtensionJobs(gameRoom, jobs);
                     // Construction
@@ -216,7 +222,7 @@ const CreateJobs = {
                     jobs = CreateFlagJob(jobs, '3MedP1', gameFlagKey, gameFlag, 'M');
                     jobs = CreateFlagJob(jobs, '3MedP2', gameFlagKey, gameFlag, 'M');
                 }
-                if((powerBank && powerBank.hits < 200000) || droppedPower){
+                if((powerBank && powerBank.hits < 250000) || droppedPower){
                     jobs = CreateFlagJob(jobs, '1TrnsprtP1', gameFlagKey, gameFlag, 'T');
                     console.log('CreateJobs PowerBankJobs 1TrnsprtP1 ' + gameFlag.room.name);
                     if((powerBank && powerBank.hits > 1000) || (droppedPower && droppedPower.amount > 800)){
