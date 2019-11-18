@@ -914,7 +914,8 @@ const ExecuteJobs = {
                         return this.JobStatus(jobObject);
                     }
                 },
-                /**@return {object} @return {undefined}*/
+                /**@return {object}
+                 * @return {undefined} */
                 FindFetchObject: function (jobObject) {
                     return FindFetchResource(creep, jobObject, RESOURCE_POWER);
                 },
@@ -2061,15 +2062,24 @@ const ExecuteJobs = {
                 if(max === -1){
                     result = creep.pickup(fetchObject);
                 }else{
-                    result = creep.pickup(fetchObject, max);
+                    if(fetchObject.amount < max){
+                        result = creep.pickup(fetchObject, fetchObject.amount);
+                    }else{
+                        result = creep.pickup(fetchObject, max);
+                    }
                 }
             } else {
                 if(creep.store[resourceToFetch] !== creep.store.getUsedCapacity()){
-                    result = ERR_FULL
+                    result = ERR_FULL; // throw this error to force the creep to transfer unwanted resource that it is carrying
                 }else if(max === -1){
                     result = creep.withdraw(fetchObject, resourceToFetch);
                 }else{
-                    result = creep.withdraw(fetchObject, resourceToFetch, max);
+                    if(fetchObject.store[resourceToFetch] < max){
+                        result = creep.withdraw(fetchObject, resourceToFetch, fetchObject.store[resourceToFetch]);
+                    }else{
+                        result = creep.withdraw(fetchObject, resourceToFetch, max);
+                    }
+
                 }
             }
             if (result === ERR_FULL) { // creep store is full with anything other than resourceToFetch - get rid of it asap
