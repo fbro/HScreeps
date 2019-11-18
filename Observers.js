@@ -14,17 +14,19 @@ const Observers = {
                 if(observer){
                     const flagAtObserver = observer.pos.lookFor(LOOK_FLAGS)[0];
                     // observer is dedicated to scanning for power banks or deposits
-                    if(Memory.MemRooms[gameRoomKey] && flagAtObserver && flagAtObserver.color === COLOR_ORANGE && flagAtObserver.secondaryColor === COLOR_RED){
+                    if(Memory.MemRooms[gameRoomKey] && flagAtObserver && flagAtObserver.color === COLOR_ORANGE){
                         if(!Memory.MemRooms[gameRoomKey].MapScan || Memory.MemRooms[gameRoomKey].MapReScan){
-                            CreateScanPowerBanksAndDeposits(gameRoomKey);
+                            CreateScan(gameRoomKey);
                         }
-                        ScanPowerBanksAndDeposits(gameRoomKey, observer);
+                        if(flagAtObserver.secondaryColor === COLOR_RED){
+                            ScanPowerBanksAndDeposits(gameRoomKey, observer);
+                        }
                     }
                 }
             }
         }
 
-        function CreateScanPowerBanksAndDeposits(gameRoomKey){
+        function CreateScan(gameRoomKey){
             if(!Memory.MemRooms[gameRoomKey].MapScan){
                 Memory.MemRooms[gameRoomKey].MapScan = {};
             }else if(Memory.MemRooms[gameRoomKey].MapReScan){
