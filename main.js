@@ -54,6 +54,7 @@ module.exports.loop = function () {
 // TODO power bank harvesting - avoid enemy rooms
 
 // TODO add ruin as alternate resource pickup
+// TODO add container at controller for Builders to quickly withdraw
 
 // avoid enemy rooms when traveling long distances
 // if doing long distance work creep should make sure it has enough timeToLive to do the job

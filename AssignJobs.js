@@ -8,7 +8,7 @@ const AssignJobs = {
         // assign jobs to creeps or create the creeps like this:
         // look for idle creep with correct type in room
         // if failed then create that creep in room
-        // TODO if that failed then create it in the closest room with enough energy at its disposal
+        // if that failed and there are no spawns present then create it in the closest room with enough energy at its disposal
 
         // different creep types for different jobs
         /*creep types:
@@ -196,7 +196,7 @@ const AssignJobs = {
                 if(creepType === 'H' && memRoom.RoomLevel < 3){
                     maxCreepsInRoom += memRoom.SourceNumber;
                 }else if(creepType === 'B' && memRoom.RoomLevel < 8){
-                    maxCreepsInRoom++;
+                    maxCreepsInRoom += 2;
                 }
             } else { // this code should only run when a reset happens
                 switch (creepType) {

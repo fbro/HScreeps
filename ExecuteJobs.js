@@ -117,8 +117,11 @@ const ExecuteJobs = {
                 case jobKey.startsWith('1Src') || jobKey.startsWith('5Src'):
                     result = JobSource(creep, roomJob);
                     break;
-                case jobKey.startsWith('0Ctrl') || jobKey.startsWith('8Ctrl') || jobKey.startsWith('9Ctrl') :
+                case jobKey.startsWith('0Ctrl') || jobKey.startsWith('8Ctrl') || jobKey.startsWith('9Ctrl'):
                     result = JobController(creep, roomJob);
+                    break;
+                case jobKey.startsWith('2FillCtrlCon'):
+                    result = JobFillControllerContainer(creep, roomJob);
                     break;
                 case jobKey.startsWith('3Rep'):
                     result = JobRepair(creep, roomJob);
@@ -414,6 +417,43 @@ const ExecuteJobs = {
                 /**@return {int}*/
                 IsJobDone: function (jobObject) {
                     return this.JobStatus(jobObject);
+                },
+                /**@return {object} @return {undefined}*/
+                FindFetchObject: function (jobObject) {
+                    return FindFetchResource(creep, jobObject, RESOURCE_ENERGY);
+                },
+                /**@return {int}*/
+                Fetch: function (fetchObject, jobObject) {
+                    return FetchResource(creep, fetchObject, RESOURCE_ENERGY);
+                },
+            });
+            return result;
+        }
+
+        /**@return {int}*/
+        function JobFillControllerContainer(creep, roomJob){
+            const result = GenericJobAction(creep, roomJob, {
+                /**@return {int}*/
+                JobStatus: function (jobObject) {
+                    if (jobObject.store.getFreeCapacity() === 0) {
+                        return JOB_IS_DONE;
+                    } else if (creep.store[RESOURCE_ENERGY] === 0) { // fetch
+                        return SHOULD_FETCH;
+                    } else { // action not done yet
+                        return SHOULD_ACT;
+                    }
+                },
+                /**@return {int}*/
+                Act: function (jobObject) {
+                    return creep.transfer(jobObject, RESOURCE_ENERGY);
+                },
+                /**@return {int}*/
+                IsJobDone: function (jobObject) {
+                    if (creep.store[RESOURCE_ENERGY] + jobObject.store[RESOURCE_ENERGY] >= jobObject.store.getCapacity(RESOURCE_ENERGY)) {
+                        return JOB_IS_DONE;
+                    } else {
+                        return this.JobStatus(jobObject);
+                    }
                 },
                 /**@return {object} @return {undefined}*/
                 FindFetchObject: function (jobObject) {
@@ -2003,7 +2043,7 @@ const ExecuteJobs = {
             if (!resourceSupply) { // creep memory had nothing stored
                 let resourceSupplies = room.find(FIND_STRUCTURES, {
                     filter: function (s) {
-                        return (s.structureType === STRUCTURE_CONTAINER
+                        return ((s.structureType === STRUCTURE_CONTAINER && (!creep.name.startsWith('T') || s.id !== Memory.MemRooms[room.name].CtrlConId)) // extra check to deny controller containers as an energy source if creep is a Transfer creep
                             || s.structureType === STRUCTURE_STORAGE
                             || s.structureType === STRUCTURE_LINK
                             || (jobObject.structureType !== STRUCTURE_TERMINAL && s.structureType === STRUCTURE_TERMINAL)

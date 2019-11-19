@@ -113,8 +113,11 @@ const CreateJobs = {
                     // Controller
                     new RoomVisual(gameRoom.name).text('🧠', gameRoom.controller.pos.x, gameRoom.controller.pos.y);
                     AddJob(jobs, '0Ctrl(' + gameRoom.controller.pos.x + ',' + gameRoom.controller.pos.y + ')' + gameRoom.name, gameRoom.controller.id, OBJECT_JOB, 'B');
-                    if(gameRoom.controller.level < 8){
+                    if(gameRoom.controller.level < 8){ // not at max level - more creeps on the controller job
                         AddJob(jobs, '8Ctrl(' + gameRoom.controller.pos.x + ',' + gameRoom.controller.pos.y + ')' + gameRoom.name, gameRoom.controller.id, OBJECT_JOB, 'B');
+                        if (!gameRoom.storage || gameRoom.storage && gameRoom.storage.store[RESOURCE_ENERGY] > 100000) {
+                            AddJob(jobs, '9Ctrl(' + gameRoom.controller.pos.x + ',' + gameRoom.controller.pos.y + ')' + gameRoom.name, gameRoom.controller.id, OBJECT_JOB, 'B');
+                        }
                     }
                     // FillSpawnExtension
                     FillSpawnExtensionJobs(gameRoom, jobs);
@@ -122,9 +125,8 @@ const CreateJobs = {
                     ConstructionJobs(gameRoom, jobs);
                     // Repair
                     RepairJobs(gameRoom, jobs);
-                    if (gameRoom.controller.level < 8 && gameRoom.storage && gameRoom.storage.store[RESOURCE_ENERGY] > 100000) { // not at max level - more creeps on the controller job
-                        AddJob(jobs, '9Ctrl(' + gameRoom.controller.pos.x + ',' + gameRoom.controller.pos.y + ')' + gameRoom.name, gameRoom.controller.id, OBJECT_JOB, 'B');
-                    }
+                    // FillControllerContainer
+                    FillControllerContainerJobs(gameRoom, jobs);
                     if (gameRoom.controller.level >= 3) {
                         // FillTower
                         FillTowerJobs(gameRoom, jobs);
@@ -408,7 +410,7 @@ const CreateJobs = {
         function FillStorageJobs(gameRoom, roomJobs) {
             const fillStorages = gameRoom.find(FIND_STRUCTURES, {
                 filter: (s) => {
-                    return (s.structureType === STRUCTURE_CONTAINER && s.store.getUsedCapacity() >= 600)
+                    return (s.structureType === STRUCTURE_CONTAINER && s.id !== Memory.MemRooms[gameRoom.name].CtrlConId && s.store.getUsedCapacity() >= 600) // do not take the controller container into account here
                         || (s.structureType === STRUCTURE_LINK && s.store[RESOURCE_ENERGY] >= 600 && s.room.storage.pos.inRangeTo(s, 1))
                         || (s.structureType === STRUCTURE_TERMINAL && (s.store[RESOURCE_ENERGY] >= 120000 || gameRoom.storage.store[RESOURCE_ENERGY] < 5000));
                 }
@@ -504,6 +506,32 @@ const CreateJobs = {
                 const repair = repairs[repairKey];
                 new RoomVisual(gameRoom.name).text('🛠', repair.pos.x, repair.pos.y);
                 AddJob(roomJobs, '3Rep-' + repair.structureType + '(' + repair.pos.x + ',' + repair.pos.y + ')' + gameRoom.name, repair.id, OBJECT_JOB, 'B');
+            }
+        }
+
+        function FillControllerContainerJobs(gameRoom, roomJobs){
+            let controllerContainer;
+            if(Memory.MemRooms[gameRoom.name].CtrlConId){
+                controllerContainer = Game.getObjectById(Memory.MemRooms[gameRoom.name].CtrlConId);
+                if(!controllerContainer){
+                    console.log('CreateJobs FillControllerContainerJobs removed container id from mem' + gameRoom.name);
+                    Memory.MemRooms[gameRoom.name].CtrlConId = undefined;
+                }
+            }
+            if(!controllerContainer){
+                controllerContainer = gameRoom.controller.pos.findInRange(FIND_STRUCTURES, 3, {
+                    filter: (s) => {
+                        return s.structureType === STRUCTURE_CONTAINER && s.store.getFreeCapacity() > 0;
+                    }
+                })[0];
+                if(controllerContainer) {
+                    console.log('CreateJobs FillControllerContainerJobs found new container (' + controllerContainer.pos.x + ',' + controllerContainer.pos.y + ',' + controllerContainer.pos.roomName + ') saving in memory');
+                    Memory.MemRooms[gameRoom.name].CtrlConId = controllerContainer.id;
+                }
+            }
+            if(controllerContainer){
+                new RoomVisual(gameRoom.name).text('🔋', controllerContainer.pos.x, controllerContainer.pos.y);
+                AddJob(roomJobs, '2FillCtrlCon(' + controllerContainer.pos.x + ',' + controllerContainer.pos.y + ')' + gameRoom.name, controllerContainer.id, OBJECT_JOB, 'T');
             }
         }
 
