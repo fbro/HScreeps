@@ -418,7 +418,8 @@ const ExecuteJobs = {
                 IsJobDone: function (jobObject) {
                     return this.JobStatus(jobObject);
                 },
-                /**@return {object} @return {undefined}*/
+                /**@return {object}
+                 * @return {undefined}*/
                 FindFetchObject: function (jobObject) {
                     return FindFetchResource(creep, jobObject, RESOURCE_ENERGY);
                 },
@@ -2061,6 +2062,8 @@ const ExecuteJobs = {
                     let distance = Math.sqrt(Math.pow(resourceSupplies[i].pos.x - creep.pos.x, 2) + Math.pow(resourceSupplies[i].pos.y - creep.pos.y, 2));
                     if(resourceSupplies[i].structureType === STRUCTURE_TERMINAL){
                         distance += 1000;
+                    }else if(resourceSupplies[i].structureType === STRUCTURE_LINK){ // prefer links over other stores
+                        distance -= 5;
                     }
                     if (distance < bestDistance) {
                         resourceSupply = resourceSupplies[i];
