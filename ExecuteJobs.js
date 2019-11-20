@@ -2054,7 +2054,17 @@ const ExecuteJobs = {
                 });
                 resourceSupplies = resourceSupplies.concat(room.find(FIND_DROPPED_RESOURCES, {
                     filter: function (d) {
-                        return (d.resourceType === resourceToFetch && d.amount >= 50);
+                        return d.resourceType === resourceToFetch && d.amount >= 50;
+                    }
+                }));
+                resourceSupplies = resourceSupplies.concat(room.find(FIND_TOMBSTONES, {
+                    filter: function (t) {
+                        return t.store[resourceToFetch]  >= 30;
+                    }
+                }));
+                resourceSupplies = resourceSupplies.concat(room.find(FIND_RUINS, {
+                    filter: function (r) {
+                        return r.store[resourceToFetch]  >= 30;
                     }
                 }));
                 let bestDistance = Number.MAX_SAFE_INTEGER;
@@ -2064,6 +2074,8 @@ const ExecuteJobs = {
                         distance += 1000;
                     }else if(resourceSupplies[i].structureType === STRUCTURE_LINK){ // prefer links over other stores
                         distance -= 5;
+                    }else if(!resourceSupplies[i].structureType){ // drop, tombstone or ruin is more important to pick up
+                        distance -= 5;
                     }
                     if (distance < bestDistance) {
                         resourceSupply = resourceSupplies[i];
@@ -2071,7 +2083,7 @@ const ExecuteJobs = {
                     }
                 }
                 if (resourceSupply) {
-                    if (resourceSupply.structureType === undefined) {
+                    if (!resourceSupply.structureType) {
                         resourceSupplyType = 'DROP';
                     } else if (resourceSupply.structureType === STRUCTURE_LINK) {
                         resourceSupplyType = 'LINK';
@@ -2081,6 +2093,10 @@ const ExecuteJobs = {
                         resourceSupplyType = 'STORAGE';
                     } else if (resourceSupply.structureType === STRUCTURE_TERMINAL) {
                         resourceSupplyType = 'TERMINAL';
+                    } else if (resourceSupply.creep) {
+                        resourceSupplyType = 'TOMBSTONE';
+                    } else if (resourceSupply.structure) {
+                        resourceSupplyType = 'RUIN';
                     }
                     creep.memory.ResourceSupply = resourceSupply.id;
                     creep.memory.ResourceSupplyType = resourceSupplyType;
@@ -2135,7 +2151,7 @@ const ExecuteJobs = {
                             break;
                         }
                     }
-                }else { // DROP
+                }else { // DROP, TOMBSTONE or RUIN
                     for (const resourceType in creep.store) {
                         if (creep.store[resourceType] > 0 && resourceType !== resourceToFetch) {
                             result = creep.drop(resourceType);
