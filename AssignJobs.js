@@ -68,6 +68,9 @@ const AssignJobs = {
                 if (idleCreep.pos.roomName === memRoomKey && idleCreep.name.startsWith(roomJob.CreepType)) {
                     // idle creep is in memory room with vacant job and matching job type
                     idleCreep.memory.JobName = roomJobKey;
+                    if(idleCreep.memory.MoveHome){
+                        idleCreep.memory.MoveHome = undefined;
+                    }
                     roomJob.Creep = idleCreep.name;
                     //console.log('AssignJobs AssignCreeps ' + idleCreep.name + ' assigned to ' + roomJobKey + ' in ' + memRoomKey);
                     delete idleCreeps[idleCreepCounter];

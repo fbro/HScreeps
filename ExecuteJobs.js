@@ -100,7 +100,7 @@ const ExecuteJobs = {
                                 gameCreep.say('🏠🏃');
                             } else {
                                 gameCreep.memory.MoveHome = undefined;
-                                gameCreep.say('🏠🏃✔'); // TODO when idle creep is assigned in the room the MoveHome is not removed
+                                gameCreep.say('🏠🏃✔');
                             }
                         }
                     }
@@ -2117,7 +2117,7 @@ const ExecuteJobs = {
         /**@return {int}*/
         function FetchResource(creep, fetchObject, resourceToFetch, max = -1) {
             let result;
-            if (creep.memory.ResourceSupplyType === 'DROP') {
+            if (creep.memory.ResourceSupplyType === 'DROP') { // pickup
                 if(max === -1){
                     result = creep.pickup(fetchObject);
                 }else{
@@ -2127,7 +2127,7 @@ const ExecuteJobs = {
                         result = creep.pickup(fetchObject, max);
                     }
                 }
-            } else {
+            } else { // store transfer
                 if(creep.store[resourceToFetch] !== creep.store.getUsedCapacity()){
                     result = ERR_FULL; // throw this error to force the creep to transfer unwanted resource that it is carrying
                 }else if(max === -1){
@@ -2167,6 +2167,37 @@ const ExecuteJobs = {
         }
 
         // TODO create new helper function for when creep wants to transfer all its stuff before returning OK - return BUSY if not done transferring all
+        // returns OK or BUSY if there are other resources to transfer
+        function DepositCreepStore(creep, storeToFillObject, storeToEmptyObject = undefined, resourceTypeToKeep = undefined) {
+            let result;
+            let countResources = 0;
+            let transferredAmount;
+            for (const resourceType in creep.store) {
+                if (creep.store[resourceType] > 0 && resourceType !== resourceTypeToKeep) {
+                    if(countResources === 0){
+                        transferredAmount = creep.store[resourceType];
+                        result = creep.transfer(storeToFillObject, resourceType);
+                    }
+                    countResources++;
+                }
+            }
+            if (result === OK && countResources === 1
+                && (!storeToEmptyObject ||
+                    (
+                        (storeToEmptyObject.structureType === STRUCTURE_CONTAINER || storeToEmptyObject.structureType === STRUCTURE_STORAGE) && storeToEmptyObject.store.getUsedCapacity(resourceTypeToKeep) < 500
+                        || storeToEmptyObject.structureType === STRUCTURE_LINK && storeToEmptyObject.store[resourceTypeToKeep] < 500
+                        || storeToEmptyObject.structureType === STRUCTURE_TERMINAL && resourceTypeToKeep === RESOURCE_ENERGY && (storeToEmptyObject.store[resourceTypeToKeep] <= 120000 && storeToEmptyObject.room.storage.store[resourceTypeToKeep] >= 5000)
+                    )
+                )
+            ) {
+                result = JOB_IS_DONE;
+            }else if(result === OK && countResources > 1){ // if there are more to be transferred then set creep to busy
+                result = ERR_BUSY;
+            }else{
+                console.log('ExecuteJobs DepositCreepStore WARNING result ' + result + ' was not expected');
+            }
+            return result;
+        }
 
         /**@return {int}*/
         function Move(creep, obj, fill = 'transparent', stroke = '#fff', lineStyle = 'dashed', strokeWidth = .15, opacity = .3) {
