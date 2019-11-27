@@ -102,6 +102,17 @@ const ExecuteJobs = {
                                 gameCreep.memory.MoveHome = undefined;
                                 gameCreep.say('🏠🏃✔');
                             }
+                        }else if(gameCreep.getActiveBodyparts(ATTACK)){ // idle creep can attack
+                            const hostileCreeps = gameCreep.room.find(FIND_HOSTILE_CREEPS);
+                            if(hostileCreeps){
+                                const hostileCreep = hostileCreeps[0];
+                                console.log('ExecuteJobs ExecuteRoomJobs idle ' + gameCreep.name + ' found ' + hostileCreeps.length + ' hostile creeps! targeting ' + hostileCreep);
+                                gameCreep.say('ATK ' + hostileCreep);
+                                let result = gameCreep.attack(hostileCreep);
+                                if(result === ERR_NOT_IN_RANGE){
+                                    result = Move(gameCreep, hostileCreep);
+                                }
+                            }
                         }
                     }
                 }
@@ -1877,6 +1888,10 @@ const ExecuteJobs = {
                         }else{ // no powerResource and no powerBank
                             Logs.Info('ExecuteJobs JobTransportPowerBank waiting at powerbank flag', creep.name + ' flag in room ' + jobObject.pos.roomName);
                             creep.say('W8');
+                            if(creep.store[RESOURCE_POWER] > 0){
+                                jobObject.remove();
+                                console.log('ExecuteJobs JobTransportPowerBank removing powerbank flag because last power has been picked up!');
+                            }
                             return OK;
                         }
                     }else{
