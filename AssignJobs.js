@@ -199,7 +199,10 @@ const AssignJobs = {
                 if(creepType === 'H' && memRoom.RoomLevel < 3){
                     maxCreepsInRoom += memRoom.SourceNumber;
                 }else if(creepType === 'B' && memRoom.RoomLevel < 8){
-                    maxCreepsInRoom += 2;
+                    maxCreepsInRoom += 1;
+                    if(memRoom.RoomLevel < 3){
+                        maxCreepsInRoom += 1;
+                    }
                 }
             } else { // this code should only run when a reset happens
                 switch (creepType) {

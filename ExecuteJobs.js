@@ -1393,7 +1393,7 @@ const ExecuteJobs = {
                         }
                         let result = creep.harvest(source);
                         if (result === ERR_NOT_ENOUGH_RESOURCES) {
-                            console.log('ExecuteJobs JobRemoteHarvest ' + creep.name + ' waiting for replenish (' + jobObject.pos.x + ',' + jobObject.pos.y + ',' + jobObject.pos.roomName + ')');
+                            //console.log('ExecuteJobs JobRemoteHarvest ' + creep.name + ' waiting for replenish (' + jobObject.pos.x + ',' + jobObject.pos.y + ',' + jobObject.pos.roomName + ')');
                             result = OK;
                         }
                         return result;

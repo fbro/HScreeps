@@ -113,11 +113,9 @@ const CreateJobs = {
                     // Controller
                     new RoomVisual(gameRoom.name).text('🧠', gameRoom.controller.pos.x, gameRoom.controller.pos.y);
                     AddJob(jobs, '0Ctrl(' + gameRoom.controller.pos.x + ',' + gameRoom.controller.pos.y + ')' + gameRoom.name, gameRoom.controller.id, OBJECT_JOB, 'B');
-                    if(gameRoom.controller.level < 8){ // not at max level - more creeps on the controller job
+                    if (!gameRoom.storage || gameRoom.storage && gameRoom.storage.store[RESOURCE_ENERGY] > 100000 && gameRoom.controller.level < 8) {
                         AddJob(jobs, '8Ctrl(' + gameRoom.controller.pos.x + ',' + gameRoom.controller.pos.y + ')' + gameRoom.name, gameRoom.controller.id, OBJECT_JOB, 'B');
-                        if (!gameRoom.storage || gameRoom.storage && gameRoom.storage.store[RESOURCE_ENERGY] > 100000) {
-                            AddJob(jobs, '9Ctrl(' + gameRoom.controller.pos.x + ',' + gameRoom.controller.pos.y + ')' + gameRoom.name, gameRoom.controller.id, OBJECT_JOB, 'B');
-                        }
+                        AddJob(jobs, '9Ctrl(' + gameRoom.controller.pos.x + ',' + gameRoom.controller.pos.y + ')' + gameRoom.name, gameRoom.controller.id, OBJECT_JOB, 'B');
                     }
                     // FillSpawnExtension
                     FillSpawnExtensionJobs(gameRoom, jobs);
