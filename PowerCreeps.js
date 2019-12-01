@@ -90,24 +90,30 @@ const PowerCreeps = {
                     const effect = source1.effects[effectKey];
                     if(effect.effect === PWR_REGEN_SOURCE){
                         selectedSource = undefined;
+                        console.log('found regen effect on source 1 ' + source2);
                         break;
                     }
                 }
             }
-            if(!selectedSource && source2 && source2.effects){
+            if(!selectedSource && source2) {
                 selectedSource = source2;
-                for(const effectKey in source2.effects){
-                    const effect = source2.effects[effectKey];
-                    if(effect.effect === PWR_REGEN_SOURCE){
-                        selectedSource = undefined;
-                        break;
+                if(source2.effects){
+                    selectedSource = source2;
+                    for(const effectKey in source2.effects){
+                        const effect = source2.effects[effectKey];
+                        if(effect.effect === PWR_REGEN_SOURCE){
+                            selectedSource = undefined;
+                            console.log('also found source 2 effect');
+                            break;
+                        }
                     }
                 }
             }
 
+
             if(selectedSource){
                 result = powerCreep.usePower(PWR_REGEN_SOURCE, selectedSource);
-                console.log('PowerCreeps RegenSource ' + powerCreep.name + ' on (' + selectedSource.x + ',' + selectedSource.y + ')');
+                console.log('PowerCreeps RegenSource ' + powerCreep.name + ' on (' + selectedSource.pos.x + ',' + selectedSource.pos.y + ',' + selectedSource.pos.roomName + ')');
                 if(result === ERR_NOT_IN_RANGE){
                     result = powerCreep.moveTo(selectedSource);
                 }

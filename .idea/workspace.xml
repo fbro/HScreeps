@@ -3,7 +3,6 @@
   <component name="ChangeListManager">
     <list default="true" id="7b6f36cb-4298-4902-b6a2-ea3816b3b82c" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ExecuteJobs.js" beforeDir="false" afterPath="$PROJECT_DIR$/ExecuteJobs.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/PowerCreeps.js" beforeDir="false" afterPath="$PROJECT_DIR$/PowerCreeps.js" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -156,8 +155,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/PowerCreeps.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="425">
-              <caret line="90" column="57" selection-start-line="90" selection-start-column="57" selection-end-line="90" selection-end-column="57" />
+            <state relative-caret-position="663">
+              <caret line="115" column="170" selection-start-line="115" selection-start-column="170" selection-end-line="115" selection-end-column="170" />
               <folding>
                 <element signature="e#2132#2537#0" />
                 <element signature="e#2583#3543#0" />
@@ -337,7 +336,7 @@
   <component name="PropertiesComponent">
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
-    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1575158693324" />
+    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1575159574764" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
@@ -397,14 +396,7 @@
       <workItem from="1574189340021" duration="1764000" />
       <workItem from="1574240683513" duration="2543000" />
       <workItem from="1574708139027" duration="713000" />
-      <workItem from="1574782709044" duration="15435000" />
-    </task>
-    <task id="LOCAL-00047" summary="small update">
-      <created>1567630313847</created>
-      <option name="number" value="00047" />
-      <option name="presentableId" value="LOCAL-00047" />
-      <option name="project" value="LOCAL" />
-      <updated>1567630313847</updated>
+      <workItem from="1574782709044" duration="16314000" />
     </task>
     <task id="LOCAL-00048" summary="small update">
       <created>1567792195431</created>
@@ -742,11 +734,18 @@
       <option name="project" value="LOCAL" />
       <updated>1575149262244</updated>
     </task>
-    <option name="localTasksCounter" value="96" />
+    <task id="LOCAL-00096" summary="small changes">
+      <created>1575158807832</created>
+      <option name="number" value="00096" />
+      <option name="presentableId" value="LOCAL-00096" />
+      <option name="project" value="LOCAL" />
+      <updated>1575158807832</updated>
+    </task>
+    <option name="localTasksCounter" value="97" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="611042000" />
+    <option name="totallyTimeSpent" value="611921000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -1107,8 +1106,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/PowerCreeps.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="425">
-          <caret line="90" column="57" selection-start-line="90" selection-start-column="57" selection-end-line="90" selection-end-column="57" />
+        <state relative-caret-position="663">
+          <caret line="115" column="170" selection-start-line="115" selection-start-column="170" selection-end-line="115" selection-end-column="170" />
           <folding>
             <element signature="e#2132#2537#0" />
             <element signature="e#2583#3543#0" />
