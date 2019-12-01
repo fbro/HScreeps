@@ -655,7 +655,10 @@ const ExecuteJobs = {
                 },
                 /**@return {int}*/
                 Act: function (jobObject) {
-                    if (jobObject.structureType === STRUCTURE_CONTAINER || jobObject.creep) { // tombstone
+                    if(!jobObject){
+                        Logs.Error('ExecuteJobs JobFillStorage jobObject undefined', creep.name + ' ' + creep.pos.roomName);
+                        return JOB_OBJ_DISAPPEARED;
+                    }else if (jobObject.structureType === STRUCTURE_CONTAINER || jobObject.creep) { // tombstone
                         for (const resourceType in jobObject.store) {
                             if (jobObject.store[resourceType] > 0) {
                                 return creep.withdraw(jobObject, resourceType);
