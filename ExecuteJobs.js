@@ -295,7 +295,7 @@ const ExecuteJobs = {
             const result = GenericJobAction(creep, roomJob, {
                 /**@return {int}*/
                 JobStatus: function (jobObject) {
-                    if (creep.store.getFreeCapacity() === 0) {
+                    if (creep.store.getFreeCapacity() === 0 || creep.memory.FetchObjectId) {
                         return SHOULD_FETCH;
                     } else {
                         return SHOULD_ACT;
@@ -383,6 +383,11 @@ const ExecuteJobs = {
                     let result = ERR_NO_RESULT_FOUND;
                     if(fetchObject.structureType === STRUCTURE_SPAWN){
                         result = creep.build(fetchObject);
+                        if(result === OK){
+                            result = ERR_BUSY;
+                        }else if(result != ERR_NOT_IN_RANGE){
+                            result = OK;
+                        }
                     }else if (fetchObject.name !== creep.name) { // if fetchObject is the creep object then drop the energy on the ground
                         const toRepair = creep.pos.findInRange(FIND_STRUCTURES, 2, {
                             filter: (structure) => {

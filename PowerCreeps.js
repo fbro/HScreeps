@@ -20,6 +20,8 @@ const PowerCreeps = {
                             result = powerCreep.usePower(PWR_GENERATE_OPS); // if power creep is an operator - always use this power when available
                         }else if(powerCreep.store.getUsedCapacity(RESOURCE_OPS) >= 100 && powerCreep.powers[PWR_OPERATE_TERMINAL].cooldown === 0 && powerCreep.room.terminal && powerCreep.room.terminal.my){
                             result = OperateTerminal(powerCreep);
+                        }else if(powerCreep.powers[PWR_REGEN_SOURCE].cooldown === 0){
+                            result = RegenSource(powerCreep);
                         }else if(powerCreep.store[RESOURCE_OPS] > 400) {
                             result = DepositOps(powerCreep);
                         }
@@ -56,6 +58,58 @@ const PowerCreeps = {
                 console.log('PowerCreeps OperateTerminal ' + powerCreep.name + ' on terminal in ' + powerCreep.room.terminal.pos.roomName);
                 if(result === ERR_NOT_IN_RANGE){
                     result = powerCreep.moveTo(powerCreep.room.terminal);
+                }
+            }
+            return result;
+        }
+
+        function RegenSource(powerCreep){
+            let result;
+            let source1;
+            let source2;
+
+            if(powerCreep.memory.Source1Id){
+                source1 = Game.getObjectById(powerCreep.memory.Source1Id);
+                if(powerCreep.memory.Source2Id){
+                    source2 = Game.getObjectById(powerCreep.memory.Source2Id);
+                }
+            }else{
+                const sources = powerCreep.room.find(FIND_SOURCES);
+                if(sources[0]){
+                    source1 = sources[0];
+                    powerCreep.memory.Source1Id = source1.id;
+                    if(sources[1]){
+                        source2 = sources[1];
+                        powerCreep.memory.Source2Id = source2.id;
+                    }
+                }
+            }
+            let selectedSource = source1;
+            if(source1 && source1.effects){
+                for(const effectKey in source1.effects){
+                    const effect = source1.effects[effectKey];
+                    if(effect.effect === PWR_REGEN_SOURCE){
+                        selectedSource = undefined;
+                        break;
+                    }
+                }
+            }
+            if(!selectedSource && source2 && source2.effects){
+                selectedSource = source2;
+                for(const effectKey in source2.effects){
+                    const effect = source2.effects[effectKey];
+                    if(effect.effect === PWR_REGEN_SOURCE){
+                        selectedSource = undefined;
+                        break;
+                    }
+                }
+            }
+
+            if(selectedSource){
+                result = powerCreep.usePower(PWR_REGEN_SOURCE, selectedSource);
+                console.log('PowerCreeps RegenSource ' + powerCreep.name + ' on (' + selectedSource.x + ',' + selectedSource.y + ')');
+                if(result === ERR_NOT_IN_RANGE){
+                    result = powerCreep.moveTo(selectedSource);
                 }
             }
             return result;
