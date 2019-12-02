@@ -104,7 +104,7 @@ const ExecuteJobs = {
                             }
                         }else if(gameCreep.getActiveBodyparts(ATTACK)){ // idle creep can attack
                             const hostileCreeps = gameCreep.room.find(FIND_HOSTILE_CREEPS);
-                            if(hostileCreeps){
+                            if(hostileCreeps[0]){
                                 const hostileCreep = hostileCreeps[0];
                                 console.log('ExecuteJobs ExecuteRoomJobs idle ' + gameCreep.name + ' found ' + hostileCreeps.length + ' hostile creeps! targeting ' + hostileCreep);
                                 gameCreep.say('ATK ' + hostileCreep);
@@ -658,7 +658,7 @@ const ExecuteJobs = {
                     if(!jobObject){
                         Logs.Error('ExecuteJobs JobFillStorage jobObject undefined', creep.name + ' ' + creep.pos.roomName);
                         return JOB_OBJ_DISAPPEARED;
-                    }else if (jobObject.structureType === STRUCTURE_CONTAINER || jobObject.creep) { // tombstone
+                    }else if (jobObject.structureType === STRUCTURE_CONTAINER || jobObject.creep/**/) {
                         for (const resourceType in jobObject.store) {
                             if (jobObject.store[resourceType] > 0) {
                                 return creep.withdraw(jobObject, resourceType);

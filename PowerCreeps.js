@@ -90,7 +90,6 @@ const PowerCreeps = {
                     const effect = source1.effects[effectKey];
                     if(effect.effect === PWR_REGEN_SOURCE){
                         selectedSource = undefined;
-                        console.log('found regen effect on source 1 ' + source2);
                         break;
                     }
                 }
@@ -103,7 +102,6 @@ const PowerCreeps = {
                         const effect = source2.effects[effectKey];
                         if(effect.effect === PWR_REGEN_SOURCE){
                             selectedSource = undefined;
-                            console.log('also found source 2 effect');
                             break;
                         }
                     }
