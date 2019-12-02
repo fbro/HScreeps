@@ -107,11 +107,9 @@ const PowerCreeps = {
                     }
                 }
             }
-
-
             if(selectedSource){
                 result = powerCreep.usePower(PWR_REGEN_SOURCE, selectedSource);
-                console.log('PowerCreeps RegenSource ' + powerCreep.name + ' on (' + selectedSource.pos.x + ',' + selectedSource.pos.y + ',' + selectedSource.pos.roomName + ')');
+                //console.log('PowerCreeps RegenSource ' + powerCreep.name + ' on (' + selectedSource.pos.x + ',' + selectedSource.pos.y + ',' + selectedSource.pos.roomName + ')');
                 if(result === ERR_NOT_IN_RANGE){
                     result = powerCreep.moveTo(selectedSource);
                 }
