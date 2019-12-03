@@ -126,9 +126,10 @@ const AssignJobs = {
                                 console.log('AssignJobs SpawnCreeps job in another room, no spawns ' + roomJobKey);
                                 bestLinearDistance = Number.MAX_SAFE_INTEGER;
                             }else if(roomJob.CreepType === 'H'){ // logic only relevant for harvester
-                                const source = gameRoom.find(FIND_SOURCES)[0].effects;
+                                const source = gameRoom.find(FIND_SOURCES)[0];
                                 for(const effectKey in source.effects){
                                     if(source.effects[effectKey].effect === PWR_REGEN_SOURCE){
+                                        console.log('AssignJobs SpawnCreep Harvester spawning uses large version because of PWR_REGEN_SOURCE ' + source.effects[effectKey].effect + ' ' + roomOnJobKey);
                                         spawnLargeVersion = true;
                                         break;
                                     }
@@ -181,7 +182,7 @@ const AssignJobs = {
                     }
                 }
                 if (bestAvailableSpawn) { // the closest spawn is found
-                    const spawnResult = bestAvailableSpawn.spawnCreep(GetCreepBody(roomJob.CreepType, Game.rooms[bestAvailableSpawn.pos.roomName].energyAvailable), availableName);
+                    const spawnResult = bestAvailableSpawn.spawnCreep(GetCreepBody(roomJob.CreepType, Game.rooms[bestAvailableSpawn.pos.roomName].energyAvailable, spawnLargeVersion), availableName);
                     if (spawnResult === OK) {
                         Game.creeps[availableName].memory.JobName = roomJobKey;
                         roomJob.Creep = availableName;
@@ -267,12 +268,23 @@ const AssignJobs = {
         }
 
         /**@return {array}*/
-        function GetCreepBody(creepType, energyAvailable) {
+        function GetCreepBody(creepType, energyAvailable, spawnLargeVersion) {
             let body = [];
             switch (creepType) {
                 // harvester
                 case 'H':
                     switch (true) {
+                        case (energyAvailable >= 2300 && spawnLargeVersion):
+                            body = [
+                                WORK, WORK, WORK, WORK, WORK,
+                                WORK, WORK, WORK, WORK, WORK,
+                                WORK, WORK, WORK, WORK, WORK,
+                                CARRY, CARRY,
+                                MOVE, MOVE, MOVE, MOVE, MOVE,
+                                MOVE, MOVE, MOVE, MOVE, MOVE,
+                                MOVE, MOVE, MOVE, MOVE, MOVE
+                            ];
+                            break;
                         case (energyAvailable >= 800): // energyCapacityAvailable: 12900, 5600, 2300, 1800, 1300
                             body = [WORK, WORK, WORK, WORK, WORK, WORK, CARRY, MOVE, MOVE, MOVE];
                             break;
