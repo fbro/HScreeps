@@ -688,6 +688,7 @@ const ExecuteJobs = {
                 },
                 /**@return {int}*/
                 Fetch: function (fetchObject, jobObject) {
+                    /*
                     let result = ERR_NO_RESULT_FOUND;
                     let countResources = 0;
                     for (const resourceType in creep.store) {
@@ -706,6 +707,8 @@ const ExecuteJobs = {
                         result = ERR_BUSY;
                     }
                     return result;
+                    */
+                    return DepositCreepStore(creep, fetchObject, jobObject);
                 },
             });
             if(result !== OK && result !== JOB_MOVING && result !== ERR_TIRED && result !== ERR_BUSY){
@@ -2186,6 +2189,7 @@ const ExecuteJobs = {
             return result;
         }
 
+        // TODO implement all the places where I deposit and i want to keep max one resource
         // creep wants to transfer all its stuff before returning OK - return BUSY if not done transferring all
         /**@return {number}*/
         function DepositCreepStore(creep, storeToFillObject, storeToEmptyObject = undefined, resourceTypeToKeep = undefined) {
@@ -2213,7 +2217,7 @@ const ExecuteJobs = {
                 result = JOB_IS_DONE;
             }else if(result === OK && countResources > 1){ // if there are more to be transferred then set creep to busy
                 result = ERR_BUSY;
-            }else{
+            }else if(result !== ERR_NOT_IN_RANGE && result !== OK){
                 Logs.Error('ExecuteJobs DepositCreepStore unexpected result!', result + ' ' + creep.name + ' (' + storeToFillObject.pos.x + ',' + storeToFillObject.pos.y + ',' + storeToFillObject.pos.roomName + ') to ' + storeToFillObject + ' from ' + storeToEmptyObject + ' ' + resourceTypeToKeep);
             }
             return result;
@@ -2234,7 +2238,7 @@ const ExecuteJobs = {
             if (result === OK) {
                 result = JOB_MOVING;
             }else if(result !== OK && result !== ERR_BUSY && result !== ERR_TIRED){
-                Logs.Error('ExecuteJobs Move unexpected move error!', creep.name + ' (' + creep.pos.x + ',' + creep.pos.y + ',' + creep.pos.roomName + ') to ' + obj);
+                Logs.Error('ExecuteJobs Move unexpected move error!', 'result ' + result + ' ' + creep.name + ' (' + creep.pos.x + ',' + creep.pos.y + ',' + creep.pos.roomName + ') to ' + obj);
             }
             return result;
         }

@@ -116,14 +116,23 @@ const AssignJobs = {
             if (ShouldSpawnCreep(roomJob.CreepType, roomOnJobKey)) {
                 const availableName = GetAvailableName(roomJob.CreepType);
                 let bestLinearDistance = 1; // normally creeps should only be spawned in the room they are needed
-
+                let spawnLargeVersion = false; // TODO implement
                 // job in another room
                 if (Game.rooms[roomOnJobKey]) { // job in invisible room
-                    if (Game.rooms[roomOnJobKey].controller) { // flag in controller-less room
-                        if (Game.rooms[roomOnJobKey].controller.my) { // not my room
-                            if (Game.rooms[roomOnJobKey].find(FIND_MY_SPAWNS).length === 0) { // no spawn in my room
+                    const gameRoom = Game.rooms[roomOnJobKey];
+                    if (gameRoom.controller) { // flag in controller-less room
+                        if (gameRoom.controller.my) { // not my room
+                            if (gameRoom.find(FIND_MY_SPAWNS).length === 0) { // no spawn in my room
                                 console.log('AssignJobs SpawnCreeps job in another room, no spawns ' + roomJobKey);
                                 bestLinearDistance = Number.MAX_SAFE_INTEGER;
+                            }else if(roomJob.CreepType === 'H'){ // logic only relevant for harvester
+                                const source = gameRoom.find(FIND_SOURCES)[0].effects;
+                                for(const effectKey in source.effects){
+                                    if(source.effects[effectKey].effect === PWR_REGEN_SOURCE){
+                                        spawnLargeVersion = true;
+                                        break;
+                                    }
+                                }
                             }
                         } else {
                             console.log('AssignJobs SpawnCreeps job in another room, not my room ' + roomJobKey);
