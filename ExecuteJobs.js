@@ -152,6 +152,18 @@ const ExecuteJobs = {
                         if (drop) {
                             gameCreep.pickup(drop); // it may do that "double" but it really does not matter
                             //console.log('ExecuteJobs JobAction ' + creep.name + ' picked up adjacent resource (' + drop.pos.x + ',' + drop.pos.y + ',' + drop.pos.roomName + ',' + drop.amount + ',' + drop.resourceType + ')');
+                        }else{
+                            const tombstone = gameCreep.pos.findInRange(FIND_TOMBSTONES, 1, {
+                                filter: (t) => {
+                                    return t.store.getUsedCapacity() > 0;
+                                }
+                            })[0];
+                            if (tombstone) {
+                                for (const resourceType in gameCreep.store) {
+                                    gameCreep.withdraw(drop, resourceType);
+                                    break;
+                                }
+                            }
                         }
                     }
                 }
@@ -688,26 +700,6 @@ const ExecuteJobs = {
                 },
                 /**@return {int}*/
                 Fetch: function (fetchObject, jobObject) {
-                    /*
-                    let result = ERR_NO_RESULT_FOUND;
-                    let countResources = 0;
-                    for (const resourceType in creep.store) {
-                        if (creep.store[resourceType] > 0) {
-                            result = creep.transfer(fetchObject, resourceType);
-                            countResources++;
-                        }
-                    }
-                    if (result === OK && countResources === 1
-                        && (jobObject.structureType === STRUCTURE_CONTAINER && jobObject.store.getUsedCapacity() < 600
-                            || jobObject.structureType === STRUCTURE_LINK && jobObject.store[RESOURCE_ENERGY] < 600
-                            || jobObject.structureType === STRUCTURE_TERMINAL && (jobObject.store[RESOURCE_ENERGY] <= 120000 && jobObject.room.storage.store[RESOURCE_ENERGY] >= 5000))
-                    ) {
-                        result = JOB_IS_DONE;
-                    }else if(result === OK && countResources > 1){ // if there are more to be transferred then set creep to busy
-                        result = ERR_BUSY;
-                    }
-                    return result;
-                    */
                     return DepositCreepStore(creep, fetchObject, jobObject);
                 },
             });
