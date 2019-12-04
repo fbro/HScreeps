@@ -837,7 +837,8 @@ const ExecuteJobs = {
                         return this.JobStatus(jobObject);
                     }
                 },
-                /**@return {object} @return {undefined}*/
+                /**@return {object}
+                 * @return {undefined}*/
                 FindFetchObject: function (jobObject) {
                     if(resourceType === RESOURCE_ENERGY){
                         return FindFetchResource(creep, jobObject, RESOURCE_ENERGY);
@@ -2144,7 +2145,11 @@ const ExecuteJobs = {
                 }
             } else { // store transfer
                 if(creep.store[resourceToFetch] !== creep.store.getUsedCapacity()){
-                    result = ERR_FULL; // throw this error to force the creep to transfer unwanted resource that it is carrying
+                    if(creep.pos.isNearTo(fetchObject)){
+                        result = ERR_FULL; // throw this error to force the creep to transfer unwanted resource that it is carrying
+                    }else{
+                        result = ERR_NOT_IN_RANGE;
+                    }
                 }else if(max === -1){
                     result = creep.withdraw(fetchObject, resourceToFetch);
                 }else{
