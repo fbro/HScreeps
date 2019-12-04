@@ -2230,7 +2230,12 @@ const ExecuteJobs = {
             if (result === OK) {
                 result = JOB_MOVING;
             }else if(result !== OK && result !== ERR_BUSY && result !== ERR_TIRED){
-                Logs.Error('ExecuteJobs Move unexpected move error!', 'result ' + result + ' ' + creep.name + ' (' + creep.pos.x + ',' + creep.pos.y + ',' + creep.pos.roomName + ') to ' + obj);
+                console.log('ExecuteJobs Move unexpected move error! result ' + result + ' ' + creep.name + ' (' + creep.pos.x + ',' + creep.pos.y + ',' + creep.pos.roomName + ') to ' + obj);
+                if(result === ERR_NO_PATH){
+                    creep.say('no path!');
+                }else if(result === ERR_NO_BODYPART){
+                    creep.say('no move!');
+                }
             }
             return result;
         }
