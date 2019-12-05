@@ -154,22 +154,24 @@ const AssignJobs = {
                     const availableSpawn = availableSpawns[availableSpawnCounter];
                     const linearDistance = Game.map.getRoomLinearDistance(availableSpawn.pos.roomName, roomOnJobKey);
                     let energyAvailableModifier = 0;
-                    switch (true) {
-                        case availableSpawn.room.energyAvailable < 500:
-                            energyAvailableModifier = -1;
-                            break;
-                        case availableSpawn.room.energyAvailable < 1000:
-                            energyAvailableModifier = -2;
-                            break;
-                        case availableSpawn.room.energyAvailable < 2000:
-                            energyAvailableModifier = -3;
-                            break;
-                        case availableSpawn.room.energyAvailable < 4000:
-                            energyAvailableModifier = -4;
-                            break;
-                        case availableSpawn.room.energyAvailable > 4000:
-                            energyAvailableModifier = -5;
-                            break;
+                    if(roomJob.JobType === FLAG_JOB) { // on flag jobs one wants to share the load between rooms with more energy
+                        switch (true) {
+                            case availableSpawn.room.energyAvailable < 500:
+                                energyAvailableModifier = -1;
+                                break;
+                            case availableSpawn.room.energyAvailable < 1000:
+                                energyAvailableModifier = -2;
+                                break;
+                            case availableSpawn.room.energyAvailable < 2000:
+                                energyAvailableModifier = -3;
+                                break;
+                            case availableSpawn.room.energyAvailable < 4000:
+                                energyAvailableModifier = -4;
+                                break;
+                            case availableSpawn.room.energyAvailable > 4000:
+                                energyAvailableModifier = -5;
+                                break;
+                        }
                     }
                     if ((energyAvailableModifier + linearDistance) < bestLinearDistance || Memory.MemRooms[roomOnJobKey].PrimaryRoom === availableSpawn.pos.roomName) {
                         bestLinearDistance = linearDistance;
@@ -382,29 +384,17 @@ const AssignJobs = {
                 // claimer
                 case 'C':
                     switch (true) {
-                        case (energyAvailable >= 3250): // energyCapacityAvailable: 12900
-                            body = [TOUGH, TOUGH, TOUGH, MOVE, MOVE, MOVE, MOVE, CLAIM];
+                        case (energyAvailable >= 850): // energyCapacityAvailable: 1800
+                            body = [MOVE, MOVE, MOVE, MOVE, MOVE, CLAIM];
                             break;
-                        case (energyAvailable >= 2050): // energyCapacityAvailable: 5600
-                            body = [TOUGH, TOUGH, MOVE, MOVE, MOVE, CLAIM];
-                            break;
-                        case (energyAvailable >= 1800): // energyCapacityAvailable: 2300
-                            body = [TOUGH, MOVE, MOVE, CLAIM];
-                            break;
-                        case (energyAvailable >= 1300): // energyCapacityAvailable: 1800
-                            body = [TOUGH, MOVE, MOVE, CLAIM];
-                            break;
-                        case (energyAvailable >= 800): // energyCapacityAvailable: 1300
-                            body = [TOUGH, MOVE, MOVE, CLAIM];
+                        case (energyAvailable >= 650): // energyCapacityAvailable: 1300
+                            body = [MOVE, CLAIM];
                             break;
                     }
                     break;
                 // reserver
                 case 'R':
                     switch (true) {
-                        case (energyAvailable >= 3250): // energyCapacityAvailable: 12900
-                            body = [MOVE, MOVE, MOVE, MOVE, MOVE, CLAIM, CLAIM, CLAIM, CLAIM, CLAIM];
-                            break;
                         case (energyAvailable >= 2050): // energyCapacityAvailable: 5600
                             body = [MOVE, MOVE, MOVE, CLAIM, CLAIM, CLAIM];
                             break;

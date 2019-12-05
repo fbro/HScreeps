@@ -107,7 +107,10 @@ const CreateJobs = {
                         new RoomVisual(gameRoom.name).text('🏭', source.pos.x, source.pos.y);
                         AddJob(jobs, '1Src(' + source.pos.x + ',' + source.pos.y + ')' + gameRoom.name, source.id, OBJECT_JOB, 'H');
                         if(gameRoom.controller.level < 3){
-                            AddJob(jobs, '5Src(' + source.pos.x + ',' + source.pos.y + ')' + gameRoom.name, source.id, OBJECT_JOB, 'H');
+                            const freeSpaces = FreeSpaces(source.pos);
+                            if(freeSpaces > 1){
+                                AddJob(jobs, '5Src(' + source.pos.x + ',' + source.pos.y + ')' + gameRoom.name, source.id, OBJECT_JOB, 'H');
+                            }
                         }
                     }
                     // Controller
@@ -567,6 +570,22 @@ const CreateJobs = {
                 'CreepType': creepType,
                 'Creep': 'vacant'
             };
+        }
+
+
+        /**@return {number}*/
+        function FreeSpaces(pos){ // get the number of free spaces around a pos
+            let freeSpaces = 0;
+            const terrain = Game.map.getRoomTerrain(pos.roomName);
+            for(let x = pos.x - 1; x <= pos.x + 1; x++){
+                for(let y = pos.y - 1; y <= pos.y + 1; y++){
+                    const t = terrain.get(x, y);
+                    if(t === 0 && (pos.x !== x || pos.y !== y)){
+                        freeSpaces++;
+                    }
+                }
+            }
+            return freeSpaces;
         }
     }
 };

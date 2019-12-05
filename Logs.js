@@ -28,6 +28,9 @@ const Logs = {
         } else {
             Memory.InfoLog[messageId][message] = Memory.InfoLog[messageId][message] + 1;
         }
+    },
+    Warning: function (messageId, message) {
+        console.log('WARNING! ' + messageId + ' | ' + message);
     }
 };
 module.exports = Logs;
