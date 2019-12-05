@@ -30,9 +30,9 @@ const AssignJobs = {
         // loop through vacant jobs per room and see if an idle creep could be assigned or a new creep should be spawned
         function AssignOrSpawnCreeps() {
             const idleCreeps = _.filter(Game.creeps, function (creep) {
-                if(creep.memory.JobName){
+                if (creep.memory.JobName) {
                     return creep.memory.JobName.startsWith('idle');
-                }else{
+                } else {
                     return false;
                 }
             });
@@ -41,7 +41,7 @@ const AssignJobs = {
             });
             for (const memRoomKey in Memory.MemRooms) {
                 const memRoom = Memory.MemRooms[memRoomKey];
-                if(!memRoom){
+                if (!memRoom) {
                     continue;
                 }
                 // TODO what about many idle creeps in one room that could be moved to another room
@@ -52,7 +52,7 @@ const AssignJobs = {
                         let creepFound = AssignCreep(roomJob, idleCreeps, roomJobKey, memRoomKey);
                         if (!creepFound) {
                             creepFound = AssignCreepOtherRoom(roomJob, idleCreeps, roomJobKey, memRoomKey);
-                            if(!creepFound){
+                            if (!creepFound) {
                                 creepFound = SpawnCreep(roomJob, availableSpawns, roomJobKey);
                             }
                         }
@@ -68,7 +68,7 @@ const AssignJobs = {
                 if (idleCreep.pos.roomName === memRoomKey && idleCreep.name.startsWith(roomJob.CreepType)) {
                     // idle creep is in memory room with vacant job and matching job type
                     idleCreep.memory.JobName = roomJobKey;
-                    if(idleCreep.memory.MoveHome){
+                    if (idleCreep.memory.MoveHome) {
                         idleCreep.memory.MoveHome = undefined;
                     }
                     roomJob.Creep = idleCreep.name;
@@ -81,24 +81,24 @@ const AssignJobs = {
         }
 
         /**@return {boolean}*/
-        function AssignCreepOtherRoom(roomJob, idleCreeps, roomJobKey, memRoomKey){
-            if(roomJob.JobType === FLAG_JOB){
+        function AssignCreepOtherRoom(roomJob, idleCreeps, roomJobKey, memRoomKey) {
+            if (roomJob.JobType === FLAG_JOB) {
                 // loop through all creeps of desired creepType and assign the nearest one to the job
                 let nearestCreep;
                 let bestRange = Number.MAX_SAFE_INTEGER;
                 let bestIdleCreepCounter;
                 for (const idleCreepCounter in idleCreeps) {
                     const idleCreep = idleCreeps[idleCreepCounter];
-                    if(idleCreep.name.startsWith(roomJob.CreepType)){
+                    if (idleCreep.name.startsWith(roomJob.CreepType)) {
                         const linearDistance = Game.map.getRoomLinearDistance(memRoomKey, idleCreep.pos.roomName);
-                        if(bestRange > linearDistance){
+                        if (bestRange > linearDistance) {
                             bestRange = linearDistance;
                             nearestCreep = idleCreep;
                             bestIdleCreepCounter = idleCreepCounter;
                         }
                     }
                 }
-                if(nearestCreep){
+                if (nearestCreep) {
                     nearestCreep.memory.JobName = roomJobKey;
                     roomJob.Creep = nearestCreep.name;
                     delete idleCreeps[bestIdleCreepCounter];
@@ -125,10 +125,10 @@ const AssignJobs = {
                             if (gameRoom.find(FIND_MY_SPAWNS).length === 0) { // no spawn in my room
                                 console.log('AssignJobs SpawnCreeps job in another room, no spawns ' + roomJobKey);
                                 bestLinearDistance = Number.MAX_SAFE_INTEGER;
-                            }else if(roomJob.CreepType === 'H'){ // logic only relevant for harvester
+                            } else if (roomJob.CreepType === 'H') { // logic only relevant for harvester
                                 const source = gameRoom.find(FIND_SOURCES)[0];
-                                for(const effectKey in source.effects){
-                                    if(source.effects[effectKey].effect === PWR_REGEN_SOURCE){
+                                for (const effectKey in source.effects) {
+                                    if (source.effects[effectKey].effect === PWR_REGEN_SOURCE) {
                                         console.log('AssignJobs SpawnCreep Harvester spawning uses large version because of PWR_REGEN_SOURCE ' + source.effects[effectKey].effect + ' ' + roomOnJobKey);
                                         spawnLargeVersion = true;
                                         break;
@@ -154,7 +154,7 @@ const AssignJobs = {
                     const availableSpawn = availableSpawns[availableSpawnCounter];
                     const linearDistance = Game.map.getRoomLinearDistance(availableSpawn.pos.roomName, roomOnJobKey);
                     let energyAvailableModifier = 0;
-                    if(roomJob.JobType === FLAG_JOB) { // on flag jobs one wants to share the load between rooms with more energy
+                    if (roomJob.JobType === FLAG_JOB) { // on flag jobs one wants to share the load between rooms with more energy
                         switch (true) {
                             case availableSpawn.room.energyAvailable < 500:
                                 energyAvailableModifier = -1;
@@ -194,7 +194,7 @@ const AssignJobs = {
                         console.log('AssignJobs SpawnCreeps OK ' + availableName + ' assigned to ' + roomJobKey + ' in ' + roomOnJobKey + ' spawn ' + bestAvailableSpawn.name);
                         delete availableSpawns[bestAvailableSpawnCounter];
                         return true;
-                    }else{
+                    } else {
                         console.log('AssignJobs SpawnCreeps failed ' + availableName + ' assigned to ' + roomJobKey + ' in ' + roomOnJobKey + ' spawnResult ' + spawnResult + ' spawn ' + bestAvailableSpawn.name + ' room energy: ' + Game.rooms[bestAvailableSpawn.pos.roomName].energyAvailable);
                         return false;
                     }
@@ -208,27 +208,27 @@ const AssignJobs = {
             let maxCreepsInRoom = 3;
             if (memRoom.MaxCreeps[creepType]) {
                 maxCreepsInRoom = memRoom.MaxCreeps[creepType].MaxCreepsInRoom;
-                if(creepType === 'H' && memRoom.RoomLevel < 3){
+                if (creepType === 'H' && memRoom.RoomLevel < 3) {
                     maxCreepsInRoom += memRoom.SourceNumber;
-                }else if(creepType === 'B' && memRoom.RoomLevel < 8){
+                } else if (creepType === 'B' && memRoom.RoomLevel < 8) {
                     maxCreepsInRoom += 1;
-                    if(memRoom.RoomLevel < 3){
+                    if (memRoom.RoomLevel < 3) {
                         maxCreepsInRoom += 1;
                     }
                 }
             } else { // this code should only run when a reset happens
                 switch (creepType) {
                     case 'T': // transporter
-                        if(memRoom.SourceNumber === -1 || memRoom.SourceNumber === 0){
+                        if (memRoom.SourceNumber === -1 || memRoom.SourceNumber === 0) {
                             maxCreepsInRoom = 4;
-                        }else{
+                        } else {
                             maxCreepsInRoom = memRoom.SourceNumber;
                         }
                         break;
                     case 'H': // harvester
-                        if(memRoom.SourceNumber === -1 || memRoom.SourceNumber === 0){
+                        if (memRoom.SourceNumber === -1 || memRoom.SourceNumber === 0) {
                             maxCreepsInRoom = 3;
-                        }else{
+                        } else {
                             maxCreepsInRoom = memRoom.SourceNumber;
                         }
                         break;
@@ -264,7 +264,7 @@ const AssignJobs = {
                         }
                     }
                 }
-                Logs.Info('new MaxCreeps', creepType + ' ' + roomKey + ' maxCreepsInRoom ' + maxCreepsInRoom + ' addedCreeps ' + addedCreeps);
+                Logs.Info('AssignJobs ShouldSpawnCreep new MaxCreeps', creepType + ' ' + roomKey + ' maxCreepsInRoom ' + maxCreepsInRoom + ' addedCreeps ' + addedCreeps);
             }
             return (Object.keys(memRoom.MaxCreeps[creepType]).length - 1) < maxCreepsInRoom;
         }

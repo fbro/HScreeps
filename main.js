@@ -63,4 +63,4 @@ module.exports.loop = function () {
 // add renewCreep functionality
 // cache paths to be reused by creeps
 // recycle creeps if there are many idle!
-// monitor creeps and see if they can work more quickly by optimizing its actions - remove "pausing" ticks
+// monitor creeps and see if they can work more quickly by optimizing its actions - remove 'pausing' ticks

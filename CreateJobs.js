@@ -23,15 +23,15 @@ const CreateJobs = {
         let flagJobs = CreateFlagJobs();
         CreateObjJobs(flagJobs);
 
-        // this method is not just run in the Game.rooms loop because flags may be in "invisible" rooms
+        // this method is not just run in the Game.rooms loop because flags may be in 'invisible' rooms
         function CreateFlagJobs() {
             let jobs = {};
-            let notFound =false;
+            let notFound = false;
             for (const gameFlagKey in Game.flags) {
                 const gameFlag = Game.flags[gameFlagKey];
                 const color = gameFlag.color;
                 const secColor = gameFlag.secondaryColor;
-                if(color === COLOR_ORANGE){
+                if (color === COLOR_ORANGE) {
                     if (secColor === COLOR_ORANGE) { // scout tag
                         jobs = CreateFlagJob(jobs, '4TagCtrl', gameFlagKey, gameFlag, 'S');
                     } else if (secColor === COLOR_YELLOW) { // scout at pos
@@ -42,46 +42,56 @@ const CreateJobs = {
                         jobs = PowerBankJobs(jobs, gameFlagKey, gameFlag);
                     } else if (secColor === COLOR_CYAN) { // flag that observers create and put on deposits and deletes again when deadline is reached
                         // TODO not harvesting deposits yet
-                    }else{notFound = true;}
-                }else if (color === COLOR_RED){
-                    if(secColor === COLOR_RED) { // warrior at pos
+                    } else {
+                        notFound = true;
+                    }
+                } else if (color === COLOR_RED) {
+                    if (secColor === COLOR_RED) { // warrior at pos
                         jobs = CreateFlagJob(jobs, '2GuardPos', gameFlagKey, gameFlag, 'W')
-                    }else if(secColor === COLOR_BLUE) { // gunner at pos
+                    } else if (secColor === COLOR_BLUE) { // gunner at pos
                         jobs = CreateFlagJob(jobs, '2GuardGunPos', gameFlagKey, gameFlag, 'G')
-                    }else if(secColor === COLOR_GREEN) { // medic at pos
+                    } else if (secColor === COLOR_GREEN) { // medic at pos
                         jobs = CreateFlagJob(jobs, '2GuardMedPos', gameFlagKey, gameFlag, 'M')
-                    }else{notFound = true;}
+                    } else {
+                        notFound = true;
+                    }
                 } else if (color === COLOR_YELLOW) {
                     if (secColor === COLOR_YELLOW) { // distantHarvester on source at flag pos
                         jobs = CreateFlagJob(jobs, '5RemoteHarvest', gameFlagKey, gameFlag, 'D');
-                    }else if (secColor === COLOR_GREEN) { // harvester move to pos
+                    } else if (secColor === COLOR_GREEN) { // harvester move to pos
                         jobs = CreateFlagJob(jobs, '2HarvestPos', gameFlagKey, gameFlag, 'H');
                         jobs = CreateFlagJob(jobs, '2TransPos', gameFlagKey, gameFlag, 'T');
                         jobs = CreateFlagJob(jobs, '2BuildPos', gameFlagKey, gameFlag, 'B');
                     }
-                } else if (color === COLOR_PURPLE){
-                    if(secColor === COLOR_PURPLE) { // FillLabMineral
+                } else if (color === COLOR_PURPLE) {
+                    if (secColor === COLOR_PURPLE) { // FillLabMineral
                         jobs = FillLabMineralJobs(jobs, gameFlagKey, gameFlag);
                     } else if (secColor === COLOR_WHITE) { // EmptyLabMineral
                         jobs = EmptyLabMineralJobs(jobs, gameFlagKey, gameFlag);
-                    }else{notFound = true;}
-                }else if (color === COLOR_GREEN){
-                    if(secColor === COLOR_GREEN) { // claimer claim
+                    } else {
+                        notFound = true;
+                    }
+                } else if (color === COLOR_GREEN) {
+                    if (secColor === COLOR_GREEN) { // claimer claim
                         jobs = CreateFlagJob(jobs, '1ClaimCtrl', gameFlagKey, gameFlag, 'C');
                     } else if (secColor === COLOR_YELLOW) { // claimer reserve
                         jobs = ReserveRoomJobs(jobs, gameFlagKey, gameFlag);
                     } else if (secColor === COLOR_ORANGE) { // claimer move to pos - used when one wants to enter a portal
                         jobs = CreateFlagJob(jobs, '2ClaimPos', gameFlagKey, gameFlag, 'C');
-                    }else{notFound = true;}
-                }else{notFound = true;}
-                if(notFound) {
+                    } else {
+                        notFound = true;
+                    }
+                } else {
+                    notFound = true;
+                }
+                if (notFound) {
                     Logs.Error('CreateJobs CreateFlagJobs flag color not found', gameFlagKey + ' ' + gameFlag.color + ' ' + gameFlag.secondaryColor + ' (' + gameFlag.pos.x + ',' + gameFlag.pos.y + ')');
                 }
             }
             return jobs;
         }
 
-        function CreateFlagJob(jobs, jobName, gameFlagKey, gameFlag, creepType){
+        function CreateFlagJob(jobs, jobName, gameFlagKey, gameFlag, creepType) {
             //console.log('CreateJobs CreateFlagJobs AddJob ' + gameFlagKey);
             return AddJob(jobs, jobName + '-' + gameFlagKey + '(' + gameFlag.pos.x + ',' + gameFlag.pos.y + ')' + gameFlag.pos.roomName, gameFlagKey, FLAG_JOB, creepType);
         }
@@ -106,9 +116,9 @@ const CreateJobs = {
                         const source = sources[sourceKey];
                         new RoomVisual(gameRoom.name).text('🏭', source.pos.x, source.pos.y);
                         AddJob(jobs, '1Src(' + source.pos.x + ',' + source.pos.y + ')' + gameRoom.name, source.id, OBJECT_JOB, 'H');
-                        if(gameRoom.controller.level < 3){
+                        if (gameRoom.controller.level < 3) {
                             const freeSpaces = FreeSpaces(source.pos);
-                            if(freeSpaces > 1){
+                            if (freeSpaces > 1) {
                                 AddJob(jobs, '5Src(' + source.pos.x + ',' + source.pos.y + ')' + gameRoom.name, source.id, OBJECT_JOB, 'H');
                             }
                         }
@@ -163,7 +173,7 @@ const CreateJobs = {
                     for (const newJobKey in jobs) { // loop through new jobs
                         if (!Memory.MemRooms[gameRoom.name].RoomJobs[newJobKey]) { // new job does not already exist
                             Memory.MemRooms[gameRoom.name].RoomJobs[newJobKey] = jobs[newJobKey]; // save it
-                            //console.log("CreateJobs CreateObjJobs new job added " + newJobKey);
+                            //console.log('CreateJobs CreateObjJobs new job added ' + newJobKey);
                             addedNewJob = true;
                         }
                     }
@@ -172,7 +182,7 @@ const CreateJobs = {
                         const oldJob = Memory.MemRooms[gameRoom.name].RoomJobs[oldJobKey];
                         if (oldJob.Creep === 'vacant' && !jobs[oldJobKey]) { // old job is vacant and old job id not in the new job array
                             Memory.MemRooms[gameRoom.name].RoomJobs[oldJobKey] = undefined; // delete old vacant disappeared job
-                            //console.log("CreateJobs CreateObjJobs old job deleted " + oldJobKey);
+                            //console.log('CreateJobs CreateObjJobs old job deleted ' + oldJobKey);
                         }
                     }
                     if (gameRoom.controller && Memory.MemRooms[gameRoom.name].RoomLevel !== gameRoom.controller.level) { // room level change
@@ -215,33 +225,37 @@ const CreateJobs = {
 
         // flag jobs:
 
-        function PowerBankJobs(jobs, gameFlagKey, gameFlag){
-            if(gameFlag.room){ // power bank on low health - get transporters over to the power bank
+        function PowerBankJobs(jobs, gameFlagKey, gameFlag) {
+            if (gameFlag.room) { // power bank on low health - get transporters over to the power bank
                 const powerBank = gameFlag.pos.lookFor(LOOK_STRUCTURES)[0];
-                const droppedPower = gameFlag.room.find(FIND_DROPPED_RESOURCES, {filter: (d) => {return d.resourceType === RESOURCE_POWER;}})[0];
-                if(powerBank){
+                const droppedPower = gameFlag.room.find(FIND_DROPPED_RESOURCES, {
+                    filter: (d) => {
+                        return d.resourceType === RESOURCE_POWER;
+                    }
+                })[0];
+                if (powerBank) {
                     jobs = CreateFlagJob(jobs, '3AtkP1', gameFlagKey, gameFlag, 'W');
                     jobs = CreateFlagJob(jobs, '3AtkP2', gameFlagKey, gameFlag, 'W');
                     jobs = CreateFlagJob(jobs, '3MedP1', gameFlagKey, gameFlag, 'M');
                     jobs = CreateFlagJob(jobs, '3MedP2', gameFlagKey, gameFlag, 'M');
                 }
-                if((powerBank && powerBank.hits < 250000) || droppedPower){
+                if ((powerBank && powerBank.hits < 250000) || droppedPower) {
                     jobs = CreateFlagJob(jobs, '1TrnsprtP1', gameFlagKey, gameFlag, 'T');
                     console.log('CreateJobs PowerBankJobs 1TrnsprtP1 ' + gameFlag.room.name);
-                    if((powerBank && powerBank.hits > 1000) || (droppedPower && droppedPower.amount > 800)){
+                    if ((powerBank && powerBank.hits > 1000) || (droppedPower && droppedPower.amount > 800)) {
                         jobs = CreateFlagJob(jobs, '1TrnsprtP2', gameFlagKey, gameFlag, 'T');
                         console.log('CreateJobs PowerBankJobs 1TrnsprtP2 ' + gameFlag.room.name);
-                        if((powerBank && powerBank.hits > 2000) || (droppedPower && droppedPower.amount > 1500)){
+                        if ((powerBank && powerBank.hits > 2000) || (droppedPower && droppedPower.amount > 1500)) {
                             jobs = CreateFlagJob(jobs, '1TrnsprtP3', gameFlagKey, gameFlag, 'T');
                             console.log('CreateJobs PowerBankJobs 1TrnsprtP3 ' + gameFlag.room.name);
-                            if((powerBank && powerBank.hits > 3000) || (droppedPower && droppedPower.amount > 2900)){
+                            if ((powerBank && powerBank.hits > 3000) || (droppedPower && droppedPower.amount > 2900)) {
                                 jobs = CreateFlagJob(jobs, '1TrnsprtP4', gameFlagKey, gameFlag, 'T');
                                 console.log('CreateJobs PowerBankJobs 1TrnsprtP4 ' + gameFlag.room.name);
                             }
                         }
                     }
                 }
-            }else{ // create the jobs if the room is invisible - not needed if the observer is looking at the room at all ticks
+            } else { // create the jobs if the room is invisible - not needed if the observer is looking at the room at all ticks
                 jobs = CreateFlagJob(jobs, '3AtkP1', gameFlagKey, gameFlag, 'W');
                 jobs = CreateFlagJob(jobs, '3AtkP2', gameFlagKey, gameFlag, 'W');
                 jobs = CreateFlagJob(jobs, '3MedP1', gameFlagKey, gameFlag, 'M');
@@ -250,7 +264,7 @@ const CreateJobs = {
             return jobs;
         }
 
-        function EmptyLabMineralJobs(jobs, gameFlagKey, gameFlag){
+        function EmptyLabMineralJobs(jobs, gameFlagKey, gameFlag) {
             if (!gameFlag.pos.findInRange(FIND_MY_STRUCTURES, 0, {
                 filter: function (s) {
                     return s.structureType === STRUCTURE_LAB;
@@ -269,7 +283,7 @@ const CreateJobs = {
             return jobs;
         }
 
-        function FillLabMineralJobs(jobs, gameFlagKey, gameFlag){
+        function FillLabMineralJobs(jobs, gameFlagKey, gameFlag) {
             if (!gameFlag.pos.findInRange(FIND_MY_STRUCTURES, 0, {
                 filter: function (s) {
                     return s.structureType === STRUCTURE_LAB;
@@ -288,7 +302,7 @@ const CreateJobs = {
             return jobs;
         }
 
-        function ReserveRoomJobs(jobs, gameFlagKey, gameFlag){
+        function ReserveRoomJobs(jobs, gameFlagKey, gameFlag) {
             if (!gameFlag.room
                 || !gameFlag.room.controller.reservation
                 || !Memory.MemRooms[gameFlag.pos.roomName]
@@ -319,8 +333,12 @@ const CreateJobs = {
         }
 
         function FillPowerSpawnPowerJobs(gameRoom, roomJobs) {
-            if(gameRoom.storage && gameRoom.storage.store[RESOURCE_POWER] > 0 || gameRoom.terminal && gameRoom.terminal.store[RESOURCE_POWER] > 0){
-                const powerSpawn = gameRoom.find(FIND_MY_STRUCTURES, {filter: (s) => {return s.structureType === STRUCTURE_POWER_SPAWN;}})[0];
+            if (gameRoom.storage && gameRoom.storage.store[RESOURCE_POWER] > 0 || gameRoom.terminal && gameRoom.terminal.store[RESOURCE_POWER] > 0) {
+                const powerSpawn = gameRoom.find(FIND_MY_STRUCTURES, {
+                    filter: (s) => {
+                        return s.structureType === STRUCTURE_POWER_SPAWN;
+                    }
+                })[0];
                 if (powerSpawn && powerSpawn.store.getFreeCapacity(RESOURCE_POWER) > 0) {
                     new RoomVisual(gameRoom.name).text('🌪️', powerSpawn.pos.x, powerSpawn.pos.y);
                     AddJob(roomJobs, '3FillPSpwnP(' + powerSpawn.pos.x + ',' + powerSpawn.pos.y + ')' + gameRoom.name, powerSpawn.id, OBJECT_JOB, 'T');
@@ -350,18 +368,18 @@ const CreateJobs = {
                 for (const resourceType in gameRoom.storage.store) {
                     const storageResourceAmount = gameRoom.storage.store[resourceType];
                     let maxResources = 3000;
-                    if(resourceType === RESOURCE_ENERGY){
-                        if(storageResourceAmount >= 200000){
+                    if (resourceType === RESOURCE_ENERGY) {
+                        if (storageResourceAmount >= 200000) {
                             maxResources = 100000;
-                        }else if(storageResourceAmount >= 100000){
+                        } else if (storageResourceAmount >= 100000) {
                             maxResources = 80000;
-                        }else if(storageResourceAmount >= 50000){
+                        } else if (storageResourceAmount >= 50000) {
                             maxResources = 50000;
                         }
-                    }else if(storageResourceAmount >= 5000){
+                    } else if (storageResourceAmount >= 5000) {
                         maxResources = 5000;
                     }
-                    if(gameRoom.terminal.store[resourceType] < maxResources){
+                    if (gameRoom.terminal.store[resourceType] < maxResources) {
                         AddJob(roomJobs, '5FillTerm(' + resourceType + ')' + gameRoom.name, gameRoom.terminal.id, OBJECT_JOB, 'T');
                     }
                 }
@@ -510,27 +528,27 @@ const CreateJobs = {
             }
         }
 
-        function FillControllerContainerJobs(gameRoom, roomJobs){
+        function FillControllerContainerJobs(gameRoom, roomJobs) {
             let controllerContainer;
-            if(Memory.MemRooms[gameRoom.name].CtrlConId){
+            if (Memory.MemRooms[gameRoom.name].CtrlConId) {
                 controllerContainer = Game.getObjectById(Memory.MemRooms[gameRoom.name].CtrlConId);
-                if(!controllerContainer){
+                if (!controllerContainer) {
                     console.log('CreateJobs FillControllerContainerJobs removed container id from mem' + gameRoom.name);
                     Memory.MemRooms[gameRoom.name].CtrlConId = undefined;
                 }
             }
-            if(!controllerContainer){
+            if (!controllerContainer) {
                 controllerContainer = gameRoom.controller.pos.findInRange(FIND_STRUCTURES, 3, {
                     filter: (s) => {
                         return s.structureType === STRUCTURE_CONTAINER && s.store.getFreeCapacity() > 0;
                     }
                 })[0];
-                if(controllerContainer) {
+                if (controllerContainer) {
                     console.log('CreateJobs FillControllerContainerJobs found new container (' + controllerContainer.pos.x + ',' + controllerContainer.pos.y + ',' + controllerContainer.pos.roomName + ') saving in memory');
                     Memory.MemRooms[gameRoom.name].CtrlConId = controllerContainer.id;
                 }
             }
-            if(controllerContainer){
+            if (controllerContainer) {
                 new RoomVisual(gameRoom.name).text('🔋', controllerContainer.pos.x, controllerContainer.pos.y);
                 AddJob(roomJobs, '2FillCtrlCon(' + controllerContainer.pos.x + ',' + controllerContainer.pos.y + ')' + gameRoom.name, controllerContainer.id, OBJECT_JOB, 'T');
             }
@@ -543,7 +561,7 @@ const CreateJobs = {
             let level = -1;
             let sourceNumber = -1;
             if (gameRoom) {
-                if(gameRoom.controller){
+                if (gameRoom.controller) {
                     level = gameRoom.controller.level;
                 }
                 sourceNumber = gameRoom.find(FIND_SOURCES).length;
@@ -574,13 +592,13 @@ const CreateJobs = {
 
 
         /**@return {number}*/
-        function FreeSpaces(pos){ // get the number of free spaces around a pos
+        function FreeSpaces(pos) { // get the number of free spaces around a pos
             let freeSpaces = 0;
             const terrain = Game.map.getRoomTerrain(pos.roomName);
-            for(let x = pos.x - 1; x <= pos.x + 1; x++){
-                for(let y = pos.y - 1; y <= pos.y + 1; y++){
+            for (let x = pos.x - 1; x <= pos.x + 1; x++) {
+                for (let y = pos.y - 1; y <= pos.y + 1; y++) {
                     const t = terrain.get(x, y);
-                    if(t === 0 && (pos.x !== x || pos.y !== y)){
+                    if (t === 0 && (pos.x !== x || pos.y !== y)) {
                         freeSpaces++;
                     }
                 }

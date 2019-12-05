@@ -30,7 +30,7 @@ const Towers = {
             if (damagedCreeps.length > 0) {
                 const val = ((i + 1) % damagedCreeps.length);
                 towers[i].heal(damagedCreeps[val]);
-            }else if (hostileTargets.length > 0) {
+            } else if (hostileTargets.length > 0) {
                 const val = ((i + 1) % hostileTargets.length);
                 towers[i].attack(hostileTargets[val]);
             } else if (damagedStructures.length > 0 && towers[i].store[RESOURCE_ENERGY] > 700) {
