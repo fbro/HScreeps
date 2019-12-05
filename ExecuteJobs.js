@@ -264,7 +264,7 @@ const ExecuteJobs = {
                     result = JobTransportPowerBank(creep, roomJob);
                     break;
                 default:
-                    Logs.Error('ExecuteJobs-JobAction-jobNotFound', 'ExecuteJobs JobAction ERROR! job not found ' + jobKey + ' ' + creep.name);
+                    Logs.Error('ExecuteJobs JobAction job not found', jobKey + ' ' + creep.name);
             }
             if (result === OK) {
                 // job is done everyone is happy, nothing to do.
@@ -276,7 +276,10 @@ const ExecuteJobs = {
                 creep.say('🏃'); // The creep is just moving to its target
             } else { // results where anything else than OK - one should end the job!
                 if (result === ERR_NO_RESULT_FOUND) {
-                    Logs.Error('ExecuteJobs-JobAction-noResultGained', 'ExecuteJobs JobAction ERROR! no result gained ' + jobKey + ' ' + result + ' ' + roomJob.Creep);
+                    Logs.Error('ExecuteJobs JobAction no result gained', jobKey + ' ' + result + ' ' + roomJob.Creep);
+                    creep.say('⚠' + result);
+                } else if (result === ERR_INVALID_TARGET || result === ERR_INVALID_ARGS) {
+                    Logs.Error('ExecuteJobs JobAction error invalid', jobKey + ' ' + result + ' ' + roomJob.Creep);
                     creep.say('⚠' + result);
                 } else if (result === JOB_OBJ_DISAPPEARED) {
                     creep.say('🙈' + result);
@@ -530,7 +533,6 @@ const ExecuteJobs = {
             return result;
         }
 
-        // TODO just go around and fill all spawns and extensions
         /**@return {int}*/
         function JobFillSpawnExtension(creep, roomJob) {
             const result = GenericJobAction(creep, roomJob, {
@@ -557,7 +559,8 @@ const ExecuteJobs = {
                         return this.JobStatus(jobObject);
                     }
                 },
-                /**@return {object} @return {undefined}*/
+                /**@return {object}
+                 * @return {undefined}*/
                 FindFetchObject: function (jobObject) {
                     return FindFetchResource(creep, jobObject, RESOURCE_ENERGY);
                 },
@@ -1213,7 +1216,7 @@ const ExecuteJobs = {
                                     result = creep.move(TOP);
                                     break;
                                 default:
-                                    Logs.Error('ExecuteJobs-JobGuardGunnerPosition-gunnerMoveError', creep.name);
+                                    Logs.Error('ExecuteJobs JobGuardGunnerPosition gunner move error', creep.name);
                             }
                         }
                         return result;
@@ -1538,7 +1541,7 @@ const ExecuteJobs = {
                         })[0];
                         if (!lab) { // lab does not exist - delete flag and remove job
                             jobObject.remove();
-                            Logs.Error('ExecuteJobs-JobFillLabMineral-labGone', 'ExecuteJobs JobFillLabMineral ERROR! no lab ' + jobObject.pos.roomName + ' ' + creep.name);
+                            Logs.Error('ExecuteJobs JobFillLabMineral lab gone', jobObject.pos.roomName + ' ' + creep.name);
                             return ERR_NO_RESULT_FOUND;
                         }
                         creep.memory.LabId = lab.id;

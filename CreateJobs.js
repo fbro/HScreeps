@@ -75,7 +75,7 @@ const CreateJobs = {
                     }else{notFound = true;}
                 }else{notFound = true;}
                 if(notFound) {
-                    Logs.Error('CreateJobs-CreateFlagJobs-flagColorNotFound', 'CreateJobs CreateFlagJobs ERROR! flag color not found ' + gameFlagKey + ' ' + gameFlag.color + ' ' + gameFlag.secondaryColor + ' (' + gameFlag.pos.x + ',' + gameFlag.pos.y + ')');
+                    Logs.Error('CreateJobs CreateFlagJobs flag color not found', gameFlagKey + ' ' + gameFlag.color + ' ' + gameFlag.secondaryColor + ' (' + gameFlag.pos.x + ',' + gameFlag.pos.y + ')');
                 }
             }
             return jobs;
@@ -257,7 +257,7 @@ const CreateJobs = {
                 }
             })) { // flag must be on top of an existing lab!
                 gameFlag.remove();
-                Logs.Error('CreateJobs-CreateFlagJobs-labGone', 'CreateJobs CreateFlagJobs ERROR! no lab ' + gameFlagKey);
+                Logs.Error('CreateJobs CreateFlagJobs lab gone', gameFlagKey);
             } else if (gameFlag.pos.findInRange(FIND_MY_STRUCTURES, 0, {
                 filter: function (s) {
                     return s.structureType === STRUCTURE_LAB;
@@ -276,7 +276,7 @@ const CreateJobs = {
                 }
             })) { // flag must be on top of an existing lab!
                 gameFlag.remove();
-                Logs.Error('CreateJobs-CreateFlagJobs-labGone', 'CreateJobs CreateFlagJobs ERROR! no lab ' + gameFlagKey);
+                Logs.Error('CreateJobs CreateFlagJobs lab gone', gameFlagKey);
             } else if (gameFlag.pos.findInRange(FIND_MY_STRUCTURES, 0, {
                 filter: function (s) {
                     return s.structureType === STRUCTURE_LAB;

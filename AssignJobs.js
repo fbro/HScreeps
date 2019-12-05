@@ -248,7 +248,7 @@ const AssignJobs = {
                         maxCreepsInRoom = 3;
                         break;
                     default:
-                        Logs.Error('AssignJobs-ShouldSpawnCreep-creepTypeNotFound', 'AssignJobs ShouldSpawnCreep ERROR! creepType not found ' + creepType);
+                        Logs.Error('AssignJobs ShouldSpawnCreep creep type not found', creepType);
                 }
                 memRoom.MaxCreeps[creepType] = {
                     'MaxCreepsInRoom': maxCreepsInRoom,
@@ -574,7 +574,7 @@ const AssignJobs = {
                     }
                     break;
                 default:
-                    Logs.Error('AssignJobs-GetCreepBody-creepTypeNotFound', 'AssignJobs GetCreepBody ERROR! creepType not found ' + creepType);
+                    Logs.Error('AssignJobs GetCreepBody creep type  not found', creepType);
             }
             return body;
         }
