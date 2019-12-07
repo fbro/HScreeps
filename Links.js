@@ -59,10 +59,10 @@ const Links = {
             let hasTransferredToControllerLink = false;
             for (let i = 0; i < harvesterLinks.length; i++) {
                 if (harvesterLinks[i].store[RESOURCE_ENERGY] >= 700) {
-                    if (!hasTransferredToControllerLink && controllerLink.store[RESOURCE_ENERGY] < 500) {
+                    if (!hasTransferredToControllerLink && controllerLink && controllerLink.store[RESOURCE_ENERGY] < 500) {
                         harvesterLinks[i].transferEnergy(controllerLink);
                         hasTransferredToControllerLink = true;
-                    } else if (storageLink.store[RESOURCE_ENERGY] < 600) {
+                    } else if (storageLink && storageLink.store[RESOURCE_ENERGY] < 600) {
                         harvesterLinks[i].transferEnergy(storageLink);
                     }
                 }
