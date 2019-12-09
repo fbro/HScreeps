@@ -49,7 +49,20 @@ const ExecuteJobs = {
                                 } else {
                                     Logs.Error('ExecuteJobs ExecuteRoomJobs job done delete failed', gameCreep.name + ' ' + roomName + ' ' + creepMemory.JobName + ' gameCreep.pos.roomName ' + gameCreep.pos.roomName);
                                 }
-                                creepMemory.JobName = 'idle(' + gameCreep.pos.x + ',' + gameCreep.pos.y + ')' + gameCreep.pos.roomName;
+                                let assignedToNewJob = false;
+                                for(const roomJobKey in Memory.MemRooms[roomName].RoomJobs){
+                                    let roomJob = Memory.MemRooms[roomName].RoomJobs[roomJobKey];
+                                    if (roomJob.Creep === 'vacant' && creepName.startsWith(roomJob.CreepType)){
+                                        assignedToNewJob = true;
+                                        creepMemory.JobName = roomJobKey;
+                                        roomJob.Creep = creepName;
+                                        console.log('ExecuteJobs ExecuteRoomJobs ' + creepName + ' assigned to new job ' + roomJobKey);
+                                        break;
+                                    }
+                                }
+                                if(!assignedToNewJob){
+                                    creepMemory.JobName = 'idle(' + gameCreep.pos.x + ',' + gameCreep.pos.y + ')' + gameCreep.pos.roomName;
+                                }
                             }
                         }
                     } else { // both job and creep is gone
@@ -334,7 +347,8 @@ const ExecuteJobs = {
                     }
                     return this.JobStatus(jobObject);
                 },
-                /**@return {object} @return {undefined}*/
+                /**@return {object}
+                 * @return {undefined}*/
                 FindFetchObject: function (jobObject) {
                     let fetchObject;
                     fetchObject = FindClosestFreeStore(creep, 2, creep.store[RESOURCE_ENERGY], RESOURCE_ENERGY);
@@ -447,7 +461,8 @@ const ExecuteJobs = {
                         return this.JobStatus(jobObject);
                     }
                 },
-                /**@return {object} @return {undefined}*/
+                /**@return {object}
+                 * @return {undefined}*/
                 FindFetchObject: function (jobObject) {
                     return FindFetchResource(creep, jobObject, RESOURCE_ENERGY);
                 },
@@ -485,7 +500,8 @@ const ExecuteJobs = {
                         return this.JobStatus(jobObject);
                     }
                 },
-                /**@return {object} @return {undefined}*/
+                /**@return {object}
+                 * @return {undefined}*/
                 FindFetchObject: function (jobObject) {
                     return FindFetchResource(creep, jobObject, RESOURCE_ENERGY);
                 },
@@ -521,7 +537,8 @@ const ExecuteJobs = {
                         return this.JobStatus(jobObject);
                     }
                 },
-                /**@return {object} @return {undefined}*/
+                /**@return {object}
+                 * @return {undefined}*/
                 FindFetchObject: function (jobObject) {
                     return FindFetchResource(creep, jobObject, RESOURCE_ENERGY);
                 },
@@ -598,7 +615,8 @@ const ExecuteJobs = {
                         return this.JobStatus(jobObject);
                     }
                 },
-                /**@return {object} @return {undefined}*/
+                /**@return {object}
+                 * @return {undefined}*/
                 FindFetchObject: function (jobObject) {
                     return FindFetchResource(creep, jobObject, RESOURCE_ENERGY);
                 },
@@ -650,7 +668,8 @@ const ExecuteJobs = {
                 IsJobDone: function (jobObject) {
                     return this.JobStatus(jobObject);
                 },
-                /**@return {object} @return {undefined}*/
+                /**@return {object}
+                 * @return {undefined}*/
                 FindFetchObject: function (jobObject) {
                     if (jobObject.room && jobObject.room.storage) {
                         return jobObject.room.storage;
@@ -667,9 +686,6 @@ const ExecuteJobs = {
                     return DepositCreepStore(creep, fetchObject, jobObject);
                 },
             });
-            if (result !== OK && result !== JOB_MOVING && result !== ERR_TIRED && result !== ERR_BUSY) {
-                creep.memory.Depositing = undefined;
-            }
             return result;
         }
 
@@ -709,9 +725,6 @@ const ExecuteJobs = {
                     return DepositCreepStore(creep, fetchObject, jobObject);
                 },
             });
-            if (result !== OK && result !== JOB_MOVING && result !== ERR_TIRED && result !== ERR_BUSY) {
-                creep.memory.ContainerId = undefined;
-            }
             return result;
         }
 
@@ -786,9 +799,6 @@ const ExecuteJobs = {
                     return FetchResource(creep, fetchObject, resourceType);
                 },
             });
-            if (result !== OK && result !== JOB_MOVING && result !== ERR_TIRED && result !== ERR_BUSY) {
-                creep.memory.resourceType = undefined;
-            }
             return result;
         }
 
@@ -817,7 +827,8 @@ const ExecuteJobs = {
                         return this.JobStatus(jobObject);
                     }
                 },
-                /**@return {object} @return {undefined}*/
+                /**@return {object}
+                 * @return {undefined}*/
                 FindFetchObject: function (jobObject) {
                     return FindFetchResource(creep, jobObject, RESOURCE_ENERGY);
                 },
@@ -935,7 +946,8 @@ const ExecuteJobs = {
                 IsJobDone: function (jobObject) {
                     return this.JobStatus(jobObject);
                 },
-                /**@return {object} @return {undefined}*/
+                /**@return {object}
+                 * @return {undefined}*/
                 FindFetchObject: function (jobObject) {
                     if (jobObject.room && jobObject.room.controller) {
                         return jobObject.room.controller;
@@ -977,7 +989,8 @@ const ExecuteJobs = {
                 IsJobDone: function (jobObject) {
                     return this.JobStatus(jobObject);
                 },
-                /**@return {object} @return {undefined}*/
+                /**@return {object}
+                 * @return {undefined}*/
                 FindFetchObject: function (jobObject) {
                     return jobObject;
                 },
@@ -1013,7 +1026,8 @@ const ExecuteJobs = {
                 IsJobDone: function (jobObject) {
                     return this.JobStatus(jobObject);
                 },
-                /**@return {object} @return {undefined}*/
+                /**@return {object}
+                 * @return {undefined}*/
                 FindFetchObject: function (jobObject) {
                     if (jobObject.room && jobObject.room.controller) {
                         return jobObject.room.controller;
@@ -1055,7 +1069,8 @@ const ExecuteJobs = {
                 IsJobDone: function (jobObject) {
                     return this.JobStatus(jobObject);
                 },
-                /**@return {object} @return {undefined}*/
+                /**@return {object}
+                 * @return {undefined}*/
                 FindFetchObject: function (jobObject) {
                     if (jobObject.room && jobObject.room.controller) {
                         return jobObject.room.controller;
@@ -1391,7 +1406,7 @@ const ExecuteJobs = {
                 },
                 /**@return {int}*/
                 Fetch: function (fetchObject, jobObject) {
-                    return creep.transfer(fetchObject, RESOURCE_ENERGY);
+                    return DepositCreepStore(creep, fetchObject);
                 },
             });
             return result;
@@ -1841,7 +1856,8 @@ const ExecuteJobs = {
                 IsJobDone: function (jobObject) {
                     return this.JobStatus(jobObject);
                 },
-                /**@return {object} @return {undefined}*/
+                /**@return {object}
+                 * @return {undefined}*/
                 FindFetchObject: function (jobObject) {
                     let closestRoomWithStorage = creep.memory.ClosestRoomWithStorage;
                     if (!closestRoomWithStorage) {
@@ -1868,7 +1884,7 @@ const ExecuteJobs = {
                 },
                 /**@return {int}*/
                 Fetch: function (fetchObject, jobObject) {
-                    const result = creep.transfer(fetchObject, RESOURCE_POWER);
+                    const result = DepositCreepStore(creep, fetchObject);
                     if (result === OK) {
                         Logs.Info('ExecuteJobs JobTransportPowerBank transfer power', creep.name + ' ' + creep.store[RESOURCE_POWER] + ' to (' + fetchObject.pos.x + ',' + fetchObject.pos.y + ',' + fetchObject.pos.roomName + ')');
                     }
@@ -2098,7 +2114,6 @@ const ExecuteJobs = {
             return result;
         }
 
-        // TODO implement all the places where I deposit and i want to keep max one resource
         // creep wants to transfer all its stuff before returning OK - return BUSY if not done transferring all
         /**@return {number}*/
         function DepositCreepStore(creep, storeToFillObject, storeToEmptyObject = undefined, resourceTypeToKeep = undefined) {
@@ -2124,11 +2139,13 @@ const ExecuteJobs = {
                 )
             ) {
                 result = JOB_IS_DONE;
+            } else if (result === ERR_NOT_IN_RANGE || result === OK && countResources <= 1) {
+
             } else if (result === OK && countResources > 1) { // if there are more to be transferred then set creep to busy
                 result = ERR_BUSY;
             } else if (result === ERR_FULL) {
                 Logs.Error('ExecuteJobs DepositCreepStore unexpected ERR_FULL!', result + ' ' + creep.name + ' (' + storeToFillObject.pos.x + ',' + storeToFillObject.pos.y + ',' + storeToFillObject.pos.roomName + ') to ' + storeToFillObject + ' from ' + storeToEmptyObject + ' ' + resourceTypeToKeep);
-            } else if (result !== ERR_NOT_IN_RANGE && result !== OK) {
+            } else{
                 Logs.Error('ExecuteJobs DepositCreepStore unexpected result!', result + ' ' + creep.name + ' (' + storeToFillObject.pos.x + ',' + storeToFillObject.pos.y + ',' + storeToFillObject.pos.roomName + ') to ' + storeToFillObject + ' from ' + storeToEmptyObject + ' ' + resourceTypeToKeep);
             }
             return result;
