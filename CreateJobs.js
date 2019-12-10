@@ -427,9 +427,13 @@ const CreateJobs = {
         }
 
         function FillStorageJobs(gameRoom, roomJobs) {
+            if(gameRoom.storage.store.getFreeCapacity() < 5000){
+                Logs.Warning('CreateJobs FillStorageJobs storage full!', gameRoom.name);
+                return;
+            }
             const fillStorages = gameRoom.find(FIND_STRUCTURES, {
                 filter: (s) => {
-                    return (s.structureType === STRUCTURE_CONTAINER && s.id !== Memory.MemRooms[gameRoom.name].CtrlConId && s.store.getUsedCapacity() >= 600) // do not take the controller container into account here
+                    return (s.structureType === STRUCTURE_CONTAINER && Memory.MemRooms[gameRoom.name] && s.id !== Memory.MemRooms[gameRoom.name].CtrlConId && s.store.getUsedCapacity() >= 600) // do not take the controller container into account here
                         || (s.structureType === STRUCTURE_LINK && s.store[RESOURCE_ENERGY] >= 600 && s.room.storage.pos.inRangeTo(s, 1))
                         || (s.structureType === STRUCTURE_TERMINAL && (s.store[RESOURCE_ENERGY] >= 120000 || gameRoom.storage.store[RESOURCE_ENERGY] < 5000));
                 }
@@ -448,7 +452,7 @@ const CreateJobs = {
             for (const resourceDropKey in resourceDrops) {
                 const resourceDrop = resourceDrops[resourceDropKey];
                 new RoomVisual(gameRoom.name).text('💰', resourceDrop.pos.x, resourceDrop.pos.y);
-                AddJob(roomJobs, '4FillStrg-drp' + '(' + resourceDrop.pos.x + ',' + resourceDrop.pos.y + ',' + resourceDrop.resourceType + ')' + gameRoom.name, resourceDrop.id, OBJECT_JOB, 'T');
+                AddJob(roomJobs, '5FillStrg-drp' + '(' + resourceDrop.pos.x + ',' + resourceDrop.pos.y + ',' + resourceDrop.resourceType + ')' + gameRoom.name, resourceDrop.id, OBJECT_JOB, 'T');
             }
             // Tombstone is also a little bit different - but same kind of job as above
             const tombstoneDrops = gameRoom.find(FIND_TOMBSTONES, {
@@ -459,7 +463,19 @@ const CreateJobs = {
             for (const tombstoneDropKey in tombstoneDrops) {
                 const tombstoneDrop = tombstoneDrops[tombstoneDropKey];
                 new RoomVisual(gameRoom.name).text('⚰', tombstoneDrop.pos.x, tombstoneDrop.pos.y);
-                AddJob(roomJobs, '4FillStrg-tmb' + '(' + tombstoneDrop.pos.x + ',' + tombstoneDrop.pos.y + ')' + gameRoom.name, tombstoneDrop.id, OBJECT_JOB, 'T');
+                AddJob(roomJobs, '5FillStrg-tmb' + '(' + tombstoneDrop.pos.x + ',' + tombstoneDrop.pos.y + ')' + gameRoom.name, tombstoneDrop.id, OBJECT_JOB, 'T');
+            }
+            // TODO
+            // Ruin is also a little bit different - but same kind of job as above
+            const ruinDrops = gameRoom.find(FIND_RUINS, {
+                filter: (ruin) => {
+                    return ruin.store.getUsedCapacity() > 0;
+                }
+            });
+            for (const ruinDropKey in ruinDrops) {
+                const ruinDrop = ruinDrops[ruinDropKey];
+                new RoomVisual(gameRoom.name).text('', ruinDrop.pos.x, ruinDrop.pos.y);
+                AddJob(roomJobs, '5FillStrg-ruin' + '(' + ruinDrop.pos.x + ',' + ruinDrop.pos.y + ')' + gameRoom.name, ruinDrop.id, OBJECT_JOB, 'T');
             }
         }
 
@@ -530,14 +546,14 @@ const CreateJobs = {
 
         function FillControllerContainerJobs(gameRoom, roomJobs) {
             let controllerContainer;
-            if (Memory.MemRooms[gameRoom.name].CtrlConId) {
+            if (Memory.MemRooms[gameRoom.name] && Memory.MemRooms[gameRoom.name].CtrlConId) {
                 controllerContainer = Game.getObjectById(Memory.MemRooms[gameRoom.name].CtrlConId);
                 if (!controllerContainer) {
                     console.log('CreateJobs FillControllerContainerJobs removed container id from mem' + gameRoom.name);
                     Memory.MemRooms[gameRoom.name].CtrlConId = undefined;
                 }
             }
-            if (!controllerContainer) {
+            if (!controllerContainer && Memory.MemRooms[gameRoom.name]) {
                 controllerContainer = gameRoom.controller.pos.findInRange(FIND_STRUCTURES, 3, {
                     filter: (s) => {
                         return s.structureType === STRUCTURE_CONTAINER && s.store.getFreeCapacity() > 0;

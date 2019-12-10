@@ -22,6 +22,7 @@ const ExecuteJobs = {
                         Logs.Error('ExecuteJobs ExecuteRoomJobs gameCreep is undefined', creepName);
                         delete Memory.creeps[creepName];
                     } else {
+                        Logs.Warning('ExecuteJobs ExecuteRoomJobs setting undefined JobName to idle', creepName + ' ' + gameCreep.pos.roomName);
                         creepMemory.JobName = 'idle(' + gameCreep.pos.x + ',' + gameCreep.pos.y + ')' + gameCreep.pos.roomName;
                     }
                     continue;
@@ -52,16 +53,23 @@ const ExecuteJobs = {
                                 let assignedToNewJob = false;
                                 for(const roomJobKey in Memory.MemRooms[roomName].RoomJobs){
                                     let roomJob = Memory.MemRooms[roomName].RoomJobs[roomJobKey];
-                                    if (roomJob.Creep === 'vacant' && creepName.startsWith(roomJob.CreepType)){
+                                    if (roomJob && roomJob.Creep === 'vacant' && creepName.startsWith(roomJob.CreepType)){
                                         assignedToNewJob = true;
+                                        for(const memoryElementKey in creepMemory){
+                                            if(memoryElementKey !== 'JobName'){
+                                                creepMemory[memoryElementKey] = undefined;
+                                            }
+                                        }
                                         creepMemory.JobName = roomJobKey;
                                         roomJob.Creep = creepName;
-                                        console.log('ExecuteJobs ExecuteRoomJobs ' + creepName + ' assigned to new job ' + roomJobKey);
                                         break;
                                     }
                                 }
                                 if(!assignedToNewJob){
                                     creepMemory.JobName = 'idle(' + gameCreep.pos.x + ',' + gameCreep.pos.y + ')' + gameCreep.pos.roomName;
+                                }
+                                if(creepMemory.JobName === undefined){
+                                    Logs.Error('ExecuteJobs ExecuteRoomJobs creep job is undefined!', creepName + ' ' + gameCreep.pos.roomName);
                                 }
                             }
                         }
@@ -205,7 +213,7 @@ const ExecuteJobs = {
                 case jobKey.startsWith('2FillTwr'):
                     result = JobFillTower(creep, roomJob);
                     break;
-                case jobKey.startsWith('5FillStrg') || jobKey.startsWith('5FillStrgFromRemote') || jobKey.startsWith('4FillStrg-drp') || jobKey.startsWith('4FillStrg-tmb'):
+                case jobKey.startsWith('5FillStrg'):
                     result = JobFillStorage(creep, roomJob);
                     break;
                 case jobKey.startsWith('5ExtrMin'):
@@ -741,9 +749,7 @@ const ExecuteJobs = {
                 /**@return {int}*/
                 JobStatus: function (jobObject) { // terminal
                     if (
-                        resourceType !== RESOURCE_ENERGY && jobObject.room.storage.store[resourceType] < 3000 // low resource in storage abort other
-
-                        || resourceType !== RESOURCE_ENERGY && jobObject.room.storage.store[resourceType] < 5000
+                        resourceType !== RESOURCE_ENERGY && jobObject.room.storage.store[resourceType] < 5000
                         && resourceType !== RESOURCE_ENERGY && jobObject.store[resourceType] >= 3000
 
                         || resourceType !== RESOURCE_ENERGY && jobObject.room.storage.store[resourceType] >= 5000
@@ -752,10 +758,10 @@ const ExecuteJobs = {
 
                         || resourceType === RESOURCE_ENERGY && jobObject.room.storage.store[RESOURCE_ENERGY] < 50000 // low resource in storage abort energy
 
-                        || resourceType === RESOURCE_ENERGY && jobObject.room.storage.store[RESOURCE_ENERGY] >= 50000
+                        || resourceType === RESOURCE_ENERGY && jobObject.room.storage.store[RESOURCE_ENERGY] <  100000
                         && resourceType === RESOURCE_ENERGY && jobObject.store[RESOURCE_ENERGY] >= 50000
 
-                        || resourceType === RESOURCE_ENERGY && jobObject.room.storage.store[RESOURCE_ENERGY] >= 100000
+                        || resourceType === RESOURCE_ENERGY && jobObject.room.storage.store[RESOURCE_ENERGY] <  200000
                         && resourceType === RESOURCE_ENERGY && jobObject.store[RESOURCE_ENERGY] >= 80000
 
                         || resourceType === RESOURCE_ENERGY && jobObject.room.storage.store[RESOURCE_ENERGY] >= 200000

@@ -69,7 +69,9 @@ const AssignJobs = {
                     // idle creep is in memory room with vacant job and matching job type
                     idleCreep.memory.JobName = roomJobKey;
                     for(const memoryElementKey in idleCreep.memory){
-                        idleCreep.memory[memoryElementKey] = undefined;
+                        if(memoryElementKey !== 'JobName'){
+                            idleCreep.memory[memoryElementKey] = undefined;
+                        }
                     }
                     roomJob.Creep = idleCreep.name;
                     //console.log('AssignJobs AssignCreeps ' + idleCreep.name + ' assigned to ' + roomJobKey + ' in ' + memRoomKey);
