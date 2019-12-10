@@ -31,6 +31,8 @@ const PowerCreeps = {
         }
 
         // TODO add withdraw ops
+        // TODO factory buff
+        // TODO mineral buff
 
         function DepositOps(powerCreep) {
             let result = powerCreep.transfer(powerCreep.room.storage, RESOURCE_OPS, powerCreep.store[RESOURCE_OPS] - 300);

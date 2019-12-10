@@ -465,7 +465,6 @@ const CreateJobs = {
                 new RoomVisual(gameRoom.name).text('⚰', tombstoneDrop.pos.x, tombstoneDrop.pos.y);
                 AddJob(roomJobs, '5FillStrg-tmb' + '(' + tombstoneDrop.pos.x + ',' + tombstoneDrop.pos.y + ')' + gameRoom.name, tombstoneDrop.id, OBJECT_JOB, 'T');
             }
-            // TODO
             // Ruin is also a little bit different - but same kind of job as above
             const ruinDrops = gameRoom.find(FIND_RUINS, {
                 filter: (ruin) => {

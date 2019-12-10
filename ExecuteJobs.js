@@ -305,7 +305,7 @@ const ExecuteJobs = {
                 } else if (result === JOB_OBJ_DISAPPEARED) {
                     creep.say('🙈' + result);
                 } else if (result === NO_FETCH_FOUND) {
-                    Logs.Warning('ExecuteJobs JobAction no fetch object found', result + ' ' + jobKey + ' ' + roomJob.Creep);
+                    Logs.Warning('ExecuteJobs JobAction no fetch object found', result + ' ' + jobKey + ' ' + roomJob.Creep); // most likely no energy to withdraw
                     creep.say('⚠⚡' + result);
                 } else {
                     if (!result) {
