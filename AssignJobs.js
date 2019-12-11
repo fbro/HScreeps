@@ -44,8 +44,6 @@ const AssignJobs = {
                 if (!memRoom) {
                     continue;
                 }
-                // TODO what about many idle creeps in one room that could be moved to another room
-                // TODO what about idle creeps that could take a job in another neutral room so that one does not need to spawn a new creep
                 for (const roomJobKey in memRoom.RoomJobs) {
                     const roomJob = memRoom.RoomJobs[roomJobKey];
                     if (roomJob && roomJob.Creep === 'vacant') {
@@ -118,7 +116,7 @@ const AssignJobs = {
             if (ShouldSpawnCreep(roomJob.CreepType, roomOnJobKey)) {
                 const availableName = GetAvailableName(roomJob.CreepType);
                 let bestLinearDistance = 1; // normally creeps should only be spawned in the room they are needed
-                let spawnLargeVersion = false; // TODO implement
+                let spawnLargeVersion = false;
                 // job in another room
                 if (Game.rooms[roomOnJobKey]) { // job in invisible room
                     const gameRoom = Game.rooms[roomOnJobKey];

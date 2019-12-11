@@ -2160,7 +2160,7 @@ const ExecuteJobs = {
         function FindClosestFreeStore(creep, maxMoveRange = 0, resourceAmountToStore = 1, resourceTypeToStore = undefined) {
             let closestFreeStore = Game.getObjectById(creep.memory.ClosestFreeStoreId);
             if (closestFreeStore) {
-                if (closestFreeStore.store.getFreeCapacity(resourceTypeToStore) < resourceAmountToStore || maxMoveRange > 0 && creep.pos.getRangeTo(closestFreeStore) > maxMoveRange) {
+                if (closestFreeStore.store.getFreeCapacity() < resourceAmountToStore || maxMoveRange > 0 && creep.pos.getRangeTo(closestFreeStore) > maxMoveRange) {
                     closestFreeStore = undefined;
                     creep.memory.ClosestFreeStoreId = undefined;
                 }
@@ -2172,7 +2172,7 @@ const ExecuteJobs = {
                             return (s.structureType === STRUCTURE_CONTAINER
                                 || s.structureType === STRUCTURE_STORAGE
                                 || (resourceTypeToStore === RESOURCE_ENERGY && s.structureType === STRUCTURE_LINK))
-                                && s.store.getFreeCapacity(resourceTypeToStore) >= resourceAmountToStore;
+                                && s.store.getFreeCapacity() >= resourceAmountToStore;
                         }
                     });
                     closestFreeStore = closestFreeStores[0];
@@ -2190,7 +2190,7 @@ const ExecuteJobs = {
                             return (s.structureType === STRUCTURE_CONTAINER
                                 || s.structureType === STRUCTURE_STORAGE
                                 || (resourceTypeToStore === RESOURCE_ENERGY && s.structureType === STRUCTURE_LINK))
-                                && s.store.getFreeCapacity(resourceTypeToStore) >= resourceAmountToStore;
+                                && s.store.getFreeCapacity() >= resourceAmountToStore;
                         }
                     });
                 }
@@ -2218,9 +2218,9 @@ const ExecuteJobs = {
             } else if (result !== OK && result !== ERR_BUSY && result !== ERR_TIRED) {
                 Logs.Warning('ExecuteJobs Move unexpected move error', result + ' ' + creep.name + ' (' + creep.pos.x + ',' + creep.pos.y + ',' + creep.pos.roomName + ') to ' + obj);
                 if (result === ERR_NO_PATH) {
-                    creep.say('no path!');
+                    creep.say('no 🛣️!');
                 } else if (result === ERR_NO_BODYPART) {
-                    creep.say('no move!');
+                    creep.say('no 🏃!');
                 }
             }
             return result;
