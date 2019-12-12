@@ -8,6 +8,7 @@ let PowerSpawns = require('PowerSpawns');
 let Logs = require('Logs');
 let Observers = require('Observers');
 let PowerCreeps = require('PowerCreeps');
+// TODO add Factories
 
 module.exports.loop = function () {
     if (!Memory.MemRooms) {
@@ -50,6 +51,9 @@ module.exports.loop = function () {
 
 // add more jobs:
 // TODO HarvestDeposit
+// TODO create factory.js
+
+// TODO Move interroom simplification - try and move in hallways!!!
 
 // TODO power bank harvesting - avoid enemy rooms
 

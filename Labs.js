@@ -2,7 +2,7 @@ const Labs = {
     run: function () {
         for (const gameRoomKey in Game.rooms) {
             const gameRoom = Game.rooms[gameRoomKey];
-            if (gameRoom.controller && gameRoom.controller.my) {
+            if (gameRoom.controller && gameRoom.controller.my && gameRoom.controller.level === 8) {
                 const labs = gameRoom.find(FIND_MY_STRUCTURES, {
                     filter: function (lab) {
                         return lab.structureType === STRUCTURE_LAB && lab.cooldown === 0 && lab.store[RESOURCE_ENERGY] > 0;

@@ -222,6 +222,9 @@ const ExecuteJobs = {
                 case jobKey.startsWith('5FillTerm'):
                     result = JobFillTerminal(creep, roomJob);
                     break;
+                case jobKey.startsWith('5FillFctr'):
+                    result = JobFillFactory(creep, roomJob);
+                    break;
                 case jobKey.startsWith('3FillLabE'):
                     result = JobFillLabEnergy(creep, roomJob);
                     break;
@@ -783,7 +786,7 @@ const ExecuteJobs = {
                 /**@return {int}*/
                 IsJobDone: function (jobObject) {
                     if (resourceType === RESOURCE_ENERGY && (creep.store[resourceType] + jobObject.store[resourceType]) >= 100000
-                        || resourceType !== RESOURCE_ENERGY && (creep.store[resourceType] + jobObject.store[resourceType]) >= 6000) {
+                        || resourceType !== RESOURCE_ENERGY && (creep.store[resourceType] + jobObject.store[resourceType]) >= 5000) {
                         return JOB_IS_DONE;
                     } else {
                         return this.JobStatus(jobObject);
@@ -803,6 +806,66 @@ const ExecuteJobs = {
                 /**@return {int}*/
                 Fetch: function (fetchObject, jobObject) {
                     return FetchResource(creep, fetchObject, resourceType);
+                },
+            });
+            return result;
+        }
+
+        /**@return {int}*/
+        function JobFillFactory(creep, roomJob) {
+            let resourceType = creep.memory.resourceType;
+            if (!resourceType) {
+                resourceType = creep.memory.JobName.split(/[()]+/).filter(function (e) {
+                    return e;
+                })[1];
+                creep.memory.resourceType = resourceType;
+            }
+            const result = GenericJobAction(creep, roomJob, {
+                /**@return {int}*/
+                JobStatus: function (jobObject) { // terminal
+                    if (resourceType !== RESOURCE_ENERGY && jobObject.store[resourceType] >= 5000
+                        || resourceType === RESOURCE_ENERGY && jobObject.store[RESOURCE_ENERGY] >= 20000
+                    ) {
+                        return JOB_IS_DONE;
+                    } else if (creep.store[resourceType] === 0) { // fetch
+                        return SHOULD_FETCH;
+                    } else { // action not done yet
+                        return SHOULD_ACT;
+                    }
+                },
+                /**@return {int}*/
+                Act: function (jobObject) {
+                    return creep.transfer(jobObject, resourceType);
+                },
+                /**@return {int}*/
+                IsJobDone: function (jobObject) {
+                    if (resourceType === RESOURCE_ENERGY && (creep.store[resourceType] + jobObject.store[resourceType]) >= 20000
+                        || resourceType !== RESOURCE_ENERGY && (creep.store[resourceType] + jobObject.store[resourceType]) >= 5000) {
+                        return JOB_IS_DONE;
+                    } else {
+                        return this.JobStatus(jobObject);
+                    }
+                },
+                /**@return {object}
+                 * @return {undefined}*/
+                FindFetchObject: function (jobObject) {
+                    if (resourceType === RESOURCE_ENERGY) {
+                        return FindFetchResource(creep, jobObject, RESOURCE_ENERGY);
+                    } else if (creep.room.storage && creep.room.storage.store[resourceType] > 0) {
+                        return creep.room.storage;
+                    } else {
+                        return undefined;
+                    }
+                },
+                /**@return {int}*/
+                Fetch: function (fetchObject, jobObject) {
+                    let max = -1;
+                    if(resourceType === RESOURCE_ENERGY){
+                        max = 20000;
+                    }else{
+                        max = 5000;
+                    }
+                    return FetchResource(creep, fetchObject, resourceType, max - jobObject.store[resourceType]);
                 },
             });
             return result;
@@ -1840,7 +1903,7 @@ const ExecuteJobs = {
                     const powerResource = jobObject.pos.lookFor(LOOK_RESOURCES)[0];
                     if (powerResource) {
                         return creep.pickup(powerResource);
-                    } else if (!powerResource && creep.pos.isNearTo(jobObject)) {
+                    } else if (!powerResource && creep.pos.getRangeTo(jobObject) < 6) {
                         const powerBank = jobObject.pos.lookFor(LOOK_STRUCTURES)[0];
                         if (powerBank) {
                             creep.say('W8');
@@ -2011,7 +2074,6 @@ const ExecuteJobs = {
                     creep.memory.ResourceSupply = undefined;
                 }
             }
-
             if (!resourceSupply) { // creep memory had nothing stored
                 let resourceSupplies = room.find(FIND_STRUCTURES, {
                     filter: function (s) {
