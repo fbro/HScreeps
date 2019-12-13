@@ -52,13 +52,10 @@ module.exports.loop = function () {
 
 // add more jobs:
 // TODO HarvestDeposit
-// TODO create factory.js
 
 // TODO Move interroom simplification - try and move in hallways!!!
 
 // TODO power bank harvesting - avoid enemy rooms
-
-// TODO idle warrior attack hostile is done but what about ranged warrior and medic???
 
 // avoid enemy rooms when traveling long distances
 // if doing long distance work creep should make sure it has enough timeToLive to do the job

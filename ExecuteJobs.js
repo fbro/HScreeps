@@ -122,11 +122,37 @@ const ExecuteJobs = {
                             const hostileCreeps = gameCreep.room.find(FIND_HOSTILE_CREEPS);
                             if (hostileCreeps[0]) {
                                 const hostileCreep = hostileCreeps[0];
-                                console.log('ExecuteJobs ExecuteRoomJobs idle ' + gameCreep.name + ' found ' + hostileCreeps.length + ' hostile creeps! targeting ' + hostileCreep);
+                                console.log('ExecuteJobs ExecuteRoomJobs idle ' + gameCreep.name + ' found ' + hostileCreeps.length + ' hostile creeps! targeting ' + hostileCreep + ' attack');
                                 gameCreep.say('ATK ' + hostileCreep);
                                 result = gameCreep.attack(hostileCreep);
                                 if (result === ERR_NOT_IN_RANGE) {
                                     result = Move(gameCreep, hostileCreep);
+                                }
+                            }
+                        } else if (gameCreep.getActiveBodyparts(RANGED_ATTACK)) { // idle creep can ranged attack
+                            const hostileCreeps = gameCreep.room.find(FIND_HOSTILE_CREEPS);
+                            if (hostileCreeps[0]) {
+                                const hostileCreep = hostileCreeps[0];
+                                console.log('ExecuteJobs ExecuteRoomJobs idle ' + gameCreep.name + ' found ' + hostileCreeps.length + ' hostile creeps! targeting ' + hostileCreep + ' ranged attack');
+                                gameCreep.say('RATK ' + hostileCreep);
+                                result = gameCreep.rangedAttack(hostileCreep);
+                                if (result === ERR_NOT_IN_RANGE) {
+                                    result = Move(gameCreep, hostileCreep);
+                                }
+                            }
+                        } else if (gameCreep.getActiveBodyparts(RANGED_ATTACK)) { // idle creep can heal
+                            const damagedCreeps = gameCreep.room.find(FIND_MY_CREEPS, {
+                                filter: (creep) => {
+                                    return creep.hits < creep.hitsMax;
+                                }
+                            });
+                            if (damagedCreeps[0]) {
+                                const damagedCreep = damagedCreeps[0];
+                                console.log('ExecuteJobs ExecuteRoomJobs idle ' + gameCreep.name + ' found ' + damagedCreeps.length + ' damaged creeps! targeting ' + damagedCreep + ' heal');
+                                gameCreep.say('HEAL ' + damagedCreep);
+                                result = gameCreep.heal(damagedCreep);
+                                if (result === ERR_NOT_IN_RANGE) {
+                                    result = Move(gameCreep, damagedCreep);
                                 }
                             }
                         }

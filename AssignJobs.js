@@ -552,11 +552,16 @@ const AssignJobs = {
                             break;
                     }
                     break;
-                // distant transporter
+                // distant harvester
                 case 'D':
                     switch (true) {
-                        case (energyAvailable >= 1500): // energyCapacityAvailable: 12900
-                            body = [WORK, WORK, WORK, WORK, WORK, WORK, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];
+                        case (energyAvailable >= 1300): // energyCapacityAvailable: 12900
+                            body = [
+                                WORK, WORK, WORK, WORK, WORK, WORK,
+                                CARRY, CARRY, CARRY, CARRY,
+                                MOVE, MOVE, MOVE, MOVE, MOVE,
+                                MOVE, MOVE, MOVE, MOVE, MOVE
+                            ];
                             break;
                         case (energyAvailable >= 1250): // energyCapacityAvailable: 5600
                             body = [WORK, WORK, WORK, WORK, WORK, WORK, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];

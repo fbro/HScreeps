@@ -109,7 +109,7 @@ const Observers = {
                             Logs.Info('observers remove flag', flagName + ' time ' + Game.time);
                             flagToRemove.remove();
                         }
-                        console.log('Observers item gone, removing ' + roomKey + ' ' + JSON.stringify(scanStatus) + ' flag removal status ');
+                        console.log('Observers item gone, removing ' + roomKey + ' ' + JSON.stringify(scanStatus));
                     } else if (!hasScanned && Game.flags[flagName]) { // if flag is in this room then keep scanning it
                         //console.log('Observers scanning ' + roomKey + ' flag ' + 'powerBank_' + roomKey + '-' + scanStatus.freeSpaces);
                         observer.observeRoom(roomKey);
@@ -167,7 +167,7 @@ const Observers = {
                                 if (!Memory.MemRooms[gameRoomKey].depositFlag) {
                                     Memory.MemRooms[gameRoomKey].depositFlag = deposit.pos;
                                     console.log('Observers deposit flag placed in ' + roomKey);
-                                    //Game.rooms[roomKey].createFlag(deposit.pos, 'deposit_' + deposit.pos.roomName + '-' + freeSpaces, COLOR_ORANGE, COLOR_CYAN); // TODO reactivate
+                                    Game.rooms[roomKey].createFlag(deposit.pos, 'deposit_' + deposit.pos.roomName + '-' + freeSpaces, COLOR_ORANGE, COLOR_CYAN);
                                 }
                             } else {
                                 deleteScan = true;
