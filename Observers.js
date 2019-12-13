@@ -147,11 +147,7 @@ const Observers = {
                                 Game.rooms[roomKey].createFlag(powerBank.pos, 'powerBank_' + powerBank.pos.roomName + '-' + freeSpaces, COLOR_ORANGE, COLOR_PURPLE);
                             }
                         } else {
-                            const deposit = Game.rooms[roomKey].find(FIND_DEPOSITS, {
-                                filter: function (deposit) {
-                                    return deposit.ticksToDecay > 4000;
-                                }
-                            })[0];
+                            const deposit = Game.rooms[roomKey].find(FIND_DEPOSITS)[0];
                             if (deposit) {
                                 const freeSpaces = FreeSpaces(deposit.pos);
                                 console.log('Observers deposit found! in ' + roomKey + ' freeSpaces ' + freeSpaces);

@@ -313,6 +313,9 @@ const ExecuteJobs = {
                 case jobKey.startsWith('1TrnsprtP'):
                     result = JobTransportPowerBank(creep, roomJob);
                     break;
+                case jobKey.startsWith('5HrvstDpst'):
+                    result = JobHarvestDeposit(creep, roomJob);
+                    break;
                 default:
                     Logs.Error('ExecuteJobs JobAction job not found', jobKey + ' ' + creep.name);
             }
@@ -1994,6 +1997,56 @@ const ExecuteJobs = {
                 result = OK;
             }
             return result;
+        }
+
+        /**@return {int}*/
+        function JobHarvestDeposit(creep, roomJob){
+            const result = GenericFlagAction(creep, roomJob, {
+                /**@return {int}*/
+                JobStatus: function (jobObject) {
+                    if (creep.store.getFreeCapacity() === 0 || creep.memory.FetchObjectId && creep.store.getUsedCapacity > 0) {
+                        return SHOULD_FETCH;
+                    } else {
+                        return SHOULD_ACT;
+                    }
+                },
+                /**@return {int}*/
+                Act: function (jobObject) {
+                    if (!jobObject.room) { // invisible room
+                        return ERR_NOT_IN_RANGE;
+                    } else {
+                        let deposit;
+                        if(creep.memory.DepositId){
+                            deposit = Game.getObjectById(creep.memory.DepositId);
+                        }
+                        if(!deposit){
+                            deposit = jobObject.pos.lookFor(LOOK_DEPOSITS)[0];
+                            if(deposit){
+                                creep.memory.DepositId = deposit.id;
+                            }
+                        }
+                        if(deposit){
+                            return creep.harvest(deposit)
+                        }else{
+                            return JOB_IS_DONE;
+                        }
+                    }
+                },
+                /**@return {int}*/
+                IsJobDone: function (jobObject) {
+                    return this.JobStatus(jobObject);
+                },
+                /**@return {object}
+                 * @return {undefined}*/
+                FindFetchObject: function (jobObject) {
+                    return Game.rooms['E28S29'].storage;
+                },
+                /**@return {int}*/
+                Fetch: function (fetchObject, jobObject) {
+                    return DepositCreepStore(creep, fetchObject);
+                },
+            });
+            return ERR_BUSY;
         }
 
         // helper functions:

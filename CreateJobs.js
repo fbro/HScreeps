@@ -41,7 +41,7 @@ const CreateJobs = {
                     } else if (secColor === COLOR_PURPLE) { // flag that observers create and put on found power banks and deletes again when deadline is reached
                         jobs = PowerBankJobs(jobs, gameFlagKey, gameFlag);
                     } else if (secColor === COLOR_CYAN) { // flag that observers create and put on deposits and deletes again when deadline is reached
-                        // TODO not harvesting deposits yet jobs = CreateFlagJob(jobs, '5HrvstDpst', gameFlagKey, gameFlag, 'D');
+                        jobs = CreateFlagJob(jobs, '5HrvstDpst', gameFlagKey, gameFlag, 'D');
                     } else {
                         notFound = true;
                     }
