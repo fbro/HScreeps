@@ -214,6 +214,11 @@ const AssignJobs = {
                     maxCreepsInRoom += 1;
                     if (memRoom.RoomLevel < 3) {
                         maxCreepsInRoom += 1;
+                        const spawn = Game.rooms[roomKey].find(FIND_MY_SPAWNS)[0];
+                        if(!spawn){
+                            maxCreepsInRoom = 0;
+                            Logs.Warning('AssignJobs ShouldSpawnCreep no spawn, no builder ', roomKey);
+                        }
                     }
                 }
             } else { // this code should only run when a reset happens

@@ -134,7 +134,7 @@ const ExecuteJobs = {
                 }
 
                 // creep actions that should always be fired no matter what the creep is doing
-                if (result !== OK && gameCreep) {
+                if (result !== OK && result !== ERR_BUSY && gameCreep) {
                     if (gameCreep.store[RESOURCE_ENERGY] > 0) { // fill adjacent spawns, extensions and towers or repair or construct on the road
                         const toFill = gameCreep.pos.findInRange(FIND_MY_STRUCTURES, 1, {
                             filter: (structure) => {
@@ -363,15 +363,18 @@ const ExecuteJobs = {
                 FindFetchObject: function (jobObject) {
                     let fetchObject;
                     fetchObject = FindClosestFreeStore(creep, 2, creep.store[RESOURCE_ENERGY], RESOURCE_ENERGY);
-                    if (!fetchObject) { // nothing can be found then drop
-                        fetchObject = jobObject.room.find(FIND_MY_CONSTRUCTION_SITES, { // if there is a spawn that should be built - then built it
+                    if (jobObject.room.controller.level < 3) {
+                        const spawnConstruction = jobObject.room.find(FIND_MY_CONSTRUCTION_SITES, { // if there is a spawn that should be built - then built it
                             filter: function (c) {
                                 return c.structureType === STRUCTURE_SPAWN;
                             }
                         })[0];
-                        if (!fetchObject) {
-                            fetchObject = 'DROP';
+                        if(spawnConstruction){
+                            fetchObject = spawnConstruction;
                         }
+                    }
+                    if (!fetchObject) { // nothing can be found then drop
+                        fetchObject = 'DROP';
                     }
                     return fetchObject;
                 },
@@ -379,6 +382,7 @@ const ExecuteJobs = {
                 Fetch: function (fetchObject, jobObject) {
                     let result = ERR_NO_RESULT_FOUND;
                     if (fetchObject.structureType === STRUCTURE_SPAWN) {
+                        console.log(creep.name + ' build ' + fetchObject);
                         result = creep.build(fetchObject);
                         if (result === OK) {
                             result = ERR_BUSY;
@@ -823,8 +827,8 @@ const ExecuteJobs = {
             const result = GenericJobAction(creep, roomJob, {
                 /**@return {int}*/
                 JobStatus: function (jobObject) { // terminal
-                    if (resourceType !== RESOURCE_ENERGY && jobObject.store[resourceType] >= 5000
-                        || resourceType === RESOURCE_ENERGY && jobObject.store[RESOURCE_ENERGY] >= 20000
+                    if (resourceType === RESOURCE_ENERGY && jobObject.store[RESOURCE_ENERGY] >= 10000
+                        || resourceType !== RESOURCE_ENERGY && jobObject.store[resourceType] >= 2000
                     ) {
                         return JOB_IS_DONE;
                     } else if (creep.store[resourceType] === 0) { // fetch
@@ -839,8 +843,8 @@ const ExecuteJobs = {
                 },
                 /**@return {int}*/
                 IsJobDone: function (jobObject) {
-                    if (resourceType === RESOURCE_ENERGY && (creep.store[resourceType] + jobObject.store[resourceType]) >= 20000
-                        || resourceType !== RESOURCE_ENERGY && (creep.store[resourceType] + jobObject.store[resourceType]) >= 5000) {
+                    if (resourceType === RESOURCE_ENERGY && (creep.store[resourceType] + jobObject.store[resourceType]) >= 10000
+                        || resourceType !== RESOURCE_ENERGY && (creep.store[resourceType] + jobObject.store[resourceType]) >= 2000) {
                         return JOB_IS_DONE;
                     } else {
                         return this.JobStatus(jobObject);
@@ -861,9 +865,9 @@ const ExecuteJobs = {
                 Fetch: function (fetchObject, jobObject) {
                     let max = -1;
                     if(resourceType === RESOURCE_ENERGY){
-                        max = 20000;
+                        max = 10000;
                     }else{
-                        max = 5000;
+                        max = 2000;
                     }
                     return FetchResource(creep, fetchObject, resourceType, max - jobObject.store[resourceType]);
                 },

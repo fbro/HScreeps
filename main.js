@@ -4,11 +4,11 @@ let ExecuteJobs = require('ExecuteJobs');
 let Towers = require('Towers');
 let Links = require('Links');
 let Terminals = require('Terminals');
+let Factories = require('Factories');
 let PowerSpawns = require('PowerSpawns');
 let Logs = require('Logs');
 let Observers = require('Observers');
 let PowerCreeps = require('PowerCreeps');
-// TODO add Factories
 
 module.exports.loop = function () {
     if (!Memory.MemRooms) {
@@ -18,7 +18,6 @@ module.exports.loop = function () {
         if (Game.time % 30 === 0) { // tick burst from https://docs.screeps.com/cpu-limit.html#Bucket
             CreateJobs.run();
             Links.run();
-            Terminals.run();
             if (Game.time % 9000 === 0) {
                 console.log('--------------- main reset of memory ---------------');
                 for (const memRoomKey in Memory.MemRooms) {
@@ -34,6 +33,8 @@ module.exports.loop = function () {
                     }
                 }
             }
+            Terminals.run();
+            Factories.run();
         }
         AssignJobs.run();
     }

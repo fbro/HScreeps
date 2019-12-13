@@ -3,10 +3,10 @@ const Factories = {
         for (const gameRoomKey in Game.rooms) {
             const gameRoom = Game.rooms[gameRoomKey];
             const memRoom = Memory.MemRooms[gameRoomKey];
-            if (gameRoom.controller && gameRoom.controller.my && gameRoom.controller.level === 8 && memRoom) {
+            if (gameRoom.controller && gameRoom.controller.my && gameRoom.controller.level === 8 && memRoom && memRoom.FctrId !== '-') {
                 let factory;
-                if(memRoom.FactoryId){
-                    factory = Game.getObjectById(memRoom.FactoryId)
+                if(memRoom.FctrId){
+                    factory = Game.getObjectById(memRoom.FctrId)
                 }
                 if(!factory){
                     factory = gameRoom.find(FIND_MY_STRUCTURES, {
@@ -15,7 +15,7 @@ const Factories = {
                         }
                     })[0];
                     if(factory) {
-                        memRoom.FactoryId = factory.id;
+                        memRoom.FctrId = factory.id;
                     }
                 }
                 if(factory && factory.cooldown === 0){
@@ -23,6 +23,8 @@ const Factories = {
                         factory.produce(RESOURCE_LEMERGIUM_BAR);
                     }
                     // TODO add others
+                }else if(!factory){ // no factory in this room - set FctrId so that it wont look again
+                    memRoom.FctrId = '-';
                 }
             }
         }
