@@ -10,7 +10,8 @@ const Terminals = {
             if (terminal.cooldown === 0) {
                 let terminalSendCount = 0;
                 terminalSendCount = DistributeResources(terminal, terminals, terminalSendCount);
-                terminalSendCount = SellExcessResource(terminal, terminals, terminalSendCount);
+                terminalSendCount = SellExcessResource(terminal, terminalSendCount);
+                terminalSendCount = BuyBasicResources(terminal, terminalSendCount);
             }
         }
 
@@ -64,7 +65,7 @@ const Terminals = {
         }
 
         /**@return {number}*/
-        function SellExcessResource(fromTerminal, terminals, terminalSendCount) {
+        function SellExcessResource(fromTerminal, terminalSendCount) {
             for (const resourceType in fromTerminal.store) { // for each resource type
                 let fromAmount = fromTerminal.store[resourceType];
                 let max;
@@ -97,6 +98,42 @@ const Terminals = {
                             break;
                         }
                     }
+                }
+            }
+            return terminalSendCount;
+        }
+
+        // buy resources to make sure that there are at least 500 Hydrogen, Oxygen, Utrium, Keanium, Lemergium, Zynthium and Catalyst in each terminal
+        /**@return {number}*/
+        function BuyBasicResources(terminal, terminalSendCount){
+            const basicResourceList = [RESOURCE_HYDROGEN, RESOURCE_OXYGEN, RESOURCE_UTRIUM, RESOURCE_KEANIUM, RESOURCE_LEMERGIUM, RESOURCE_ZYNTHIUM, RESOURCE_CATALYST];
+            for(const basicResource in basicResourceList){
+                const usedCapacity = terminal.store.getUsedCapacity(basicResource);
+                if (usedCapacity  < 500 && terminalSendCount < 10) {
+                    terminalSendCount = BuyResource(terminal, basicResource, 500 - usedCapacity, terminalSendCount);
+                }
+            }
+            return terminalSendCount;
+        }
+
+        /**@return {number}*/
+        function BuyResource(terminal, resourceType, amount, terminalSendCount){
+            const resourceHistory = Game.market.getHistory(resourceType);
+            const orders = Game.market.getAllOrders(order => order.resourceType === resourceType
+                && order.type === ORDER_SELL
+                && Game.market.calcTransactionCost(500, terminal.pos.roomName, order.roomName) <= 500
+                && resourceHistory[0].avgPrice >= order.price
+                && order.remainingAmount > 0
+            );
+            console.log(JSON.stringify(orders));
+            const amountBought = 0;
+            for (const orderKey in orders) {
+                const order = orders[orderKey];
+                const result = Game.market.deal(order.id, amount - amountBought, terminal.pos.roomName);
+                console.log('Terminals BuyResource result ' + result + ' resource ' + resourceType + ' amount ' + amount - amountBought + ' from ' + terminal.pos.roomName + ' to ' + order.roomName + ' terminalSendCount ' + terminalSendCount + ' order.remainingAmount ' + order.remainingAmount + ' price ' + order.price + ' total price ' + order.price * (amount - amountBought));
+                terminalSendCount++;
+                if (terminalSendCount >= 10 || amount <= amountBought) {
+                    break;
                 }
             }
             return terminalSendCount;

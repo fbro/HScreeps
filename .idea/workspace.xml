@@ -3,9 +3,7 @@
   <component name="ChangeListManager">
     <list default="true" id="7b6f36cb-4298-4902-b6a2-ea3816b3b82c" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/CreateJobs.js" beforeDir="false" afterPath="$PROJECT_DIR$/CreateJobs.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ExecuteJobs.js" beforeDir="false" afterPath="$PROJECT_DIR$/ExecuteJobs.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Observers.js" beforeDir="false" afterPath="$PROJECT_DIR$/Observers.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Terminals.js" beforeDir="false" afterPath="$PROJECT_DIR$/Terminals.js" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -29,11 +27,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/ExecuteJobs.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="133">
-              <caret line="2000" lean-forward="true" selection-start-line="2000" selection-end-line="2000" />
+            <state relative-caret-position="575">
+              <caret line="2041" column="56" lean-forward="true" selection-start-line="2041" selection-start-column="56" selection-end-line="2041" selection-end-column="56" />
               <folding>
                 <element signature="e#646#15458#0" />
                 <element signature="e#15468#15489#0" />
@@ -121,6 +119,20 @@
           </provider>
         </entry>
       </file>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/Terminals.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="594">
+              <caret line="124" column="46" selection-start-line="124" selection-start-column="38" selection-end-line="124" selection-end-column="46" />
+              <folding>
+                <element signature="e#671#1006#0" />
+                <element signature="e#1149#1170#0" />
+                <element signature="e#1252#3368#0" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/CreateJobs.js">
           <provider selected="true" editor-type-id="text-editor">
@@ -160,8 +172,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/AssignJobs.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="320">
-              <caret line="561" column="61" lean-forward="true" selection-start-line="561" selection-start-column="61" selection-end-line="561" selection-end-column="61" />
+            <state relative-caret-position="728">
+              <caret line="585" column="16" selection-start-line="585" selection-start-column="16" selection-end-line="585" selection-end-column="24" />
               <folding>
                 <element signature="e#201#257#0" />
                 <element signature="e#556#1208#0" />
@@ -208,8 +220,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>cre</find>
-      <find>1TrnsprtP</find>
       <find>MemRooms</find>
       <find>RoomJobs object gone</find>
       <find>3AtkP</find>
@@ -238,6 +248,8 @@
       <find>FillFactoryJobs</find>
       <find>filter</find>
       <find>remove</find>
+      <find>terminals</find>
+      <find>true ===</find>
     </findStrings>
     <replaceStrings>
       <replace>const</replace>
@@ -270,7 +282,6 @@
         <option value="$PROJECT_DIR$/v2/Towers.js" />
         <option value="$PROJECT_DIR$/v2/Terminals.js" />
         <option value="$PROJECT_DIR$/v2/CreateJobs.js" />
-        <option value="$PROJECT_DIR$/Terminals.js" />
         <option value="$PROJECT_DIR$/README.md" />
         <option value="$PROJECT_DIR$/Links.js" />
         <option value="$PROJECT_DIR$/Logs.js" />
@@ -285,6 +296,7 @@
         <option value="$PROJECT_DIR$/CreateJobs.js" />
         <option value="$PROJECT_DIR$/Observers.js" />
         <option value="$PROJECT_DIR$/ExecuteJobs.js" />
+        <option value="$PROJECT_DIR$/Terminals.js" />
       </list>
     </option>
   </component>
@@ -326,7 +338,7 @@
   <component name="PropertiesComponent">
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
-    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1576277974779" />
+    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1576449205026" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
@@ -389,14 +401,7 @@
       <workItem from="1574782709044" duration="46100000" />
       <workItem from="1575870347722" duration="6468000" />
       <workItem from="1576011053894" duration="6930000" />
-      <workItem from="1576169775768" duration="23867000" />
-    </task>
-    <task id="LOCAL-00063" summary="small update">
-      <created>1571598491953</created>
-      <option name="number" value="00063" />
-      <option name="presentableId" value="LOCAL-00063" />
-      <option name="project" value="LOCAL" />
-      <updated>1571598491953</updated>
+      <workItem from="1576169775768" duration="29491000" />
     </task>
     <task id="LOCAL-00064" summary="small update">
       <created>1571661057166</created>
@@ -734,11 +739,18 @@
       <option name="project" value="LOCAL" />
       <updated>1576272313716</updated>
     </task>
-    <option name="localTasksCounter" value="112" />
+    <task id="LOCAL-00112" summary="small changes">
+      <created>1576281094098</created>
+      <option name="number" value="00112" />
+      <option name="presentableId" value="LOCAL-00112" />
+      <option name="project" value="LOCAL" />
+      <updated>1576281094098</updated>
+    </task>
+    <option name="localTasksCounter" value="113" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="678972000" />
+    <option name="totallyTimeSpent" value="684596000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -899,13 +911,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Terminals.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="238">
-          <caret line="14" column="9" selection-start-line="14" selection-start-column="9" selection-end-line="14" selection-end-column="9" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/README.md">
       <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
         <state split_layout="SPLIT">
@@ -979,29 +984,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/AssignJobs.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="320">
-          <caret line="561" column="61" lean-forward="true" selection-start-line="561" selection-start-column="61" selection-end-line="561" selection-end-column="61" />
-          <folding>
-            <element signature="e#201#257#0" />
-            <element signature="e#556#1208#0" />
-            <element signature="e#1402#2779#0" />
-            <element signature="e#2789#2811#0" />
-            <element signature="e#2886#3862#0" />
-            <element signature="e#3872#3894#0" />
-            <element signature="e#3978#5263#0" />
-            <element signature="e#5273#5295#0" />
-            <element signature="e#5362#11554#0" />
-            <element signature="e#11564#11586#0" />
-            <element signature="e#11641#15129#0" />
-            <element signature="e#15139#15159#0" />
-            <element signature="e#34557#34578#0" />
-            <element signature="e#34624#34948#0" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/CreateJobs.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="238">
@@ -1051,8 +1033,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/ExecuteJobs.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="133">
-          <caret line="2000" lean-forward="true" selection-start-line="2000" selection-end-line="2000" />
+        <state relative-caret-position="575">
+          <caret line="2041" column="56" lean-forward="true" selection-start-line="2041" selection-start-column="56" selection-end-line="2041" selection-end-column="56" />
           <folding>
             <element signature="e#646#15458#0" />
             <element signature="e#15468#15489#0" />
@@ -1135,6 +1117,41 @@
             <element signature="e#113869#116291#0" />
             <element signature="e#116301#116319#0" />
             <element signature="e#116448#117410#0" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/AssignJobs.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="728">
+          <caret line="585" column="16" selection-start-line="585" selection-start-column="16" selection-end-line="585" selection-end-column="24" />
+          <folding>
+            <element signature="e#201#257#0" />
+            <element signature="e#556#1208#0" />
+            <element signature="e#1402#2779#0" />
+            <element signature="e#2789#2811#0" />
+            <element signature="e#2886#3862#0" />
+            <element signature="e#3872#3894#0" />
+            <element signature="e#3978#5263#0" />
+            <element signature="e#5273#5295#0" />
+            <element signature="e#5362#11554#0" />
+            <element signature="e#11564#11586#0" />
+            <element signature="e#11641#15129#0" />
+            <element signature="e#15139#15159#0" />
+            <element signature="e#34557#34578#0" />
+            <element signature="e#34624#34948#0" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Terminals.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="594">
+          <caret line="124" column="46" selection-start-line="124" selection-start-column="38" selection-end-line="124" selection-end-column="46" />
+          <folding>
+            <element signature="e#671#1006#0" />
+            <element signature="e#1149#1170#0" />
+            <element signature="e#1252#3368#0" />
           </folding>
         </state>
       </provider>
