@@ -1,3 +1,4 @@
+let Logs = require('Logs');
 const Terminals = {
     run: function () {
         const TARGET_ENERGY = 30000;
@@ -122,15 +123,17 @@ const Terminals = {
             const orders = Game.market.getAllOrders(order => order.resourceType === resourceType
                 && order.type === ORDER_SELL
                 && Game.market.calcTransactionCost(500, terminal.pos.roomName, order.roomName) <= 500
-                && resourceHistory[0].avgPrice >= order.price
+                && (resourceHistory[0].avgPrice * 2) >= order.price
                 && order.remainingAmount > 0
             );
-            console.log(JSON.stringify(orders));
+
             const amountBought = 0;
             for (const orderKey in orders) {
                 const order = orders[orderKey];
+                console.log(JSON.stringify(order));
                 const result = Game.market.deal(order.id, amount - amountBought, terminal.pos.roomName);
                 console.log('Terminals BuyResource result ' + result + ' resource ' + resourceType + ' amount ' + amount - amountBought + ' from ' + terminal.pos.roomName + ' to ' + order.roomName + ' terminalSendCount ' + terminalSendCount + ' order.remainingAmount ' + order.remainingAmount + ' price ' + order.price + ' total price ' + order.price * (amount - amountBought));
+                Logs.Info('Terminals BuyResource', result + ' resource ' + resourceType + ' amount ' + amount - amountBought + ' from ' + terminal.pos.roomName + ' to ' + order.roomName + ' terminalSendCount ' + terminalSendCount + ' order.remainingAmount ' + order.remainingAmount + ' price ' + order.price + ' total price ' + order.price * (amount - amountBought));
                 terminalSendCount++;
                 if (terminalSendCount >= 10 || amount <= amountBought) {
                     break;
