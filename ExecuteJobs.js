@@ -784,7 +784,7 @@ const ExecuteJobs = {
             const result = GenericJobAction(creep, roomJob, {
                 /**@return {int}*/
                 JobStatus: function (jobObject) { // terminal
-                    if (
+                    if ( !jobObject.room.storage ||
                         resourceType !== RESOURCE_ENERGY && jobObject.room.storage.store[resourceType] < 5000
                         && resourceType !== RESOURCE_ENERGY && jobObject.store[resourceType] >= 3000
 

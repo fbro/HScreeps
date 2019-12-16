@@ -399,24 +399,24 @@ const CreateJobs = {
                     if(factory.store.getUsedCapacity(RESOURCE_ENERGY) < 10000){
                         AddJob(roomJobs, '5FillFctr(' + RESOURCE_ENERGY + ')' + gameRoom.name, factory.id, OBJECT_JOB, 'T');
                     }
-                    if(gameRoom.storage.store.getUsedCapacity(RESOURCE_BIOMASS) > 0){
-                        if(factory.store.getUsedCapacity(RESOURCE_BIOMASS) < 2000 && gameRoom.storage.store.getUsedCapacity(RESOURCE_BIOMASS) > 0) {
+                    if(gameRoom.storage.store.getUsedCapacity(RESOURCE_BIOMASS) > 0 || gameRoom.terminal.store.getUsedCapacity(RESOURCE_BIOMASS) > 0) {
+                        if(factory.store.getUsedCapacity(RESOURCE_BIOMASS) < 2000) {
                             AddJob(roomJobs, '5FillFctr(' + RESOURCE_BIOMASS + ')' + gameRoom.name, factory.id, OBJECT_JOB, 'T');
                         }
-                        if(factory.store.getUsedCapacity(RESOURCE_LEMERGIUM) < 2000 && gameRoom.storage.store.getUsedCapacity(RESOURCE_LEMERGIUM) > 0) {
+                        if(factory.store.getUsedCapacity(RESOURCE_LEMERGIUM) < 2000 && (gameRoom.storage.store.getUsedCapacity(RESOURCE_LEMERGIUM) > 0 || gameRoom.terminal.store.getUsedCapacity(RESOURCE_LEMERGIUM) > 0)) {
                             AddJob(roomJobs, '5FillFctr(' + RESOURCE_LEMERGIUM + ')' + gameRoom.name, factory.id, OBJECT_JOB, 'T');
                         }
-                        if(factory.store.getUsedCapacity(RESOURCE_LEMERGIUM_BAR) < 2000 && gameRoom.storage.store.getUsedCapacity(RESOURCE_LEMERGIUM_BAR) > 0) {
+                        if(factory.store.getUsedCapacity(RESOURCE_LEMERGIUM_BAR) < 2000 && (gameRoom.storage.store.getUsedCapacity(RESOURCE_LEMERGIUM_BAR) > 0 || gameRoom.terminal.store.getUsedCapacity(RESOURCE_LEMERGIUM_BAR) > 0)) {
                             AddJob(roomJobs, '5FillFctr(' + RESOURCE_LEMERGIUM_BAR + ')' + gameRoom.name, factory.id, OBJECT_JOB, 'T');
                         }
-                        if(factory.store.getUsedCapacity(RESOURCE_CELL) < 2000 && gameRoom.storage.store.getUsedCapacity(RESOURCE_CELL) > 0) {
+                        if(factory.store.getUsedCapacity(RESOURCE_CELL) < 2000 && (gameRoom.storage.store.getUsedCapacity(RESOURCE_CELL) > 0 || gameRoom.terminal.store.getUsedCapacity(RESOURCE_CELL) > 0)) {
                             AddJob(roomJobs, '5FillFctr(' + RESOURCE_CELL + ')' + gameRoom.name, factory.id, OBJECT_JOB, 'T');
                         }
                         if(factory.store.getUsedCapacity(RESOURCE_CELL) > 0 && factory.level === 1) {
-                            if(factory.store.getUsedCapacity(RESOURCE_OXYGEN) < 2000 && gameRoom.storage.store.getUsedCapacity(RESOURCE_OXYGEN) > 0) {
+                            if(factory.store.getUsedCapacity(RESOURCE_OXYGEN) < 2000 && (gameRoom.storage.store.getUsedCapacity(RESOURCE_OXYGEN) > 0 || gameRoom.terminal.store.getUsedCapacity(RESOURCE_OXYGEN) > 0)) {
                                 AddJob(roomJobs, '5FillFctr(' + RESOURCE_OXYGEN + ')' + gameRoom.name, factory.id, OBJECT_JOB, 'T');
                             }
-                            if(factory.store.getUsedCapacity(RESOURCE_OXIDANT) < 2000 && gameRoom.storage.store.getUsedCapacity(RESOURCE_OXIDANT) > 0) {
+                            if(factory.store.getUsedCapacity(RESOURCE_OXIDANT) < 2000 && (gameRoom.storage.store.getUsedCapacity(RESOURCE_OXIDANT) > 0 || gameRoom.terminal.store.getUsedCapacity(RESOURCE_OXIDANT) > 0)) {
                                 AddJob(roomJobs, '5FillFctr(' + RESOURCE_OXIDANT + ')' + gameRoom.name, factory.id, OBJECT_JOB, 'T');
                             }
                         }

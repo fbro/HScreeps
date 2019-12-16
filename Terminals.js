@@ -108,7 +108,8 @@ const Terminals = {
         /**@return {number}*/
         function BuyBasicResources(terminal, terminalSendCount){
             const basicResourceList = [RESOURCE_HYDROGEN, RESOURCE_OXYGEN, RESOURCE_UTRIUM, RESOURCE_KEANIUM, RESOURCE_LEMERGIUM, RESOURCE_ZYNTHIUM, RESOURCE_CATALYST];
-            for(const basicResource in basicResourceList){
+            for(const basicResourceKey in basicResourceList){
+                const basicResource = basicResourceList[basicResourceKey];
                 const usedCapacity = terminal.store.getUsedCapacity(basicResource);
                 if (usedCapacity  < 500 && terminalSendCount < 10) {
                     terminalSendCount = BuyResource(terminal, basicResource, 500 - usedCapacity, terminalSendCount);
@@ -126,15 +127,17 @@ const Terminals = {
                 && (resourceHistory[0].avgPrice * 2) >= order.price
                 && order.remainingAmount > 0
             );
-
-            const amountBought = 0;
+            let amountBought = 0;
+            console.log('Terminals BuyResource WTB ' + resourceType + ' ' + amount + ' from ' + terminal + ' ' + JSON.stringify(orders) + ' avg price ' + resourceHistory[0].avgPrice);
             for (const orderKey in orders) {
                 const order = orders[orderKey];
-                console.log(JSON.stringify(order));
-                const result = Game.market.deal(order.id, amount - amountBought, terminal.pos.roomName);
-                console.log('Terminals BuyResource result ' + result + ' resource ' + resourceType + ' amount ' + amount - amountBought + ' from ' + terminal.pos.roomName + ' to ' + order.roomName + ' terminalSendCount ' + terminalSendCount + ' order.remainingAmount ' + order.remainingAmount + ' price ' + order.price + ' total price ' + order.price * (amount - amountBought));
-                Logs.Info('Terminals BuyResource', result + ' resource ' + resourceType + ' amount ' + amount - amountBought + ' from ' + terminal.pos.roomName + ' to ' + order.roomName + ' terminalSendCount ' + terminalSendCount + ' order.remainingAmount ' + order.remainingAmount + ' price ' + order.price + ' total price ' + order.price * (amount - amountBought));
+                const amountToBuy = amount - amountBought;
+                const result = Game.market.deal(order.id, amountToBuy, terminal.pos.roomName);
+                Logs.Info('Terminals BuyResource', result + ' resource ' + resourceType + ' amount ' + amountToBuy + ' from ' + terminal.pos.roomName + ' to ' + order.roomName + ' terminalSendCount ' + terminalSendCount + ' order.remainingAmount ' + order.remainingAmount + ' price ' + order.price + ' total price ' + (order.price * amountToBuy));
                 terminalSendCount++;
+                if(result === OK){
+                    amountBought = amountToBuy + amountBought;
+                }
                 if (terminalSendCount >= 10 || amount <= amountBought) {
                     break;
                 }
