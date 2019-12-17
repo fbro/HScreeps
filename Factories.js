@@ -19,8 +19,25 @@ const Factories = {
                     }
                 }
                 if(factory && factory.cooldown === 0){
-                    if(factory.store.getUsedCapacity(RESOURCE_ENERGY) >= 200 && factory.store.getUsedCapacity(RESOURCE_LEMERGIUM) >= 500){
-                        factory.produce(RESOURCE_LEMERGIUM_BAR);
+                    let result;
+                    if(factory.store.getUsedCapacity(RESOURCE_ENERGY) >= 200
+                        && factory.store.getUsedCapacity(RESOURCE_LEMERGIUM) >= 500
+                        && factory.store.getUsedCapacity(RESOURCE_LEMERGIUM_BAR) < 500){
+                        result = factory.produce(RESOURCE_LEMERGIUM_BAR);
+                        console.log('Factories ' + factory.pos.roomName + ' producing ' + RESOURCE_LEMERGIUM_BAR + ' ' + factory.store.getUsedCapacity(RESOURCE_LEMERGIUM_BAR) + ' ' + result + ' ' + RESOURCE_ENERGY + ' ' + factory.store.getUsedCapacity(RESOURCE_ENERGY) + ' ' + RESOURCE_LEMERGIUM + ' ' + factory.store.getUsedCapacity(RESOURCE_LEMERGIUM));
+                    }
+                    else if(factory.store.getUsedCapacity(RESOURCE_ENERGY) >= 200
+                        && factory.store.getUsedCapacity(RESOURCE_OXYGEN) >= 500
+                        && factory.store.getUsedCapacity(RESOURCE_OXIDANT) < 500){
+                        result = factory.produce(RESOURCE_OXIDANT);
+                        console.log('Factories ' + factory.pos.roomName + ' producing ' + RESOURCE_OXIDANT + ' ' + factory.store.getUsedCapacity(RESOURCE_OXIDANT) + ' ' + result + ' ' + RESOURCE_ENERGY + ' ' + factory.store.getUsedCapacity(RESOURCE_ENERGY) + ' ' + RESOURCE_OXYGEN + ' ' + factory.store.getUsedCapacity(RESOURCE_OXYGEN));
+                    }
+                    else if(factory.store.getUsedCapacity(RESOURCE_LEMERGIUM_BAR) >= 20
+                        && factory.store.getUsedCapacity(RESOURCE_BIOMASS) >= 100
+                        && factory.store.getUsedCapacity(RESOURCE_ENERGY) >= 40
+                        && factory.store.getUsedCapacity(RESOURCE_CELL) < 500){
+                        result = factory.produce(RESOURCE_CELL);
+                        console.log('Factories ' + factory.pos.roomName + ' producing ' + RESOURCE_CELL + ' ' + factory.store.getUsedCapacity(RESOURCE_CELL) + ' ' + result + ' ' + RESOURCE_LEMERGIUM_BAR + ' ' + factory.store.getUsedCapacity(RESOURCE_LEMERGIUM_BAR) + ' ' + RESOURCE_BIOMASS + ' ' + factory.store.getUsedCapacity(RESOURCE_BIOMASS) + ' ' + RESOURCE_ENERGY + ' ' + factory.store.getUsedCapacity(RESOURCE_ENERGY));
                     }
                     // TODO add others
                 }else if(!factory){ // no factory in this room - set FctrId so that it wont look again

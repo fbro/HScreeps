@@ -886,6 +886,8 @@ const ExecuteJobs = {
                         return FindFetchResource(creep, jobObject, RESOURCE_ENERGY);
                     } else if (creep.room.storage && creep.room.storage.store[resourceType] > 0) {
                         return creep.room.storage;
+                    } else if (creep.room.terminal && creep.room.terminal.store[resourceType] > 0) {
+                        return creep.room.terminal;
                     } else {
                         return undefined;
                     }
