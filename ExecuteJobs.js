@@ -2240,9 +2240,17 @@ const ExecuteJobs = {
                     result = creep.withdraw(fetchObject, resourceToFetch);
                 } else {
                     if (fetchObject.store[resourceToFetch] < max) {
-                        result = creep.withdraw(fetchObject, resourceToFetch, fetchObject.store[resourceToFetch]);
+                        if(creep.store.getFreeCapacity() > fetchObject.store[resourceToFetch]){
+                            result = creep.withdraw(fetchObject, resourceToFetch, fetchObject.store[resourceToFetch]);
+                        }else{
+                            result = creep.withdraw(fetchObject, resourceToFetch, creep.store.getFreeCapacity());
+                        }
                     } else {
-                        result = creep.withdraw(fetchObject, resourceToFetch, max);
+                        if(creep.store.getFreeCapacity() > max){
+                            result = creep.withdraw(fetchObject, resourceToFetch, max);
+                        }else{
+                            result = creep.withdraw(fetchObject, resourceToFetch, creep.store.getFreeCapacity());
+                        }
                     }
 
                 }
