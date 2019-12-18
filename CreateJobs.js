@@ -399,8 +399,8 @@ const CreateJobs = {
                     if(factory.store.getUsedCapacity(RESOURCE_ENERGY) < 10000){
                         AddJob(roomJobs, '5FillFctr(' + RESOURCE_ENERGY + ')' + gameRoom.name, factory.id, OBJECT_JOB, 'T');
                     }
-                    if(gameRoom.storage.store.getUsedCapacity(RESOURCE_BIOMASS) > 0 || gameRoom.terminal.store.getUsedCapacity(RESOURCE_BIOMASS) > 0) {
-                        if(factory.store.getUsedCapacity(RESOURCE_BIOMASS) < 2000) {
+                    if(gameRoom.storage.store.getUsedCapacity(RESOURCE_BIOMASS) > 0 || gameRoom.terminal.store.getUsedCapacity(RESOURCE_BIOMASS) > 0 || factory.store.getUsedCapacity(RESOURCE_BIOMASS) > 0 || factory.store.getUsedCapacity(RESOURCE_CELL) > 0) {
+                        if(factory.store.getUsedCapacity(RESOURCE_BIOMASS) < 2000 && (gameRoom.storage.store.getUsedCapacity(RESOURCE_BIOMASS) > 0 || gameRoom.terminal.store.getUsedCapacity(RESOURCE_BIOMASS) > 0)) {
                             AddJob(roomJobs, '5FillFctr(' + RESOURCE_BIOMASS + ')' + gameRoom.name, factory.id, OBJECT_JOB, 'T');
                         }
                         if(factory.store.getUsedCapacity(RESOURCE_LEMERGIUM) < 2000 && (gameRoom.storage.store.getUsedCapacity(RESOURCE_LEMERGIUM) > 0 || gameRoom.terminal.store.getUsedCapacity(RESOURCE_LEMERGIUM) > 0)) {

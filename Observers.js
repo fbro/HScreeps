@@ -110,10 +110,11 @@ const Observers = {
                             flagToRemove.remove();
                         }
                         console.log('Observers item gone, removing ' + roomKey + ' ' + JSON.stringify(scanStatus));
-                    } else if (!hasScanned && Game.flags[flagName]) { // if flag is in this room then keep scanning it
-                        //console.log('Observers scanning ' + roomKey + ' flag ' + 'powerBank_' + roomKey + '-' + scanStatus.freeSpaces);
+                    } else if (!hasScanned && Game.flags[flagName] && flagName.startsWith('powerBank_')) { // if flag is in this room then keep scanning it - only powerbank
+                        console.log('Observers scanning ' + roomKey + ' flag ' + 'powerBank_' + roomKey + '-' + scanStatus.freeSpaces);
                         observer.observeRoom(roomKey);
                         hasScanned = true;
+                        numOfScansLeft++;
                     }
                 } else if (scanStatus === 's' && Game.rooms[roomKey]) { // check in rooms that where scanned last tick
                     const walls = Game.rooms[roomKey].find(FIND_STRUCTURES, { // if any walls are present the rooms resources might be walled off - better to just ignore the room!
