@@ -111,7 +111,7 @@ const Observers = {
                         }
                         console.log('Observers item gone, removing ' + roomKey + ' ' + JSON.stringify(scanStatus));
                     } else if (!hasScanned && Game.flags[flagName] && flagName.startsWith('powerBank_')) { // if flag is in this room then keep scanning it - only powerbank
-                        console.log('Observers scanning ' + roomKey + ' flag ' + 'powerBank_' + roomKey + '-' + scanStatus.freeSpaces);
+                        //console.log('Observers scanning ' + roomKey + ' flag ' + 'powerBank_' + roomKey + '-' + scanStatus.freeSpaces);
                         observer.observeRoom(roomKey);
                         hasScanned = true;
                         numOfScansLeft++;

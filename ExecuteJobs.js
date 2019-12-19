@@ -2359,6 +2359,20 @@ const ExecuteJobs = {
         /**@return {int}*/
         function Move(creep, obj, fill = 'transparent', stroke = '#fff', lineStyle = 'dashed', strokeWidth = .15, opacity = .3) {
             // TODO maybe try and reuse move path here?
+            if(creep.pos.roomName !== obj.pos.roomName){ // not in the same room - make a map in mem
+                // have a map of desired movement between rooms
+                // if dest room is in cluster - move without going to hall - use moveTo normally
+                // if dest room is in hall or in another cluster - move to hall
+                    // move to hall map
+                // weight could be Hall: 1, rooms in cluster: 2, owned enemy rooms: 10
+                /*
+                {
+                Dest: roomName,
+                Path: [{roomNameKey, roomNameValue}]
+                }
+
+                */
+            }
             let result = creep.moveTo(obj, {
                 visualizePathStyle: {
                     fill: fill,

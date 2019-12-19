@@ -104,7 +104,7 @@ const PowerCreeps = {
             if (source1 && source1.effects) {
                 for (const effectKey in source1.effects) {
                     const effect = source1.effects[effectKey];
-                    if (effect.effect === PWR_REGEN_SOURCE) {
+                    if (effect.effect === PWR_REGEN_SOURCE && effect.ticksRemaining > 30) {
                         selectedSource = undefined;
                         break;
                     }
@@ -116,7 +116,7 @@ const PowerCreeps = {
                     selectedSource = source2;
                     for (const effectKey in source2.effects) {
                         const effect = source2.effects[effectKey];
-                        if (effect.effect === PWR_REGEN_SOURCE) {
+                        if (effect.effect === PWR_REGEN_SOURCE && effect.ticksRemaining > 30) {
                             selectedSource = undefined;
                             break;
                         }
@@ -131,9 +131,9 @@ const PowerCreeps = {
                     result = powerCreep.moveTo(selectedSource);
                 }else if(result === OK){
                     if(selectedSource.id === source1.id){
-                        powerCreep.memory.RegenSource1Cooldown = Game.time + 300; // add duration
+                        powerCreep.memory.RegenSource1Cooldown = Game.time + 270; // add duration
                     }else if(selectedSource.id === source2.id){
-                        powerCreep.memory.RegenSource2Cooldown = Game.time + 300; // add duration
+                        powerCreep.memory.RegenSource2Cooldown = Game.time + 270; // add duration
                     }
                 }
             }
