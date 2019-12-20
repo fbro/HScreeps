@@ -3,7 +3,11 @@
   <component name="ChangeListManager">
     <list default="true" id="7b6f36cb-4298-4902-b6a2-ea3816b3b82c" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/AssignJobs.js" beforeDir="false" afterPath="$PROJECT_DIR$/AssignJobs.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ExecuteJobs.js" beforeDir="false" afterPath="$PROJECT_DIR$/ExecuteJobs.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Factories.js" beforeDir="false" afterPath="$PROJECT_DIR$/Factories.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Observers.js" beforeDir="false" afterPath="$PROJECT_DIR$/Observers.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/PowerCreeps.js" beforeDir="false" afterPath="$PROJECT_DIR$/PowerCreeps.js" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -30,8 +34,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/ExecuteJobs.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="477">
-              <caret line="897" column="57" lean-forward="true" selection-start-line="897" selection-start-column="57" selection-end-line="897" selection-end-column="57" />
+            <state relative-caret-position="360">
+              <caret line="2023" column="37" lean-forward="true" selection-start-line="2023" selection-start-column="37" selection-end-line="2023" selection-end-column="37" />
               <folding>
                 <element signature="e#646#15458#0" />
                 <element signature="e#15468#15489#0" />
@@ -51,101 +55,123 @@
                 <element signature="e#35328#35346#0" />
                 <element signature="e#35393#37059#0" />
                 <element signature="e#37069#37087#0" />
-                <element signature="e#37136#40477#0" />
-                <element signature="e#40487#40505#0" />
-                <element signature="e#40557#42180#0" />
-                <element signature="e#42190#42208#0" />
-                <element signature="e#42258#45832#0" />
-                <element signature="e#45842#45860#0" />
-                <element signature="e#48783#48801#0" />
-                <element signature="e#48852#50455#0" />
-                <element signature="e#50465#50483#0" />
-                <element signature="e#50541#52335#0" />
-                <element signature="e#52345#52363#0" />
-                <element signature="e#52420#54219#0" />
-                <element signature="e#54252#54270#0" />
-                <element signature="e#54321#55976#0" />
-                <element signature="e#55986#56004#0" />
-                <element signature="e#56055#57304#0" />
-                <element signature="e#57314#57332#0" />
-                <element signature="e#57385#59029#0" />
-                <element signature="e#59039#59057#0" />
-                <element signature="e#59112#60367#0" />
-                <element signature="e#60377#60395#0" />
-                <element signature="e#60448#61764#0" />
-                <element signature="e#61774#61792#0" />
-                <element signature="e#61843#63871#0" />
-                <element signature="e#63881#63899#0" />
-                <element signature="e#63956#68337#0" />
-                <element signature="e#68347#68365#0" />
-                <element signature="e#68421#70599#0" />
-                <element signature="e#70609#70627#0" />
-                <element signature="e#70678#77096#0" />
-                <element signature="e#77106#77124#0" />
-                <element signature="e#77179#78977#0" />
-                <element signature="e#78987#79005#0" />
-                <element signature="e#79062#80860#0" />
-                <element signature="e#80870#80888#0" />
-                <element signature="e#80941#82739#0" />
-                <element signature="e#82749#82767#0" />
-                <element signature="e#82819#85397#0" />
-                <element signature="e#85407#85425#0" />
-                <element signature="e#85478#87481#0" />
-                <element signature="e#87491#87509#0" />
-                <element signature="e#87562#90187#0" />
-                <element signature="e#90197#90215#0" />
-                <element signature="e#90267#94971#0" />
-                <element signature="e#94981#94999#0" />
-                <element signature="e#95055#99873#0" />
-                <element signature="e#99883#99901#0" />
-                <element signature="e#99952#101927#0" />
-                <element signature="e#101967#101989#0" />
-                <element signature="e#102051#103548#0" />
-                <element signature="e#103558#103576#0" />
-                <element signature="e#103644#103798#0" />
-                <element signature="e#103808#103826#0" />
-                <element signature="e#103895#104037#0" />
-                <element signature="e#104047#104065#0" />
-                <element signature="e#104141#106887#0" />
-                <element signature="e#106897#106938#0" />
-                <element signature="e#107023#110409#0" />
-                <element signature="e#110419#110460#0" />
-                <element signature="e#110531#110935#0" />
-                <element signature="e#110945#110963#0" />
-                <element signature="e#111042#113366#0" />
-                <element signature="e#113488#113509#0" />
-                <element signature="e#113635#116123#0" />
-                <element signature="e#116248#118670#0" />
-                <element signature="e#118680#118698#0" />
-                <element signature="e#118827#119789#0" />
+                <element signature="e#37136#40508#0" />
+                <element signature="e#40518#40536#0" />
+                <element signature="e#40588#42211#0" />
+                <element signature="e#42221#42239#0" />
+                <element signature="e#42289#45863#0" />
+                <element signature="e#45873#45891#0" />
+                <element signature="e#45940#48804#0" />
+                <element signature="e#48814#48832#0" />
+                <element signature="e#48883#50486#0" />
+                <element signature="e#50496#50514#0" />
+                <element signature="e#50572#52366#0" />
+                <element signature="e#52376#52394#0" />
+                <element signature="e#52451#54250#0" />
+                <element signature="e#54283#54301#0" />
+                <element signature="e#54352#56007#0" />
+                <element signature="e#56017#56035#0" />
+                <element signature="e#56086#57335#0" />
+                <element signature="e#57345#57363#0" />
+                <element signature="e#57416#59060#0" />
+                <element signature="e#59070#59088#0" />
+                <element signature="e#59143#60398#0" />
+                <element signature="e#60408#60426#0" />
+                <element signature="e#60479#61795#0" />
+                <element signature="e#61805#61823#0" />
+                <element signature="e#61874#63902#0" />
+                <element signature="e#63912#63930#0" />
+                <element signature="e#63987#68368#0" />
+                <element signature="e#68378#68396#0" />
+                <element signature="e#68452#70630#0" />
+                <element signature="e#70640#70658#0" />
+                <element signature="e#70709#77127#0" />
+                <element signature="e#77137#77155#0" />
+                <element signature="e#77210#79008#0" />
+                <element signature="e#79018#79036#0" />
+                <element signature="e#79093#80891#0" />
+                <element signature="e#80901#80919#0" />
+                <element signature="e#80972#82770#0" />
+                <element signature="e#82780#82798#0" />
+                <element signature="e#82850#85428#0" />
+                <element signature="e#85438#85456#0" />
+                <element signature="e#85509#87512#0" />
+                <element signature="e#87522#87540#0" />
+                <element signature="e#87593#90218#0" />
+                <element signature="e#90228#90246#0" />
+                <element signature="e#90298#95002#0" />
+                <element signature="e#95012#95030#0" />
+                <element signature="e#95086#99904#0" />
+                <element signature="e#99914#99932#0" />
+                <element signature="e#101998#102020#0" />
+                <element signature="e#102082#103579#0" />
+                <element signature="e#103589#103607#0" />
+                <element signature="e#103675#103829#0" />
+                <element signature="e#103839#103857#0" />
+                <element signature="e#103926#104068#0" />
+                <element signature="e#104078#104096#0" />
+                <element signature="e#104172#106918#0" />
+                <element signature="e#106928#106969#0" />
+                <element signature="e#107054#110440#0" />
+                <element signature="e#110450#110491#0" />
+                <element signature="e#110562#110966#0" />
+                <element signature="e#110976#110994#0" />
+                <element signature="e#111073#113908#0" />
+                <element signature="e#114030#114051#0" />
+                <element signature="e#114177#116665#0" />
+                <element signature="e#116790#119212#0" />
+                <element signature="e#119222#119240#0" />
+                <element signature="e#119369#120974#0" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/Factories.js">
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/PowerCreeps.js">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="663">
-              <caret line="39" column="59" lean-forward="true" selection-start-line="39" selection-start-column="59" selection-end-line="39" selection-end-column="59" />
+              <caret line="39" column="62" selection-start-line="39" selection-start-column="62" selection-end-line="39" selection-end-column="62" />
             </state>
           </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/Factories.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="629">
+              <caret line="46" column="41" selection-start-line="46" selection-start-column="41" selection-end-line="46" selection-end-column="41" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/Observers.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="374">
-              <caret line="91" column="99" lean-forward="true" selection-start-line="91" selection-start-column="99" selection-end-line="95" selection-end-column="29" />
+            <state relative-caret-position="311">
+              <caret line="215" column="30" lean-forward="true" selection-start-line="215" selection-start-column="30" selection-end-line="215" selection-end-column="30" />
             </state>
           </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/Towers.js">
+        <entry file="file://$PROJECT_DIR$/AssignJobs.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="170">
-              <caret line="10" column="88" selection-start-line="10" selection-start-column="88" selection-end-line="10" selection-end-column="88" />
+            <state relative-caret-position="396">
+              <caret line="563" column="66" selection-start-line="563" selection-start-column="66" selection-end-line="563" selection-end-column="66" />
+              <folding>
+                <element signature="e#201#257#0" />
+                <element signature="e#556#1208#0" />
+                <element signature="e#1402#2779#0" />
+                <element signature="e#2789#2811#0" />
+                <element signature="e#2886#3862#0" />
+                <element signature="e#3872#3894#0" />
+                <element signature="e#3978#5263#0" />
+                <element signature="e#5273#5295#0" />
+                <element signature="e#11564#11586#0" />
+                <element signature="e#11641#15129#0" />
+                <element signature="e#15139#15159#0" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -161,9 +187,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>3AtkP</find>
-      <find>5FillPSpwnP</find>
-      <find>getFreeCapacity</find>
       <find>creepName.substring(0, 1)</find>
       <find>body</find>
       <find>ATTAC</find>
@@ -189,8 +212,11 @@
       <find>remove</find>
       <find>terminals</find>
       <find>true ===</find>
-      <find>MapReScan</find>
       <find>getF</find>
+      <find>MapReScan</find>
+      <find>look</find>
+      <find>powerBankFlag</find>
+      <find>AssignJobs SpawnCreeps failed</find>
     </findStrings>
     <replaceStrings>
       <replace>const</replace>
@@ -228,16 +254,16 @@
         <option value="$PROJECT_DIR$/Logs.js" />
         <option value="$PROJECT_DIR$/QuickCommands.js" />
         <option value="$PROJECT_DIR$/PowerSpawns.js" />
-        <option value="$PROJECT_DIR$/PowerCreeps.js" />
         <option value="$PROJECT_DIR$/Labs.js" />
         <option value="$PROJECT_DIR$/main.js" />
-        <option value="$PROJECT_DIR$/AssignJobs.js" />
         <option value="$PROJECT_DIR$/Terminals.js" />
         <option value="$PROJECT_DIR$/CreateJobs.js" />
-        <option value="$PROJECT_DIR$/Observers.js" />
         <option value="$PROJECT_DIR$/Towers.js" />
+        <option value="$PROJECT_DIR$/AssignJobs.js" />
         <option value="$PROJECT_DIR$/ExecuteJobs.js" />
+        <option value="$PROJECT_DIR$/PowerCreeps.js" />
         <option value="$PROJECT_DIR$/Factories.js" />
+        <option value="$PROJECT_DIR$/Observers.js" />
       </list>
     </option>
   </component>
@@ -279,7 +305,7 @@
   <component name="PropertiesComponent">
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
-    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1576708000893" />
+    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1576886125142" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
@@ -342,14 +368,7 @@
       <workItem from="1574782709044" duration="46100000" />
       <workItem from="1575870347722" duration="6468000" />
       <workItem from="1576011053894" duration="6930000" />
-      <workItem from="1576169775768" duration="41735000" />
-    </task>
-    <task id="LOCAL-00069" summary="small update">
-      <created>1571939835300</created>
-      <option name="number" value="00069" />
-      <option name="presentableId" value="LOCAL-00069" />
-      <option name="project" value="LOCAL" />
-      <updated>1571939835300</updated>
+      <workItem from="1576169775768" duration="51745000" />
     </task>
     <task id="LOCAL-00070" summary="small update">
       <created>1572124064148</created>
@@ -687,11 +706,18 @@
       <option name="project" value="LOCAL" />
       <updated>1576707418916</updated>
     </task>
-    <option name="localTasksCounter" value="118" />
+    <task id="LOCAL-00118" summary="small changes">
+      <created>1576708153455</created>
+      <option name="number" value="00118" />
+      <option name="presentableId" value="LOCAL-00118" />
+      <option name="project" value="LOCAL" />
+      <updated>1576708153455</updated>
+    </task>
+    <option name="localTasksCounter" value="119" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="696840000" />
+    <option name="totallyTimeSpent" value="706850000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -883,40 +909,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/PowerCreeps.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-694">
-          <caret line="46" column="32" selection-start-line="46" selection-start-column="32" selection-end-line="46" selection-end-column="32" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/Labs.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="68">
           <caret line="4" column="96" selection-start-line="4" selection-start-column="96" selection-end-line="4" selection-end-column="96" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/AssignJobs.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="728">
-          <caret line="585" column="16" selection-start-line="585" selection-start-column="16" selection-end-line="585" selection-end-column="24" />
-          <folding>
-            <element signature="e#201#257#0" />
-            <element signature="e#556#1208#0" />
-            <element signature="e#1402#2779#0" />
-            <element signature="e#2789#2811#0" />
-            <element signature="e#2886#3862#0" />
-            <element signature="e#3872#3894#0" />
-            <element signature="e#3978#5263#0" />
-            <element signature="e#5273#5295#0" />
-            <element signature="e#5362#11554#0" />
-            <element signature="e#11564#11586#0" />
-            <element signature="e#11641#15129#0" />
-            <element signature="e#15139#15159#0" />
-            <element signature="e#34557#34578#0" />
-            <element signature="e#34624#34948#0" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -981,13 +977,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Observers.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="374">
-          <caret line="91" column="99" lean-forward="true" selection-start-line="91" selection-start-column="99" selection-end-line="95" selection-end-column="29" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/Towers.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="170">
@@ -995,10 +984,30 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/AssignJobs.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="396">
+          <caret line="563" column="66" selection-start-line="563" selection-start-column="66" selection-end-line="563" selection-end-column="66" />
+          <folding>
+            <element signature="e#201#257#0" />
+            <element signature="e#556#1208#0" />
+            <element signature="e#1402#2779#0" />
+            <element signature="e#2789#2811#0" />
+            <element signature="e#2886#3862#0" />
+            <element signature="e#3872#3894#0" />
+            <element signature="e#3978#5263#0" />
+            <element signature="e#5273#5295#0" />
+            <element signature="e#11564#11586#0" />
+            <element signature="e#11641#15129#0" />
+            <element signature="e#15139#15159#0" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/ExecuteJobs.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="477">
-          <caret line="897" column="57" lean-forward="true" selection-start-line="897" selection-start-column="57" selection-end-line="897" selection-end-column="57" />
+        <state relative-caret-position="360">
+          <caret line="2023" column="37" lean-forward="true" selection-start-line="2023" selection-start-column="37" selection-end-line="2023" selection-end-column="37" />
           <folding>
             <element signature="e#646#15458#0" />
             <element signature="e#15468#15489#0" />
@@ -1018,81 +1027,95 @@
             <element signature="e#35328#35346#0" />
             <element signature="e#35393#37059#0" />
             <element signature="e#37069#37087#0" />
-            <element signature="e#37136#40477#0" />
-            <element signature="e#40487#40505#0" />
-            <element signature="e#40557#42180#0" />
-            <element signature="e#42190#42208#0" />
-            <element signature="e#42258#45832#0" />
-            <element signature="e#45842#45860#0" />
-            <element signature="e#48783#48801#0" />
-            <element signature="e#48852#50455#0" />
-            <element signature="e#50465#50483#0" />
-            <element signature="e#50541#52335#0" />
-            <element signature="e#52345#52363#0" />
-            <element signature="e#52420#54219#0" />
-            <element signature="e#54252#54270#0" />
-            <element signature="e#54321#55976#0" />
-            <element signature="e#55986#56004#0" />
-            <element signature="e#56055#57304#0" />
-            <element signature="e#57314#57332#0" />
-            <element signature="e#57385#59029#0" />
-            <element signature="e#59039#59057#0" />
-            <element signature="e#59112#60367#0" />
-            <element signature="e#60377#60395#0" />
-            <element signature="e#60448#61764#0" />
-            <element signature="e#61774#61792#0" />
-            <element signature="e#61843#63871#0" />
-            <element signature="e#63881#63899#0" />
-            <element signature="e#63956#68337#0" />
-            <element signature="e#68347#68365#0" />
-            <element signature="e#68421#70599#0" />
-            <element signature="e#70609#70627#0" />
-            <element signature="e#70678#77096#0" />
-            <element signature="e#77106#77124#0" />
-            <element signature="e#77179#78977#0" />
-            <element signature="e#78987#79005#0" />
-            <element signature="e#79062#80860#0" />
-            <element signature="e#80870#80888#0" />
-            <element signature="e#80941#82739#0" />
-            <element signature="e#82749#82767#0" />
-            <element signature="e#82819#85397#0" />
-            <element signature="e#85407#85425#0" />
-            <element signature="e#85478#87481#0" />
-            <element signature="e#87491#87509#0" />
-            <element signature="e#87562#90187#0" />
-            <element signature="e#90197#90215#0" />
-            <element signature="e#90267#94971#0" />
-            <element signature="e#94981#94999#0" />
-            <element signature="e#95055#99873#0" />
-            <element signature="e#99883#99901#0" />
-            <element signature="e#99952#101927#0" />
-            <element signature="e#101967#101989#0" />
-            <element signature="e#102051#103548#0" />
-            <element signature="e#103558#103576#0" />
-            <element signature="e#103644#103798#0" />
-            <element signature="e#103808#103826#0" />
-            <element signature="e#103895#104037#0" />
-            <element signature="e#104047#104065#0" />
-            <element signature="e#104141#106887#0" />
-            <element signature="e#106897#106938#0" />
-            <element signature="e#107023#110409#0" />
-            <element signature="e#110419#110460#0" />
-            <element signature="e#110531#110935#0" />
-            <element signature="e#110945#110963#0" />
-            <element signature="e#111042#113366#0" />
-            <element signature="e#113488#113509#0" />
-            <element signature="e#113635#116123#0" />
-            <element signature="e#116248#118670#0" />
-            <element signature="e#118680#118698#0" />
-            <element signature="e#118827#119789#0" />
+            <element signature="e#37136#40508#0" />
+            <element signature="e#40518#40536#0" />
+            <element signature="e#40588#42211#0" />
+            <element signature="e#42221#42239#0" />
+            <element signature="e#42289#45863#0" />
+            <element signature="e#45873#45891#0" />
+            <element signature="e#45940#48804#0" />
+            <element signature="e#48814#48832#0" />
+            <element signature="e#48883#50486#0" />
+            <element signature="e#50496#50514#0" />
+            <element signature="e#50572#52366#0" />
+            <element signature="e#52376#52394#0" />
+            <element signature="e#52451#54250#0" />
+            <element signature="e#54283#54301#0" />
+            <element signature="e#54352#56007#0" />
+            <element signature="e#56017#56035#0" />
+            <element signature="e#56086#57335#0" />
+            <element signature="e#57345#57363#0" />
+            <element signature="e#57416#59060#0" />
+            <element signature="e#59070#59088#0" />
+            <element signature="e#59143#60398#0" />
+            <element signature="e#60408#60426#0" />
+            <element signature="e#60479#61795#0" />
+            <element signature="e#61805#61823#0" />
+            <element signature="e#61874#63902#0" />
+            <element signature="e#63912#63930#0" />
+            <element signature="e#63987#68368#0" />
+            <element signature="e#68378#68396#0" />
+            <element signature="e#68452#70630#0" />
+            <element signature="e#70640#70658#0" />
+            <element signature="e#70709#77127#0" />
+            <element signature="e#77137#77155#0" />
+            <element signature="e#77210#79008#0" />
+            <element signature="e#79018#79036#0" />
+            <element signature="e#79093#80891#0" />
+            <element signature="e#80901#80919#0" />
+            <element signature="e#80972#82770#0" />
+            <element signature="e#82780#82798#0" />
+            <element signature="e#82850#85428#0" />
+            <element signature="e#85438#85456#0" />
+            <element signature="e#85509#87512#0" />
+            <element signature="e#87522#87540#0" />
+            <element signature="e#87593#90218#0" />
+            <element signature="e#90228#90246#0" />
+            <element signature="e#90298#95002#0" />
+            <element signature="e#95012#95030#0" />
+            <element signature="e#95086#99904#0" />
+            <element signature="e#99914#99932#0" />
+            <element signature="e#101998#102020#0" />
+            <element signature="e#102082#103579#0" />
+            <element signature="e#103589#103607#0" />
+            <element signature="e#103675#103829#0" />
+            <element signature="e#103839#103857#0" />
+            <element signature="e#103926#104068#0" />
+            <element signature="e#104078#104096#0" />
+            <element signature="e#104172#106918#0" />
+            <element signature="e#106928#106969#0" />
+            <element signature="e#107054#110440#0" />
+            <element signature="e#110450#110491#0" />
+            <element signature="e#110562#110966#0" />
+            <element signature="e#110976#110994#0" />
+            <element signature="e#111073#113908#0" />
+            <element signature="e#114030#114051#0" />
+            <element signature="e#114177#116665#0" />
+            <element signature="e#116790#119212#0" />
+            <element signature="e#119222#119240#0" />
+            <element signature="e#119369#120974#0" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/PowerCreeps.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="663">
+          <caret line="39" column="62" selection-start-line="39" selection-start-column="62" selection-end-line="39" selection-end-column="62" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/Factories.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="663">
-          <caret line="39" column="59" lean-forward="true" selection-start-line="39" selection-start-column="59" selection-end-line="39" selection-end-column="59" />
+        <state relative-caret-position="629">
+          <caret line="46" column="41" selection-start-line="46" selection-start-column="41" selection-end-line="46" selection-end-column="41" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Observers.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="311">
+          <caret line="215" column="30" lean-forward="true" selection-start-line="215" selection-start-column="30" selection-end-line="215" selection-end-column="30" />
         </state>
       </provider>
     </entry>

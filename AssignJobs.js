@@ -555,10 +555,16 @@ const AssignJobs = {
                 // distant harvester
                 case 'D':
                     switch (true) {
-                        case (energyAvailable >= 1300): // energyCapacityAvailable: 12900
+                        case (energyAvailable >= 3500): // energyCapacityAvailable: 12900
                             body = [
-                                WORK, WORK, WORK, WORK, WORK, WORK,
-                                CARRY, CARRY, CARRY, CARRY,
+                                WORK, WORK, WORK, WORK, WORK,
+                                WORK, WORK, WORK, WORK, WORK,
+                                WORK, WORK, WORK, WORK, WORK,
+                                WORK, WORK, WORK, WORK, WORK,
+                                CARRY, CARRY, CARRY, CARRY, CARRY,
+                                MOVE, MOVE, MOVE, MOVE, MOVE,
+                                MOVE, MOVE, MOVE, MOVE, MOVE,
+                                MOVE, MOVE, MOVE, MOVE, MOVE,
                                 MOVE, MOVE, MOVE, MOVE, MOVE,
                                 MOVE, MOVE, MOVE, MOVE, MOVE
                             ];

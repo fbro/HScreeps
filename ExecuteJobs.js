@@ -2027,8 +2027,10 @@ const ExecuteJobs = {
                                 creep.memory.DepositId = deposit.id;
                             }
                         }
-                        if(deposit){
+                        if(deposit && deposit.cooldown === 0){
                             return creep.harvest(deposit)
+                        }else if(deposit && deposit.cooldown > 0){
+                            return ERR_BUSY;
                         }else{
                             return JOB_IS_DONE;
                         }
@@ -2048,7 +2050,7 @@ const ExecuteJobs = {
                     return DepositCreepStore(creep, fetchObject);
                 },
             });
-            return ERR_BUSY;
+            return result;
         }
 
         // helper functions:

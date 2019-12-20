@@ -3,7 +3,7 @@ const Factories = {
         for (const gameRoomKey in Game.rooms) {
             const gameRoom = Game.rooms[gameRoomKey];
             const memRoom = Memory.MemRooms[gameRoomKey];
-            if (memRoom.FctrId !== '-' && gameRoom.controller && gameRoom.controller.my && gameRoom.controller.level === 8 && memRoom) {
+            if (memRoom && memRoom.FctrId !== '-' && gameRoom.controller && gameRoom.controller.my && gameRoom.controller.level === 8 && memRoom) {
                 let factory;
                 if(memRoom.FctrId){
                     factory = Game.getObjectById(memRoom.FctrId)
@@ -43,7 +43,8 @@ const Factories = {
                         && factory.store.getUsedCapacity(RESOURCE_CELL) >= 20
                         && factory.store.getUsedCapacity(RESOURCE_LEMERGIUM_BAR) >= 16
                         && factory.store.getUsedCapacity(RESOURCE_ENERGY) >= 8
-                        && factory.store.getUsedCapacity(RESOURCE_PHLEGM) < 500){
+                        && factory.store.getUsedCapacity(RESOURCE_PHLEGM) < 500
+                        && factory.effect){
                         result = factory.produce(RESOURCE_PHLEGM);
                         console.log('Factories ' + factory.pos.roomName + ' producing ' + RESOURCE_PHLEGM + ' ' + factory.store.getUsedCapacity(RESOURCE_PHLEGM) + ' ' + result + ' ' + RESOURCE_LEMERGIUM_BAR + ' ' + factory.store.getUsedCapacity(RESOURCE_LEMERGIUM_BAR) + ' ' + RESOURCE_CELL + ' ' + factory.store.getUsedCapacity(RESOURCE_CELL) + ' ' + RESOURCE_OXIDANT + ' ' + factory.store.getUsedCapacity(RESOURCE_OXIDANT) + ' ' + RESOURCE_ENERGY + ' ' + factory.store.getUsedCapacity(RESOURCE_ENERGY));
                     }
