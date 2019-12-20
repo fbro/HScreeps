@@ -1,8 +1,8 @@
 const Logs = {
     Error: function (messageId, message) {
-        console.log('!!--------------- ' + messageId + ' ---------------!!');
+        console.log('!!--------------- ' + messageId + ' ' + Game.shard.name  + ' ---------------!!');
         console.log('Logs Error ' + message);
-        console.log('!!--------------- ' + messageId + ' ---------------!!');
+        console.log('!!--------------- ' + messageId + ' ' + Game.shard.name  + ' ---------------!!');
         if (!Memory.ErrorLog) {
             Memory.ErrorLog = {};
         }
@@ -16,7 +16,7 @@ const Logs = {
         }
     },
     Info: function (messageId, message) {
-        console.log('Logs Info ' + messageId + ' | ' + message);
+        console.log('Logs Info ' + messageId + ' ' + Game.shard.name + ' | ' + message);
         if (!Memory.InfoLog) {
             Memory.InfoLog = {};
         }
@@ -30,7 +30,7 @@ const Logs = {
         }
     },
     Warning: function (messageId, message) {
-        console.log('WARNING! ' + messageId + ' | ' + message);
+        console.log('WARNING! ' + messageId + ' ' + Game.shard.name + ' | ' + message);
     }
 };
 module.exports = Logs;

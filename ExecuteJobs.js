@@ -693,7 +693,7 @@ const ExecuteJobs = {
                 },
                 /**@return {int}*/
                 Act: function (jobObject) {
-                    if (jobObject.structureType === STRUCTURE_CONTAINER || jobObject.creep/*tombstone*/) {
+                    if (jobObject.structure/*ruin*/ || jobObject.structureType === STRUCTURE_CONTAINER || jobObject.creep/*tombstone*/) {
                         for (const resourceType in jobObject.store) {
                             if (jobObject.store[resourceType] > 0) {
                                 return creep.withdraw(jobObject, resourceType);
