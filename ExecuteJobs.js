@@ -2006,7 +2006,7 @@ const ExecuteJobs = {
             const result = GenericFlagAction(creep, roomJob, {
                 /**@return {int}*/
                 JobStatus: function (jobObject) {
-                    if (creep.store.getFreeCapacity() === 0 || creep.memory.FetchObjectId && creep.store.getUsedCapacity > 0) {
+                    if (creep.store.getFreeCapacity() === 0 || creep.memory.FetchObjectId && creep.store.getUsedCapacity > 0 || creep.ticksToLive < 500) {
                         return SHOULD_FETCH;
                     } else {
                         return SHOULD_ACT;
@@ -2043,7 +2043,7 @@ const ExecuteJobs = {
                 /**@return {object}
                  * @return {undefined}*/
                 FindFetchObject: function (jobObject) {
-                    return Game.rooms['E28S29'].storage;
+                    return Game.rooms['E28S29'].storage; // TODO
                 },
                 /**@return {int}*/
                 Fetch: function (fetchObject, jobObject) {

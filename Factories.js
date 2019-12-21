@@ -44,7 +44,7 @@ const Factories = {
                         && factory.store.getUsedCapacity(RESOURCE_LEMERGIUM_BAR) >= 16
                         && factory.store.getUsedCapacity(RESOURCE_ENERGY) >= 8
                         && factory.store.getUsedCapacity(RESOURCE_PHLEGM) < 500
-                        && factory.effect){
+                        ){
                         result = factory.produce(RESOURCE_PHLEGM);
                         console.log('Factories ' + factory.pos.roomName + ' producing ' + RESOURCE_PHLEGM + ' ' + factory.store.getUsedCapacity(RESOURCE_PHLEGM) + ' ' + result + ' ' + RESOURCE_LEMERGIUM_BAR + ' ' + factory.store.getUsedCapacity(RESOURCE_LEMERGIUM_BAR) + ' ' + RESOURCE_CELL + ' ' + factory.store.getUsedCapacity(RESOURCE_CELL) + ' ' + RESOURCE_OXIDANT + ' ' + factory.store.getUsedCapacity(RESOURCE_OXIDANT) + ' ' + RESOURCE_ENERGY + ' ' + factory.store.getUsedCapacity(RESOURCE_ENERGY));
                     }
