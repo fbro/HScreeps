@@ -491,7 +491,7 @@ const CreateJobs = {
             for (const resourceDropKey in resourceDrops) {
                 const resourceDrop = resourceDrops[resourceDropKey];
                 new RoomVisual(gameRoom.name).text('💰', resourceDrop.pos.x, resourceDrop.pos.y);
-                AddJob(roomJobs, '5FillStrg-drp' + '(' + resourceDrop.pos.x + ',' + resourceDrop.pos.y + ',' + resourceDrop.resourceType + ')' + gameRoom.name, resourceDrop.id, OBJECT_JOB, 'T');
+                AddJob(roomJobs, '3FillStrg-drp' + '(' + resourceDrop.pos.x + ',' + resourceDrop.pos.y + ',' + resourceDrop.resourceType + ')' + gameRoom.name, resourceDrop.id, OBJECT_JOB, 'T');
             }
             // Tombstone is also a little bit different - but same kind of job as above
             const tombstoneDrops = gameRoom.find(FIND_TOMBSTONES, {
@@ -502,7 +502,7 @@ const CreateJobs = {
             for (const tombstoneDropKey in tombstoneDrops) {
                 const tombstoneDrop = tombstoneDrops[tombstoneDropKey];
                 new RoomVisual(gameRoom.name).text('⚰', tombstoneDrop.pos.x, tombstoneDrop.pos.y);
-                AddJob(roomJobs, '5FillStrg-tmb' + '(' + tombstoneDrop.pos.x + ',' + tombstoneDrop.pos.y + ')' + gameRoom.name, tombstoneDrop.id, OBJECT_JOB, 'T');
+                AddJob(roomJobs, '4FillStrg-tmb' + '(' + tombstoneDrop.pos.x + ',' + tombstoneDrop.pos.y + ')' + gameRoom.name, tombstoneDrop.id, OBJECT_JOB, 'T');
             }
             // Ruin is also a little bit different - but same kind of job as above
             const ruinDrops = gameRoom.find(FIND_RUINS, {
@@ -513,7 +513,7 @@ const CreateJobs = {
             for (const ruinDropKey in ruinDrops) {
                 const ruinDrop = ruinDrops[ruinDropKey];
                 new RoomVisual(gameRoom.name).text('', ruinDrop.pos.x, ruinDrop.pos.y);
-                AddJob(roomJobs, '5FillStrg-ruin' + '(' + ruinDrop.pos.x + ',' + ruinDrop.pos.y + ')' + gameRoom.name, ruinDrop.id, OBJECT_JOB, 'T');
+                AddJob(roomJobs, '4FillStrg-ruin' + '(' + ruinDrop.pos.x + ',' + ruinDrop.pos.y + ')' + gameRoom.name, ruinDrop.id, OBJECT_JOB, 'T');
             }
         }
 

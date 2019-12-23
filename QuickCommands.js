@@ -18,3 +18,10 @@ gc.suicide();
 console.log('manual search: ' + JSON.stringify(Game.getObjectById('5cee5f96d1936f6f4667aa35')));
 console.log('Game.time: ' + Game.time);
 console.log(JSON.stringify(Game.powerCreeps['Hulmir']));
+
+// terminal send
+Game.getObjectById('5d60034ce360cc20d4c6deee').send(RESOURCE_BIOMASS, 2000, 'E28S29')
+Game.market.deal('5e00325c7072b2051bcdb880', 4000, 'E29S31')
+console.log(JSON.stringify(Game.rooms['E29S31'].controller.owner))
+
+console.log(JSON.stringify(Game.rooms['E29S28'].controller.owner))

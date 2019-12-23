@@ -239,7 +239,7 @@ const ExecuteJobs = {
                 case jobKey.startsWith('2FillTwr'):
                     result = JobFillTower(creep, roomJob);
                     break;
-                case jobKey.startsWith('5FillStrg'):
+                case jobKey.startsWith('3FillStrg') || jobKey.startsWith('4FillStrg') || jobKey.startsWith('5FillStrg'):
                     result = JobFillStorage(creep, roomJob);
                     break;
                 case jobKey.startsWith('5ExtrMin'):
@@ -329,7 +329,7 @@ const ExecuteJobs = {
                 creep.say('🏃'); // The creep is just moving to its target
             } else { // results where anything else than OK - one should end the job!
                 if (result === ERR_NO_RESULT_FOUND) {
-                    Logs.Error('ExecuteJobs JobAction no result gained', jobKey + ' ' + result + ' ' + roomJob.Creep);
+                    Logs.Error('ExecuteJobs JobAction ERR_NO_RESULT_FOUND', jobKey + ' ' + result + ' ' + roomJob.Creep);
                     creep.say('⚠' + result);
                 } else if (result === ERR_INVALID_TARGET || result === ERR_INVALID_ARGS) {
                     Logs.Error('ExecuteJobs JobAction error invalid', jobKey + ' ' + result + ' ' + roomJob.Creep);
@@ -762,7 +762,12 @@ const ExecuteJobs = {
                 /**@return {object}
                  * @return {undefined}*/
                 FindFetchObject: function (jobObject) {
-                    return FindClosestFreeStore(creep);
+                    let fetchObject = FindClosestFreeStore(creep, 2);
+                    if(!fetchObject){
+                        Logs.Warning('ExecuteJobs JobExtractMineral no nearby store', creep.name + ' ' + creep.memory.JobName);
+                        fetchObject = jobObject.room.storage;
+                    }
+                    return fetchObject;
                 },
                 /**@return {int}*/
                 Fetch: function (fetchObject, jobObject) {
@@ -2150,7 +2155,8 @@ const ExecuteJobs = {
             return result;
         }
 
-        /**@return {object} @return {undefined}*/
+        /**@return {object}
+         * @return {undefined}*/
         function FindClosestResourceInRoom(creep, room, resourceToFetch, jobObject) {
             let resourceSupply = undefined;
             if (creep.memory.ResourceSupply) {
@@ -2193,9 +2199,15 @@ const ExecuteJobs = {
                     if (resourceSupplies[i].structureType === STRUCTURE_TERMINAL) {
                         distance += 1000;
                     } else if (resourceSupplies[i].structureType === STRUCTURE_LINK) { // prefer links over other stores
-                        distance -= 5;
+                        distance -= 3;
                     } else if (!resourceSupplies[i].structureType) { // drop, tombstone or ruin is more important to pick up
                         distance -= 5;
+                        if(resourceSupplies[i].store && resourceSupplies[i].store.getUsedCapacity(resourceToFetch) > 1000 || resourceSupplies[i].amount > 1000){
+                            distance -= 10; // try and favor stores and drops that has way more of the resource
+                        }
+                    }
+                    if(resourceSupplies[i].store && resourceSupplies[i].store.getUsedCapacity(resourceToFetch) > 500 || resourceSupplies[i].amount > 500){
+                        distance -= 5; // try and favor stores that has more of the resource
                     }
                     if (distance < bestDistance) {
                         resourceSupply = resourceSupplies[i];
@@ -2231,7 +2243,7 @@ const ExecuteJobs = {
                         result = creep.pickup(fetchObject, max);
                     }
                 }
-            } else { // store transfer
+            } else { // store withdraw
                 if (creep.store[resourceToFetch] !== creep.store.getUsedCapacity()) {
                     if (creep.pos.isNearTo(fetchObject)) {
                         result = ERR_FULL; // throw this error to force the creep to transfer unwanted resource that it is carrying
@@ -2255,6 +2267,10 @@ const ExecuteJobs = {
                         }
                     }
 
+                }
+                if(result === OK && creep.store.getFreeCapacity() >= fetchObject.store[resourceToFetch]){
+                    //console.log('remove ResourceSupply ' + creep.name + ' creep freeCapacity ' + creep.store.getFreeCapacity() + ' fetchObject.store ' + fetchObject.store[resourceToFetch]);
+                    creep.memory.ResourceSupply = undefined;
                 }
             }
             if (result === ERR_FULL) { // creep store is full with anything other than resourceToFetch - get rid of it asap
@@ -2329,7 +2345,7 @@ const ExecuteJobs = {
                             return (s.structureType === STRUCTURE_CONTAINER
                                 || s.structureType === STRUCTURE_STORAGE
                                 || (resourceTypeToStore === RESOURCE_ENERGY && s.structureType === STRUCTURE_LINK))
-                                && s.store.getFreeCapacity() >= resourceAmountToStore;
+                                && s.store.getFreeCapacity(resourceTypeToStore) >= resourceAmountToStore;
                         }
                     });
                     closestFreeStore = closestFreeStores[0];
@@ -2361,21 +2377,10 @@ const ExecuteJobs = {
         /**@return {int}*/
         function Move(creep, obj, fill = 'transparent', stroke = '#fff', lineStyle = 'dashed', strokeWidth = .15, opacity = .3) {
             // TODO maybe try and reuse move path here?
-            if(creep.pos.roomName !== obj.pos.roomName){ // not in the same room - make a map in mem
-                // have a map of desired movement between rooms
-                // if dest room is in cluster - move without going to hall - use moveTo normally
-                // if dest room is in hall or in another cluster - move to hall
-                    // move to hall map
-                // weight could be Hall: 1, rooms in cluster: 2, owned enemy rooms: 10
-                /*
-                {
-                Dest: roomName,
-                Path: [{roomNameKey, roomNameValue}]
-                }
-
-                */
-            }
-            let result = creep.moveTo(obj, {
+            const opts ={
+                reusePath: 5, // default
+                serializeMemory: true,  // default
+                noPathFinding: false,  // default
                 visualizePathStyle: {
                     fill: fill,
                     stroke: stroke,
@@ -2383,7 +2388,56 @@ const ExecuteJobs = {
                     strokeWidth: strokeWidth,
                     opacity: opacity
                 }
-            });
+            };
+            let result = ERR_NO_RESULT_FOUND;
+            if(creep.pos.roomName !== obj.pos.roomName){ // not in the same room - make a map in mem
+                opts.reusePath = 50; // movement between rooms should reuse path more
+                if(!Memory.Paths){
+                    Memory.Paths = {};
+                }
+                if(false){
+                    let from = creep.pos;
+                    let to = obj.pos;
+
+                    // Use `findRoute` to calculate a high-level plan for this path,
+                    // prioritizing highways and owned rooms
+                    const route = Game.map.findRoute(from.roomName, to.roomName, {
+                        routeCallback(roomName) {
+                            const parsed = /^[WE]([0-9]+)[NS]([0-9]+)$/.exec(roomName);
+                            const isHighway = (parsed[1] % 10 === 0) || (parsed[2] % 10 === 0);
+                            let isMyRoom = false;
+                            let isEnemyRoom = false;
+                            if(Game.rooms[roomName] && Game.rooms[roomName].controller){
+                                if(Game.rooms[roomName].controller.my){
+                                    isMyRoom = true;
+                                }else if(Game.rooms[roomName].controller.owner){
+                                    isEnemyRoom = true;
+                                }
+                            }
+                            if (isHighway || isMyRoom) {
+                                return 1;
+                            } else if(isEnemyRoom){
+                                return 100;
+                            } else {
+                                return 1.5; // unowned room
+                            }
+                        }
+                    });
+                    let lastRoom = from.roomName;
+                    const roomPath = {};
+                    for(const roomInRouteKey in route){
+                        const roomInRoute = route[roomInRouteKey];
+                        roomPath[lastRoom] = roomInRoute.room;
+                        lastRoom = roomInRoute.room
+                    }
+                    console.log(JSON.stringify(roomPath));
+                    // loop through roomPath to find the room the creep is in and then moveTo exit that leads to the roomPath value in the linked list
+
+                }
+                result = creep.moveTo(obj, opts);
+            }else{
+                result = creep.moveTo(obj, opts);
+            }
             if (result === OK) {
                 result = JOB_MOVING;
             } else if (result !== OK && result !== ERR_BUSY && result !== ERR_TIRED) {

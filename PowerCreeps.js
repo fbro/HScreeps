@@ -143,7 +143,6 @@ const PowerCreeps = {
         function RegenMineral(powerCreep){
             let result;
             let mineral;
-
             if (powerCreep.memory.MineralId) {
                 mineral = Game.getObjectById(powerCreep.memory.MineralId);
             }
@@ -153,13 +152,18 @@ const PowerCreeps = {
                     powerCreep.memory.MineralId = mineral.id;
                 }
             }
-            if (mineral) {
+            if (mineral && mineral.mineralAmount > 0) {
                 result = powerCreep.usePower(PWR_REGEN_MINERAL, mineral);
                 if (result === ERR_NOT_IN_RANGE) {
                     result = powerCreep.moveTo(mineral);
                 }else if(result === OK){
                     powerCreep.memory.RegenMineralCooldown = Game.time + 100; // add duration
                 }
+            }else if(mineral && mineral.mineralAmount === 0){
+                // mineral is in the regen period
+                result = OK;
+                powerCreep.memory.RegenMineralCooldown = Game.time + mineral.ticksToRegeneration;
+                console.log('PowerCreeps RegenMineral ' + powerCreep.name + ' in ' + powerCreep.pos.roomName + ' mineral is empty waiting ' + mineral.ticksToRegeneration + ' ticks');
             }
             return result;
         }
