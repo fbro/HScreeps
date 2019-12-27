@@ -25,3 +25,9 @@ Game.market.deal('5e00325c7072b2051bcdb880', 4000, 'E29S31')
 console.log(JSON.stringify(Game.rooms['E29S31'].controller.owner))
 
 console.log(JSON.stringify(Game.rooms['E29S28'].controller.owner))
+
+// check all flags
+for (const flagKey in Game.flags) {
+    const flag = Game.flags[flagKey];
+    console.log('' + JSON.stringify(flag));
+}

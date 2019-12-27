@@ -72,6 +72,8 @@ const Terminals = {
                 let max;
                 if (resourceType === RESOURCE_ENERGY) {
                     max = MAX_ENERGY;
+                } else if(resourceType === RESOURCE_PHLEGM){
+                    max = 0;
                 } else {
                     max = MAX_RESOURCE;
                 }
@@ -79,10 +81,13 @@ const Terminals = {
                     const resourceHistory = Game.market.getHistory(resourceType);
                     const orders = Game.market.getAllOrders(order => order.resourceType === resourceType
                         && order.type === ORDER_BUY
-                        && Game.market.calcTransactionCost(500, fromTerminal.pos.roomName, order.roomName) <= 500
+                        /*&& Game.market.calcTransactionCost(500, fromTerminal.pos.roomName, order.roomName) <= 500*/
                         && resourceHistory[0].avgPrice <= order.price
                         && order.remainingAmount > 0
                     );
+                    if(orders.length > 0){
+                        orders.sort(comparePriceExpensiveFirst);
+                    }
                     for (const orderKey in orders) {
                         const order = orders[orderKey];
                         let sendAmount = fromAmount - max; // possible send amount
@@ -127,6 +132,9 @@ const Terminals = {
                 && (resourceHistory[0].avgPrice * 2) >= order.price
                 && order.remainingAmount > 0
             );
+            if(orders.length > 0){
+                orders.sort(comparePriceCheapestFirst);
+            }
             let amountBought = 0;
             console.log('Terminals BuyResource WTB ' + resourceType + ' ' + amount + ' from ' + terminal + ' ' + JSON.stringify(orders) + ' avg price ' + resourceHistory[0].avgPrice);
             for (const orderKey in orders) {
@@ -143,6 +151,17 @@ const Terminals = {
                 }
             }
             return terminalSendCount;
+        }
+
+        function comparePriceCheapestFirst(a, b) {
+            if (a.price < b.price) { return -1; }
+            if (a.price > b.price) { return 1; }
+            return 0;
+        }
+        function comparePriceExpensiveFirst(a, b) {
+            if (a.price > b.price) { return -1; }
+            if (a.price < b.price) { return 1; }
+            return 0;
         }
     }
 };

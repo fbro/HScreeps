@@ -515,6 +515,19 @@ const CreateJobs = {
                 new RoomVisual(gameRoom.name).text('', ruinDrop.pos.x, ruinDrop.pos.y);
                 AddJob(roomJobs, '4FillStrg-ruin' + '(' + ruinDrop.pos.x + ',' + ruinDrop.pos.y + ')' + gameRoom.name, ruinDrop.id, OBJECT_JOB, 'T');
             }
+            const factory = gameRoom.find(FIND_STRUCTURES, {
+                filter: (f) => {
+                    return (f.structureType === STRUCTURE_FACTORY && f.store[RESOURCE_PHLEGM] > 1000);
+                }
+            })[0];
+            if(factory){
+                for (const resourceType in factory.store) {
+                    if(resourceType === RESOURCE_PHLEGM){
+                        new RoomVisual(gameRoom.name).text('📦', factory.pos.x, factory.pos.y);
+                        AddJob(roomJobs, '5FillStrg-' + factory.structureType + '(' + factory.pos.x + ',' + factory.pos.y + ',' + resourceType + ')' + gameRoom.name, factory.id, OBJECT_JOB, 'T');
+                    }
+                }
+            }
         }
 
         function FillTowerJobs(gameRoom, roomJobs) {

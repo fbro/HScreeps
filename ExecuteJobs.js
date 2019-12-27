@@ -672,6 +672,7 @@ const ExecuteJobs = {
             return result;
         }
 
+        // TODO should change to resource specific like terminal
         /**@return {int}*/
         function JobFillStorage(creep, roomJob) {
             const result = GenericJobAction(creep, roomJob, {
@@ -700,7 +701,25 @@ const ExecuteJobs = {
                             }
                         }
                         return ERR_NOT_ENOUGH_RESOURCES;
-                    } else if (jobObject.structureType === STRUCTURE_LINK || jobObject.structureType === STRUCTURE_TERMINAL) {
+                    } else if(jobObject.structureType === STRUCTURE_FACTORY){
+                        let resourceType = creep.memory.resourceType;
+                        if (!resourceType) {
+                            resourceType = creep.memory.JobName.split(/[(,)]+/).filter(function (e) {
+                                return e;
+                            })[3];
+                            creep.memory.resourceType = resourceType;
+                        }
+                        if (resourceType && jobObject.store[resourceType] > 500) {
+                            let amountToWithdraw = jobObject.store[resourceType] - 500;
+                            if(amountToWithdraw > creep.store.getFreeCapacity()){
+                                amountToWithdraw = creep.store.getFreeCapacity();
+                            }
+                            console.log('Test withdrawing ' + creep.name + ' ' + resourceType + ' amountToWithdraw ' + amountToWithdraw);
+                            return creep.withdraw(jobObject, resourceType, amountToWithdraw);
+                        }else{
+                            return JOB_IS_DONE;
+                        }
+                    }else if (jobObject.structureType === STRUCTURE_LINK || jobObject.structureType === STRUCTURE_TERMINAL) {
                         return creep.withdraw(jobObject, RESOURCE_ENERGY);
                     } else if (jobObject.resourceType) { // drop
                         return creep.pickup(jobObject);

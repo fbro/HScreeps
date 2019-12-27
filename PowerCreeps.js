@@ -36,19 +36,41 @@ const PowerCreeps = {
                             result = RegenSource(powerCreep);//console.log('RegenSource');
                         } else if(powerCreep.memory.RegenMineralCooldown < Game.time && powerCreep.powers[PWR_REGEN_MINERAL].cooldown === 0){
                             result = RegenMineral(powerCreep);//console.log('RegenMineral');
-                        } else if (powerCreep.store[RESOURCE_OPS] > 400) {
+                        } else if (powerCreep.store[RESOURCE_OPS] > 500) {
                             result = DepositOps(powerCreep);//console.log('DepositOps');
+                        }else if(powerCreep.store[RESOURCE_OPS] < 100){
+                            result = WithdrawOps(powerCreep);
                         }
                     }
                 }
             }
         }
 
-        // TODO add withdraw ops
+        function WithdrawOps(powerCreep){
+            let amountToWithdraw = (300 - powerCreep.store[RESOURCE_OPS]);
+            let result;
+            let target;
+            if(powerCreep.room.storage && powerCreep.room.storage.store[RESOURCE_OPS] > 0){
+                target = powerCreep.room.storage;
+            }else if(powerCreep.room.terminal && powerCreep.room.terminal.store[RESOURCE_OPS] > 0){
+                target = powerCreep.room.terminal;
+            }
+            if(target){
+                if(amountToWithdraw > target.store[RESOURCE_OPS]){
+                    amountToWithdraw = target.store[RESOURCE_OPS];
+                }
+                result = powerCreep.withdraw(target, RESOURCE_OPS, amountToWithdraw);
+                console.log('PowerCreeps WithdrawOps ' + powerCreep.name + ' ' + result + ' target amount ' + target.store[RESOURCE_OPS]);
+            }
+            if (result === ERR_NOT_IN_RANGE) {
+                result = powerCreep.moveTo(target);
+            }
+            return result;
+        }
 
         function DepositOps(powerCreep) {
             let result = powerCreep.transfer(powerCreep.room.storage, RESOURCE_OPS, powerCreep.store[RESOURCE_OPS] - 300);
-            console.log('PowerCreeps DepositOps ' + powerCreep.name + ' amount ' + powerCreep.store[RESOURCE_OPS]);
+            console.log('PowerCreeps DepositOps ' + powerCreep.name + ' ' + result + ' amount ' + powerCreep.store[RESOURCE_OPS]);
             if (result === ERR_NOT_IN_RANGE) {
                 result = powerCreep.moveTo(powerCreep.room.storage);
             }
