@@ -30,9 +30,9 @@ const PowerCreeps = {
                             result = powerCreep.usePower(PWR_GENERATE_OPS); // if power creep is an operator - always use this power when available
                         } else if(powerCreep.memory.OperateFactoryCooldown < Game.time && powerCreep.powers[PWR_OPERATE_FACTORY].cooldown === 0 && powerCreep.store.getUsedCapacity(RESOURCE_OPS) >= 100){
                             result = OperateFactory(powerCreep);//console.log('OperateFactory');
-                        } else if (powerCreep.memory.OperateTerminalCooldown < Game.time && powerCreep.store.getUsedCapacity(RESOURCE_OPS) >= 100 && powerCreep.powers[PWR_OPERATE_TERMINAL].cooldown === 0 && powerCreep.room.terminal && powerCreep.room.terminal.my) {
+                        } /*else if (powerCreep.memory.OperateTerminalCooldown < Game.time && powerCreep.store.getUsedCapacity(RESOURCE_OPS) >= 100 && powerCreep.powers[PWR_OPERATE_TERMINAL].cooldown === 0 && powerCreep.room.terminal && powerCreep.room.terminal.my) {
                             result = OperateTerminal(powerCreep);//console.log('OperateTerminal');
-                        } else if ((powerCreep.memory.RegenSource1Cooldown < Game.time || powerCreep.memory.RegenSource2Cooldown < Game.time) && powerCreep.powers[PWR_REGEN_SOURCE].cooldown === 0) {
+                        }*/ else if ((powerCreep.memory.RegenSource1Cooldown < Game.time || powerCreep.memory.RegenSource2Cooldown < Game.time) && powerCreep.powers[PWR_REGEN_SOURCE].cooldown === 0) {
                             result = RegenSource(powerCreep);//console.log('RegenSource');
                         } else if(powerCreep.memory.RegenMineralCooldown < Game.time && powerCreep.powers[PWR_REGEN_MINERAL].cooldown === 0){
                             result = RegenMineral(powerCreep);//console.log('RegenMineral');

@@ -638,7 +638,6 @@ const CreateJobs = {
                 'RoomJobs': jobs,
                 'MaxCreeps': {},
                 'SourceNumber': sourceNumber,
-                'AttachedRooms': {},
             };
             console.log('CreateJobs CreateRoom add new room ' + roomName + ' level ' + level + ' sourceNumber ' + sourceNumber + ' jobs ' + JSON.stringify(jobs))
         }

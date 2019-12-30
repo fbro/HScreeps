@@ -2409,15 +2409,18 @@ const ExecuteJobs = {
                 }
             };
             let result = ERR_NO_RESULT_FOUND;
-            if(creep.pos.roomName !== obj.pos.roomName){ // not in the same room - make a map in mem
+            let from = creep.pos;
+            let to = obj.pos;
+            if(from.roomName !== to.roomName){ // not in the same room - make a map in mem
                 opts.reusePath = 50; // movement between rooms should reuse path more
                 if(!Memory.Paths){
                     Memory.Paths = {};
                 }
-                if(false){
-                    let from = creep.pos;
-                    let to = obj.pos;
-
+                let shouldCalculate = true;
+                if(Memory.Paths[to.roomName] && Memory.Paths[to.roomName][from.roomName]){
+                    shouldCalculate = false;
+                }
+                if(shouldCalculate){
                     // Use `findRoute` to calculate a high-level plan for this path,
                     // prioritizing highways and owned rooms
                     const route = Game.map.findRoute(from.roomName, to.roomName, {
@@ -2442,16 +2445,17 @@ const ExecuteJobs = {
                             }
                         }
                     });
+                    if(!Memory.Paths[to.roomName]){
+                        Memory.Paths[to.roomName] = {};
+                    }
                     let lastRoom = from.roomName;
-                    const roomPath = {};
                     for(const roomInRouteKey in route){
                         const roomInRoute = route[roomInRouteKey];
-                        roomPath[lastRoom] = roomInRoute.room;
+                        Memory.Paths[to.roomName][lastRoom] = roomInRoute.room;
                         lastRoom = roomInRoute.room
                     }
-                    console.log(JSON.stringify(roomPath));
+                    console.log(to.roomName + ' paths: ' + JSON.stringify(Memory.Paths[to.roomName]));
                     // loop through roomPath to find the room the creep is in and then moveTo exit that leads to the roomPath value in the linked list
-
                 }
                 result = creep.moveTo(obj, opts);
             }else{

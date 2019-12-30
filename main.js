@@ -20,6 +20,8 @@ module.exports.loop = function () {
             Links.run();
             if (Game.time % 9000 === 0) {
                 console.log('--------------- main reset of memory ---------------');
+                delete Memory.Paths;
+                const foundCreeps = {};
                 for (const memRoomKey in Memory.MemRooms) {
                     const memRoom = Memory.MemRooms[memRoomKey];
                     memRoom.AttachedRooms = undefined;
@@ -27,9 +29,33 @@ module.exports.loop = function () {
                     memRoom.links = undefined;
                     if (memRoom.RoomLevel <= 0 && Object.keys(memRoom.RoomJobs).length === 0) {
                         // room is unowned and there are no jobs in it - remove the room
-                        console.log('-------- removing unused room ' + memRoomKey + ' from Memory --------');
                         Memory.MemRooms[memRoomKey] = undefined;
                         Logs.Info('removed unused room', memRoomKey);
+                    }
+                    // search through MaxCreeps to see if they all have an alive creep and that there are only one of each creep names in MaxCreeps
+                    for (const creepTypesKey in Memory.MemRooms[memRoomKey].MaxCreeps) {
+                        for (const creepKey in Memory.MemRooms[memRoomKey].MaxCreeps[creepTypesKey]) {
+                            if(creepKey !== 'MaxCreepsInRoom'){
+                                let foundCreep = false;
+                                for (const creepName in Memory.creeps) {
+                                    if(creepName === creepKey){
+                                        foundCreep = true;
+                                        for (const foundCreepsKey in foundCreeps) {
+                                            if(foundCreepsKey === creepKey){
+                                                foundCreep = false;
+                                                break;
+                                            }
+                                        }
+                                        foundCreeps[creepKey] = memRoomKey;
+                                        break;
+                                    }
+                                }
+                                if(!foundCreep){
+                                    Logs.Error('Lingering MaxCreeps found and removed', creepTypesKey + ' ' + creepKey + ' in ' + memRoomKey);
+                                    Memory.MemRooms[memRoomKey].MaxCreeps[creepTypesKey][creepKey] = undefined;
+                                }
+                            }
+                        }
                     }
                 }
             }
