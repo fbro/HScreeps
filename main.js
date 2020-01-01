@@ -12,7 +12,7 @@ let PowerCreeps = require('PowerCreeps');
 
 module.exports.loop = function () {
     if (!Memory.MemRooms) {
-        Memory.MemRooms = new Object();
+        Memory.MemRooms = {};
     }
     if (Game.time % 10 === 0) {
         if (Game.time % 30 === 0) { // tick burst from https://docs.screeps.com/cpu-limit.html#Bucket
@@ -24,18 +24,11 @@ module.exports.loop = function () {
                 const foundCreeps = {};
                 for (const memRoomKey in Memory.MemRooms) {
                     const memRoom = Memory.MemRooms[memRoomKey];
-                    memRoom.AttachedRooms = undefined;
-                    memRoom.PrimaryRoom = undefined;
                     memRoom.links = undefined;
-                    if (memRoom.RoomLevel <= 0 && Object.keys(memRoom.RoomJobs).length === 0) {
-                        // room is unowned and there are no jobs in it - remove the room
-                        Memory.MemRooms[memRoomKey] = undefined;
-                        Logs.Info('removed unused room', memRoomKey);
-                    }
                     // search through MaxCreeps to see if they all have an alive creep and that there are only one of each creep names in MaxCreeps
-                    for (const creepTypesKey in Memory.MemRooms[memRoomKey].MaxCreeps) {
-                        for (const creepKey in Memory.MemRooms[memRoomKey].MaxCreeps[creepTypesKey]) {
-                            if(creepKey !== 'MaxCreepsInRoom'){
+                    for (const creepTypesKey in memRoom.MaxCreeps) {
+                        for (const creepKey in memRoom.MaxCreeps[creepTypesKey]) {
+                            if(creepKey !== 'M'){
                                 let foundCreep = false;
                                 for (const creepName in Memory.creeps) {
                                     if(creepName === creepKey){
@@ -52,10 +45,15 @@ module.exports.loop = function () {
                                 }
                                 if(!foundCreep){
                                     Logs.Error('Lingering MaxCreeps found and removed', creepTypesKey + ' ' + creepKey + ' in ' + memRoomKey);
-                                    Memory.MemRooms[memRoomKey].MaxCreeps[creepTypesKey][creepKey] = undefined;
+                                    memRoom.MaxCreeps[creepTypesKey][creepKey] = undefined;
                                 }
                             }
                         }
+                    }
+                    if (memRoom.RoomLevel <= 0 && Object.keys(memRoom.RoomJobs).length === 0) {
+                        // room is unowned and there are no jobs in it - remove the room
+                        Memory.MemRooms[memRoomKey] = undefined;
+                        Logs.Info('removed unused room', memRoomKey);
                     }
                 }
             }
@@ -76,16 +74,12 @@ module.exports.loop = function () {
 
 // TODO:
 
-// add more jobs:
-// TODO HarvestDeposit
-
 // TODO Move interroom simplification - try and move in hallways!!!
-
 // TODO power bank harvesting - avoid enemy rooms
-
 // avoid enemy rooms when traveling long distances
+
+
 // if doing long distance work creep should make sure it has enough timeToLive to do the job
-// handle links at room exits for remote harvests
 // add constructions
 // add renewCreep functionality
 // cache paths to be reused by creeps

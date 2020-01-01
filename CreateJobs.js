@@ -56,9 +56,7 @@ const CreateJobs = {
                         notFound = true;
                     }
                 } else if (color === COLOR_YELLOW) {
-                    if (secColor === COLOR_YELLOW) { // distantHarvester on source at flag pos
-                        jobs = CreateFlagJob(jobs, '5RemoteHarvest', gameFlagKey, gameFlag, 'D');
-                    } else if (secColor === COLOR_GREEN) { // harvester move to pos
+                    if (secColor === COLOR_GREEN) { // harvester, transporter and builder move to pos
                         jobs = CreateFlagJob(jobs, '2HarvestPos', gameFlagKey, gameFlag, 'H');
                         jobs = CreateFlagJob(jobs, '2TransPos', gameFlagKey, gameFlag, 'T');
                         jobs = CreateFlagJob(jobs, '2BuildPos', gameFlagKey, gameFlag, 'B');
@@ -145,10 +143,6 @@ const CreateJobs = {
                             if (gameRoom.storage !== undefined) {
                                 // FillStorage - link, container and resource drops
                                 FillStorageJobs(gameRoom, jobs);
-                                // FillStorageFromRemote
-                                if (Memory.MemRooms[gameRoom.name] && Memory.MemRooms[gameRoom.name].AttachedRooms) {
-                                    FillStorageFromRemoteJobs(gameRoom, jobs);
-                                }
                                 if (gameRoom.controller.level >= 6) {
                                     // ExtractMineral
                                     ExtractMineralJobs(gameRoom, jobs);
@@ -444,23 +438,6 @@ const CreateJobs = {
                 if (mineral && extractMineral) {
                     new RoomVisual(gameRoom.name).text('⛏', extractMineral.pos.x, extractMineral.pos.y);
                     AddJob(roomJobs, '5ExtrMin-' + mineral.mineralType + '(' + extractMineral.pos.x + ',' + extractMineral.pos.y + ')' + gameRoom.name, mineral.id, OBJECT_JOB, 'E');
-                }
-            }
-        }
-
-        function FillStorageFromRemoteJobs(gameRoom, roomJobs) {
-            for (const attachedRoomKey in Memory.MemRooms[gameRoom.name].AttachedRooms) {
-                if (Game.rooms[attachedRoomKey]) {
-                    const fillStorageFromRemotes = Game.rooms[attachedRoomKey].find(FIND_STRUCTURES, {
-                        filter: (s) => {
-                            return s.structureType === STRUCTURE_CONTAINER && s.store.getUsedCapacity() >= 600;
-                        }
-                    });
-                    for (const fillStorageFromRemoteKey in fillStorageFromRemotes) {
-                        const fillStorageFromRemote = fillStorageFromRemotes[fillStorageFromRemoteKey];
-                        const jobName = '5FillStrgFromRemote-' + fillStorageFromRemote.structureType + '(' + fillStorageFromRemote.pos.x + ',' + fillStorageFromRemote.pos.y + ')' + gameRoom.name;
-                        AddJob(roomJobs, jobName, fillStorageFromRemote.id, OBJECT_JOB, 'T');
-                    }
                 }
             }
         }

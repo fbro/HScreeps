@@ -160,7 +160,7 @@ const ExecuteJobs = {
                 }
 
                 // creep actions that should always be fired no matter what the creep is doing
-                if (result !== OK && result !== ERR_BUSY && gameCreep) {
+                if (result !== OK  && gameCreep) {
                     if (gameCreep.store[RESOURCE_ENERGY] > 0) { // fill adjacent spawns, extensions and towers or repair or construct on the road
                         const toFill = gameCreep.pos.findInRange(FIND_MY_STRUCTURES, 1, {
                             filter: (structure) => {
@@ -189,7 +189,7 @@ const ExecuteJobs = {
                                 }
                             }
                         }
-                    } else if (gameCreep.store.getUsedCapacity() < gameCreep.store.getCapacity() && !gameCreep.name.startsWith('D')) { // pickup adjacent resources
+                    } else if (gameCreep.store.getUsedCapacity() < gameCreep.store.getCapacity()) { // pickup adjacent resources
                         const drop = gameCreep.pos.findInRange(FIND_DROPPED_RESOURCES, 1)[0];
                         if (drop) {
                             gameCreep.pickup(drop); // it may do that 'double' but it really does not matter
@@ -286,9 +286,6 @@ const ExecuteJobs = {
                 case jobKey.startsWith('2GuardMedPos'):
                     result = JobGuardMedicPosition(creep, roomJob);
                     break;
-                case jobKey.startsWith('5RemoteHarvest'):
-                    result = JobRemoteHarvest(creep, roomJob);
-                    break;
                 case jobKey.startsWith('2HarvestPos'):
                     result = JobHarvesterPosition(creep, roomJob);
                     break;
@@ -324,7 +321,7 @@ const ExecuteJobs = {
             } else if (result === ERR_TIRED) {
                 creep.say('😫 ' + creep.fatigue); // creep has fatigue and is limited in movement
             } else if (result === ERR_BUSY) {
-                // The creep is still being spawned
+                // The creep might is still being spawned
             } else if (result === JOB_MOVING) {
                 creep.say('🏃'); // The creep is just moving to its target
             } else { // results where anything else than OK - one should end the job!
@@ -344,7 +341,12 @@ const ExecuteJobs = {
                         console.log('ExecuteJobs JobAction removing ' + jobKey + ' ' + result + ' ' + roomJob.Creep);
                         Logs.Error('ExecuteJobs JobAction undefined result', creep.name + ' ' + jobKey);
                     }
-                    creep.say('✔' + result);
+                    if(result === JOB_IS_DONE){
+                        creep.say('✔');
+                    }else{
+                        creep.say('✔' + result);
+                    }
+
                 }
                 result = JOB_IS_DONE;
             }
@@ -738,8 +740,6 @@ const ExecuteJobs = {
                         return jobObject.room.storage;
                     } else if (creep.room.storage && (jobObject.room && jobObject.room.name !== creep.room.name || !jobObject.room)) {
                         return creep.room.storage;
-                    } else if (Memory.MemRooms[jobObject.pos.roomName].PrimaryRoom) {
-                        return Game.rooms[Memory.MemRooms[jobObject.pos.roomName].PrimaryRoom].storage;
                     } else {
                         return undefined;
                     }
@@ -1433,114 +1433,6 @@ const ExecuteJobs = {
         }
 
         /**@return {int}*/
-        function JobRemoteHarvest(creep, roomJob) {
-            const result = GenericFlagAction(creep, roomJob, {
-                /**@return {int}*/
-                JobStatus: function (jobObject) {
-                    if (creep.store.getFreeCapacity() === 0 || creep.memory.FetchObjectId && creep.store.getUsedCapacity > 0) {
-                        return SHOULD_FETCH;
-                    } else {
-                        return SHOULD_ACT;
-                    }
-                },
-                /**@return {int}*/
-                Act: function (jobObject) {
-                    if (!jobObject.room) { // invisible room
-                        return ERR_NOT_IN_RANGE;
-                    } else {
-                        if (creep.store[RESOURCE_ENERGY] > 0) { // try and repair / build container
-                            const construction = jobObject.pos.findInRange(FIND_CONSTRUCTION_SITES, 2)[0];
-                            if (construction) { // build found - now build it
-                                return creep.build(construction);
-                            }
-                            const damagedStructure = jobObject.pos.findInRange(FIND_STRUCTURES, 2, {
-                                filter: function (structure) {
-                                    return structure.hits < structure.hitsMax && (structure.structureType !== STRUCTURE_WALL || structure.structureType !== STRUCTURE_RAMPART);
-                                }
-                            })[0];
-                            if (damagedStructure) { // damagedStructure found - now repair it
-                                return creep.repair(damagedStructure);
-                            }
-                        }
-                        let source = Game.getObjectById(creep.memory.SourceId);
-                        if (!source) {
-                            source = jobObject.pos.findInRange(FIND_SOURCES, 0)[0];
-                            if (source) {
-                                creep.memory.SourceId = source.id;
-                            } else {
-                                jobObject.remove(); // remove flag
-                                Logs.Info('ExecuteJobs JobRemoteHarvest RemoteHarvest flag removed', creep.name + ' ' + roomJob);
-                                return JOB_IS_DONE; // flag is supposed to be on top of source!
-                            }
-                        }
-                        let result = creep.harvest(source);
-                        if (result === ERR_NOT_ENOUGH_RESOURCES) {
-                            //console.log('ExecuteJobs JobRemoteHarvest ' + creep.name + ' waiting for replenish (' + jobObject.pos.x + ',' + jobObject.pos.y + ',' + jobObject.pos.roomName + ')');
-                            result = OK;
-                        }
-                        return result;
-                    }
-                },
-                /**@return {int}*/
-                IsJobDone: function (jobObject) {
-                    if (creep.store.getFreeCapacity() <= 6) { // predict that creep will be full and make a transfer that wont stop the harvesting flow
-                        let fetchObject = Game.getObjectById(creep.memory.ContainerId);
-                        if (fetchObject) {
-                            creep.transfer(fetchObject, RESOURCE_ENERGY);
-                            return SHOULD_ACT;
-                        }
-                    }
-                    return this.JobStatus(jobObject);
-                },
-                /**@return {object} @return {undefined}*/
-                FindFetchObject: function (jobObject) { // find free container at source or a storage in another room
-                    let container = Game.getObjectById(creep.memory.ContainerId);
-                    if (!container || container.store.getFreeCapacity() === 0) {
-                        container = jobObject.pos.findInRange(FIND_STRUCTURES, 1, {
-                            filter: function (container) {
-                                return container.structureType === STRUCTURE_CONTAINER && container.store.getFreeCapacity() > 0;
-                            }
-                        })[0];
-                        if (container) {
-                            creep.memory.ContainerId = container.id;
-                        }
-                    }
-                    if (container) { // container found now transfer to container
-                        return container;
-                    }
-                    // container was not an option - now go back to primary room and transfer to storage
-                    let closestRoomWithStorage = Memory.MemRooms[jobObject.pos.roomName].PrimaryRoom;
-                    if (!closestRoomWithStorage) {
-                        let bestDistance = Number.MAX_SAFE_INTEGER;
-                        for (const memRoomKey in Memory.MemRooms) { // search for best storage
-                            if (Game.rooms[memRoomKey] && Game.rooms[memRoomKey].storage && Game.rooms[memRoomKey].storage.store.getFreeCapacity() > 0) { // exist and has room
-                                const distance = Game.map.getRoomLinearDistance(jobObject.pos.roomName, memRoomKey);
-                                if (distance < bestDistance) {
-                                    closestRoomWithStorage = memRoomKey;
-                                    bestDistance = distance;
-                                }
-                            }
-                        }
-                        if (closestRoomWithStorage) { // save to creep and MemRooms
-                            creep.memory.ClosestRoomWithStorage = closestRoomWithStorage; // save in creep memory
-                            if (!Memory.MemRooms[closestRoomWithStorage].AttachedRooms) {
-                                Memory.MemRooms[closestRoomWithStorage].AttachedRooms = {};
-                            }
-                            Memory.MemRooms[closestRoomWithStorage].AttachedRooms[jobObject.pos.roomName] = {};
-                            Memory.MemRooms[jobObject.pos.roomName].PrimaryRoom = closestRoomWithStorage;
-                        }
-                    }
-                    return Game.rooms[closestRoomWithStorage].storage;
-                },
-                /**@return {int}*/
-                Fetch: function (fetchObject, jobObject) {
-                    return DepositCreepStore(creep, fetchObject);
-                },
-            });
-            return result;
-        }
-
-        /**@return {int}*/
         function JobHarvesterPosition(creep, roomJob) {
             const result = GenericFlagAction(creep, roomJob, {
                 /**@return {int}*/
@@ -2030,7 +1922,11 @@ const ExecuteJobs = {
             const result = GenericFlagAction(creep, roomJob, {
                 /**@return {int}*/
                 JobStatus: function (jobObject) {
-                    if (creep.store.getFreeCapacity() === 0 || creep.memory.FetchObjectId && creep.store.getUsedCapacity > 0 || creep.ticksToLive < 500) {
+                    if(creep.store.getUsedCapacity() === 0 && creep.ticksToLive < 500){
+                        console.log('ExecuteJobs JobHarvestDeposit ' + creep.name + ' committed suicide creep.ticksToLive ' + creep.ticksToLive + ' JOB_IS_DONE');
+                        creep.suicide();
+                        return JOB_IS_DONE;
+                    }else if (creep.store.getFreeCapacity() === 0 || creep.memory.FetchObjectId && creep.store.getUsedCapacity > 0 || creep.ticksToLive < 500) {
                         return SHOULD_FETCH;
                     } else {
                         return SHOULD_ACT;
@@ -2067,7 +1963,7 @@ const ExecuteJobs = {
                 /**@return {object}
                  * @return {undefined}*/
                 FindFetchObject: function (jobObject) {
-                    return Game.rooms['E28S29'].storage; // TODO
+                    return FindClosestFreeStore(creep);
                 },
                 /**@return {int}*/
                 Fetch: function (fetchObject, jobObject) {
@@ -2386,7 +2282,25 @@ const ExecuteJobs = {
                         }
                     });
                 }
-                if (closestFreeStore) {
+                if(!closestFreeStore && maxMoveRange !== 0){ // closestFreeStore still not found - look in nearest room for a storage that is free
+                    console.log('ExecuteJobs FindClosestFreeStore not found, looking in other rooms for a storage');
+                    let closestRoom;
+                    let closestRoomRange = Number.MAX_SAFE_INTEGER;
+                    for(const gameRoomKey in Game.rooms){
+                        const gameRoom = Game.rooms[gameRoomKey];
+                        const distance = Game.map.getRoomLinearDistance(creep.pos.roomName, gameRoom.name);
+                        if(gameRoom.controller && gameRoom.controller.my && gameRoom.storage && gameRoom.storage.store.getFreeCapacity() > 0
+                        && closestRoomRange > distance){
+                            closestRoomRange = distance;
+                            closestRoom = gameRoom;
+                        }
+                    }
+                    if(closestRoom){
+                        closestFreeStore = closestRoom.storage;
+                        creep.memory.ClosestFreeStoreId = closestFreeStore.id;
+                        console.log('ExecuteJobs FindClosestFreeStore ' + creep.name + ' in ' + creep.pos.roomName + ' found closest available storage in ' + closestFreeStore.pos.roomName);
+                    }
+                } else {
                     creep.memory.ClosestFreeStoreId = closestFreeStore.id;
                 }
             }
@@ -2395,7 +2309,6 @@ const ExecuteJobs = {
 
         /**@return {int}*/
         function Move(creep, obj, fill = 'transparent', stroke = '#fff', lineStyle = 'dashed', strokeWidth = .15, opacity = .3) {
-            // TODO maybe try and reuse move path here?
             const opts ={
                 reusePath: 5, // default
                 serializeMemory: true,  // default
@@ -2420,8 +2333,7 @@ const ExecuteJobs = {
                 if(Memory.Paths[to.roomName] && Memory.Paths[to.roomName][from.roomName]){
                     shouldCalculate = false;
                 }
-                if(shouldCalculate){
-                    // Use `findRoute` to calculate a high-level plan for this path,
+                if(shouldCalculate){ // Use `findRoute` to calculate a high-level plan for this path,
                     // prioritizing highways and owned rooms
                     const route = Game.map.findRoute(from.roomName, to.roomName, {
                         routeCallback(roomName) {
@@ -2455,9 +2367,12 @@ const ExecuteJobs = {
                         lastRoom = roomInRoute.room
                     }
                     console.log(to.roomName + ' paths: ' + JSON.stringify(Memory.Paths[to.roomName]));
-                    // loop through roomPath to find the room the creep is in and then moveTo exit that leads to the roomPath value in the linked list
                 }
-                result = creep.moveTo(obj, opts);
+                const nextRoom = Memory.Paths[to.roomName][creep.pos.roomName];
+                const exitDirection = Game.map.findExit(creep.room, nextRoom);
+                const exitPosition = creep.pos.findClosestByRange(exitDirection);
+                result = creep.moveTo(exitPosition, opts);
+                //console.log('MOVE TEST nextRoom ' + nextRoom + ' exitDirection ' + exitDirection + ' exitPosition ' + exitPosition + ' result ' + result);
             }else{
                 result = creep.moveTo(obj, opts);
             }

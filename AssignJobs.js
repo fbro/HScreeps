@@ -173,13 +173,13 @@ const AssignJobs = {
                                 break;
                         }
                     }
-                    if ((energyAvailableModifier + linearDistance) < bestLinearDistance || Memory.MemRooms[roomOnJobKey].PrimaryRoom === availableSpawn.pos.roomName) {
+                    if ((energyAvailableModifier + linearDistance) < bestLinearDistance) {
                         bestLinearDistance = linearDistance;
                         bestAvailableSpawn = availableSpawn;
                         bestAvailableSpawnCounter = availableSpawnCounter;
                     }
                     // get on with it if a spawn in room is found or if the primary room is found
-                    if (bestLinearDistance === 0 || Memory.MemRooms[roomOnJobKey].PrimaryRoom === availableSpawn.pos.roomName) {
+                    if (bestLinearDistance === 0) {
                         break;
                     }
                 }

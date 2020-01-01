@@ -2159,7 +2159,7 @@ const POWER_CLASS = {
  * @constant
  * @type {number}
  */
-const PWR_GENERATE_OPS = 1;
+const; PWR_GENERATE_OPS = 1;
 
 /**
  * @constant

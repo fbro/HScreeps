@@ -176,7 +176,7 @@ const Observers = {
                 }
             }else if(target.type === 'powerBank'){
                 if(!Memory.MemRooms[gameRoomKey].powerBankFlag){
-                    if((target.deadline - 4000) > Game.time){
+                    if((target.deadline - 4000) > Game.time && Game.rooms[target.pos.roomName]){
                         Memory.MemRooms[gameRoomKey].powerBankFlag = target.pos;
                         Game.rooms[target.pos.roomName].createFlag(target.pos, target.type + '_' + target.pos.roomName + '-' + target.freeSpaces, primaryColor, secondaryColor);
                         console.log('Observers AddFlag ' + target.pos.roomName + ' ' + target.type + ' ' + target.pos + ' ' + target.freeSpaces + ' ' + primaryColor + ' ' + secondaryColor);
