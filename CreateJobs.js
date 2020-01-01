@@ -447,19 +447,48 @@ const CreateJobs = {
                 Logs.Warning('CreateJobs FillStorageJobs storage full!', gameRoom.name);
                 return;
             }
-            const fillStorages = gameRoom.find(FIND_STRUCTURES, {
+
+            // container
+            const containers = gameRoom.find(FIND_STRUCTURES, {
                 filter: (s) => {
-                    return (s.structureType === STRUCTURE_CONTAINER && Memory.MemRooms[gameRoom.name] && s.id !== Memory.MemRooms[gameRoom.name].CtrlConId && s.store.getUsedCapacity() >= 600) // do not take the controller container into account here
-                        || (s.structureType === STRUCTURE_LINK && s.store[RESOURCE_ENERGY] >= 600 && s.room.storage.pos.inRangeTo(s, 1))
-                        || (s.structureType === STRUCTURE_TERMINAL && (s.store[RESOURCE_ENERGY] >= 120000 || gameRoom.storage.store[RESOURCE_ENERGY] < 5000));
+                    return (s.structureType === STRUCTURE_CONTAINER && Memory.MemRooms[gameRoom.name] && s.id !== Memory.MemRooms[gameRoom.name].CtrlConId && s.store.getUsedCapacity() >= 600); // do not take the controller container into account here
                 }
             });
-            for (const fillStorageKey in fillStorages) {
-                const fillStorage = fillStorages[fillStorageKey];
-                new RoomVisual(gameRoom.name).text('📦', fillStorage.pos.x, fillStorage.pos.y);
-                AddJob(roomJobs, '5FillStrg-' + fillStorage.structureType + '(' + fillStorage.pos.x + ',' + fillStorage.pos.y + ')' + gameRoom.name, fillStorage.id, OBJECT_JOB, 'T');
+            for (const containerKey in containers) {
+                const container = containers[containerKey];
+                new RoomVisual(gameRoom.name).text('📦', container.pos.x, container.pos.y);
+                for(const resourceType in container.store){
+                    AddJob(roomJobs, '5FillStrg-' + container.structureType + '(' + container.pos.x + ',' + container.pos.y + ',' + resourceType + ')' + gameRoom.name, container.id, OBJECT_JOB, 'T');
+                }
             }
-            // drop is a little bit different - but same kind of job as above
+
+            // link
+            const link = gameRoom.storage.pos.findInRange(FIND_MY_STRUCTURES, 1, {filter: (s) => {return s.structureType === STRUCTURE_LINK && s.store[RESOURCE_ENERGY] >= 600;}})[0];
+            if(link){
+                AddJob(roomJobs, '5FillStrg-' + link.structureType + '(' + link.pos.x + ',' + link.pos.y + ',' + RESOURCE_ENERGY + ')' + gameRoom.name, link.id, OBJECT_JOB, 'T');
+            }
+
+            // terminal
+            if(gameRoom.terminal && (gameRoom.terminal.store[RESOURCE_ENERGY] >= 120000 || gameRoom.storage.store[RESOURCE_ENERGY] < 5000)){
+                AddJob(roomJobs, '5FillStrg-' + gameRoom.terminal.structureType + '(' + gameRoom.terminal.pos.x + ',' + gameRoom.terminal.pos.y + ',' + RESOURCE_ENERGY + ')' + gameRoom.name, gameRoom.terminal.id, OBJECT_JOB, 'T');
+            }
+
+            // factory
+            const factory = gameRoom.find(FIND_STRUCTURES, {
+                filter: (f) => {
+                    return (f.structureType === STRUCTURE_FACTORY && f.store[RESOURCE_PHLEGM] > 1000);
+                }
+            })[0];
+            if(factory){
+                for (const resourceType in factory.store) {
+                    if(resourceType === RESOURCE_PHLEGM && factory.store[resourceType] > 1000){
+                        new RoomVisual(gameRoom.name).text('🏭', factory.pos.x, factory.pos.y);
+                        AddJob(roomJobs, '5FillStrg-' + factory.structureType + '(' + factory.pos.x + ',' + factory.pos.y + ',' + resourceType + ')' + gameRoom.name, factory.id, OBJECT_JOB, 'T');
+                    }
+                }
+            }
+
+            // drop
             const resourceDrops = gameRoom.find(FIND_DROPPED_RESOURCES, {
                 filter: (drop) => {
                     return (drop.resourceType === RESOURCE_ENERGY && drop.amount > 100 || drop.resourceType !== RESOURCE_ENERGY && drop.amount > 30);
@@ -468,9 +497,10 @@ const CreateJobs = {
             for (const resourceDropKey in resourceDrops) {
                 const resourceDrop = resourceDrops[resourceDropKey];
                 new RoomVisual(gameRoom.name).text('💰', resourceDrop.pos.x, resourceDrop.pos.y);
-                AddJob(roomJobs, '3FillStrg-drp' + '(' + resourceDrop.pos.x + ',' + resourceDrop.pos.y + ',' + resourceDrop.resourceType + ')' + gameRoom.name, resourceDrop.id, OBJECT_JOB, 'T');
+                AddJob(roomJobs, '3FillStrg-drop' + '(' + resourceDrop.pos.x + ',' + resourceDrop.pos.y + ',' + resourceDrop.resourceType + ')' + gameRoom.name, resourceDrop.id, OBJECT_JOB, 'T');
             }
-            // Tombstone is also a little bit different - but same kind of job as above
+
+            // tombstone
             const tombstoneDrops = gameRoom.find(FIND_TOMBSTONES, {
                 filter: (tombstone) => {
                     return tombstone.store.getUsedCapacity() > 0;
@@ -479,9 +509,10 @@ const CreateJobs = {
             for (const tombstoneDropKey in tombstoneDrops) {
                 const tombstoneDrop = tombstoneDrops[tombstoneDropKey];
                 new RoomVisual(gameRoom.name).text('⚰', tombstoneDrop.pos.x, tombstoneDrop.pos.y);
-                AddJob(roomJobs, '4FillStrg-tmb' + '(' + tombstoneDrop.pos.x + ',' + tombstoneDrop.pos.y + ')' + gameRoom.name, tombstoneDrop.id, OBJECT_JOB, 'T');
+                AddJob(roomJobs, '4FillStrg-tomb' + '(' + tombstoneDrop.pos.x + ',' + tombstoneDrop.pos.y + ')' + gameRoom.name, tombstoneDrop.id, OBJECT_JOB, 'T');
             }
-            // Ruin is also a little bit different - but same kind of job as above
+
+            // ruin
             const ruinDrops = gameRoom.find(FIND_RUINS, {
                 filter: (ruin) => {
                     return ruin.store.getUsedCapacity() > 0;
@@ -489,21 +520,8 @@ const CreateJobs = {
             });
             for (const ruinDropKey in ruinDrops) {
                 const ruinDrop = ruinDrops[ruinDropKey];
-                new RoomVisual(gameRoom.name).text('', ruinDrop.pos.x, ruinDrop.pos.y);
+                new RoomVisual(gameRoom.name).text('🏚️', ruinDrop.pos.x, ruinDrop.pos.y);
                 AddJob(roomJobs, '4FillStrg-ruin' + '(' + ruinDrop.pos.x + ',' + ruinDrop.pos.y + ')' + gameRoom.name, ruinDrop.id, OBJECT_JOB, 'T');
-            }
-            const factory = gameRoom.find(FIND_STRUCTURES, {
-                filter: (f) => {
-                    return (f.structureType === STRUCTURE_FACTORY && f.store[RESOURCE_PHLEGM] > 1000);
-                }
-            })[0];
-            if(factory){
-                for (const resourceType in factory.store) {
-                    if(resourceType === RESOURCE_PHLEGM){
-                        new RoomVisual(gameRoom.name).text('📦', factory.pos.x, factory.pos.y);
-                        AddJob(roomJobs, '5FillStrg-' + factory.structureType + '(' + factory.pos.x + ',' + factory.pos.y + ',' + resourceType + ')' + gameRoom.name, factory.id, OBJECT_JOB, 'T');
-                    }
-                }
             }
         }
 

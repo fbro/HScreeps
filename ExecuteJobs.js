@@ -377,11 +377,8 @@ const ExecuteJobs = {
                 },
                 /**@return {int}*/
                 IsJobDone: function (jobObject) {
-                    if (creep.store.getFreeCapacity() <= 6) { // predict that creep will be full and make a transfer that wont stop the harvesting flow
-                        let fetchObject = Game.getObjectById(creep.memory.LinkId);
-                        if (!fetchObject) {
-                            fetchObject = Game.getObjectById(creep.memory.ContainerId);
-                        }
+                    if (creep.store.getFreeCapacity() <= creep.getActiveBodyparts(WORK)) { // predict that creep will be full and make a transfer that wont stop the harvesting flow
+                        let fetchObject = Game.getObjectById(creep.memory.ClosestFreeStoreId);
                         if (fetchObject) {
                             creep.transfer(fetchObject, RESOURCE_ENERGY);
                             return SHOULD_ACT;
@@ -428,8 +425,12 @@ const ExecuteJobs = {
                             }
                         })[0];
                         if (toRepair) { // repair on the road
-                            creep.repair(toRepair);
-                            result = creep.transfer(fetchObject, RESOURCE_ENERGY, creep.store[RESOURCE_ENERGY] - creep.getActiveBodyparts(WORK));
+                            result = creep.repair(toRepair);
+                            let amountToTransfer = creep.store[RESOURCE_ENERGY] - creep.getActiveBodyparts(WORK);
+                            if(result !== OK || amountToTransfer <= 0){
+                                amountToTransfer = undefined;
+                            }
+                            result = creep.transfer(fetchObject, RESOURCE_ENERGY, amountToTransfer);
                         } else {
                             result = DepositCreepStore(creep, fetchObject);
                         }
@@ -674,7 +675,6 @@ const ExecuteJobs = {
             return result;
         }
 
-        // TODO should change to resource specific like terminal
         /**@return {int}*/
         function JobFillStorage(creep, roomJob) {
             const result = GenericJobAction(creep, roomJob, {
@@ -716,7 +716,6 @@ const ExecuteJobs = {
                             if(amountToWithdraw > creep.store.getFreeCapacity()){
                                 amountToWithdraw = creep.store.getFreeCapacity();
                             }
-                            console.log('Test withdrawing ' + creep.name + ' ' + resourceType + ' amountToWithdraw ' + amountToWithdraw);
                             return creep.withdraw(jobObject, resourceType, amountToWithdraw);
                         }else{
                             return JOB_IS_DONE;
@@ -1879,28 +1878,7 @@ const ExecuteJobs = {
                 /**@return {object}
                  * @return {undefined}*/
                 FindFetchObject: function (jobObject) {
-                    let closestRoomWithStorage = creep.memory.ClosestRoomWithStorage;
-                    if (!closestRoomWithStorage) {
-                        let bestDistance = Number.MAX_SAFE_INTEGER;
-                        for (const memRoomKey in Memory.MemRooms) { // search for best storage
-                            if (Game.rooms[memRoomKey] && Game.rooms[memRoomKey].storage && Game.rooms[memRoomKey].storage.store.getFreeCapacity() > 0) { // exist and has room
-                                const distance = Game.map.getRoomLinearDistance(jobObject.pos.roomName, memRoomKey);
-                                if (distance < bestDistance) {
-                                    closestRoomWithStorage = memRoomKey;
-                                    bestDistance = distance;
-                                }
-                            }
-                        }
-                        if (closestRoomWithStorage) { // save to creep
-                            creep.memory.ClosestRoomWithStorage = closestRoomWithStorage;
-                        }
-                    }
-                    if (closestRoomWithStorage) {
-                        return Game.rooms[closestRoomWithStorage].storage;
-                    } else {
-                        Logs.Info('ExecuteJobs JobTransportPowerBank WARNING storage not found!', creep.name + ' could not find storage from ' + jobObject.pos.roomName);
-                        return undefined;
-                    }
+                    return FindClosestFreeStore(creep);
                 },
                 /**@return {int}*/
                 Fetch: function (fetchObject, jobObject) {

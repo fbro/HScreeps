@@ -44,7 +44,7 @@ module.exports.loop = function () {
                                     }
                                 }
                                 if(!foundCreep){
-                                    Logs.Error('Lingering MaxCreeps found and removed', creepTypesKey + ' ' + creepKey + ' in ' + memRoomKey);
+                                    Logs.Error('Lingering MaxCreeps found and removed', creepKey + ' in ' + memRoomKey);
                                     memRoom.MaxCreeps[creepTypesKey][creepKey] = undefined;
                                 }
                             }
