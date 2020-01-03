@@ -129,7 +129,7 @@ const Terminals = {
             const orders = Game.market.getAllOrders(order => order.resourceType === resourceType
                 && order.type === ORDER_SELL
                 && Game.market.calcTransactionCost(500, terminal.pos.roomName, order.roomName) <= 500
-                && (resourceHistory[0].avgPrice * 2) >= order.price
+                && (resourceHistory[0].avgPrice * 1.5) >= order.price
                 && order.remainingAmount > 0
             );
             if(orders.length > 0){

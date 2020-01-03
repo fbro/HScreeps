@@ -165,16 +165,37 @@ const AssignJobs = {
                             case availableSpawn.room.energyAvailable < 2000:
                                 energyAvailableModifier = -3;
                                 break;
-                            case availableSpawn.room.energyAvailable < 4000:
+                            case availableSpawn.room.energyAvailable < 3000:
                                 energyAvailableModifier = -4;
                                 break;
-                            case availableSpawn.room.energyAvailable > 4000:
+                            case availableSpawn.room.energyAvailable < 4000:
                                 energyAvailableModifier = -5;
+                                break;
+                            case availableSpawn.room.energyAvailable < 5000:
+                                energyAvailableModifier = -6;
+                                break;
+                            case availableSpawn.room.energyAvailable < 6000:
+                                energyAvailableModifier = -7;
+                                break;
+                            case availableSpawn.room.energyAvailable < 7000:
+                                energyAvailableModifier = -8;
+                                break;
+                            case availableSpawn.room.energyAvailable < 8000:
+                                energyAvailableModifier = -9;
+                                break;
+                            case availableSpawn.room.energyAvailable < 9000:
+                                energyAvailableModifier = -10;
+                                break;
+                            case availableSpawn.room.energyAvailable < 10000:
+                                energyAvailableModifier = -11;
+                                break;
+                            case availableSpawn.room.energyAvailable > 10000:
+                                energyAvailableModifier = -12;
                                 break;
                         }
                     }
                     if ((energyAvailableModifier + linearDistance) < bestLinearDistance) {
-                        bestLinearDistance = linearDistance;
+                        bestLinearDistance = energyAvailableModifier + linearDistance;
                         bestAvailableSpawn = availableSpawn;
                         bestAvailableSpawnCounter = availableSpawnCounter;
                     }

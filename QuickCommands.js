@@ -2,6 +2,7 @@
 Memory.MemRooms = {};
 Memory.ErrorLog = undefined;
 Memory.InfoLog = undefined;
+Memory.Paths = undefined;
 for (const creepName in Memory.creeps) {
     const gc = Game.creeps[creepName];
     const mc = Memory.creeps[creepName];
@@ -31,3 +32,9 @@ for (const flagKey in Game.flags) {
     const flag = Game.flags[flagKey];
     console.log(flagKey + ' ' + JSON.stringify(flag));
 }
+
+console.log(Game.rooms['E35S29'].controller.owner);
+
+Game.creeps['M1'].move(LEFT)
+
+console.log(Game.rooms['E28S29'].energyAvailable);

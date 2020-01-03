@@ -380,7 +380,10 @@ const ExecuteJobs = {
                     if (creep.store.getFreeCapacity() <= creep.getActiveBodyparts(WORK)) { // predict that creep will be full and make a transfer that wont stop the harvesting flow
                         let fetchObject = Game.getObjectById(creep.memory.ClosestFreeStoreId);
                         if (fetchObject) {
-                            creep.transfer(fetchObject, RESOURCE_ENERGY);
+                            const result = creep.transfer(fetchObject, RESOURCE_ENERGY);
+                            if(result === OK){
+                                creep.memory.FetchObjectId = undefined;
+                            }
                             return SHOULD_ACT;
                         }
                     }
@@ -1274,18 +1277,20 @@ const ExecuteJobs = {
                     if (hostileCreep) {
                         return hostileCreep;
                     } else {
-                        return jobObject;
+                        if(jobObject){
+                            const hostileStructure = jobObject.pos.findClosestByPath(FIND_HOSTILE_STRUCTURES);
+                            if (hostileStructure) {
+                                return hostileStructure;
+                            }
+                        }else {
+                            return jobObject;
+                        }
                     }
                 },
                 /**@return {int}*/
                 Fetch: function (fetchObject, jobObject) {
                     if (jobObject !== fetchObject) { // hostileCreep
-                        if (Math.abs(creep.pos.x - fetchObject.pos.x) > 1 || Math.abs(creep.pos.y - fetchObject.pos.y) > 1) {
-                            creep.rangedAttack(fetchObject);
-                            return ERR_NOT_IN_RANGE;
-                        } else {
-                            return creep.attack(fetchObject);
-                        }
+                        return creep.attack(fetchObject);
                     } else if (creep.pos.isNearTo(jobObject)) {
                         creep.say(jobObject.name);
                         return OK; // when OK is returned FindFetchObject is checking each tick for new hostileCreeps
@@ -1808,8 +1813,12 @@ const ExecuteJobs = {
                 },
                 /**@return {int}*/
                 Fetch: function (fetchObject, jobObject) {
-                    if (fetchObject === jobObject) {
-                        return OK;
+                    if (fetchObject === jobObject ) {
+                        if(creep.pos.getRangeTo(jobObject) < 8){
+                            return OK;
+                        }else{
+                            return ERR_NOT_IN_RANGE;
+                        }
                     } else {
                         let result = creep.heal(fetchObject);
                         if (result !== OK || creep.getActiveBodyparts(HEAL) * 12 + fetchObject.hits >= fetchObject.hitsMax) { // predict that creep is fully healed
@@ -2260,7 +2269,7 @@ const ExecuteJobs = {
                         }
                     });
                 }
-                if(!closestFreeStore && maxMoveRange !== 0){ // closestFreeStore still not found - look in nearest room for a storage that is free
+                if(!closestFreeStore && maxMoveRange === 0){ // closestFreeStore still not found - look in nearest room for a storage that is free
                     console.log('ExecuteJobs FindClosestFreeStore not found, looking in other rooms for a storage');
                     let closestRoom;
                     let closestRoomRange = Number.MAX_SAFE_INTEGER;
@@ -2278,7 +2287,7 @@ const ExecuteJobs = {
                         creep.memory.ClosestFreeStoreId = closestFreeStore.id;
                         console.log('ExecuteJobs FindClosestFreeStore ' + creep.name + ' in ' + creep.pos.roomName + ' found closest available storage in ' + closestFreeStore.pos.roomName);
                     }
-                } else {
+                } else if(closestFreeStore) {
                     creep.memory.ClosestFreeStoreId = closestFreeStore.id;
                 }
             }
@@ -2318,20 +2327,15 @@ const ExecuteJobs = {
                             const parsed = /^[WE]([0-9]+)[NS]([0-9]+)$/.exec(roomName);
                             const isHighway = (parsed[1] % 10 === 0) || (parsed[2] % 10 === 0);
                             let isMyRoom = false;
-                            let isEnemyRoom = false;
                             if(Game.rooms[roomName] && Game.rooms[roomName].controller){
                                 if(Game.rooms[roomName].controller.my){
                                     isMyRoom = true;
-                                }else if(Game.rooms[roomName].controller.owner){
-                                    isEnemyRoom = true;
                                 }
                             }
                             if (isHighway || isMyRoom) {
                                 return 1;
-                            } else if(isEnemyRoom){
-                                return 100;
                             } else {
-                                return 1.5; // unowned room
+                                return 10;
                             }
                         }
                     });
