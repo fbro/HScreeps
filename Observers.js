@@ -93,12 +93,12 @@ const Observers = {
                         }
                     });
                     let shouldVacateHallway = false;
-                    if(walls[0]){ // other factors could be added here like hostile creeps
+                    if (walls[0]) { // other factors could be added here like hostile creeps
                         shouldVacateHallway = true;
                     }
 
                     // powerBankFlag
-                    if(!Memory.MemRooms[gameRoomKey].powerBankFlag){
+                    if (!Memory.MemRooms[gameRoomKey].powerBankFlag) {
                         const powerBank = LookForPowerBank(roomKey, observer);
                         if (powerBank) {
                             if ((powerBank.deadline - 4000) > Game.time && !shouldVacateHallway) {
@@ -107,12 +107,24 @@ const Observers = {
                                 console.log('Observers ScanPowerBanksAndDeposits add ' + powerBank.pos.roomName + ' ' + powerBank.type + ' ' + powerBank.pos + ' ' + powerBank.freeSpaces + ' ' + COLOR_ORANGE + ' ' + COLOR_PURPLE + ' result ' + result);
                             }
                         }
-                    }else if(Memory.MemRooms[gameRoomKey].powerBankFlag && Memory.MemRooms[gameRoomKey].powerBankFlag.deadline < Game.time){
+                    } else if (Memory.MemRooms[gameRoomKey].powerBankFlag
+                        && (Memory.MemRooms[gameRoomKey].powerBankFlag.deadline < Game.time
+                            || Memory.MemRooms[gameRoomKey].powerBankFlag.pos.roomName === roomKey
+                            && (!Game.rooms[roomKey].find(FIND_STRUCTURES, {
+                                    filter: function (pb) {
+                                        return pb.structureType === STRUCTURE_POWER_BANK;
+                                    }
+                                })[0]
+                                && !Game.rooms[roomKey].find(FIND_DROPPED_RESOURCES, {
+                                    filter: function (r) {
+                                        return r.resourceType === RESOURCE_POWER;
+                                    }
+                                })[0]))) {
                         DeleteFlag(Memory.MemRooms[gameRoomKey].powerBankFlag.type, Memory.MemRooms[gameRoomKey].powerBankFlag.pos.roomName, Memory.MemRooms[gameRoomKey].powerBankFlag.freeSpaces);
                     }
 
                     // depositFlag
-                    if(!Memory.MemRooms[gameRoomKey].depositFlag){
+                    if (!Memory.MemRooms[gameRoomKey].depositFlag) {
                         const deposit = LookForDeposit(roomKey, observer);
                         if (deposit) {
                             if (deposit.lastCooldown < 70 && !shouldVacateHallway) {
@@ -121,9 +133,9 @@ const Observers = {
                                 console.log('Observers ScanPowerBanksAndDeposits add ' + deposit.pos.roomName + ' ' + deposit.type + ' ' + deposit.pos + ' ' + deposit.freeSpaces + ' ' + COLOR_ORANGE + ' ' + COLOR_CYAN + ' result ' + result);
                             }
                         }
-                    }else if(Memory.MemRooms[gameRoomKey].depositFlag && Memory.MemRooms[gameRoomKey].depositFlag.lastCooldown > 70){
+                    } else if (Memory.MemRooms[gameRoomKey].depositFlag && Memory.MemRooms[gameRoomKey].depositFlag.lastCooldown > 70) {
                         DeleteFlag(Memory.MemRooms[gameRoomKey].depositFlag.type, Memory.MemRooms[gameRoomKey].depositFlag.pos.roomName, Memory.MemRooms[gameRoomKey].depositFlag.freeSpaces);
-                    }else if(Memory.MemRooms[gameRoomKey].depositFlag && Memory.MemRooms[gameRoomKey].depositFlag.pos.roomName === roomKey){ // if room is the same then update deposit
+                    } else if (Memory.MemRooms[gameRoomKey].depositFlag && Memory.MemRooms[gameRoomKey].depositFlag.pos.roomName === roomKey) { // if room is the same then update deposit
                         Memory.MemRooms[gameRoomKey].depositFlag = LookForDeposit(roomKey, observer);
                     }
 
@@ -140,8 +152,8 @@ const Observers = {
             const flagName = flagType + '_' + roomKey + '-' + freeSpaces;
             const flagToRemove = Game.flags[flagName];
             if (flagType === 'powerBank') {
-                Memory.MemRooms[gameRoomKey].powerBankFlag = undefined;
                 console.log('Observers DeleteFlag removed powerBankFlag memory in ' + gameRoomKey + ' ' + JSON.stringify(Memory.MemRooms[gameRoomKey].powerBankFlag));
+                Memory.MemRooms[gameRoomKey].powerBankFlag = undefined;
             } else if (flagType === 'deposit') {
                 console.log('Observers DeleteFlag removed depositFlag memory in ' + gameRoomKey + ' ' + JSON.stringify(Memory.MemRooms[gameRoomKey].depositFlag));
                 Memory.MemRooms[gameRoomKey].depositFlag = undefined;

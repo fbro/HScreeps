@@ -38,3 +38,8 @@ console.log(Game.rooms['E35S29'].controller.owner);
 Game.creeps['M1'].move(LEFT)
 
 console.log(Game.rooms['E28S29'].energyAvailable);
+
+const structures = Game.rooms['E32S28'].find(FIND_STRUCTURES, {filter: function (s) {return s.structureType === STRUCTURE_EXTENSION;}});
+for(const structureKey in structures){
+    structures[structureKey].destroy();
+}
