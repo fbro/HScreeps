@@ -228,6 +228,9 @@ const PowerCreeps = {
             let powerSpawnOrBank;
             if (powerCreep.memory.PowerSpawnOrBankId) {
                 powerSpawnOrBank = Game.getObjectById(powerCreep.memory.PowerSpawnOrBankId);
+                if(powerSpawnOrBank && powerSpawnOrBank.pos.roomName !== powerCreep.pos.roomName){
+                    powerSpawnOrBank = undefined;
+                }
             }
             if (!powerSpawnOrBank) {
                 powerSpawnOrBank = powerCreep.room.find(FIND_MY_STRUCTURES, {

@@ -2296,7 +2296,7 @@ const ExecuteJobs = {
 
         /**@return {int}*/
         function Move(creep, obj, fill = 'transparent', stroke = '#fff', lineStyle = 'dashed', strokeWidth = .15, opacity = .3) {
-            const opts ={
+            const opts = {
                 reusePath: 5, // default
                 serializeMemory: true,  // default
                 noPathFinding: false,  // default
@@ -2352,8 +2352,14 @@ const ExecuteJobs = {
                 }
                 const nextRoom = Memory.Paths[to.roomName][creep.pos.roomName];
                 const exitDirection = Game.map.findExit(creep.room, nextRoom);
-                const exitPosition = creep.pos.findClosestByRange(exitDirection);
+                const exitPosition = creep.pos.findClosestByPath(exitDirection);
                 result = creep.moveTo(exitPosition, opts);
+                if(result === ERR_NO_PATH){
+                    Logs.Warning('ExecuteJobs Move ERR_NO_PATH', creep.name + ' (' + creep.pos.x + ',' + creep.pos.y + ',' + creep.pos.roomName + ')');
+                    console.log('MOVE TEST nextRoom ' + nextRoom + ' exitDirection ' + exitDirection + ' exitPosition ' + exitPosition + ' result ' + result);
+                    opts.reusePath = 0;
+                    result = creep.moveTo(exitPosition, opts);
+                }
                 //console.log('MOVE TEST nextRoom ' + nextRoom + ' exitDirection ' + exitDirection + ' exitPosition ' + exitPosition + ' result ' + result);
             }else{
                 result = creep.moveTo(obj, opts);

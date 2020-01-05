@@ -72,16 +72,16 @@ module.exports.loop = function () {
     PowerCreeps.run();
 };
 
-// TODO:
+// TODOs:
+// lab reactions
+// RenewPowerCreep: only looks for renew sources in the current room
 
-// TODO Move interroom simplification - try and move in hallways!!!
-// TODO power bank harvesting - avoid enemy rooms
-// avoid enemy rooms when traveling long distances
-
+// attack NPC strongholds
+// harvest middle rooms
+// harvest neutral rooms
 
 // if doing long distance work creep should make sure it has enough timeToLive to do the job
 // add constructions
 // add renewCreep functionality
-// cache paths to be reused by creeps
 // recycle creeps if there are many idle!
 // monitor creeps and see if they can work more quickly by optimizing its actions - remove 'pausing' ticks
