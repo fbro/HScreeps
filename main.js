@@ -73,6 +73,7 @@ module.exports.loop = function () {
 };
 
 // TODOs:
+// TODO - Harvester -20 error rarely appears
 // lab reactions
 // RenewPowerCreep: only looks for renew sources in the current room
 
