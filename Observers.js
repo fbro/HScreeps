@@ -117,7 +117,8 @@ const Observers = {
                                     filter: function (r) {
                                         return r.resourceType === RESOURCE_POWER;
                                     }
-                                })[0]))) {
+                                })[0]
+                                && !Game.rooms[roomKey].find(FIND_RUINS)[0]))) {
                         DeleteFlag(Memory.MemRooms[gameRoomKey].PowerBankFlag.Type, Memory.MemRooms[gameRoomKey].PowerBankFlag.pos.roomName, Memory.MemRooms[gameRoomKey].PowerBankFlag.FreeSpaces);
                     }
 
@@ -160,7 +161,7 @@ const Observers = {
                 Logs.Info('observers DeleteFlag', flagName);
                 flagToRemove.remove();
             } else {
-                console.log('Observers DeleteFlag could not delete flag ' + flagName + ' it does not exist');
+                console.log('Observers DeleteFlag could not delete flag ' + flagName + ' it does not exist'); // maybe JobTransportPowerBank have removed it
             }
         }
 

@@ -238,13 +238,13 @@ const CreateJobs = {
                 if ((powerBank && powerBank.hits < 250000) || droppedPower) {
                     jobs = CreateFlagJob(jobs, '1TrnsprtP1', gameFlagKey, gameFlag, 'T');
                     console.log('CreateJobs PowerBankJobs 1TrnsprtP1 ' + gameFlag.room.name);
-                    if ((powerBank && powerBank.hits > 1000) || (droppedPower && droppedPower.amount > 800)) {
+                    if ((powerBank && powerBank.power > 1000) || (droppedPower && droppedPower.amount > 1000)) {
                         jobs = CreateFlagJob(jobs, '1TrnsprtP2', gameFlagKey, gameFlag, 'T');
                         console.log('CreateJobs PowerBankJobs 1TrnsprtP2 ' + gameFlag.room.name);
-                        if ((powerBank && powerBank.hits > 2000) || (droppedPower && droppedPower.amount > 1500)) {
+                        if ((powerBank && powerBank.power > 2000) || (droppedPower && droppedPower.amount > 2000)) {
                             jobs = CreateFlagJob(jobs, '1TrnsprtP3', gameFlagKey, gameFlag, 'T');
                             console.log('CreateJobs PowerBankJobs 1TrnsprtP3 ' + gameFlag.room.name);
-                            if ((powerBank && powerBank.hits > 3000) || (droppedPower && droppedPower.amount > 2900)) {
+                            if ((powerBank && powerBank.power > 3000) || (droppedPower && droppedPower.amount > 3000)) {
                                 jobs = CreateFlagJob(jobs, '1TrnsprtP4', gameFlagKey, gameFlag, 'T');
                                 console.log('CreateJobs PowerBankJobs 1TrnsprtP4 ' + gameFlag.room.name);
                             }
