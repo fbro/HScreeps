@@ -2227,7 +2227,7 @@ const ExecuteJobs = {
             } else if (result === ERR_FULL) {
                 Logs.Error('ExecuteJobs DepositCreepStore unexpected ERR_FULL!', result + ' ' + creep.name + ' (' + storeToFillObject.pos.x + ',' + storeToFillObject.pos.y + ',' + storeToFillObject.pos.roomName + ') to ' + storeToFillObject + ' from ' + storeToEmptyObject + ' ' + resourceTypeToKeep);
             } else{
-                Logs.Error('ExecuteJobs DepositCreepStore unexpected result!', result + ' ' + creep.name + ' (' + storeToFillObject.pos.x + ',' + storeToFillObject.pos.y + ',' + storeToFillObject.pos.roomName + ') to ' + storeToFillObject + ' from ' + storeToEmptyObject + ' ' + resourceTypeToKeep);
+                Logs.Error('ExecuteJobs DepositCreepStore unexpected result!', result + ' ' + creep.name + ' (' + storeToFillObject.pos.x + ',' + storeToFillObject.pos.y + ',' + storeToFillObject.pos.roomName + ') to ' + storeToFillObject + ' from ' + storeToEmptyObject + ' ' + resourceTypeToKeep + ' ' + JSON.stringify(creep.store) + ' ' + JSON.stringify(storeToFillObject));
             }
             return result;
         }
