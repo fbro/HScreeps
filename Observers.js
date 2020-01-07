@@ -120,6 +120,13 @@ const Observers = {
                                 })[0]
                                 && !Game.rooms[roomKey].find(FIND_RUINS)[0]))) {
                         DeleteFlag(Memory.MemRooms[gameRoomKey].PowerBankFlag.Type, Memory.MemRooms[gameRoomKey].PowerBankFlag.pos.roomName, Memory.MemRooms[gameRoomKey].PowerBankFlag.FreeSpaces);
+                    }else{
+                        const leftoverFlag = Game.rooms[roomKey].find(FIND_FLAGS)[0];
+                        if(leftoverFlag && leftoverFlag.color === COLOR_ORANGE && leftoverFlag.secondaryColor === COLOR_PURPLE
+                            && leftoverFlag.name !== (Memory.MemRooms[gameRoomKey].PowerBankFlag.Type + '_' + Memory.MemRooms[gameRoomKey].PowerBankFlag.pos.roomName + '-' + Memory.MemRooms[gameRoomKey].PowerBankFlag.FreeSpaces)){
+                            Logs.Error('Observers ScanPowerBanksAndDeposits remove leftoverFlag', leftoverFlag.name);
+                            leftoverFlag.remove();
+                        }
                     }
 
                     // DepositFlag
@@ -136,6 +143,13 @@ const Observers = {
                         DeleteFlag(Memory.MemRooms[gameRoomKey].DepositFlag.Type, Memory.MemRooms[gameRoomKey].DepositFlag.pos.roomName, Memory.MemRooms[gameRoomKey].DepositFlag.FreeSpaces);
                     } else if (Memory.MemRooms[gameRoomKey].DepositFlag && Memory.MemRooms[gameRoomKey].DepositFlag.pos.roomName === roomKey) { // if room is the same then update deposit
                         Memory.MemRooms[gameRoomKey].DepositFlag = LookForDeposit(roomKey, observer);
+                    }else{
+                        const leftoverFlag = Game.rooms[roomKey].find(FIND_FLAGS)[0];
+                        if(leftoverFlag && leftoverFlag.color === COLOR_ORANGE && leftoverFlag.secondaryColor === COLOR_CYAN
+                            && leftoverFlag.name !== (Memory.MemRooms[gameRoomKey].DepositFlag.Type + '_' + Memory.MemRooms[gameRoomKey].DepositFlag.pos.roomName + '-' + Memory.MemRooms[gameRoomKey].DepositFlag.FreeSpaces)){
+                            Logs.Error('Observers ScanPowerBanksAndDeposits remove leftoverFlag', leftoverFlag.name);
+                            leftoverFlag.remove();
+                        }
                     }
 
                     numOfScansLeft++;

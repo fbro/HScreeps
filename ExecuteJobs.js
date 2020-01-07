@@ -1709,9 +1709,9 @@ const ExecuteJobs = {
                             }
                         })[0];
                         if (powerResource) {
-                            Logs.Info('ExecuteJobs JobAttackPowerBank done', creep.name + ' ' + jobObject.name + ' power ' + powerResource.amount);
+                            console.log('ExecuteJobs JobAttackPowerBank done ' + creep.name + ' ' + jobObject.name + ' power ' + powerResource.amount);
                         } else {
-                            Logs.Info('ExecuteJobs JobAttackPowerBank done', creep.name + ' ' + jobObject.name);
+                            console.log('ExecuteJobs JobAttackPowerBank done ' + creep.name + ' ' + jobObject.name);
                         }
                         result = JOB_IS_DONE;
                     }
@@ -1868,7 +1868,7 @@ const ExecuteJobs = {
                             creep.say('W8');
                             return OK;
                         } else { // no powerResource and no powerBank
-                            Logs.Info('ExecuteJobs JobTransportPowerBank waiting at powerbank flag', creep.name + ' flag in room ' + jobObject.pos.roomName);
+                            console.log('ExecuteJobs JobTransportPowerBank waiting at powerbank flag ' + creep.name + ' flag in room ' + jobObject.pos.roomName);
                             creep.say('W8');
                             if (creep.store[RESOURCE_POWER] > 0) {
                                 jobObject.remove();

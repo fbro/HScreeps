@@ -73,7 +73,11 @@ module.exports.loop = function () {
 };
 
 // TODOs:
-// TODO - Harvester -20 error rarely appears
+// TODO - Harvester -20 error rarely appears - created more info logs for monitoring - wait for some results
+// TODO - map pathfinding problem ERR_NO_PATH happens at room exits
+// TODO powerbank creeps gets -7 - maybe when object disappears
+// TODO remove deposit after 70 cooldown does not work
+// TODO remove powerbank flag does not work
 // lab reactions
 // RenewPowerCreep: only looks for renew sources in the current room
 
