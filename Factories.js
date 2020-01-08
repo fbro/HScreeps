@@ -1,3 +1,4 @@
+let Util = require('Util');
 const Factories = {
     run: function () {
         for (const gameRoomKey in Game.rooms) {
@@ -28,21 +29,21 @@ const Factories = {
                         && factory.effects[0] && factory.effects[0].effect === PWR_OPERATE_FACTORY
                     ){
                         result = factory.produce(RESOURCE_PHLEGM);
-                        console.log('Factories ' + factory.pos.roomName + ' producing ' + RESOURCE_PHLEGM + ' ' + factory.store.getUsedCapacity(RESOURCE_PHLEGM) + ' ' + result + ' ' + RESOURCE_LEMERGIUM_BAR + ' ' + factory.store.getUsedCapacity(RESOURCE_LEMERGIUM_BAR) + ' ' + RESOURCE_CELL + ' ' + factory.store.getUsedCapacity(RESOURCE_CELL) + ' ' + RESOURCE_OXIDANT + ' ' + factory.store.getUsedCapacity(RESOURCE_OXIDANT) + ' ' + RESOURCE_ENERGY + ' ' + factory.store.getUsedCapacity(RESOURCE_ENERGY));
+                        Util.Info('Factories', '', factory.pos.roomName + ' producing ' + RESOURCE_PHLEGM + ' ' + factory.store.getUsedCapacity(RESOURCE_PHLEGM) + ' ' + result + ' ' + RESOURCE_LEMERGIUM_BAR + ' ' + factory.store.getUsedCapacity(RESOURCE_LEMERGIUM_BAR) + ' ' + RESOURCE_CELL + ' ' + factory.store.getUsedCapacity(RESOURCE_CELL) + ' ' + RESOURCE_OXIDANT + ' ' + factory.store.getUsedCapacity(RESOURCE_OXIDANT) + ' ' + RESOURCE_ENERGY + ' ' + factory.store.getUsedCapacity(RESOURCE_ENERGY));
                     }
                     else if(factory.store.getUsedCapacity(RESOURCE_ENERGY) >= 200
                         && factory.store.getUsedCapacity(RESOURCE_LEMERGIUM) >= 500
                         && factory.store.getUsedCapacity(RESOURCE_LEMERGIUM_BAR) < 500
                     ){
                         result = factory.produce(RESOURCE_LEMERGIUM_BAR);
-                        console.log('Factories ' + factory.pos.roomName + ' producing ' + RESOURCE_LEMERGIUM_BAR + ' ' + factory.store.getUsedCapacity(RESOURCE_LEMERGIUM_BAR) + ' ' + result + ' ' + RESOURCE_ENERGY + ' ' + factory.store.getUsedCapacity(RESOURCE_ENERGY) + ' ' + RESOURCE_LEMERGIUM + ' ' + factory.store.getUsedCapacity(RESOURCE_LEMERGIUM));
+                        Util.Info('Factories', '', factory.pos.roomName + ' producing ' + RESOURCE_LEMERGIUM_BAR + ' ' + factory.store.getUsedCapacity(RESOURCE_LEMERGIUM_BAR) + ' ' + result + ' ' + RESOURCE_ENERGY + ' ' + factory.store.getUsedCapacity(RESOURCE_ENERGY) + ' ' + RESOURCE_LEMERGIUM + ' ' + factory.store.getUsedCapacity(RESOURCE_LEMERGIUM));
                     }
                     else if(factory.store.getUsedCapacity(RESOURCE_ENERGY) >= 200
                         && factory.store.getUsedCapacity(RESOURCE_OXYGEN) >= 500
                         && factory.store.getUsedCapacity(RESOURCE_OXIDANT) < 500
                     ){
                         result = factory.produce(RESOURCE_OXIDANT);
-                        console.log('Factories ' + factory.pos.roomName + ' producing ' + RESOURCE_OXIDANT + ' ' + factory.store.getUsedCapacity(RESOURCE_OXIDANT) + ' ' + result + ' ' + RESOURCE_ENERGY + ' ' + factory.store.getUsedCapacity(RESOURCE_ENERGY) + ' ' + RESOURCE_OXYGEN + ' ' + factory.store.getUsedCapacity(RESOURCE_OXYGEN));
+                        Util.Info('Factories', '', factory.pos.roomName + ' producing ' + RESOURCE_OXIDANT + ' ' + factory.store.getUsedCapacity(RESOURCE_OXIDANT) + ' ' + result + ' ' + RESOURCE_ENERGY + ' ' + factory.store.getUsedCapacity(RESOURCE_ENERGY) + ' ' + RESOURCE_OXYGEN + ' ' + factory.store.getUsedCapacity(RESOURCE_OXYGEN));
                     }
                     else if(factory.store.getUsedCapacity(RESOURCE_LEMERGIUM_BAR) >= 20
                         && factory.store.getUsedCapacity(RESOURCE_BIOMASS) >= 100
@@ -50,7 +51,7 @@ const Factories = {
                         && factory.store.getUsedCapacity(RESOURCE_CELL) < 500
                     ){
                         result = factory.produce(RESOURCE_CELL);
-                        console.log('Factories ' + factory.pos.roomName + ' producing ' + RESOURCE_CELL + ' ' + factory.store.getUsedCapacity(RESOURCE_CELL) + ' ' + result + ' ' + RESOURCE_LEMERGIUM_BAR + ' ' + factory.store.getUsedCapacity(RESOURCE_LEMERGIUM_BAR) + ' ' + RESOURCE_BIOMASS + ' ' + factory.store.getUsedCapacity(RESOURCE_BIOMASS) + ' ' + RESOURCE_ENERGY + ' ' + factory.store.getUsedCapacity(RESOURCE_ENERGY));
+                        Util.Info('Factories', '', factory.pos.roomName + ' producing ' + RESOURCE_CELL + ' ' + factory.store.getUsedCapacity(RESOURCE_CELL) + ' ' + result + ' ' + RESOURCE_LEMERGIUM_BAR + ' ' + factory.store.getUsedCapacity(RESOURCE_LEMERGIUM_BAR) + ' ' + RESOURCE_BIOMASS + ' ' + factory.store.getUsedCapacity(RESOURCE_BIOMASS) + ' ' + RESOURCE_ENERGY + ' ' + factory.store.getUsedCapacity(RESOURCE_ENERGY));
                     }
                 }else if(!factory){ // no factory in this room - set FctrId so that it wont look again
                     memRoom.FctrId = '-';

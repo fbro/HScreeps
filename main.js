@@ -6,7 +6,7 @@ let Links = require('Links');
 let Terminals = require('Terminals');
 let Factories = require('Factories');
 let PowerSpawns = require('PowerSpawns');
-let Logs = require('Logs');
+let Util = require('Util');
 let Observers = require('Observers');
 let PowerCreeps = require('PowerCreeps');
 
@@ -19,7 +19,7 @@ module.exports.loop = function () {
             CreateJobs.run();
             Links.run();
             if (Game.time % 9000 === 0) {
-                console.log('--------------- main reset of memory ---------------');
+                Util.Info('Main', 'Main', '--------------- main reset of memory ---------------');
                 delete Memory.Paths;
                 const foundCreeps = {};
                 for (const memRoomKey in Memory.MemRooms) {
@@ -44,7 +44,7 @@ module.exports.loop = function () {
                                     }
                                 }
                                 if(!foundCreep){
-                                    Logs.Error('Lingering MaxCreeps found and removed', creepKey + ' in ' + memRoomKey);
+                                    Util.ErrorLog('Lingering MaxCreeps found and removed', creepKey + ' in ' + memRoomKey);
                                     memRoom.MaxCreeps[creepTypesKey][creepKey] = undefined;
                                 }
                             }
@@ -53,7 +53,7 @@ module.exports.loop = function () {
                     if (memRoom.RoomLevel <= 0 && Object.keys(memRoom.RoomJobs).length === 0) {
                         // room is unowned and there are no jobs in it - remove the room
                         Memory.MemRooms[memRoomKey] = undefined;
-                        Logs.Info('removed unused room', memRoomKey);
+                        Util.InfoLog('removed unused room', memRoomKey);
                     }
                 }
             }
@@ -73,11 +73,13 @@ module.exports.loop = function () {
 };
 
 // TODOs:
-// TODO - Harvester -20 error rarely appears - created more info logs for monitoring - wait for some results
+// TODO - Harvester -20 error rarely appears - created more info logs for monitoring - wait for some results.... none yet..... still none
 // TODO - map pathfinding problem ERR_NO_PATH happens at room exits
 // TODO powerbank creeps gets -7 - maybe when object disappears
+
 // TODO remove deposit after 70 cooldown does not work
 // TODO remove powerbank flag does not work
+
 // lab reactions
 // RenewPowerCreep: only looks for renew sources in the current room
 

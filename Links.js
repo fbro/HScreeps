@@ -1,3 +1,4 @@
+let Util = require('Util');
 const Links = {
     run: function () {
 
@@ -48,7 +49,7 @@ const Links = {
                     'ControllerLinkId': controllerLinkId,
                     'HarvesterLinksId': harvesterLinksId
                 };
-                //console.log('Links added in ' + memRoomKey + ' storage: ' + storageLinkId + ' controller ' + controllerLinkId + ' harvester ' + harvesterLinksId.length + ' roomLevel ' + memRoom.RoomLevel);
+                //Util.Info('Links', 'Links', 'added in ' + memRoomKey + ' storage: ' + storageLinkId + ' controller ' + controllerLinkId + ' harvester ' + harvesterLinksId.length + ' roomLevel ' + memRoom.RoomLevel);
             }
             if ((storageLink || controllerLink) && harvesterLinks.length > 0) {
                 LinkTransfer(storageLink, controllerLink, harvesterLinks);

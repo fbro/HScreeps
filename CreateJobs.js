@@ -1,4 +1,4 @@
-let Logs = require('Logs');
+let Util = require('Util');
 const CreateJobs = {
     run: function () {
         // CreateJobs
@@ -83,14 +83,14 @@ const CreateJobs = {
                     notFound = true;
                 }
                 if (notFound) {
-                    Logs.Error('CreateJobs CreateFlagJobs flag color not found', gameFlagKey + ' ' + gameFlag.color + ' ' + gameFlag.secondaryColor + ' (' + gameFlag.pos.x + ',' + gameFlag.pos.y + ')');
+                    Util.ErrorLog('CreateJobs CreateFlagJobs flag color not found', gameFlagKey + ' ' + gameFlag.color + ' ' + gameFlag.secondaryColor + ' (' + gameFlag.pos.x + ',' + gameFlag.pos.y + ')');
                 }
             }
             return jobs;
         }
 
         function CreateFlagJob(jobs, jobName, gameFlagKey, gameFlag, creepType) {
-            //console.log('CreateJobs CreateFlagJobs AddJob ' + gameFlagKey);
+            //Util.Info('CreateJobs', 'CreateFlagJob', 'AddJob ' + gameFlagKey);
             return AddJob(jobs, jobName + '-' + gameFlagKey + '(' + gameFlag.pos.x + ',' + gameFlag.pos.y + ')' + gameFlag.pos.roomName, gameFlagKey, FLAG_JOB, creepType);
         }
 
@@ -104,7 +104,7 @@ const CreateJobs = {
                         const flagJob = flagJobs[flagJobKey];
                         jobs[flagJobKey] = flagJob; // add job to this room job array
                         flagJobs[flagJobKey] = undefined;
-                        // console.log('CreateJobs CreateObjJobs flagJobs found in ' + gameRoomKey + ' ' + flagJobKey + ' ' + JSON.stringify(jobs[flagJobKey]) + ' length ' + Object.keys(jobs).length);
+                        //Util.Info('CreateJobs', 'CreateObjJobs', 'flagJobs found in ' + gameRoomKey + ' ' + flagJobKey + ' ' + JSON.stringify(jobs[flagJobKey]) + ' length ' + Object.keys(jobs).length);
                     }
                 }
                 if (gameRoom.controller && gameRoom.controller.my) { // create all the jobs in this room
@@ -115,7 +115,7 @@ const CreateJobs = {
                         new RoomVisual(gameRoom.name).text('🏭', source.pos.x, source.pos.y);
                         AddJob(jobs, '1Src(' + source.pos.x + ',' + source.pos.y + ')' + gameRoom.name, source.id, OBJECT_JOB, 'H');
                         if (gameRoom.controller.level < 3) {
-                            const freeSpaces = FreeSpaces(source.pos);
+                            const freeSpaces = Util.FreeSpaces(source.pos);
                             if (freeSpaces > 1) {
                                 AddJob(jobs, '5Src(' + source.pos.x + ',' + source.pos.y + ')' + gameRoom.name, source.id, OBJECT_JOB, 'H');
                             }
@@ -169,7 +169,7 @@ const CreateJobs = {
                     for (const newJobKey in jobs) { // loop through new jobs
                         if (!Memory.MemRooms[gameRoom.name].RoomJobs[newJobKey]) { // new job does not already exist
                             Memory.MemRooms[gameRoom.name].RoomJobs[newJobKey] = jobs[newJobKey]; // save it
-                            //console.log('CreateJobs CreateObjJobs new job added ' + newJobKey);
+                            //Util.Info('CreateJobs', 'CreateObjJobs', 'new job added ' + newJobKey);
                             addedNewJob = true;
                         }
                     }
@@ -178,7 +178,7 @@ const CreateJobs = {
                         const oldJob = Memory.MemRooms[gameRoom.name].RoomJobs[oldJobKey];
                         if (oldJob.Creep === 'vacant' && !jobs[oldJobKey]) { // old job is vacant and old job id not in the new job array
                             Memory.MemRooms[gameRoom.name].RoomJobs[oldJobKey] = undefined; // delete old vacant disappeared job
-                            //console.log('CreateJobs CreateObjJobs old job deleted ' + oldJobKey);
+                            //Util.Info('CreateJobs', 'CreateObjJobs', 'old job deleted ' + oldJobKey);
                         }
                     }
                     if (gameRoom.controller && Memory.MemRooms[gameRoom.name].RoomLevel !== gameRoom.controller.level) { // room level change
@@ -237,16 +237,16 @@ const CreateJobs = {
                 }
                 if ((powerBank && powerBank.hits < 250000) || droppedPower) {
                     jobs = CreateFlagJob(jobs, '1TrnsprtP1', gameFlagKey, gameFlag, 'T');
-                    console.log('CreateJobs PowerBankJobs 1TrnsprtP1 ' + gameFlag.room.name);
+                    Util.Info('CreateJobs', 'PowerBankJobs', '1TrnsprtP1 ' + gameFlag.room.name);
                     if ((powerBank && powerBank.power > 1000) || (droppedPower && droppedPower.amount > 1000)) {
                         jobs = CreateFlagJob(jobs, '1TrnsprtP2', gameFlagKey, gameFlag, 'T');
-                        console.log('CreateJobs PowerBankJobs 1TrnsprtP2 ' + gameFlag.room.name);
+                        Util.Info('CreateJobs', 'PowerBankJobs', '1TrnsprtP2 ' + gameFlag.room.name);
                         if ((powerBank && powerBank.power > 2000) || (droppedPower && droppedPower.amount > 2000)) {
                             jobs = CreateFlagJob(jobs, '1TrnsprtP3', gameFlagKey, gameFlag, 'T');
-                            console.log('CreateJobs PowerBankJobs 1TrnsprtP3 ' + gameFlag.room.name);
+                            Util.Info('CreateJobs', 'PowerBankJobs', '1TrnsprtP3 ' + gameFlag.room.name);
                             if ((powerBank && powerBank.power > 3000) || (droppedPower && droppedPower.amount > 3000)) {
                                 jobs = CreateFlagJob(jobs, '1TrnsprtP4', gameFlagKey, gameFlag, 'T');
-                                console.log('CreateJobs PowerBankJobs 1TrnsprtP4 ' + gameFlag.room.name);
+                                Util.Info('CreateJobs', 'PowerBankJobs', '1TrnsprtP4 ' + gameFlag.room.name);
                             }
                         }
                     }
@@ -267,7 +267,7 @@ const CreateJobs = {
                 }
             })) { // flag must be on top of an existing lab!
                 gameFlag.remove();
-                Logs.Error('CreateJobs CreateFlagJobs lab gone', gameFlagKey);
+                Util.ErrorLog('CreateJobs CreateFlagJobs lab gone', gameFlagKey);
             } else if (gameFlag.pos.findInRange(FIND_MY_STRUCTURES, 0, {
                 filter: function (s) {
                     return s.structureType === STRUCTURE_LAB;
@@ -286,7 +286,7 @@ const CreateJobs = {
                 }
             })) { // flag must be on top of an existing lab!
                 gameFlag.remove();
-                Logs.Error('CreateJobs CreateFlagJobs lab gone', gameFlagKey);
+                Util.ErrorLog('CreateJobs CreateFlagJobs lab gone', gameFlagKey);
             } else if (gameFlag.pos.findInRange(FIND_MY_STRUCTURES, 0, {
                 filter: function (s) {
                     return s.structureType === STRUCTURE_LAB;
@@ -444,7 +444,7 @@ const CreateJobs = {
 
         function FillStorageJobs(gameRoom, roomJobs) {
             if(gameRoom.storage.store.getFreeCapacity() < 5000){
-                Logs.Warning('CreateJobs FillStorageJobs storage full!', gameRoom.name);
+                Util.Warning('CreateJobs FillStorageJobs storage full!', gameRoom.name);
                 return;
             }
 
@@ -595,7 +595,7 @@ const CreateJobs = {
             if (Memory.MemRooms[gameRoom.name] && Memory.MemRooms[gameRoom.name].CtrlConId) {
                 controllerContainer = Game.getObjectById(Memory.MemRooms[gameRoom.name].CtrlConId);
                 if (!controllerContainer) {
-                    console.log('CreateJobs FillControllerContainerJobs removed container id from mem' + gameRoom.name);
+                    Util.Info('CreateJobs', 'FillControllerContainerJobs', 'removed container id from mem' + gameRoom.name);
                     Memory.MemRooms[gameRoom.name].CtrlConId = undefined;
                 }
             }
@@ -606,7 +606,7 @@ const CreateJobs = {
                     }
                 })[0];
                 if (controllerContainer) {
-                    console.log('CreateJobs FillControllerContainerJobs found new container (' + controllerContainer.pos.x + ',' + controllerContainer.pos.y + ',' + controllerContainer.pos.roomName + ') saving in memory');
+                    Util.Info('CreateJobs', 'FillControllerContainerJobs', 'found new container (' + controllerContainer.pos.x + ',' + controllerContainer.pos.y + ',' + controllerContainer.pos.roomName + ') saving in memory');
                     Memory.MemRooms[gameRoom.name].CtrlConId = controllerContainer.id;
                 }
             }
@@ -634,7 +634,7 @@ const CreateJobs = {
                 'MaxCreeps': {},
                 'SourceNumber': sourceNumber,
             };
-            console.log('CreateJobs CreateRoom add new room ' + roomName + ' level ' + level + ' sourceNumber ' + sourceNumber + ' jobs ' + JSON.stringify(jobs))
+            Util.Info('CreateJobs', 'CreateRoom', 'add new room ' + roomName + ' level ' + level + ' sourceNumber ' + sourceNumber + ' jobs ' + JSON.stringify(jobs))
         }
 
         function AddJob(roomJobs, jobName, jobId, jobType, creepType) {
@@ -649,22 +649,6 @@ const CreateJobs = {
                 'CreepType': creepType,
                 'Creep': 'vacant'
             };
-        }
-
-
-        /**@return {number}*/
-        function FreeSpaces(pos) { // get the number of free spaces around a pos
-            let freeSpaces = 0;
-            const terrain = Game.map.getRoomTerrain(pos.roomName);
-            for (let x = pos.x - 1; x <= pos.x + 1; x++) {
-                for (let y = pos.y - 1; y <= pos.y + 1; y++) {
-                    const t = terrain.get(x, y);
-                    if (t === 0 && (pos.x !== x || pos.y !== y)) {
-                        freeSpaces++;
-                    }
-                }
-            }
-            return freeSpaces;
         }
     }
 };

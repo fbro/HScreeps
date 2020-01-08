@@ -1,3 +1,4 @@
+let Util = require('Util');
 const PowerCreeps = {
     run: function () {
         PowerCreepsActions();
@@ -12,10 +13,10 @@ const PowerCreeps = {
                 } else if (!powerCreep.spawnCooldownTime) {
                     if (powerCreep.ticksToLive < 500) { // power creep needs to be renewed
                         result = RenewPowerCreep(powerCreep);
-                        console.log('PowerCreeps trying to renew ' + powerCreep.name + ' result ' + result + ' ticksToLive ' + powerCreep.ticksToLive);
+                        Util.Info('PowerCreeps', 'PowerCreepsActions','trying to renew ' + powerCreep.name + ' result ' + result + ' ticksToLive ' + powerCreep.ticksToLive);
                     } else if (powerCreep.room.controller && powerCreep.room.controller.my && !powerCreep.room.controller.isPowerEnabled) { // my room is not power enabled
                         result = EnablePowerInRoom(powerCreep);
-                        console.log('PowerCreeps trying to EnablePowerInRoom ' + powerCreep.name + ' ' + powerCreep.pos.roomName);
+                        Util.Info('PowerCreeps', 'PowerCreepsActions','trying to EnablePowerInRoom ' + powerCreep.name + ' ' + powerCreep.pos.roomName);
                     } else if (powerCreep.className === POWER_CLASS.OPERATOR) { // power creep is not too old and power is enabled in the room
 
                         if(!powerCreep.memory.OperateTerminalCooldown || !powerCreep.memory.RegenSource1Cooldown || !powerCreep.memory.RegenSource2Cooldown || !powerCreep.memory.OperateFactoryCooldown || !powerCreep.memory.RegenMineralCooldown){
@@ -29,15 +30,15 @@ const PowerCreeps = {
                         if (powerCreep.powers[PWR_GENERATE_OPS].cooldown === 0 && powerCreep.store.getFreeCapacity() > 0) {
                             result = powerCreep.usePower(PWR_GENERATE_OPS); // if power creep is an operator - always use this power when available
                         } else if(powerCreep.memory.OperateFactoryCooldown < Game.time && powerCreep.powers[PWR_OPERATE_FACTORY].cooldown === 0 && powerCreep.store.getUsedCapacity(RESOURCE_OPS) >= 100){
-                            result = OperateFactory(powerCreep);//console.log('OperateFactory');
+                            result = OperateFactory(powerCreep);
                         } /*else if (powerCreep.memory.OperateTerminalCooldown < Game.time && powerCreep.store.getUsedCapacity(RESOURCE_OPS) >= 100 && powerCreep.powers[PWR_OPERATE_TERMINAL].cooldown === 0 && powerCreep.room.terminal && powerCreep.room.terminal.my) {
-                            result = OperateTerminal(powerCreep);//console.log('OperateTerminal');
+                            result = OperateTerminal(powerCreep);
                         }*/ else if ((powerCreep.memory.RegenSource1Cooldown < Game.time || powerCreep.memory.RegenSource2Cooldown < Game.time) && powerCreep.powers[PWR_REGEN_SOURCE].cooldown === 0) {
-                            result = RegenSource(powerCreep);//console.log('RegenSource');
+                            result = RegenSource(powerCreep);
                         } else if(powerCreep.memory.RegenMineralCooldown < Game.time && powerCreep.powers[PWR_REGEN_MINERAL].cooldown === 0){
-                            result = RegenMineral(powerCreep);//console.log('RegenMineral');
+                            result = RegenMineral(powerCreep);
                         } else if (powerCreep.store[RESOURCE_OPS] > 500) {
-                            result = DepositOps(powerCreep);//console.log('DepositOps');
+                            result = DepositOps(powerCreep);
                         }else if(powerCreep.store[RESOURCE_OPS] < 100){
                             result = WithdrawOps(powerCreep);
                         }
@@ -60,7 +61,7 @@ const PowerCreeps = {
                     amountToWithdraw = target.store[RESOURCE_OPS];
                 }
                 result = powerCreep.withdraw(target, RESOURCE_OPS, amountToWithdraw);
-                console.log('PowerCreeps WithdrawOps ' + powerCreep.name + ' ' + result + ' target amount ' + target.store[RESOURCE_OPS]);
+                Util.Info('PowerCreeps', 'WithdrawOps', powerCreep.name + ' ' + result + ' target amount ' + target.store[RESOURCE_OPS]);
             }
             if (result === ERR_NOT_IN_RANGE) {
                 result = powerCreep.moveTo(target);
@@ -70,7 +71,7 @@ const PowerCreeps = {
 
         function DepositOps(powerCreep) {
             let result = powerCreep.transfer(powerCreep.room.storage, RESOURCE_OPS, powerCreep.store[RESOURCE_OPS] - 300);
-            console.log('PowerCreeps DepositOps ' + powerCreep.name + ' ' + result + ' amount ' + powerCreep.store[RESOURCE_OPS]);
+            Util.Info('PowerCreeps', 'WithdrawOps', powerCreep.name + ' ' + result + ' amount ' + powerCreep.store[RESOURCE_OPS]);
             if (result === ERR_NOT_IN_RANGE) {
                 result = powerCreep.moveTo(powerCreep.room.storage);
             }
@@ -91,7 +92,7 @@ const PowerCreeps = {
             }
             if (!operateTerminalEffectExist) {
                 result = powerCreep.usePower(PWR_OPERATE_TERMINAL, powerCreep.room.terminal);
-                console.log('PowerCreeps OperateTerminal ' + powerCreep.name + ' on terminal in ' + powerCreep.room.terminal.pos.roomName);
+                Util.Info('PowerCreeps', 'OperateTerminal', powerCreep.name + ' on terminal in ' + powerCreep.room.terminal.pos.roomName);
                 if (result === ERR_NOT_IN_RANGE) {
                     result = powerCreep.moveTo(powerCreep.room.terminal);
                 }else if(result === OK){
@@ -148,7 +149,7 @@ const PowerCreeps = {
             if (selectedSource) {
                 result = powerCreep.usePower(PWR_REGEN_SOURCE, selectedSource);
 
-                //console.log('PowerCreeps RegenSource ' + powerCreep.name + ' on (' + selectedSource.pos.x + ',' + selectedSource.pos.y + ',' + selectedSource.pos.roomName + ')');
+                //Util.Info('PowerCreeps', 'RegenSource', powerCreep.name + ' on (' + selectedSource.pos.x + ',' + selectedSource.pos.y + ',' + selectedSource.pos.roomName + ')');
                 if (result === ERR_NOT_IN_RANGE) {
                     result = powerCreep.moveTo(selectedSource);
                 }else if(result === OK){
@@ -185,7 +186,7 @@ const PowerCreeps = {
                 // mineral is in the regen period
                 result = OK;
                 powerCreep.memory.RegenMineralCooldown = Game.time + mineral.ticksToRegeneration;
-                console.log('PowerCreeps RegenMineral ' + powerCreep.name + ' in ' + powerCreep.pos.roomName + ' mineral is empty waiting ' + mineral.ticksToRegeneration + ' ticks');
+                Util.Info('PowerCreeps', 'RegenMineral', powerCreep.name + ' in ' + powerCreep.pos.roomName + ' mineral is empty waiting ' + mineral.ticksToRegeneration + ' ticks');
             }
             return result;
         }

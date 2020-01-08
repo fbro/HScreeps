@@ -1,8 +1,7 @@
-let Logs = require('Logs');
+let Util = require('Util');
 const Observers = {
     run: function (gameRoom, gameRoomKey) {
         ObserversActions(gameRoom, gameRoomKey);
-
 
         function ObserversActions(gameRoom, gameRoomKey) {
             if (gameRoom.controller && gameRoom.controller.my && gameRoom.controller.level === 8) {
@@ -102,8 +101,8 @@ const Observers = {
                         const powerBank = LookForPowerBank(roomKey, observer);
                         if (powerBank && (powerBank.Deadline - 4000) > Game.time && !shouldVacateHallway && powerBank.FreeSpaces >= 2) {
                             Memory.MemRooms[gameRoomKey].PowerBankFlag = powerBank;
-                            const result = Game.rooms[powerBank.pos.roomName].createFlag(powerBank.pos, powerBank.Type + '_' + powerBank.pos.roomName + '-' + powerBank.FreeSpaces, COLOR_ORANGE, COLOR_PURPLE);
-                            console.log('Observers ScanPowerBanksAndDeposits add ' + powerBank.pos.roomName + ' ' + powerBank.Type + ' ' + powerBank.pos + ' ' + powerBank.FreeSpaces + ' ' + COLOR_ORANGE + ' ' + COLOR_PURPLE + ' result ' + result);
+                            const result = Game.rooms[powerBank.pos.roomName].createFlag(powerBank.pos, CreateFlagName(powerBank.Type, powerBank.pos.roomName, powerBank.FreeSpaces), COLOR_ORANGE, COLOR_PURPLE);
+                            Util.Info('Observers','ScanPowerBanksAndDeposits', 'add ' + powerBank.pos.roomName + ' ' + powerBank.Type + ' ' + powerBank.pos + ' ' + powerBank.FreeSpaces + ' ' + COLOR_ORANGE + ' ' + COLOR_PURPLE + ' result ' + result);
                         }
                     } else if (Memory.MemRooms[gameRoomKey].PowerBankFlag
                         && (Memory.MemRooms[gameRoomKey].PowerBankFlag.Deadline < Game.time
@@ -119,12 +118,12 @@ const Observers = {
                                     }
                                 })[0]
                                 && !Game.rooms[roomKey].find(FIND_RUINS)[0]))) {
-                        DeleteFlag(Memory.MemRooms[gameRoomKey].PowerBankFlag.Type, Memory.MemRooms[gameRoomKey].PowerBankFlag.pos.roomName, Memory.MemRooms[gameRoomKey].PowerBankFlag.FreeSpaces);
+                        DeleteFlag(Memory.MemRooms[gameRoomKey].PowerBankFlag.FlagName);
                     }else{
                         const leftoverFlag = Game.rooms[roomKey].find(FIND_FLAGS)[0];
                         if(leftoverFlag && leftoverFlag.color === COLOR_ORANGE && leftoverFlag.secondaryColor === COLOR_PURPLE
-                            && leftoverFlag.name !== (Memory.MemRooms[gameRoomKey].PowerBankFlag.Type + '_' + Memory.MemRooms[gameRoomKey].PowerBankFlag.pos.roomName + '-' + Memory.MemRooms[gameRoomKey].PowerBankFlag.FreeSpaces)){
-                            Logs.Error('Observers ScanPowerBanksAndDeposits remove leftoverFlag', leftoverFlag.name);
+                            && leftoverFlag.name !== Memory.MemRooms[gameRoomKey].PowerBankFlag.FlagName){
+                            Util.ErrorLog('Observers ScanPowerBanksAndDeposits remove leftoverFlag', leftoverFlag.name);
                             leftoverFlag.remove();
                         }
                     }
@@ -135,19 +134,19 @@ const Observers = {
                         if (deposit) {
                             if (deposit.LastCooldown < 70 && !shouldVacateHallway) {
                                 Memory.MemRooms[gameRoomKey].DepositFlag = deposit;
-                                const result = Game.rooms[deposit.pos.roomName].createFlag(deposit.pos, deposit.Type + '_' + deposit.pos.roomName + '-' + deposit.FreeSpaces, COLOR_ORANGE, COLOR_CYAN);
-                                console.log('Observers ScanPowerBanksAndDeposits add ' + deposit.pos.roomName + ' ' + deposit.Type + ' ' + deposit.pos + ' ' + deposit.FreeSpaces + ' ' + COLOR_ORANGE + ' ' + COLOR_CYAN + ' result ' + result);
+                                const result = Game.rooms[deposit.pos.roomName].createFlag(deposit.pos, CreateFlagName(deposit.Type, deposit.pos.roomName, deposit.FreeSpaces), COLOR_ORANGE, COLOR_CYAN);
+                                Util.Info('Observers', 'ScanPowerBanksAndDeposits', 'add ' + deposit.pos.roomName + ' ' + deposit.Type + ' ' + deposit.pos + ' ' + deposit.FreeSpaces + ' ' + COLOR_ORANGE + ' ' + COLOR_CYAN + ' result ' + result);
                             }
                         }
                     } else if (Memory.MemRooms[gameRoomKey].DepositFlag && Memory.MemRooms[gameRoomKey].DepositFlag.LastCooldown > 70) {
-                        DeleteFlag(Memory.MemRooms[gameRoomKey].DepositFlag.Type, Memory.MemRooms[gameRoomKey].DepositFlag.pos.roomName, Memory.MemRooms[gameRoomKey].DepositFlag.FreeSpaces);
+                        DeleteFlag(Memory.MemRooms[gameRoomKey].DepositFlag.FlagName);
                     } else if (Memory.MemRooms[gameRoomKey].DepositFlag && Memory.MemRooms[gameRoomKey].DepositFlag.pos.roomName === roomKey) { // if room is the same then update deposit
                         Memory.MemRooms[gameRoomKey].DepositFlag = LookForDeposit(roomKey, observer);
                     }else{
                         const leftoverFlag = Game.rooms[roomKey].find(FIND_FLAGS)[0];
                         if(leftoverFlag && leftoverFlag.color === COLOR_ORANGE && leftoverFlag.secondaryColor === COLOR_CYAN
-                            && leftoverFlag.name !== (Memory.MemRooms[gameRoomKey].DepositFlag.Type + '_' + Memory.MemRooms[gameRoomKey].DepositFlag.pos.roomName + '-' + Memory.MemRooms[gameRoomKey].DepositFlag.FreeSpaces)){
-                            Logs.Error('Observers ScanPowerBanksAndDeposits remove leftoverFlag', leftoverFlag.name);
+                            && leftoverFlag.name !== Memory.MemRooms[gameRoomKey].DepositFlag.FlagName){
+                            Util.ErrorLog('Observers ScanPowerBanksAndDeposits remove leftoverFlag', leftoverFlag.name);
                             leftoverFlag.remove();
                         }
                     }
@@ -161,21 +160,20 @@ const Observers = {
             }
         }
 
-        function DeleteFlag(flagType, roomKey, freeSpaces) { // remove the flag and remove the flag in memory
-            const flagName = flagType + '_' + roomKey + '-' + freeSpaces;
+        function DeleteFlag(flagName) { // remove the flag and remove the flag in memory
             const flagToRemove = Game.flags[flagName];
-            if (flagType === 'powerBank') {
-                console.log('Observers DeleteFlag removed PowerBankFlag memory in ' + gameRoomKey + ' ' + JSON.stringify(Memory.MemRooms[gameRoomKey].PowerBankFlag));
+            if (flagName.startsWith('powerBank')) {
+                Util.Info('Observers', 'DeleteFlag', 'removed PowerBankFlag memory in ' + gameRoomKey + ' ' + JSON.stringify(Memory.MemRooms[gameRoomKey].PowerBankFlag));
                 Memory.MemRooms[gameRoomKey].PowerBankFlag = undefined;
-            } else if (flagType === 'deposit') {
-                console.log('Observers DeleteFlag removed DepositFlag memory in ' + gameRoomKey + ' ' + JSON.stringify(Memory.MemRooms[gameRoomKey].DepositFlag));
+            } else if (flagName.startsWith('deposit')) {
+                Util.Info('Observers', 'DeleteFlag', 'removed DepositFlag memory in ' + gameRoomKey + ' ' + JSON.stringify(Memory.MemRooms[gameRoomKey].DepositFlag));
                 Memory.MemRooms[gameRoomKey].DepositFlag = undefined;
             }
             if (flagToRemove) {
-                Logs.Info('observers DeleteFlag', flagName);
+                Util.InfoLog('observers DeleteFlag', flagName);
                 flagToRemove.remove();
             } else {
-                console.log('Observers DeleteFlag could not delete flag ' + flagName + ' it does not exist'); // maybe JobTransportPowerBank have removed it
+                Util.Info('Observers', 'DeleteFlag', 'could not delete flag ' + flagName + ' it does not exist'); // maybe JobTransportPowerBank have removed it
             }
         }
 
@@ -187,7 +185,7 @@ const Observers = {
                     }
                 })[0];
                 if (deposit) {
-                    const freeSpaces = FreeSpaces(deposit.pos);
+                    const freeSpaces = Util.FreeSpaces(deposit.pos);
                     const depositScan = {
                         'Type': 'deposit',
                         'Id': deposit.id,
@@ -196,9 +194,9 @@ const Observers = {
                         'DepositType': deposit.depositType,
                         'LastCooldown': deposit.lastCooldown,
                         'FreeSpaces': freeSpaces,
-                        'ObserverId': observer.id
+                        'ObserverId': observer.id,
+                        'FlagName' : CreateFlagName('deposit', roomKey, freeSpaces)
                     };
-                    //console.log('Observers AddDeposit found! in ' + roomKey + ' ' + JSON.stringify(depositScan));
                     return depositScan;
                 }
             }
@@ -212,34 +210,24 @@ const Observers = {
                     }
                 })[0];
                 if (powerBank) {
-                    const freeSpaces = FreeSpaces(powerBank.pos);
+                    const freeSpaces = Util.FreeSpaces(powerBank.pos);
                     const powerBankScan = {
                         'Type': 'powerBank',
                         'Id': powerBank.id,
                         'pos': powerBank.pos,
                         'Deadline': powerBank.ticksToDecay + Game.time,
                         'FreeSpaces': freeSpaces,
-                        'ObserverId': observer.id
+                        'ObserverId': observer.id,
+                        'FlagName' : CreateFlagName('powerBank', roomKey, freeSpaces)
                     };
-                    //console.log('Observers AddPowerBank found! in ' + roomKey + ' ' + JSON.stringify(powerBankScan));
                     return powerBankScan;
                 }
             }
         }
 
-        /**@return {number}*/
-        function FreeSpaces(pos) { // get the number of free spaces around the power bank or deposit
-            let freeSpaces = 0;
-            const terrain = Game.map.getRoomTerrain(pos.roomName);
-            for (let x = pos.x - 1; x <= pos.x + 1; x++) {
-                for (let y = pos.y - 1; y <= pos.y + 1; y++) {
-                    const t = terrain.get(x, y);
-                    if (t === 0 && (pos.x !== x || pos.y !== y)) {
-                        freeSpaces++;
-                    }
-                }
-            }
-            return freeSpaces;
+        /**@return {string}*/
+        function CreateFlagName(flagType, roomKey, freeSpaces){
+            return flagType + '_' + roomKey + '-' + freeSpaces;
         }
     }
 };
