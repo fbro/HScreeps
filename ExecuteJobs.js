@@ -2064,6 +2064,15 @@ const ExecuteJobs = {
             return result;
         }
 
+        /**@return {object} @return {undefined}*/
+        function FindFetchResource(creep, jobObject, resourceToFetch) {
+            let energySupply = FindClosestResourceInRoom(creep, jobObject.room, resourceToFetch, jobObject);
+            if (!energySupply && creep.pos.roomName !== jobObject.pos.roomName && creep.room.controller && creep.room.controller.my && creep.room.storage) {
+                energySupply = creep.room.storage;
+            }
+            return energySupply;
+        }
+
         /**@return {object}
          * @return {undefined}*/
         function FindClosestResourceInRoom(creep, room, resourceToFetch, jobObject) {
@@ -2073,6 +2082,9 @@ const ExecuteJobs = {
                 // if the saved resourceSupply does not have any energy then remove it to make way for a new search
                 if (!resourceSupply || !resourceSupply.store || resourceSupply.store[resourceToFetch] === 0) {
                     resourceSupply = undefined;
+                    creep.memory.ResourceSupply = undefined;
+                }else if(resourceSupply && resourceSupply.structureType === STRUCTURE_STORAGE && creep.pos.roomName === jobObject.pos.roomName && creep.pos.getRangeTo(jobObject.pos) > 2){ // creep should have a chance at finding stores that are closer
+                    Util.Info('ExecuteJobs', 'FindClosestResourceInRoom', 'remove memory.ResourceSupply ' + creep.name + ' ' + JSON.stringify(creep.pos) + ' range ' + creep.pos.getRangeTo(jobObject.pos));
                     creep.memory.ResourceSupply = undefined;
                 }
             }
@@ -2104,7 +2116,7 @@ const ExecuteJobs = {
                 }));
                 let bestDistance = Number.MAX_SAFE_INTEGER;
                 for (let i = 0; i < resourceSupplies.length; i++) {
-                    let distance = Math.sqrt(Math.pow(resourceSupplies[i].pos.x - creep.pos.x, 2) + Math.pow(resourceSupplies[i].pos.y - creep.pos.y, 2));
+                    let distance = Math.sqrt(Math.pow(resourceSupplies[i].pos.x - jobObject.pos.x, 2) + Math.pow(resourceSupplies[i].pos.y - jobObject.pos.y, 2));
                     if (resourceSupplies[i].structureType === STRUCTURE_TERMINAL) {
                         distance += 1000;
                     } else if (resourceSupplies[i].structureType === STRUCTURE_LINK) { // prefer links over other stores
@@ -2128,15 +2140,6 @@ const ExecuteJobs = {
                 }
             }
             return resourceSupply;
-        }
-
-        /**@return {object} @return {undefined}*/
-        function FindFetchResource(creep, jobObject, resourceToFetch) {
-            let energySupply = FindClosestResourceInRoom(creep, jobObject.room, resourceToFetch, jobObject);
-            if (!energySupply && creep.pos.roomName !== jobObject.pos.roomName) {
-                energySupply = FindClosestResourceInRoom(creep, creep.room, resourceToFetch, jobObject); // try again but look at the room the creep is in
-            }
-            return energySupply;
         }
 
         /**@return {int}*/
