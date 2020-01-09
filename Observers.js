@@ -123,7 +123,7 @@ const Observers = {
                         const leftoverFlag = Game.rooms[roomKey].find(FIND_FLAGS)[0];
                         if(leftoverFlag && leftoverFlag.color === COLOR_ORANGE && leftoverFlag.secondaryColor === COLOR_PURPLE
                             && leftoverFlag.name !== Memory.MemRooms[gameRoomKey].PowerBankFlag.FlagName){
-                            Util.ErrorLog('Observers ScanPowerBanksAndDeposits remove leftoverFlag', leftoverFlag.name);
+                            Util.ErrorLog('Observers', 'ScanPowerBanksAndDeposits', 'remove leftoverFlag ' + leftoverFlag.name);
                             leftoverFlag.remove();
                         }
                     }
@@ -146,7 +146,7 @@ const Observers = {
                         const leftoverFlag = Game.rooms[roomKey].find(FIND_FLAGS)[0];
                         if(leftoverFlag && leftoverFlag.color === COLOR_ORANGE && leftoverFlag.secondaryColor === COLOR_CYAN
                             && leftoverFlag.name !== Memory.MemRooms[gameRoomKey].DepositFlag.FlagName){
-                            Util.ErrorLog('Observers ScanPowerBanksAndDeposits remove leftoverFlag', leftoverFlag.name);
+                            Util.ErrorLog('Observers', 'ScanPowerBanksAndDeposits', 'remove leftoverFlag ' + leftoverFlag.name);
                             leftoverFlag.remove();
                         }
                     }
@@ -170,7 +170,7 @@ const Observers = {
                 Memory.MemRooms[gameRoomKey].DepositFlag = undefined;
             }
             if (flagToRemove) {
-                Util.InfoLog('observers DeleteFlag', flagName);
+                Util.InfoLog('Observers', 'DeleteFlag', flagName);
                 flagToRemove.remove();
             } else {
                 Util.Info('Observers', 'DeleteFlag', 'could not delete flag ' + flagName + ' it does not exist'); // maybe JobTransportPowerBank have removed it

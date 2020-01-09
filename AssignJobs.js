@@ -238,7 +238,7 @@ const AssignJobs = {
                             const spawn = Game.rooms[roomKey].find(FIND_MY_SPAWNS)[0];
                             if(!spawn){
                                 maxCreepsInRoom = 0;
-                                Util.Warning('AssignJobs ShouldSpawnCreep no spawn = no builder ', roomKey);
+                                Util.Warning('AssignJobs', 'ShouldSpawnCreep', 'no spawn = no builder ' + roomKey);
                             }
                         }
                     }else if(memRoom.RoomLevel === 8 && Game.rooms[roomKey].storage && Game.rooms[roomKey].storage.store[RESOURCE_ENERGY] > 600000){
@@ -277,7 +277,7 @@ const AssignJobs = {
                         maxCreepsInRoom = 3;
                         break;
                     default:
-                        Util.ErrorLog('AssignJobs ShouldSpawnCreep creep type not found', creepType);
+                        Util.ErrorLog('AssignJobs', 'ShouldSpawnCreep', 'creep type not found ' + creepType);
                 }
                 memRoom.MaxCreeps[creepType] = {
                     'M': maxCreepsInRoom,
@@ -293,7 +293,7 @@ const AssignJobs = {
                         }
                     }
                 }
-                Util.InfoLog('AssignJobs ShouldSpawnCreep new MaxCreeps', creepType + ' ' + roomKey + ' maxCreepsInRoom ' + maxCreepsInRoom + ' addedCreeps ' + addedCreeps);
+                Util.InfoLog('AssignJobs', 'ShouldSpawnCreep', 'new MaxCreeps ' + creepType + ' ' + roomKey + ' maxCreepsInRoom ' + maxCreepsInRoom + ' addedCreeps ' + addedCreeps);
             }
             return (Object.keys(memRoom.MaxCreeps[creepType]).length - 1) < maxCreepsInRoom;
         }
@@ -614,7 +614,7 @@ const AssignJobs = {
                     }
                     break;
                 default:
-                    Util.ErrorLog('AssignJobs GetCreepBody creep type  not found', creepType);
+                    Util.ErrorLog('AssignJobs', 'GetCreepBody', 'creep type  not found' + creepType);
             }
             return body;
         }

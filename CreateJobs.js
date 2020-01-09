@@ -83,7 +83,7 @@ const CreateJobs = {
                     notFound = true;
                 }
                 if (notFound) {
-                    Util.ErrorLog('CreateJobs CreateFlagJobs flag color not found', gameFlagKey + ' ' + gameFlag.color + ' ' + gameFlag.secondaryColor + ' (' + gameFlag.pos.x + ',' + gameFlag.pos.y + ')');
+                    Util.ErrorLog('CreateJobs', 'CreateFlagJobs', 'flag color not found ' + gameFlagKey + ' ' + gameFlag.color + ' ' + gameFlag.secondaryColor + ' (' + gameFlag.pos.x + ',' + gameFlag.pos.y + ')');
                 }
             }
             return jobs;
@@ -267,7 +267,7 @@ const CreateJobs = {
                 }
             })) { // flag must be on top of an existing lab!
                 gameFlag.remove();
-                Util.ErrorLog('CreateJobs CreateFlagJobs lab gone', gameFlagKey);
+                Util.ErrorLog('CreateJobs', 'CreateFlagJobs', 'lab gone ' + gameFlagKey);
             } else if (gameFlag.pos.findInRange(FIND_MY_STRUCTURES, 0, {
                 filter: function (s) {
                     return s.structureType === STRUCTURE_LAB;
@@ -286,7 +286,7 @@ const CreateJobs = {
                 }
             })) { // flag must be on top of an existing lab!
                 gameFlag.remove();
-                Util.ErrorLog('CreateJobs CreateFlagJobs lab gone', gameFlagKey);
+                Util.ErrorLog('CreateJobs', 'CreateFlagJobs', 'lab gone ' + gameFlagKey);
             } else if (gameFlag.pos.findInRange(FIND_MY_STRUCTURES, 0, {
                 filter: function (s) {
                     return s.structureType === STRUCTURE_LAB;
@@ -444,7 +444,7 @@ const CreateJobs = {
 
         function FillStorageJobs(gameRoom, roomJobs) {
             if(gameRoom.storage.store.getFreeCapacity() < 5000){
-                Util.Warning('CreateJobs FillStorageJobs storage full!', gameRoom.name);
+                Util.Warning('CreateJobs', 'FillStorageJobs', 'storage full! ' + gameRoom.name);
                 return;
             }
 

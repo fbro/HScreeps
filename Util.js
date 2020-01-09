@@ -1,8 +1,8 @@
 const Util = {
-    ErrorLog: function (messageId, message) {
+    ErrorLog: function (functionParentName, functionName, message) {
+        const messageId = functionParentName + ' ' + functionName;
         console.log('!!--------------- ' + messageId + ' ' + Game.shard.name  + ' ---------------!!');
-        console.log('Util Error ' + message);
-        console.log('!!--------------- ' + messageId + ' ' + Game.shard.name  + ' ---------------!!');
+        console.log(message);
         if (!Memory.ErrorLog) {
             Memory.ErrorLog = {};
         }
@@ -15,8 +15,10 @@ const Util = {
             Memory.ErrorLog[messageId][message] = Memory.ErrorLog[messageId][message] + 1;
         }
     },
-    InfoLog: function (messageId, message) {
-        console.log('Util Info ' + messageId + ' ' + Game.shard.name + ' | ' + message);
+    InfoLog: function (functionParentName, functionName, message) {
+        const messageId = functionParentName + ' ' + functionName;
+        console.log('----------------- ' + messageId + ' ' + Game.shard.name  + '----------------- ');
+        console.log(message);
         if (!Memory.InfoLog) {
             Memory.InfoLog = {};
         }
@@ -32,8 +34,8 @@ const Util = {
     Info: function (functionParentName, functionName, message) {
         console.log(functionParentName + ' ' + functionParentName + ' ' + Game.shard.name + ' | ' + message);
     },
-    Warning: function (messageId, message) {
-        console.log('WARNING! ' + messageId + ' ' + Game.shard.name + ' | ' + message);
+    Warning: function (functionParentName, functionName, message) {
+        console.log('WARNING! ' + functionParentName + ' ' + functionParentName + ' ' + Game.shard.name + ' | ' + message);
     },
     /**@return {number}*/
     FreeSpaces: function(pos) { // get the number of free spaces around a pos

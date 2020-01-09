@@ -141,7 +141,7 @@ const Terminals = {
                 const order = orders[orderKey];
                 const amountToBuy = amount - amountBought;
                 const result = Game.market.deal(order.id, amountToBuy, terminal.pos.roomName);
-                Util.InfoLog('Terminals BuyResource', result + ' resource ' + resourceType + ' amount ' + amountToBuy + ' from ' + terminal.pos.roomName + ' to ' + order.roomName + ' terminalSendCount ' + terminalSendCount + ' order.remainingAmount ' + order.remainingAmount + ' price ' + order.price + ' total price ' + (order.price * amountToBuy));
+                Util.InfoLog('Terminals', 'BuyResource', result + ' resource ' + resourceType + ' amount ' + amountToBuy + ' from ' + terminal.pos.roomName + ' to ' + order.roomName + ' terminalSendCount ' + terminalSendCount + ' order.remainingAmount ' + order.remainingAmount + ' price ' + order.price + ' total price ' + (order.price * amountToBuy));
                 terminalSendCount++;
                 if(result === OK){
                     amountBought = amountToBuy + amountBought;

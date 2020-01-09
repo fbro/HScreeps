@@ -44,7 +44,7 @@ module.exports.loop = function () {
                                     }
                                 }
                                 if(!foundCreep){
-                                    Util.ErrorLog('Lingering MaxCreeps found and removed', creepKey + ' in ' + memRoomKey);
+                                    Util.ErrorLog('Main', 'Main', 'Lingering MaxCreeps found and removed ' + creepKey + ' in ' + memRoomKey);
                                     memRoom.MaxCreeps[creepTypesKey][creepKey] = undefined;
                                 }
                             }
@@ -53,7 +53,7 @@ module.exports.loop = function () {
                     if (memRoom.RoomLevel <= 0 && Object.keys(memRoom.RoomJobs).length === 0) {
                         // room is unowned and there are no jobs in it - remove the room
                         Memory.MemRooms[memRoomKey] = undefined;
-                        Util.InfoLog('removed unused room', memRoomKey);
+                        Util.InfoLog('Main', 'Main', 'removed unused room ' + memRoomKey);
                     }
                 }
             }
