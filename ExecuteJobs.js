@@ -441,7 +441,10 @@ const ExecuteJobs = {
                                 amountToTransfer = undefined;
                             }
                             result = creep.transfer(fetchObject, RESOURCE_ENERGY, amountToTransfer);
-                        } else {
+                        } else if(creep.store.getUsedCapacity() === 0) {
+                            Util.InfoLog('ExecuteJobs', 'JobSource', creep.name + ' nothing to store! ' + creep.store.getUsedCapacity());
+                            result = OK;
+                        }else{
                             result = DepositCreepStore(creep, fetchObject);
                         }
                     } else {
