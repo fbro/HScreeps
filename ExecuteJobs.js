@@ -1682,6 +1682,7 @@ const ExecuteJobs = {
             return result;
         }
 
+        // TODO ERROR JobAttackPowerBank -7
         /**@return {int}*/
         function JobAttackPowerBank(creep, roomJob) {
             const result = GenericFlagAction(creep, roomJob, {
@@ -1711,6 +1712,9 @@ const ExecuteJobs = {
                         result = creep.attack(powerBank);
                         if (result === ERR_NO_BODYPART) {
                             result = ERR_TIRED;
+                        }else if(result === ERR_INVALID_TARGET){
+                            Util.ErrorLog('ExecuteJobs', 'JobAttackPowerBank', 'ERR_INVALID_TARGET on attacking' + creep.name + ' ' + jobObject.name);
+                            result = JOB_IS_DONE;
                         }
                     } else {
                         const powerResource = jobObject.pos.findInRange(FIND_DROPPED_RESOURCES, 1, {
@@ -1743,6 +1747,7 @@ const ExecuteJobs = {
             return result;
         }
 
+        // TODO ERROR JobMedicPowerBank -7
         /**@return {int}*/
         function JobMedicPowerBank(creep, roomJob) {
             const result = GenericFlagAction(creep, roomJob, {
@@ -1842,6 +1847,7 @@ const ExecuteJobs = {
             return result;
         }
 
+        // TODO ERROR JobTransportPowerBank -7
         /**@return {int}*/
         function JobTransportPowerBank(creep, roomJob) {
             let result = GenericFlagAction(creep, roomJob, {
@@ -1914,6 +1920,7 @@ const ExecuteJobs = {
             return result;
         }
 
+        // TODO ERROR JobHarvestDeposit -7
         /**@return {int}*/
         function JobHarvestDeposit(creep, roomJob){
             const result = GenericFlagAction(creep, roomJob, {
@@ -2385,6 +2392,9 @@ const ExecuteJobs = {
                     creep.say('no 🛣️!');
                 } else if (result === ERR_NO_BODYPART) {
                     creep.say('no 🏃!');
+                } else {
+                    Util.ErrorLog('ExecuteJobs', 'Move', 'unexpected move error ' + result + ' ' + creep.name + ' (' + creep.pos.x + ',' + creep.pos.y + ',' + creep.pos.roomName + ') to ' + obj);
+                    result = JOB_IS_DONE;
                 }
             }
             return result;
