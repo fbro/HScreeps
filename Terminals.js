@@ -74,6 +74,8 @@ const Terminals = {
                     max = MAX_ENERGY;
                 } else if(resourceType === RESOURCE_PHLEGM){
                     max = 0;
+                }  else if(resourceType === RESOURCE_POWER){ // i will never sell out on power!
+                    max = Number.MAX_SAFE_INTEGER;
                 } else {
                     max = MAX_RESOURCE;
                 }

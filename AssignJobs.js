@@ -363,8 +363,19 @@ const AssignJobs = {
                 // builder
                 case 'B':
                     switch (true) {
-                        case (energyAvailable >= 2200): // energyCapacityAvailable: 12900
-                            body = [WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];
+                        case (energyAvailable >= 3250): // energyCapacityAvailable: 12900
+                            body = [
+                                WORK, WORK, WORK, WORK, WORK,
+                                WORK, WORK, WORK, WORK, WORK,
+                                WORK, WORK, WORK, WORK, WORK,
+                                CARRY, CARRY, CARRY, CARRY, CARRY,
+                                CARRY, CARRY, CARRY, CARRY, CARRY,
+                                CARRY, CARRY, CARRY, CARRY, CARRY,
+                                CARRY, CARRY,
+                                MOVE, MOVE, MOVE, MOVE, MOVE,
+                                MOVE, MOVE, MOVE, MOVE, MOVE,
+                                MOVE, MOVE, MOVE, MOVE, MOVE,
+                                MOVE, MOVE, MOVE];
                             break;
                         case (energyAvailable >= 2000): // energyCapacityAvailable: 5600
                             body = [WORK, WORK, WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];

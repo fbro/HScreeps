@@ -1352,32 +1352,23 @@ const ExecuteJobs = {
                             });
                             switch (true) {
                                 case nearestRampart:
-                                    result = Move(creep, nearestRampart);
-                                    break;
+                                    result = Move(creep, nearestRampart); break;
                                 case creep.pos.x < fetchObject.pos.x && creep.pos.y < fetchObject.pos.y:
-                                    result = creep.move(TOP_LEFT);
-                                    break;
+                                    result = creep.move(TOP_LEFT); break;
                                 case creep.pos.x > fetchObject.pos.x && creep.pos.y < fetchObject.pos.y:
-                                    result = creep.move(TOP_RIGHT);
-                                    break;
+                                    result = creep.move(TOP_RIGHT); break;
                                 case creep.pos.x > fetchObject.pos.x && creep.pos.y > fetchObject.pos.y:
-                                    result = creep.move(BOTTOM_RIGHT);
-                                    break;
+                                    result = creep.move(BOTTOM_RIGHT); break;
                                 case creep.pos.x < fetchObject.pos.x && creep.pos.y > fetchObject.pos.y:
-                                    result = creep.move(BOTTOM_LEFT);
-                                    break;
+                                    result = creep.move(BOTTOM_LEFT); break;
                                 case creep.pos.x < fetchObject.pos.x && creep.pos.y === fetchObject.pos.y:
-                                    result = creep.move(LEFT);
-                                    break;
+                                    result = creep.move(LEFT); break;
                                 case creep.pos.x > fetchObject.pos.x && creep.pos.y === fetchObject.pos.y:
-                                    result = creep.move(RIGHT);
-                                    break;
+                                    result = creep.move(RIGHT); break;
                                 case creep.pos.x === fetchObject.pos.x && creep.pos.y > fetchObject.pos.y:
-                                    result = creep.move(BOTTOM);
-                                    break;
+                                    result = creep.move(BOTTOM); break;
                                 case creep.pos.x === fetchObject.pos.x && creep.pos.y < fetchObject.pos.y:
-                                    result = creep.move(TOP);
-                                    break;
+                                    result = creep.move(TOP); break;
                                 default:
                                     Util.ErrorLog('ExecuteJobs', 'JobGuardGunnerPosition', 'gunner move error ' + creep.name);
                             }
@@ -1712,9 +1703,6 @@ const ExecuteJobs = {
                         result = creep.attack(powerBank);
                         if (result === ERR_NO_BODYPART) {
                             result = ERR_TIRED;
-                        }else if(result === ERR_INVALID_TARGET){
-                            Util.ErrorLog('ExecuteJobs', 'JobAttackPowerBank', 'ERR_INVALID_TARGET on attacking' + creep.name + ' ' + jobObject.name);
-                            result = JOB_IS_DONE;
                         }
                     } else {
                         const powerResource = jobObject.pos.findInRange(FIND_DROPPED_RESOURCES, 1, {
@@ -2094,7 +2082,6 @@ const ExecuteJobs = {
                     resourceSupply = undefined;
                     creep.memory.ResourceSupply = undefined;
                 }else if(resourceSupply && resourceSupply.structureType === STRUCTURE_STORAGE && creep.pos.roomName === jobObject.pos.roomName && creep.pos.getRangeTo(jobObject.pos) > 2){ // creep should have a chance at finding stores that are closer
-                    Util.Info('ExecuteJobs', 'FindClosestResourceInRoom', 'remove memory.ResourceSupply ' + creep.name + ' ' + JSON.stringify(creep.pos) + ' range ' + creep.pos.getRangeTo(jobObject.pos));
                     creep.memory.ResourceSupply = undefined;
                 }
             }
@@ -2331,7 +2318,9 @@ const ExecuteJobs = {
             let result = ERR_NO_RESULT_FOUND;
             let from = creep.pos;
             let to = obj.pos;
-            if(from.roomName !== to.roomName){ // not in the same room - make a map in mem
+            if(from.roomName === to.roomName){
+                result = creep.moveTo(to, opts);
+            }else{ // not in the same room - make a map in mem
                 opts.reusePath = 50; // movement between rooms should reuse path more
                 if(!Memory.Paths){
                     Memory.Paths = {};
@@ -2368,34 +2357,70 @@ const ExecuteJobs = {
                         Memory.Paths[to.roomName][lastRoom] = roomInRoute.room;
                         lastRoom = roomInRoute.room
                     }
-                    Util.Info('ExecuteJobs', 'Move', to.roomName + ' paths: ' + JSON.stringify(Memory.Paths[to.roomName]));
+                    Util.Info('ExecuteJobs', 'Move', 'new path from ' + from.roomName + ' to ' + to.roomName + ' ' + creep.name +  ' paths: ' + JSON.stringify(Memory.Paths[to.roomName]));
                 }
                 const nextRoom = Memory.Paths[to.roomName][creep.pos.roomName];
                 const exitDirection = Game.map.findExit(creep.room, nextRoom);
                 const exitPosition = creep.pos.findClosestByPath(exitDirection);
                 result = creep.moveTo(exitPosition, opts);
-                if(result === ERR_NO_PATH){
-                    Util.ErrorLog('ExecuteJobs', 'Move', 'ERR_NO_PATH ' + creep.name + ' (' + creep.pos.x + ',' + creep.pos.y + ',' + creep.pos.roomName + ')');
-                    Util.Info('ExecuteJobs', 'Move', ' TEST! nextRoom ' + nextRoom + ' exitDirection ' + exitDirection + ' exitPosition ' + exitPosition + ' result ' + result);
-                    opts.reusePath = 0;
-                    result = creep.moveTo(exitPosition, opts);
+                if(result !== OK && result !== ERR_BUSY && result !== ERR_TIRED){
+                    Util.ErrorLog('ExecuteJobs', 'Move', 'multiple room move error ' + result + ' ' + creep.name + ' (' + from.x + ',' + from.y + ',' + from.roomName + ') to ' + obj + '(' + to.x + ',' + to.y + ',' + to.roomName + ') nextRoom ' + nextRoom + ' exitDirection ' + exitDirection + ' exitPosition ' + exitPosition);
                 }
-                //Util.Info('ExecuteJobs', 'Move', 'TEST! nextRoom ' + nextRoom + ' exitDirection ' + exitDirection + ' exitPosition ' + exitPosition + ' result ' + result);
-            }else{
-                result = creep.moveTo(obj, opts);
             }
+
             if (result === OK) {
                 result = JOB_MOVING;
-            } else if (result !== OK && result !== ERR_BUSY && result !== ERR_TIRED) {
-                Util.Warning('ExecuteJobs', 'Move', 'unexpected move error ' + result + ' ' + creep.name + ' (' + creep.pos.x + ',' + creep.pos.y + ',' + creep.pos.roomName + ') to ' + obj);
-                if (result === ERR_NO_PATH) {
-                    creep.say('no 🛣️!');
-                } else if (result === ERR_NO_BODYPART) {
-                    creep.say('no 🏃!');
-                } else {
-                    Util.ErrorLog('ExecuteJobs', 'Move', 'unexpected move error ' + result + ' ' + creep.name + ' (' + creep.pos.x + ',' + creep.pos.y + ',' + creep.pos.roomName + ') to ' + obj);
-                    result = JOB_IS_DONE;
+            } else if(result === ERR_NO_PATH){
+                if(from.roomName === to.roomName){
+                    switch (true) {
+                        case from.x < to.x && from.y < to.y:
+                            result = creep.move(BOTTOM_RIGHT); break;
+                        case from.x > to.x && from.y < to.y:
+                            result = creep.move(BOTTOM_LEFT); break;
+                        case from.x > to.x && from.y > to.y:
+                            result = creep.move(TOP_LEFT); break;
+                        case from.x < to.x && from.y > to.y:
+                            result = creep.move(TOP_RIGHT); break;
+                        case from.x < to.x && from.y === to.y:
+                            result = creep.move(RIGHT); break;
+                        case from.x > to.x && from.y === to.y:
+                            result = creep.move(LEFT); break;
+                        case from.x === to.x && from.y > to.y:
+                            result = creep.move(TOP); break;
+                        case from.x === to.x && from.y < to.y:
+                            result = creep.move(BOTTOM); break;
+                        default:
+                            Util.ErrorLog('ExecuteJobs', 'Move', 'manual move error ' + creep.name);
+                    }
+                    Util.Warning('ExecuteJobs', 'Move', 'manual move action ' + result + ' ' + creep.name + ' (' + from.x + ',' + from.y + ',' + from.roomName + ') to ' + obj + '(' + to.x + ',' + to.y + ',' + to.roomName + ')');
+                    if(result === OK){
+                        result = JOB_MOVING;
+                    }
+                }else{
+                    if (creep.pos.x === 0) { // get away from room exits asap
+                        creep.move(RIGHT);
+                    } else if (creep.pos.x === 49) {
+                        creep.move(LEFT);
+                    } else if (creep.pos.y === 0) {
+                        creep.move(BOTTOM);
+                    } else if (creep.pos.y === 49) {
+                        creep.move(TOP);
+                    }
+                    if(!creep.memory.MoveErrWait){
+                        creep.memory.MoveErrWait = 1;
+                        result = JOB_MOVING
+                    }else if(creep.memory.MoveErrWait < 6){
+                        creep.memory.MoveErrWait++;
+                        result = JOB_MOVING
+                    }else{
+                        Util.Warning('ExecuteJobs', 'Move', 'multiple room MoveErrWait ' + creep.memory.MoveErrWait + ' ' + result + ' ' + creep.name + ' (' + from.x + ',' + from.y + ',' + from.roomName + ') to ' + obj + '(' + to.x + ',' + to.y + ',' + to.roomName + ') ending move!');
+                        result = JOB_IS_DONE;
+                        creep.memory.MoveErrWait = undefined;
+                    }
                 }
+            } else if (result !== OK && result !== ERR_BUSY && result !== ERR_TIRED) {
+                Util.ErrorLog('ExecuteJobs', 'Move', 'move error ' + result + ' ' + creep.name + ' (' + from.x + ',' + from.y + ',' + from.roomName + ') to ' + obj + '(' + to.x + ',' + to.y + ',' + to.roomName + ')');
+                result = JOB_IS_DONE;
             }
             return result;
         }

@@ -32,10 +32,10 @@ const Util = {
         }
     },
     Info: function (functionParentName, functionName, message) {
-        console.log(functionParentName + ' ' + functionParentName + ' ' + Game.shard.name + ' | ' + message);
+        console.log(functionParentName + ' ' + functionName + ' ' + Game.shard.name + ' | ' + message);
     },
     Warning: function (functionParentName, functionName, message) {
-        console.log('WARNING! ' + functionParentName + ' ' + functionParentName + ' ' + Game.shard.name + ' | ' + message);
+        console.log('WARNING! ' + functionParentName + ' ' + functionName + ' ' + Game.shard.name + ' | ' + message);
     },
     /**@return {number}*/
     FreeSpaces: function(pos) { // get the number of free spaces around a pos

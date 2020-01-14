@@ -71,7 +71,7 @@ const PowerCreeps = {
 
         function DepositOps(powerCreep) {
             let result = powerCreep.transfer(powerCreep.room.storage, RESOURCE_OPS, powerCreep.store[RESOURCE_OPS] - 300);
-            Util.Info('PowerCreeps', 'WithdrawOps', powerCreep.name + ' ' + result + ' amount ' + powerCreep.store[RESOURCE_OPS]);
+            Util.Info('PowerCreeps', 'DepositOps', powerCreep.name + ' ' + result + ' amount ' + powerCreep.store[RESOURCE_OPS]);
             if (result === ERR_NOT_IN_RANGE) {
                 result = powerCreep.moveTo(powerCreep.room.storage);
             }
