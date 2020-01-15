@@ -2363,64 +2363,35 @@ const ExecuteJobs = {
                 const exitDirection = Game.map.findExit(creep.room, nextRoom);
                 const exitPosition = creep.pos.findClosestByPath(exitDirection);
                 result = creep.moveTo(exitPosition, opts);
-                if(result !== OK && result !== ERR_BUSY && result !== ERR_TIRED){
-                    Util.ErrorLog('ExecuteJobs', 'Move', 'multiple room move error ' + result + ' ' + creep.name + ' (' + from.x + ',' + from.y + ',' + from.roomName + ') to ' + obj + '(' + to.x + ',' + to.y + ',' + to.roomName + ') nextRoom ' + nextRoom + ' exitDirection ' + exitDirection + ' exitPosition ' + exitPosition);
-                }
             }
 
             if (result === OK) {
                 result = JOB_MOVING;
-            } else if(result === ERR_NO_PATH){
-                if(from.roomName === to.roomName){
-                    switch (true) {
-                        case from.x < to.x && from.y < to.y:
-                            result = creep.move(BOTTOM_RIGHT); break;
-                        case from.x > to.x && from.y < to.y:
-                            result = creep.move(BOTTOM_LEFT); break;
-                        case from.x > to.x && from.y > to.y:
-                            result = creep.move(TOP_LEFT); break;
-                        case from.x < to.x && from.y > to.y:
-                            result = creep.move(TOP_RIGHT); break;
-                        case from.x < to.x && from.y === to.y:
-                            result = creep.move(RIGHT); break;
-                        case from.x > to.x && from.y === to.y:
-                            result = creep.move(LEFT); break;
-                        case from.x === to.x && from.y > to.y:
-                            result = creep.move(TOP); break;
-                        case from.x === to.x && from.y < to.y:
-                            result = creep.move(BOTTOM); break;
-                        default:
-                            Util.ErrorLog('ExecuteJobs', 'Move', 'manual move error ' + creep.name);
-                    }
-                    Util.Warning('ExecuteJobs', 'Move', 'manual move action ' + result + ' ' + creep.name + ' (' + from.x + ',' + from.y + ',' + from.roomName + ') to ' + obj + '(' + to.x + ',' + to.y + ',' + to.roomName + ')');
-                    if(result === OK){
-                        result = JOB_MOVING;
-                    }
-                }else{
-                    if (creep.pos.x === 0) { // get away from room exits asap
-                        creep.move(RIGHT);
-                    } else if (creep.pos.x === 49) {
-                        creep.move(LEFT);
-                    } else if (creep.pos.y === 0) {
-                        creep.move(BOTTOM);
-                    } else if (creep.pos.y === 49) {
-                        creep.move(TOP);
-                    }
-                    if(!creep.memory.MoveErrWait){
-                        creep.memory.MoveErrWait = 1;
-                        result = JOB_MOVING
-                    }else if(creep.memory.MoveErrWait < 6){
-                        creep.memory.MoveErrWait++;
-                        result = JOB_MOVING
-                    }else{
-                        Util.Warning('ExecuteJobs', 'Move', 'multiple room MoveErrWait ' + creep.memory.MoveErrWait + ' ' + result + ' ' + creep.name + ' (' + from.x + ',' + from.y + ',' + from.roomName + ') to ' + obj + '(' + to.x + ',' + to.y + ',' + to.roomName + ') ending move!');
-                        result = JOB_IS_DONE;
-                        creep.memory.MoveErrWait = undefined;
-                    }
+            } else if(result !== ERR_BUSY && result !== ERR_TIRED){
+                if (creep.pos.x === 0) { // get away from room exits asap
+                    creep.move(RIGHT);
+                } else if (creep.pos.x === 49) {
+                    creep.move(LEFT);
+                } else if (creep.pos.y === 0) {
+                    creep.move(BOTTOM);
+                } else if (creep.pos.y === 49) {
+                    creep.move(TOP);
                 }
-            } else if (result !== OK && result !== ERR_BUSY && result !== ERR_TIRED) {
-                Util.ErrorLog('ExecuteJobs', 'Move', 'move error ' + result + ' ' + creep.name + ' (' + from.x + ',' + from.y + ',' + from.roomName + ') to ' + obj + '(' + to.x + ',' + to.y + ',' + to.roomName + ')');
-                result = JOB_IS_DONE;
+                if(!creep.memory.MoveErrWait){
+                    creep.memory.MoveErrWait = 1;
+                    result = JOB_MOVING
+                }else if(creep.memory.MoveErrWait < 6){
+                    creep.memory.MoveErrWait++;
+                    result = JOB_MOVING
+                }else{
+                    if(from.roomName === to.roomName){
+                        Util.ErrorLog('ExecuteJobs', 'Move', 'move error MoveErrWait ' + creep.memory.MoveErrWait + ' ' + result + ' ' + creep.name + ' (' + from.x + ',' + from.y + ',' + from.roomName + ') to ' + obj + '(' + to.x + ',' + to.y + ',' + to.roomName + ') ending move!');
+                    }else{
+                        Util.ErrorLog('ExecuteJobs', 'Move', 'move error multiple room MoveErrWait' + creep.memory.MoveErrWait + ' ' + result + ' ' + creep.name + ' (' + from.x + ',' + from.y + ',' + from.roomName + ') to ' + obj + '(' + to.x + ',' + to.y + ',' + to.roomName + ') ending move!');
+                    }
+                    result = JOB_IS_DONE;
+                    creep.memory.MoveErrWait = undefined;
+                }
             }
             return result;
         }
