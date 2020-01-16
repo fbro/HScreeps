@@ -1908,6 +1908,7 @@ const ExecuteJobs = {
             return result;
         }
 
+        // TODO if in room with storage make sure to completely empty creep.store before moving out again
         // TODO ERROR JobHarvestDeposit -7
         /**@return {int}*/
         function JobHarvestDeposit(creep, roomJob){
@@ -2366,6 +2367,7 @@ const ExecuteJobs = {
             }
 
             if (result === OK) {
+
                 result = JOB_MOVING;
             } else if(result !== ERR_BUSY && result !== ERR_TIRED){
                 if (creep.pos.x === 0) { // get away from room exits asap
@@ -2379,15 +2381,22 @@ const ExecuteJobs = {
                 }
                 if(!creep.memory.MoveErrWait){
                     creep.memory.MoveErrWait = 1;
-                    result = JOB_MOVING
-                }else if(creep.memory.MoveErrWait < 6){
+                    creep.memory.MoveErrLastWait = Game.time;
+                    result = JOB_MOVING;
+                }else if(creep.memory.MoveErrWait < 10){
+                    const ticksSinceWaitingStart = Game.time - creep.memory.MoveErrLastWait;
+                    if(creep.memory.MoveErrLastWait && ticksSinceWaitingStart > 30){ // if the start of the wait time is more than 30 ticks away then reset it
+                        Util.Info('ExecuteJobs', 'Move', 'move error reset time MoveErrWait ' + creep.memory.MoveErrWait + ' waited ' + ticksSinceWaitingStart + ' ticks ' + result + ' ' + creep.name + ' (' + from.x + ',' + from.y + ',' + from.roomName + ') to ' + obj + '(' + to.x + ',' + to.y + ',' + to.roomName + ')');
+                        creep.memory.MoveErrLastWait = Game.time;
+                        creep.memory.MoveErrWait = 0;
+                    }
                     creep.memory.MoveErrWait++;
-                    result = JOB_MOVING
+                    result = JOB_MOVING;
                 }else{
                     if(from.roomName === to.roomName){
                         Util.ErrorLog('ExecuteJobs', 'Move', 'move error MoveErrWait ' + creep.memory.MoveErrWait + ' ' + result + ' ' + creep.name + ' (' + from.x + ',' + from.y + ',' + from.roomName + ') to ' + obj + '(' + to.x + ',' + to.y + ',' + to.roomName + ') ending move!');
                     }else{
-                        Util.ErrorLog('ExecuteJobs', 'Move', 'move error multiple room MoveErrWait' + creep.memory.MoveErrWait + ' ' + result + ' ' + creep.name + ' (' + from.x + ',' + from.y + ',' + from.roomName + ') to ' + obj + '(' + to.x + ',' + to.y + ',' + to.roomName + ') ending move!');
+                        Util.ErrorLog('ExecuteJobs', 'Move', 'move error multiple room MoveErrWait ' + creep.memory.MoveErrWait + ' ' + result + ' ' + creep.name + ' (' + from.x + ',' + from.y + ',' + from.roomName + ') to ' + obj + '(' + to.x + ',' + to.y + ',' + to.roomName + ') ending move!');
                     }
                     result = JOB_IS_DONE;
                     creep.memory.MoveErrWait = undefined;
