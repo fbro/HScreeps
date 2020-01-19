@@ -1919,7 +1919,7 @@ const ExecuteJobs = {
                         Util.Info('ExecuteJobs', 'JobHarvestDeposit', creep.name + ' committed suicide creep.ticksToLive ' + creep.ticksToLive + ' JOB_IS_DONE');
                         creep.suicide();
                         return JOB_IS_DONE;
-                    }else if (creep.store.getFreeCapacity() === 0 || creep.memory.FetchObjectId && creep.store.getUsedCapacity > 0 || creep.ticksToLive < 500) {
+                    }else if (creep.store.getFreeCapacity() === 0 || creep.memory.FetchObjectId && creep.store.getUsedCapacity() > 0 || creep.ticksToLive < 500) {
                         return SHOULD_FETCH;
                     } else {
                         return SHOULD_ACT;

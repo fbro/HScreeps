@@ -16,6 +16,7 @@ const CreateJobs = {
         const FLAG_JOB = 2;
 
         const EXTRACTOR_WHEN_STORAGE_ENERGY = 50000;
+        const EXTRACTOR_WHEN_STORAGE_MINERAL = 150000;
         const RAMPART_WALL_HITS_U_LVL8 = 100000;
         const RAMPART_WALL_HITS_O_LVL8 = 2000000;
         const RAMPART_WALL_MAX_HITS_WHEN_STORAGE_ENERGY = 600000;
@@ -420,22 +421,24 @@ const CreateJobs = {
         }
 
         function ExtractMineralJobs(gameRoom, roomJobs) {
-            if (gameRoom.storage && gameRoom.storage.store[RESOURCE_ENERGY] > EXTRACTOR_WHEN_STORAGE_ENERGY || gameRoom.find(FIND_MY_CREEPS, {
-                filter: (c) => {
-                    return c.name.startsWith('E');
+            const mineral = gameRoom.find(FIND_MINERALS, {
+                filter: (s) => {
+                    return s.mineralAmount > 0;
                 }
-            })[0]) { // only create these jobs when one has energy in the room
+            })[0];
+            if (mineral && gameRoom.storage && (gameRoom.storage.store[RESOURCE_ENERGY] > EXTRACTOR_WHEN_STORAGE_ENERGY && gameRoom.storage.store[mineral.mineralType] < EXTRACTOR_WHEN_STORAGE_MINERAL
+                || gameRoom.find(FIND_MY_CREEPS, {
+                    filter: (c) => {
+                        return c.name.startsWith('E');
+                    }
+                })[0]
+                )) { // only create these jobs when one has energy in the room
                 const extractMineral = gameRoom.find(FIND_MY_STRUCTURES, {
                     filter: (s) => {
                         return s.structureType === STRUCTURE_EXTRACTOR;
                     }
                 })[0];
-                const mineral = gameRoom.find(FIND_MINERALS, {
-                    filter: (s) => {
-                        return s.mineralAmount > 0;
-                    }
-                })[0];
-                if (mineral && extractMineral) {
+                if (extractMineral) {
                     new RoomVisual(gameRoom.name).text('⛏', extractMineral.pos.x, extractMineral.pos.y);
                     AddJob(roomJobs, '5ExtrMin-' + mineral.mineralType + '(' + extractMineral.pos.x + ',' + extractMineral.pos.y + ')' + gameRoom.name, mineral.id, OBJECT_JOB, 'E');
                 }

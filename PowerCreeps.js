@@ -8,9 +8,9 @@ const PowerCreeps = {
                 const powerCreep = Game.powerCreeps[powerCreepKey];
                 let result;
 
-                if (!powerCreep.pos && !powerCreep.spawnCooldownTime) {
+                if (!powerCreep.pos && !powerCreep.spawnCooldownTime && powerCreep.name === 'Hulmir') { // TODO introduce a flag that is placed on powerspawn that specifies a powercreep that should be assigned to this room
                     powerCreep.spawn(Game.getObjectById('5daecf40eb466e8543e2f82d'));
-                } else if (!powerCreep.spawnCooldownTime) {
+                } else if (powerCreep && !powerCreep.spawnCooldownTime && powerCreep.ticksToLive) {
                     if (powerCreep.ticksToLive < 500) { // power creep needs to be renewed
                         result = RenewPowerCreep(powerCreep);
                         Util.Info('PowerCreeps', 'PowerCreepsActions','trying to renew ' + powerCreep.name + ' result ' + result + ' ticksToLive ' + powerCreep.ticksToLive);
