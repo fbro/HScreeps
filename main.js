@@ -73,8 +73,6 @@ module.exports.loop = function () {
 };
 
 // TODOs:
-// TODO - map pathfinding problem ERR_NO_PATH happens at room exits - maybe it is solved
-// TODO powerbank creeps gets -7 - maybe when object disappears
 // TODO when removing unused room remember to clean up MaxCreeps!
 
 // TODO remove deposit after 70 cooldown does not work

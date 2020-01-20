@@ -1673,7 +1673,6 @@ const ExecuteJobs = {
             return result;
         }
 
-        // TODO ERROR JobAttackPowerBank -7
         /**@return {int}*/
         function JobAttackPowerBank(creep, roomJob) {
             const result = GenericFlagAction(creep, roomJob, {
@@ -1735,7 +1734,6 @@ const ExecuteJobs = {
             return result;
         }
 
-        // TODO ERROR JobMedicPowerBank -7
         /**@return {int}*/
         function JobMedicPowerBank(creep, roomJob) {
             const result = GenericFlagAction(creep, roomJob, {
@@ -1835,7 +1833,6 @@ const ExecuteJobs = {
             return result;
         }
 
-        // TODO ERROR JobTransportPowerBank -7
         /**@return {int}*/
         function JobTransportPowerBank(creep, roomJob) {
             let result = GenericFlagAction(creep, roomJob, {
@@ -1909,7 +1906,6 @@ const ExecuteJobs = {
         }
 
         // TODO if in room with storage make sure to completely empty creep.store before moving out again
-        // TODO ERROR JobHarvestDeposit -7
         /**@return {int}*/
         function JobHarvestDeposit(creep, roomJob){
             const result = GenericFlagAction(creep, roomJob, {
