@@ -1905,7 +1905,6 @@ const ExecuteJobs = {
             return result;
         }
 
-        // TODO if in room with storage make sure to completely empty creep.store before moving out again
         /**@return {int}*/
         function JobHarvestDeposit(creep, roomJob){
             const result = GenericFlagAction(creep, roomJob, {
@@ -2390,7 +2389,7 @@ const ExecuteJobs = {
                     result = JOB_MOVING;
                 }else{
                     if(from.roomName === to.roomName){
-                        Util.ErrorLog('ExecuteJobs', 'Move', 'move error MoveErrWait ' + creep.memory.MoveErrWait + ' ' + result + ' ' + creep.name + ' (' + from.x + ',' + from.y + ',' + from.roomName + ') to ' + obj + '(' + to.x + ',' + to.y + ',' + to.roomName + ') ending move!');
+                        Util.Warning('ExecuteJobs', 'Move', 'move error MoveErrWait ' + creep.memory.MoveErrWait + ' ' + result + ' ' + creep.name + ' (' + from.x + ',' + from.y + ',' + from.roomName + ') to ' + obj + '(' + to.x + ',' + to.y + ',' + to.roomName + ') ending move!');
                     }else{
                         Util.ErrorLog('ExecuteJobs', 'Move', 'move error multiple room MoveErrWait ' + creep.memory.MoveErrWait + ' ' + result + ' ' + creep.name + ' (' + from.x + ',' + from.y + ',' + from.roomName + ') to ' + obj + '(' + to.x + ',' + to.y + ',' + to.roomName + ') ending move!');
                     }

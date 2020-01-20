@@ -4,6 +4,7 @@
     <list default="true" id="7b6f36cb-4298-4902-b6a2-ea3816b3b82c" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ExecuteJobs.js" beforeDir="false" afterPath="$PROJECT_DIR$/ExecuteJobs.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Terminals.js" beforeDir="false" afterPath="$PROJECT_DIR$/Terminals.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.js" beforeDir="false" afterPath="$PROJECT_DIR$/main.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -120,14 +121,7 @@
       <workItem from="1576011053894" duration="6930000" />
       <workItem from="1576169775768" duration="190690000" />
       <workItem from="1578583491605" duration="22323000" />
-      <workItem from="1579172967628" duration="9268000" />
-    </task>
-    <task id="LOCAL-00089" summary="small changes">
-      <created>1573344209699</created>
-      <option name="number" value="00089" />
-      <option name="presentableId" value="LOCAL-00089" />
-      <option name="project" value="LOCAL" />
-      <updated>1573344209699</updated>
+      <workItem from="1579172967628" duration="11824000" />
     </task>
     <task id="LOCAL-00090" summary="small changes">
       <created>1574016877752</created>
@@ -465,7 +459,14 @@
       <option name="project" value="LOCAL" />
       <updated>1579443739656</updated>
     </task>
-    <option name="localTasksCounter" value="138" />
+    <task id="LOCAL-00138" summary="small changes">
+      <created>1579552751652</created>
+      <option name="number" value="00138" />
+      <option name="presentableId" value="LOCAL-00138" />
+      <option name="project" value="LOCAL" />
+      <updated>1579552751652</updated>
+    </task>
+    <option name="localTasksCounter" value="139" />
     <servers />
   </component>
   <component name="TodoView">
@@ -541,10 +542,10 @@
     <option name="LAST_COMMIT_MESSAGE" value="small changes" />
   </component>
   <component name="WindowStateProjectService">
-    <state x="526" y="130" key="CommitChangelistDialog2" timestamp="1579443738832">
+    <state x="526" y="130" key="CommitChangelistDialog2" timestamp="1579552750784">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="526" y="130" key="CommitChangelistDialog2/0.0.1920.1040@0.0.1920.1040" timestamp="1579443738832" />
+    <state x="526" y="130" key="CommitChangelistDialog2/0.0.1920.1040@0.0.1920.1040" timestamp="1579552750784" />
     <state x="526" y="135" key="CommitChangelistDialog2/0.0.1920.1080@0.0.1920.1080" timestamp="1579120815875" />
     <state x="92" y="89" width="1736" height="896" key="DiffContextDialog" timestamp="1579443824731">
       <screen x="0" y="0" width="1920" height="1040" />
@@ -555,10 +556,10 @@
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
     <state x="461" y="183" key="SettingsEditor/0.0.1920.1080@0.0.1920.1080" timestamp="1578585185476" />
-    <state x="552" y="264" key="Vcs.Push.Dialog.v2" timestamp="1579443826064">
+    <state x="552" y="264" key="Vcs.Push.Dialog.v2" timestamp="1579552753420">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="552" y="264" key="Vcs.Push.Dialog.v2/0.0.1920.1040@0.0.1920.1040" timestamp="1579443826064" />
+    <state x="552" y="264" key="Vcs.Push.Dialog.v2/0.0.1920.1040@0.0.1920.1040" timestamp="1579552753420" />
     <state x="552" y="274" key="Vcs.Push.Dialog.v2/0.0.1920.1080@0.0.1920.1080" timestamp="1579120936828" />
     <state x="655" y="365" key="com.intellij.ide.util.TipDialog" timestamp="1579176090261">
       <screen x="0" y="0" width="1920" height="1080" />

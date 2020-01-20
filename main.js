@@ -51,6 +51,7 @@ module.exports.loop = function () {
                         }
                     }
                     if (memRoom.RoomLevel <= 0 && Object.keys(memRoom.RoomJobs).length === 0) {
+                        // TODO find new places for the creeps that are in maxCreeps memory
                         // room is unowned and there are no jobs in it - remove the room
                         Memory.MemRooms[memRoomKey] = undefined;
                         Util.InfoLog('Main', 'Main', 'removed unused room ' + memRoomKey);
@@ -74,9 +75,6 @@ module.exports.loop = function () {
 
 // TODOs:
 // TODO when removing unused room remember to clean up MaxCreeps!
-
-// TODO remove deposit after 70 cooldown does not work
-// TODO remove powerbank flag does not work
 
 // lab reactions
 // RenewPowerCreep: only looks for renew sources in the current room

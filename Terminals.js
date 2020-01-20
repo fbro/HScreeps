@@ -119,26 +119,33 @@ const Terminals = {
                 const basicResource = basicResourceList[basicResourceKey];
                 const usedCapacity = terminal.store.getUsedCapacity(basicResource);
                 if (usedCapacity  < 500 && terminalSendCount < 10) {
-                    terminalSendCount = BuyResource(terminal, basicResource, 500 - usedCapacity, terminalSendCount);
+                    terminalSendCount = BuyResource(terminal, basicResource, 500 - usedCapacity, terminalSendCount, 1.5);
                 }
+            }
+            // buy power
+            const usedPowerCapacity = terminal.store.getUsedCapacity(RESOURCE_POWER);
+            if(usedPowerCapacity  < 500 && terminalSendCount < 10){
+                terminalSendCount = BuyResource(terminal, RESOURCE_POWER, 500 - usedPowerCapacity, terminalSendCount, 0.9);
             }
             return terminalSendCount;
         }
 
         /**@return {number}*/
-        function BuyResource(terminal, resourceType, amount, terminalSendCount){
+        function BuyResource(terminal, resourceType, amount, terminalSendCount, avgPrice){
             const resourceHistory = Game.market.getHistory(resourceType);
             const orders = Game.market.getAllOrders(order => order.resourceType === resourceType
                 && order.type === ORDER_SELL
                 && Game.market.calcTransactionCost(500, terminal.pos.roomName, order.roomName) <= 500
-                && (resourceHistory[0].avgPrice * 1.5) >= order.price
+                && (resourceHistory[0].avgPrice * avgPrice) >= order.price
                 && order.remainingAmount > 0
             );
             if(orders.length > 0){
                 orders.sort(comparePriceCheapestFirst);
             }
             let amountBought = 0;
-            Util.Info('Terminals', 'BuyResource', 'WTB ' + resourceType + ' ' + amount + ' from ' + terminal + ' ' + JSON.stringify(orders) + ' avg price ' + resourceHistory[0].avgPrice);
+            if(resourceHistory.length > 0){
+                Util.Info('Terminals', 'BuyResource', 'WTB ' + resourceType + ' ' + amount + ' from ' + terminal + ' ' + JSON.stringify(orders) + ' avg price ' + resourceHistory[0].avgPrice);
+            }
             for (const orderKey in orders) {
                 const order = orders[orderKey];
                 const amountToBuy = amount - amountBought;
