@@ -432,7 +432,7 @@ const CreateJobs = {
                         return c.name.startsWith('E');
                     }
                 })[0]
-                )) { // only create these jobs when one has energy in the room
+            )) { // only create these jobs when one has energy in the room
                 const extractMineral = gameRoom.find(FIND_MY_STRUCTURES, {
                     filter: (s) => {
                         return s.structureType === STRUCTURE_EXTRACTOR;

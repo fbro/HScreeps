@@ -51,10 +51,19 @@ module.exports.loop = function () {
                         }
                     }
                     if (memRoom.RoomLevel <= 0 && Object.keys(memRoom.RoomJobs).length === 0) {
-                        // TODO find new places for the creeps that are in maxCreeps memory
-                        // room is unowned and there are no jobs in it - remove the room
-                        Memory.MemRooms[memRoomKey] = undefined;
-                        Util.InfoLog('Main', 'Main', 'removed unused room ' + memRoomKey);
+                        let foundCreep = false;
+                        for(const creepType in memRoom.MaxCreeps){
+                            const maxCreep = memRoom.MaxCreeps[creepType];
+                            if(Object.keys(maxCreep).length > 1){ // more than 'M' is present - a creep is still attached to the room. wait until it dies
+                                foundCreep = true;
+                                break;
+                            }
+                        }
+                        if(!foundCreep){
+                            // room is unowned and there are no jobs in it - remove the room
+                            Memory.MemRooms[memRoomKey] = undefined;
+                            Util.InfoLog('Main', 'Main', 'removed unused room ' + memRoomKey);
+                        }
                     }
                 }
             }
@@ -74,8 +83,8 @@ module.exports.loop = function () {
 };
 
 // TODOs:
-// TODO when removing unused room remember to clean up MaxCreeps!
 
+// TODO add flag in powercreeps to handle spawning
 // lab reactions
 // RenewPowerCreep: only looks for renew sources in the current room
 

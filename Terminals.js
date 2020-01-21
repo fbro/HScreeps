@@ -53,7 +53,7 @@ const Terminals = {
                                 sendAmount = resourcesNeeded; // does not need more resources than this
                             }
                             let result = fromTerminal.send(resourceType, sendAmount, toTerminal.pos.roomName);
-                            Util.Info('Terminals', 'DistributeResources', 'result ' + result + ' resource ' + resourceType + ' sendAmount ' + sendAmount + ' from ' + fromTerminal.pos.roomName + ' to ' + toTerminal.pos.roomName + ' terminalSendCount ' + terminalSendCount + ' resourcesNeeded ' + resourcesNeeded);
+                            Util.Info('Terminals', 'DistributeResources', sendAmount + ' ' + resourceType + ' from ' + fromTerminal.pos.roomName + ' to ' + toTerminal.pos.roomName + ' result ' + result + ' terminalSendCount ' + terminalSendCount + ' resourcesNeeded ' + resourcesNeeded);
                             toTerminal.store[resourceType] += sendAmount;
                             fromTerminal.store[resourceType] -= sendAmount;
                             fromAmount -= sendAmount;
@@ -97,7 +97,7 @@ const Terminals = {
                             sendAmount = order.remainingAmount; // does not need more resources than this
                         }
                         const result = Game.market.deal(order.id, sendAmount, fromTerminal.pos.roomName);
-                        Util.Info('Terminals', 'SellExcessResource', 'result ' + result + ' resource ' + resourceType + ' sendAmount ' + sendAmount + ' from ' + fromTerminal.pos.roomName + ' to ' + order.roomName + ' terminalSendCount ' + terminalSendCount + ' order.remainingAmount ' + order.remainingAmount + ' price ' + order.price + ' total price ' + order.price * sendAmount + ' fromAmount ' + fromAmount);
+                        Util.Info('Terminals', 'SellExcessResource', sendAmount + ' ' + resourceType + ' from ' + fromTerminal.pos.roomName + ' to ' + order.roomName + ' result ' + result + ' terminalSendCount ' + terminalSendCount + ' order.remainingAmount ' + order.remainingAmount + ' price ' + order.price + ' total price ' + order.price * sendAmount + ' fromAmount ' + fromAmount);
                         // the terminals may try and sell to the same order - I will ignore this error
                         fromTerminal.store[resourceType] -= sendAmount;
                         fromAmount -= sendAmount;
@@ -141,16 +141,14 @@ const Terminals = {
             );
             if(orders.length > 0){
                 orders.sort(comparePriceCheapestFirst);
+                Util.Info('Terminals', 'BuyResource', 'WTB ' + amount + ' ' + resourceType + ' from ' + terminal + ' ' + JSON.stringify(orders) + ' avg price ' + resourceHistory[0].avgPrice);
             }
             let amountBought = 0;
-            if(resourceHistory.length > 0){
-                Util.Info('Terminals', 'BuyResource', 'WTB ' + resourceType + ' ' + amount + ' from ' + terminal + ' ' + JSON.stringify(orders) + ' avg price ' + resourceHistory[0].avgPrice);
-            }
             for (const orderKey in orders) {
                 const order = orders[orderKey];
                 const amountToBuy = amount - amountBought;
                 const result = Game.market.deal(order.id, amountToBuy, terminal.pos.roomName);
-                Util.InfoLog('Terminals', 'BuyResource', result + ' resource ' + resourceType + ' amount ' + amountToBuy + ' from ' + terminal.pos.roomName + ' to ' + order.roomName + ' terminalSendCount ' + terminalSendCount + ' order.remainingAmount ' + order.remainingAmount + ' price ' + order.price + ' total price ' + (order.price * amountToBuy));
+                Util.InfoLog('Terminals', 'BuyResource', amountToBuy + ' ' + resourceType + ' from ' + terminal.pos.roomName + ' to ' + order.roomName + ' result ' + result + ' terminalSendCount ' + terminalSendCount + ' order.remainingAmount ' + order.remainingAmount + ' price ' + order.price + ' total price ' + (order.price * amountToBuy));
                 terminalSendCount++;
                 if(result === OK){
                     amountBought = amountToBuy + amountBought;
@@ -167,6 +165,7 @@ const Terminals = {
             if (a.price > b.price) { return 1; }
             return 0;
         }
+
         function comparePriceExpensiveFirst(a, b) {
             if (a.price > b.price) { return -1; }
             if (a.price < b.price) { return 1; }

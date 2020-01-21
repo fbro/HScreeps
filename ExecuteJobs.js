@@ -2280,7 +2280,7 @@ const ExecuteJobs = {
                         const gameRoom = Game.rooms[gameRoomKey];
                         const distance = Game.map.getRoomLinearDistance(creep.pos.roomName, gameRoom.name);
                         if(gameRoom.controller && gameRoom.controller.my && gameRoom.storage && gameRoom.storage.store.getFreeCapacity() > 0
-                        && closestRoomRange > distance){
+                            && closestRoomRange > distance){
                             closestRoomRange = distance;
                             closestRoom = gameRoom;
                         }
