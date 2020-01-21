@@ -83,7 +83,7 @@ module.exports.loop = function () {
 };
 
 // TODOs:
-
+// TODO containers at controller must be allowed to get emptied of all non Energy stuff
 // TODO add flag in powercreeps to handle spawning
 // lab reactions
 // RenewPowerCreep: only looks for renew sources in the current room
