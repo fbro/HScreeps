@@ -50,7 +50,7 @@ const CreateJobs = {
                     } else {
                         notFound = true;
                     }
-                } else if (color === COLOR_RED) { // aggresive jobs
+                } else if (color === COLOR_RED) { // aggressive jobs
                     if (secColor === COLOR_RED) { // warrior at pos
                         jobs = CreateFlagJob(jobs, '2GuardPos', gameFlagKey, gameFlag, 'W');
                     } else if (secColor === COLOR_BLUE) { // gunner at pos
