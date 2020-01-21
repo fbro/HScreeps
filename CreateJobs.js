@@ -32,7 +32,7 @@ const CreateJobs = {
                 const gameFlag = Game.flags[gameFlagKey];
                 const color = gameFlag.color;
                 const secColor = gameFlag.secondaryColor;
-                if (color === COLOR_ORANGE) {
+                if (color === COLOR_ORANGE) { // scout and pos actions and hallway action
                     if (secColor === COLOR_ORANGE) { // scout tag
                         jobs = CreateFlagJob(jobs, '4TagCtrl', gameFlagKey, gameFlag, 'S');
                     } else if (secColor === COLOR_YELLOW) { // scout at pos
@@ -43,26 +43,26 @@ const CreateJobs = {
                         jobs = PowerBankJobs(jobs, gameFlagKey, gameFlag);
                     } else if (secColor === COLOR_CYAN) { // flag that observers create and put on deposits and deletes again when deadline is reached
                         jobs = CreateFlagJob(jobs, '5HrvstDpst', gameFlagKey, gameFlag, 'D');
-                    } else {
-                        notFound = true;
-                    }
-                } else if (color === COLOR_RED) {
-                    if (secColor === COLOR_RED) { // warrior at pos
-                        jobs = CreateFlagJob(jobs, '2GuardPos', gameFlagKey, gameFlag, 'W')
-                    } else if (secColor === COLOR_BLUE) { // gunner at pos
-                        jobs = CreateFlagJob(jobs, '2GuardGunPos', gameFlagKey, gameFlag, 'G')
-                    } else if (secColor === COLOR_GREEN) { // medic at pos
-                        jobs = CreateFlagJob(jobs, '2GuardMedPos', gameFlagKey, gameFlag, 'M')
-                    } else {
-                        notFound = true;
-                    }
-                } else if (color === COLOR_YELLOW) {
-                    if (secColor === COLOR_GREEN) { // harvester, transporter and builder move to pos
+                    } else if (secColor === COLOR_GREEN) { // harvester, transporter and builder move to pos
                         jobs = CreateFlagJob(jobs, '2HarvestPos', gameFlagKey, gameFlag, 'H');
                         jobs = CreateFlagJob(jobs, '2TransPos', gameFlagKey, gameFlag, 'T');
                         jobs = CreateFlagJob(jobs, '2BuildPos', gameFlagKey, gameFlag, 'B');
+                    } else {
+                        notFound = true;
                     }
-                } else if (color === COLOR_PURPLE) {
+                } else if (color === COLOR_RED) { // aggresive jobs
+                    if (secColor === COLOR_RED) { // warrior at pos
+                        jobs = CreateFlagJob(jobs, '2GuardPos', gameFlagKey, gameFlag, 'W');
+                    } else if (secColor === COLOR_BLUE) { // gunner at pos
+                        jobs = CreateFlagJob(jobs, '2GuardGunPos', gameFlagKey, gameFlag, 'G');
+                    } else if (secColor === COLOR_GREEN) { // medic at pos
+                        jobs = CreateFlagJob(jobs, '2GuardMedPos', gameFlagKey, gameFlag, 'M');
+                    } else {
+                        notFound = true;
+                    }
+                } else if (color === COLOR_YELLOW) { // energy actions
+                    notFound = true;
+                } else if (color === COLOR_PURPLE) { // lab actions
                     if (secColor === COLOR_PURPLE) { // FillLabMineral
                         jobs = FillLabMineralJobs(jobs, gameFlagKey, gameFlag);
                     } else if (secColor === COLOR_WHITE) { // EmptyLabMineral
@@ -70,7 +70,7 @@ const CreateJobs = {
                     } else {
                         notFound = true;
                     }
-                } else if (color === COLOR_GREEN) {
+                } else if (color === COLOR_GREEN) { // claimer actions
                     if (secColor === COLOR_GREEN) { // claimer claim
                         jobs = CreateFlagJob(jobs, '1ClaimCtrl', gameFlagKey, gameFlag, 'C');
                     } else if (secColor === COLOR_YELLOW) { // claimer reserve
@@ -80,7 +80,13 @@ const CreateJobs = {
                     } else {
                         notFound = true;
                     }
-                } else {
+                } else if(color === COLOR_BLUE){ // power creep actions
+                    if (secColor === COLOR_ORANGE) {
+                        // PowerCreeps spawn based on flag name = power creep name
+                    } else {
+                        notFound = true;
+                    }
+                }else {
                     notFound = true;
                 }
                 if (notFound) {
