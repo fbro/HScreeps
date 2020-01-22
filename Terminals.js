@@ -124,8 +124,8 @@ const Terminals = {
             }
             // buy power - logic here is a bit more custom
             const usedPowerCapacity = terminal.store.getUsedCapacity(RESOURCE_POWER);
-            if(usedPowerCapacity  < 500 && terminalSendCount < 10){
-                terminalSendCount = BuyResource(terminal, RESOURCE_POWER, 500 - usedPowerCapacity, terminalSendCount, 0.95, 1);
+            if(usedPowerCapacity  < 1000 && terminalSendCount < 10){
+                terminalSendCount = BuyResource(terminal, RESOURCE_POWER, 1000 - usedPowerCapacity, terminalSendCount, 1, 1.2);
             }
             return terminalSendCount;
         }
