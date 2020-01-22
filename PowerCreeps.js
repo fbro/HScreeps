@@ -54,7 +54,7 @@ const PowerCreeps = {
                             result = RegenSource(powerCreep);
                         } else if(powerCreep.memory.RegenMineralCooldown < Game.time && powerCreep.powers[PWR_REGEN_MINERAL] && powerCreep.powers[PWR_REGEN_MINERAL].cooldown === 0){
                             result = RegenMineral(powerCreep);
-                        } else if (powerCreep.store[RESOURCE_OPS] > 500) {
+                        } else if (powerCreep.store[RESOURCE_OPS] > 500 || powerCreep.store[RESOURCE_OPS] === powerCreep.store.getCapacity()) {
                             result = DepositOps(powerCreep);
                         }else if(powerCreep.store[RESOURCE_OPS] < 100){
                             result = WithdrawOps(powerCreep);
@@ -90,7 +90,8 @@ const PowerCreeps = {
         }
 
         function DepositOps(powerCreep) {
-            let result = powerCreep.transfer(powerCreep.room.storage, RESOURCE_OPS, powerCreep.store[RESOURCE_OPS] - 300);
+            let opsToDeposit = powerCreep.store[RESOURCE_OPS] - 100;
+            let result = powerCreep.transfer(powerCreep.room.storage, RESOURCE_OPS, opsToDeposit);
             Util.Info('PowerCreeps', 'DepositOps', powerCreep.name + ' ' + result + ' amount ' + powerCreep.store[RESOURCE_OPS]);
             if (result === ERR_NOT_IN_RANGE) {
                 result = powerCreep.moveTo(powerCreep.room.storage);

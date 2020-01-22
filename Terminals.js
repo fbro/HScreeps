@@ -119,24 +119,27 @@ const Terminals = {
                 const basicResource = basicResourceList[basicResourceKey];
                 const usedCapacity = terminal.store.getUsedCapacity(basicResource);
                 if (usedCapacity  < 500 && terminalSendCount < 10) {
-                    terminalSendCount = BuyResource(terminal, basicResource, 500 - usedCapacity, terminalSendCount, 1.5);
+                    terminalSendCount = BuyResource(terminal, basicResource, 500 - usedCapacity, terminalSendCount);
                 }
             }
-            // buy power
+            // buy power - logic here is a bit more custom
             const usedPowerCapacity = terminal.store.getUsedCapacity(RESOURCE_POWER);
             if(usedPowerCapacity  < 500 && terminalSendCount < 10){
-                terminalSendCount = BuyResource(terminal, RESOURCE_POWER, 500 - usedPowerCapacity, terminalSendCount, 0.95);
+                terminalSendCount = BuyResource(terminal, RESOURCE_POWER, 500 - usedPowerCapacity, terminalSendCount, 0.95, 1);
             }
             return terminalSendCount;
         }
 
         /**@return {number}*/
-        function BuyResource(terminal, resourceType, amount, terminalSendCount, avgPrice){
+        function BuyResource(terminal, resourceType, amount, terminalSendCount,
+                             avgPrice = 1.5, // set if one wants a another acceptable average price
+                             maxPrice = undefined // set if one should use a fixed price to buy under
+        ){
             const resourceHistory = Game.market.getHistory(resourceType);
             const orders = Game.market.getAllOrders(order => order.resourceType === resourceType
                 && order.type === ORDER_SELL
                 && Game.market.calcTransactionCost(500, terminal.pos.roomName, order.roomName) <= 500
-                && (resourceHistory[0].avgPrice * avgPrice) >= order.price
+                && ((resourceHistory[0].avgPrice * avgPrice) >= order.price || maxPrice && maxPrice >= order.price)
                 && order.remainingAmount > 0
             );
             if(orders.length > 0){

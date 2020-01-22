@@ -1839,7 +1839,11 @@ const ExecuteJobs = {
                 /**@return {int}*/
                 JobStatus: function (jobObject) {
                     if (!jobObject) {
-                        return JOB_IS_DONE;
+                        if(creep.store.getUsedCapacity() > 0){
+                            return SHOULD_FETCH;
+                        }else{
+                            return JOB_IS_DONE;
+                        }
                     } else if (creep.store.getFreeCapacity() > 0) {
                         return SHOULD_ACT;
                     } else {
@@ -1863,13 +1867,13 @@ const ExecuteJobs = {
                     const powerResource = jobObject.pos.lookFor(LOOK_RESOURCES)[0];
                     if (powerResource) {
                         return creep.pickup(powerResource);
-                    } else if (!powerResource && creep.pos.getRangeTo(jobObject) < 6) {
+                    } else if (!powerResource && creep.pos.getRangeTo(jobObject) < 6) { // no powerResource on ground and in range to flag
                         const powerBank = jobObject.pos.lookFor(LOOK_STRUCTURES)[0];
-                        if (powerBank) {
+                        if (powerBank) { // powerBank is still alive - wait for it to get destroyed
                             creep.say('W8');
                             return OK;
                         } else { // no powerResource and no powerBank
-                            Util.Info('ExecuteJobs', 'JobTransportPowerBank', 'waiting at powerbank flag ' + creep.name + ' flag in room ' + jobObject.pos.roomName);
+                            Util.Info('ExecuteJobs', 'JobTransportPowerBank', 'waiting at powerbank flag ' + creep.name + ' flag in room ' + jobObject.pos.roomName + ' powerbank is gone and there is no powerResource');
                             creep.say('W8');
                             if (creep.store[RESOURCE_POWER] > 0) {
                                 jobObject.remove();
@@ -1933,12 +1937,19 @@ const ExecuteJobs = {
                             deposit = jobObject.pos.lookFor(LOOK_DEPOSITS)[0];
                             if(deposit){
                                 creep.memory.DepositId = deposit.id;
+                            }else{
+                                Util.ErrorLog('ExecuteJobs', 'JobHarvestDeposit', creep.name + ' no deposit found removed deposit flag in ' + jobObject.pos.roomName);
+                                jobObject.remove();
                             }
                         }
                         if(deposit && deposit.cooldown === 0){
                             return creep.harvest(deposit)
                         }else if(deposit && deposit.cooldown > 0){
                             return ERR_BUSY;
+                        }else if(deposit && deposit.lastCooldown > 70){
+                            Util.InfoLog('ExecuteJobs', 'JobHarvestDeposit', creep.name + ' removed deposit in ' + jobObject.pos.roomName + ' lastCooldown ' + deposit.lastCooldown);
+                            jobObject.remove();
+                            return JOB_IS_DONE;
                         }else{
                             return JOB_IS_DONE;
                         }
