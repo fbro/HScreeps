@@ -6,9 +6,9 @@ const Util = {
     // if over max - then try and sell
     TERMINAL_MAX_RESOURCE: 4000,
     TERMINAL_MAX_ENERGY: 90000,
-    // if storage contains more or equal of x then transfer to terminal until y is in terminal
-    TERMINAL_STORAGE_ENERGY_HIGH: 200000, // x
-    TERMINAL_STORAGE_ENERGY_HIGH_TRANSFER: 100000, // y
+    // if storage contains more or equal of high then transfer to terminal until high_transfer is in terminal
+    TERMINAL_STORAGE_ENERGY_HIGH: 200000,
+    TERMINAL_STORAGE_ENERGY_HIGH_TRANSFER: 100000,
     TERMINAL_STORAGE_ENERGY_MEDIUM: 100000,
     TERMINAL_STORAGE_ENERGY_MEDIUM_TRANSFER: 80000,
     TERMINAL_STORAGE_ENERGY_LOW: 50000, // abort transfer when storage is lower than this

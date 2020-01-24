@@ -6,6 +6,7 @@ const ExecuteJobs = {
         const JOB_IS_DONE = -21; // when the job should be removed but there are no ERR codes
         const JOB_MOVING = -22; // when the creep os moving to complete its job
         const JOB_OBJ_DISAPPEARED = -23; // getObjectById returned null
+
         const NO_FETCH_FOUND = -24; // creep could not find any fetch object - end job
         const SHOULD_FETCH = -25;
         const SHOULD_ACT = -26;

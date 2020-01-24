@@ -9,7 +9,7 @@ const CreateJobs = {
         //       JobId - real id
         //       JobType - int enum - OBJECT_JOB = 1, FLAG_JOB = 2
         //       CreepType - T, H, B...
-        //       Creep - CreepName
+        //       Creep - CreepName - H1 or B4... - if job is not taken then the value is vacant
 
         // job type int enum
         const OBJECT_JOB = 1;
@@ -471,14 +471,16 @@ const CreateJobs = {
             // container
             const containers = gameRoom.find(FIND_STRUCTURES, {
                 filter: (s) => {
-                    return (s.structureType === STRUCTURE_CONTAINER && Memory.MemRooms[gameRoom.name] && s.id !== Memory.MemRooms[gameRoom.name].CtrlConId && s.store.getUsedCapacity() >= 600); // do not take the controller container into account here
+                    return (s.structureType === STRUCTURE_CONTAINER && Memory.MemRooms[gameRoom.name]);
                 }
             });
             for (const containerKey in containers) {
                 const container = containers[containerKey];
                 new RoomVisual(gameRoom.name).text('📦', container.pos.x, container.pos.y);
                 for(const resourceType in container.store){
-                    AddJob(roomJobs, '5FillStrg-' + container.structureType + '(' + container.pos.x + ',' + container.pos.y + ',' + resourceType + ')' + gameRoom.name, container.id, OBJECT_JOB, 'T');
+                    if(container.id !== Memory.MemRooms[gameRoom.name].CtrlConId && container.store.getUsedCapacity() >= 600 || resourceType !== RESOURCE_ENERGY){ // do not empty the controller container for energy
+                        AddJob(roomJobs, '5FillStrg-' + container.structureType + '(' + container.pos.x + ',' + container.pos.y + ',' + resourceType + ')' + gameRoom.name, container.id, OBJECT_JOB, 'T');
+                    }
                 }
             }
 
