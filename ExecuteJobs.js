@@ -817,29 +817,35 @@ const ExecuteJobs = {
                 })[1];
                 creep.memory.resourceType = resourceType;
             }
+            let Low = Util.TERMINAL_STORAGE_LOW;
+            let LowTransfer = Util.TERMINAL_STORAGE_LOW_TRANSFER;
+            let Medium = Util.TERMINAL_STORAGE_MEDIUM;
+            let MediumTransfer = Util.TERMINAL_STORAGE_MEDIUM_TRANSFER;
+            let High = Util.TERMINAL_STORAGE_HIGH;
+            let HighTransfer = Util.TERMINAL_STORAGE_HIGH_TRANSFER;
+            if(resourceType === RESOURCE_ENERGY){
+                Low = Util.TERMINAL_STORAGE_ENERGY_LOW;
+                LowTransfer = Util.TERMINAL_STORAGE_ENERGY_LOW_TRANSFER;
+                Medium = Util.TERMINAL_STORAGE_ENERGY_MEDIUM;
+                MediumTransfer = Util.TERMINAL_STORAGE_ENERGY_MEDIUM_TRANSFER;
+                High = Util.TERMINAL_STORAGE_ENERGY_HIGH;
+                HighTransfer = Util.TERMINAL_STORAGE_ENERGY_HIGH_TRANSFER;
+            }
             const result = GenericJobAction(creep, roomJob, {
                 /**@return {int}*/
-                JobStatus: function (jobObject) { // terminal
-                    if ( !jobObject.room.storage ||
-                        resourceType !== RESOURCE_ENERGY && jobObject.room.storage.store[resourceType] < 5000
-                        && resourceType !== RESOURCE_ENERGY && jobObject.store[resourceType] >= 3000
+                JobStatus: function (terminal) {
+                    const storage = terminal.room.storage;
+                    if ( !storage ||
+                        storage.store[resourceType] <= Low // low resource in storage abort
 
-                        || resourceType !== RESOURCE_ENERGY && jobObject.room.storage.store[resourceType] >= 5000
-                        && resourceType !== RESOURCE_ENERGY && jobObject.store[resourceType] >= 5000
+                        || storage.store[resourceType] <=  Medium
+                        && terminal.store[resourceType] >= LowTransfer
 
+                        || storage.store[resourceType] <=  High
+                        && terminal.store[resourceType] >= MediumTransfer
 
-                        || resourceType === RESOURCE_ENERGY && jobObject.room.storage.store[RESOURCE_ENERGY] < 50000 // low resource in storage abort energy
-
-                        || resourceType === RESOURCE_ENERGY && jobObject.room.storage.store[RESOURCE_ENERGY] <  100000
-                        && resourceType === RESOURCE_ENERGY && jobObject.store[RESOURCE_ENERGY] >= 50000
-
-                        || resourceType === RESOURCE_ENERGY && jobObject.room.storage.store[RESOURCE_ENERGY] <  200000
-                        && resourceType === RESOURCE_ENERGY && jobObject.store[RESOURCE_ENERGY] >= 80000
-
-                        || resourceType === RESOURCE_ENERGY && jobObject.room.storage.store[RESOURCE_ENERGY] >= 200000
-                        && resourceType === RESOURCE_ENERGY && jobObject.store[RESOURCE_ENERGY] >= 100000
-
-
+                        || storage.store[resourceType] >= High
+                        && terminal.store[resourceType] >= HighTransfer
                     ) {
                         return JOB_IS_DONE;
                     } else if (creep.store[resourceType] === 0) { // fetch
@@ -853,12 +859,24 @@ const ExecuteJobs = {
                     return creep.transfer(jobObject, resourceType);
                 },
                 /**@return {int}*/
-                IsJobDone: function (jobObject) {
-                    if (resourceType === RESOURCE_ENERGY && (creep.store[resourceType] + jobObject.store[resourceType]) >= 100000
-                        || resourceType !== RESOURCE_ENERGY && (creep.store[resourceType] + jobObject.store[resourceType]) >= 5000) {
+                IsJobDone: function (terminal) {
+                    const storage = terminal.room.storage;
+                    const newAmountInTerminal = creep.store[resourceType] + terminal.store[resourceType];
+                    if (
+                        storage.store[resourceType] <= Low // low resource in storage abort
+
+                        || storage.store[resourceType] <=  Medium
+                        && newAmountInTerminal >= LowTransfer
+
+                        || storage.store[resourceType] <=  High
+                        && newAmountInTerminal >= MediumTransfer
+
+                        || storage.store[resourceType] >= High
+                        && newAmountInTerminal >= HighTransfer
+                    ) {
                         return JOB_IS_DONE;
                     } else {
-                        return this.JobStatus(jobObject);
+                        return this.JobStatus(terminal);
                     }
                 },
                 /**@return {object}

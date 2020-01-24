@@ -1,10 +1,6 @@
 let Util = require('Util');
 const Terminals = {
     run: function () {
-        const TARGET_ENERGY = 30000;
-        const TARGET_RESOURCE = 2000;
-        const MAX_ENERGY = 90000;
-        const MAX_RESOURCE = 4000;
         const terminals = LoadMyTerminals();
         for (const terminalKey in terminals) {
             const terminal = terminals[terminalKey];
@@ -34,9 +30,9 @@ const Terminals = {
                 let fromAmount = fromTerminal.store[resourceType];
                 let target;
                 if (resourceType === RESOURCE_ENERGY) {
-                    target = TARGET_ENERGY;
+                    target = Util.TERMINAL_TARGET_ENERGY;
                 } else {
-                    target = TARGET_RESOURCE;
+                    target = Util.TERMINAL_TARGET_RESOURCE;
                 }
                 for (const toTerminalKey in terminals) {
                     if (terminalSendCount < 10 && fromAmount > target) { // is allowed to send this resource to another terminal
@@ -71,13 +67,13 @@ const Terminals = {
                 let fromAmount = fromTerminal.store[resourceType];
                 let max;
                 if (resourceType === RESOURCE_ENERGY) {
-                    max = MAX_ENERGY;
+                    max = Util.TERMINAL_MAX_ENERGY;
                 } else if(resourceType === RESOURCE_PHLEGM){
                     max = 0;
-                }  else if(resourceType === RESOURCE_POWER){ // i will never sell out on power!
+                }  else if(resourceType === RESOURCE_POWER){ // will never sell out on power
                     max = Number.MAX_SAFE_INTEGER;
                 } else {
-                    max = MAX_RESOURCE;
+                    max = Util.TERMINAL_MAX_RESOURCE;
                 }
                 if (terminalSendCount < 10 && fromAmount > max) { // is allowed to sell this resource
                     const resourceHistory = Game.market.getHistory(resourceType);
@@ -124,8 +120,8 @@ const Terminals = {
             }
             // buy power - logic here is a bit more custom
             const usedPowerCapacity = terminal.store.getUsedCapacity(RESOURCE_POWER);
-            if(usedPowerCapacity  < 1000 && terminalSendCount < 10){
-                terminalSendCount = BuyResource(terminal, RESOURCE_POWER, 1000 - usedPowerCapacity, terminalSendCount, 1, 1.2);
+            if(usedPowerCapacity === 0 && terminalSendCount < 10){
+                terminalSendCount = BuyResource(terminal, RESOURCE_POWER, 1000 - usedPowerCapacity, terminalSendCount, 1, 1);
             }
             return terminalSendCount;
         }

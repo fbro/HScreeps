@@ -15,8 +15,8 @@ const CreateJobs = {
         const OBJECT_JOB = 1;
         const FLAG_JOB = 2;
 
-        const EXTRACTOR_WHEN_STORAGE_ENERGY = 50000;
-        const EXTRACTOR_WHEN_STORAGE_MINERAL = 150000;
+        const DO_EXTRACTOR_WHEN_STORAGE_OVER_ENERGY = 50000;
+        const DO_EXTRACTOR_WHEN_STORAGE_UNDER_MINERAL = 150000;
         const RAMPART_WALL_HITS_U_LVL8 = 100000;
         const RAMPART_WALL_HITS_O_LVL8 = 2000000;
         const RAMPART_WALL_MAX_HITS_WHEN_STORAGE_ENERGY = 600000;
@@ -370,17 +370,28 @@ const CreateJobs = {
             if (gameRoom.storage && gameRoom.terminal) {
                 for (const resourceType in gameRoom.storage.store) {
                     const storageResourceAmount = gameRoom.storage.store[resourceType];
-                    let maxResources = 3000;
-                    if (resourceType === RESOURCE_ENERGY) {
-                        if (storageResourceAmount >= 200000) {
-                            maxResources = 100000;
-                        } else if (storageResourceAmount >= 100000) {
-                            maxResources = 80000;
-                        } else if (storageResourceAmount >= 50000) {
-                            maxResources = 50000;
-                        }
-                    } else if (storageResourceAmount >= 5000) {
-                        maxResources = 5000;
+                    let maxResources = 0;
+                    let High = Util.TERMINAL_STORAGE_HIGH;
+                    let HighTransfer = Util.TERMINAL_STORAGE_HIGH_TRANSFER;
+                    let Medium = Util.TERMINAL_STORAGE_MEDIUM;
+                    let MediumTransfer = Util.TERMINAL_STORAGE_MEDIUM_TRANSFER;
+                    let Low = Util.TERMINAL_STORAGE_LOW;
+                    let LowTransfer = Util.TERMINAL_STORAGE_LOW_TRANSFER;
+                    if(resourceType === RESOURCE_ENERGY){
+                        High = Util.TERMINAL_STORAGE_ENERGY_HIGH;
+                        HighTransfer = Util.TERMINAL_STORAGE_ENERGY_HIGH_TRANSFER;
+                        Medium = Util.TERMINAL_STORAGE_ENERGY_MEDIUM;
+                        MediumTransfer = Util.TERMINAL_STORAGE_ENERGY_MEDIUM_TRANSFER;
+                        Low = Util.TERMINAL_STORAGE_ENERGY_LOW;
+                        LowTransfer = Util.TERMINAL_STORAGE_ENERGY_LOW_TRANSFER;
+                    }
+                    // if storage contains alot of the specified resource then allow the terminal to be filled to an extent where it will sell out
+                    if (storageResourceAmount >= High) {
+                        maxResources = HighTransfer;
+                    }else if(storageResourceAmount >= Medium){
+                        maxResources = MediumTransfer;
+                    }else if(storageResourceAmount >= Low){
+                        maxResources = LowTransfer;
                     }
                     if (gameRoom.terminal.store[resourceType] < maxResources) {
                         AddJob(roomJobs, '5FillTerm(' + resourceType + ')' + gameRoom.name, gameRoom.terminal.id, OBJECT_JOB, 'T');
@@ -432,7 +443,7 @@ const CreateJobs = {
                     return s.mineralAmount > 0;
                 }
             })[0];
-            if (mineral && gameRoom.storage && (gameRoom.storage.store[RESOURCE_ENERGY] > EXTRACTOR_WHEN_STORAGE_ENERGY && gameRoom.storage.store[mineral.mineralType] < EXTRACTOR_WHEN_STORAGE_MINERAL
+            if (mineral && gameRoom.storage && (gameRoom.storage.store[RESOURCE_ENERGY] > DO_EXTRACTOR_WHEN_STORAGE_OVER_ENERGY && gameRoom.storage.store[mineral.mineralType] < DO_EXTRACTOR_WHEN_STORAGE_UNDER_MINERAL
                 || gameRoom.find(FIND_MY_CREEPS, {
                     filter: (c) => {
                         return c.name.startsWith('E');

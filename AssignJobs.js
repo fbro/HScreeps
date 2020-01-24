@@ -120,11 +120,11 @@ const AssignJobs = {
                 if (Game.rooms[roomOnJobKey]) { // job in invisible room
                     const gameRoom = Game.rooms[roomOnJobKey];
                     if (gameRoom.controller) { // flag in controller-less room
-                        if (gameRoom.controller.my) { // not my room
+                        if (gameRoom.controller.my) { // only use my room
                             if (gameRoom.find(FIND_MY_SPAWNS).length === 0) { // no spawn in my room
                                 Util.Info('AssignJobs', 'SpawnCreep', 'job in another room, no spawns ' + roomJobKey);
                                 bestLinearDistance = Number.MAX_SAFE_INTEGER;
-                            } else if (roomJob.CreepType === 'H') { // logic only relevant for harvester
+                            } else if (roomJob.CreepType === 'H' && gameRoom.storage) { // logic only relevant for harvester
                                 const source = gameRoom.find(FIND_SOURCES)[0];
                                 for (const effectKey in source.effects) {
                                     if (source.effects[effectKey].effect === PWR_REGEN_SOURCE) {
@@ -133,6 +133,8 @@ const AssignJobs = {
                                         break;
                                     }
                                 }
+                            } else if(roomJob.CreepType === 'B' && gameRoom.storage && gameRoom.storage.store.getUsedCapacity(RESOURCE_ENERGY) > Util.SPAWN_LARGE_B_WHEN_STORAGE_ENERGY){
+                                spawnLargeVersion = true;
                             }
                         } else {
                             Util.Info('AssignJobs', 'SpawnCreep', 'job in another room, not my room ' + roomJobKey);
@@ -363,7 +365,7 @@ const AssignJobs = {
                 // builder
                 case 'B':
                     switch (true) {
-                        case (energyAvailable >= 3250): // energyCapacityAvailable: 12900
+                        case (energyAvailable >= 3250 && spawnLargeVersion): // energyCapacityAvailable: 12900
                             body = [
                                 WORK, WORK, WORK, WORK, WORK,
                                 WORK, WORK, WORK, WORK, WORK,
