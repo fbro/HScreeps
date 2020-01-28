@@ -394,7 +394,12 @@ const ExecuteJobs = {
                  * @return {undefined}*/
                 FindFetchObject: function (jobObject) {
                     let fetchObject;
-                    fetchObject = FindClosestFreeStore(creep, 2, creep.store[RESOURCE_ENERGY], RESOURCE_ENERGY);
+                    const isOnlyEnergy = creep.store.getUsedCapacity(RESOURCE_ENERGY) === creep.store.getUsedCapacity();
+                    if(isOnlyEnergy){
+                        fetchObject = FindClosestFreeStore(creep, 2, creep.store[RESOURCE_ENERGY], RESOURCE_ENERGY);
+                    }else{
+                        fetchObject = FindClosestFreeStore(creep, 2);
+                    }
                     if (jobObject.room.controller.level < 3) {
                         const spawnConstruction = jobObject.room.find(FIND_MY_CONSTRUCTION_SITES, { // if there is a spawn that should be built - then built it
                             filter: function (c) {
@@ -410,7 +415,7 @@ const ExecuteJobs = {
                         creep.memory.LinkId = fetchObject.id
                     }else if(creep.memory.LinkId && fetchObject.structureType !== STRUCTURE_LINK){ // if fetchObject is not link and a link is saved in memory then take that instead
                         const link = Game.getObjectById(creep.memory.LinkId);
-                        if(link && link.store.getFreeCapacity() > 200){
+                        if(link && link.store.getFreeCapacity() > 200 && isOnlyEnergy){
                             fetchObject = link;
                             creep.memory.ClosestFreeStoreId = fetchObject;
                         }
@@ -2265,7 +2270,7 @@ const ExecuteJobs = {
             return result;
         }
 
-        function FindClosestFreeStore(creep, maxMoveRange = 0, resourceAmountToStore = 1, resourceTypeToStore = undefined) {
+        function FindClosestFreeStore(creep, maxMoveRange = 0, resourceAmountToStore = 1/*filters stores that are not large enough*/, resourceTypeToStore = undefined/*if energy then take link*/) {
             let closestFreeStore = Game.getObjectById(creep.memory.ClosestFreeStoreId);
             if (closestFreeStore) {
                 if (closestFreeStore.store.getFreeCapacity() < resourceAmountToStore || maxMoveRange > 0 && creep.pos.getRangeTo(closestFreeStore) > maxMoveRange) {
