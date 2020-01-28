@@ -102,16 +102,16 @@ const Observers = {
                         if (powerBank && (powerBank.Deadline - 4000) > Game.time && !shouldVacateHallway && powerBank.FreeSpaces >= 2) {
                             Memory.MemRooms[observerRoomKey].PowerBankFlag = powerBank;
                             const result = Game.rooms[powerBank.pos.roomName].createFlag(powerBank.pos, CreateFlagName(powerBank.Type, powerBank.pos.roomName, observerRoomKey), COLOR_ORANGE, COLOR_PURPLE);
-                            Util.Info('Observers','ScanPowerBanksAndDeposits', 'add ' + powerBank.pos.roomName + ' ' + powerBank.Type + ' ' + powerBank.pos + ' ' + powerBank.FreeSpaces + ' result ' + result);
+                            Util.Info('Observers', 'ScanPowerBanksAndDeposits', 'add ' + powerBank.pos.roomName + ' ' + powerBank.Type + ' ' + powerBank.pos + ' ' + powerBank.FreeSpaces + ' result ' + result);
                         }
                     } else if (Memory.MemRooms[observerRoomKey].PowerBankFlag
                         && (Memory.MemRooms[observerRoomKey].PowerBankFlag.Deadline < Game.time
                             || Memory.MemRooms[observerRoomKey].PowerBankFlag.pos.roomName === roomKey
                             && (!Game.rooms[roomKey].find(FIND_STRUCTURES, {
-                                    filter: function (pb) {
-                                        return pb.structureType === STRUCTURE_POWER_BANK;
-                                    }
-                                })[0]))) {
+                                filter: function (pb) {
+                                    return pb.structureType === STRUCTURE_POWER_BANK;
+                                }
+                            })[0]))) {
                         Util.Info('Observers', 'ScanPowerBanksAndDeposits', 'delete ' + JSON.stringify(Memory.MemRooms[observerRoomKey].PowerBankFlag));
                         delete Memory.MemRooms[observerRoomKey].PowerBankFlag;
                     }
@@ -131,8 +131,8 @@ const Observers = {
                         delete Memory.MemRooms[observerRoomKey].DepositFlag;
                     } else if (Memory.MemRooms[observerRoomKey].DepositFlag && Memory.MemRooms[observerRoomKey].DepositFlag.pos.roomName === roomKey) { // if room is the same then update deposit
                         const deposit = Game.rooms[roomKey].find(FIND_DEPOSITS)[0];
-                        if(deposit){
-                            Memory.MemRooms[observerRoomKey].DepositFlag.Deadline = deposit.lastCooldown
+                        if (deposit) {
+                            Memory.MemRooms[observerRoomKey].DepositFlag.Deadline = deposit.lastCooldown;
                         }
                     }
 
@@ -151,7 +151,11 @@ const Observers = {
                     return deposit.lastCooldown < 70;
                 }
             })[0];
-            const depositFlag = Game.rooms[roomKey].find(FIND_FLAGS, {filter: function (f) {return f.color === COLOR_ORANGE && f.secondaryColor === COLOR_CYAN;}})[0];
+            const depositFlag = Game.rooms[roomKey].find(FIND_FLAGS, {
+                filter: function (f) {
+                    return f.color === COLOR_ORANGE && f.secondaryColor === COLOR_CYAN;
+                }
+            })[0];
             if (deposit && !depositFlag) { // only add flag if no other deposit flags are present
                 const freeSpaces = Util.FreeSpaces(deposit.pos);
                 const depositScan = {
@@ -163,7 +167,7 @@ const Observers = {
                     'LastCooldown': deposit.lastCooldown,
                     'FreeSpaces': freeSpaces,
                     'ObserverId': observer.id,
-                    'FlagName' : CreateFlagName('deposit', roomKey, observerRoomKey)
+                    'FlagName': CreateFlagName('deposit', roomKey, observerRoomKey)
                 };
                 return depositScan;
             }
@@ -176,7 +180,11 @@ const Observers = {
                         return powerBank.structureType === STRUCTURE_POWER_BANK && powerBank.ticksToDecay > 0;
                     }
                 })[0];
-                if (powerBank && !Game.rooms[roomKey].find(FIND_FLAGS, {filter: function (f) {return f.color === COLOR_ORANGE && f.secondaryColor === COLOR_PURPLE;}})[0]) { // only add flag if no other powerBank flags are present
+                if (powerBank && !Game.rooms[roomKey].find(FIND_FLAGS, {
+                    filter: function (f) {
+                        return f.color === COLOR_ORANGE && f.secondaryColor === COLOR_PURPLE;
+                    }
+                })[0]) { // only add flag if no other powerBank flags are present
                     const freeSpaces = Util.FreeSpaces(powerBank.pos);
                     const powerBankScan = {
                         'Type': 'powerBank',
@@ -185,8 +193,8 @@ const Observers = {
                         'Deadline': powerBank.ticksToDecay + Game.time,
                         'FreeSpaces': freeSpaces,
                         'ObserverId': observer.id,
-                        'FlagName' : CreateFlagName('powerBank', roomKey, observerRoomKey),
-                        'Power' : powerBank.power
+                        'FlagName': CreateFlagName('powerBank', roomKey, observerRoomKey),
+                        'Power': powerBank.power
                     };
                     return powerBankScan;
                 }
@@ -194,8 +202,8 @@ const Observers = {
         }
 
         /**@return {string}*/
-        function CreateFlagName(flagType, roomKey, observerRoomKey){
-            return flagType + '_' + roomKey + '_'  + observerRoomKey;
+        function CreateFlagName(flagType, roomKey, observerRoomKey) {
+            return flagType + '_' + roomKey + '_' + observerRoomKey;
         }
     }
 };

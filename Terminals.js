@@ -68,9 +68,9 @@ const Terminals = {
                 let max;
                 if (resourceType === RESOURCE_ENERGY) {
                     max = Util.TERMINAL_MAX_ENERGY;
-                } else if(resourceType === RESOURCE_PHLEGM){
+                } else if (resourceType === RESOURCE_PHLEGM) {
                     max = 0;
-                }  else if(resourceType === RESOURCE_POWER){ // will never sell out on power
+                } else if (resourceType === RESOURCE_POWER) { // will never sell out on power
                     max = Number.MAX_SAFE_INTEGER;
                 } else {
                     max = Util.TERMINAL_MAX_RESOURCE;
@@ -83,7 +83,7 @@ const Terminals = {
                         && (resourceHistory[0].avgPrice <= order.price || resourceType === RESOURCE_ENERGY && fromTerminal.room.storage && fromTerminal.room.storage[RESOURCE_ENERGY] > 800000)
                         && order.remainingAmount > 0
                     );
-                    if(orders.length > 0){
+                    if (orders.length > 0) {
                         orders.sort(comparePriceExpensiveFirst);
                     }
                     for (const orderKey in orders) {
@@ -109,18 +109,18 @@ const Terminals = {
 
         // buy resources to make sure that there are at least 500 Hydrogen, Oxygen, Utrium, Keanium, Lemergium, Zynthium and Catalyst in each terminal
         /**@return {number}*/
-        function BuyBasicResources(terminal, terminalSendCount){
+        function BuyBasicResources(terminal, terminalSendCount) {
             const basicResourceList = [RESOURCE_HYDROGEN, RESOURCE_OXYGEN, RESOURCE_UTRIUM, RESOURCE_KEANIUM, RESOURCE_LEMERGIUM, RESOURCE_ZYNTHIUM, RESOURCE_CATALYST];
-            for(const basicResourceKey in basicResourceList){
+            for (const basicResourceKey in basicResourceList) {
                 const basicResource = basicResourceList[basicResourceKey];
                 const usedCapacity = terminal.store.getUsedCapacity(basicResource);
-                if (usedCapacity  < 500 && terminalSendCount < 10) {
+                if (usedCapacity < 500 && terminalSendCount < 10) {
                     terminalSendCount = BuyResource(terminal, basicResource, 500 - usedCapacity, terminalSendCount);
                 }
             }
             // buy power - logic here is a bit more custom
             const usedPowerCapacity = terminal.store.getUsedCapacity(RESOURCE_POWER);
-            if(usedPowerCapacity === 0 && terminalSendCount < 10){
+            if (usedPowerCapacity === 0 && terminalSendCount < 10) {
                 terminalSendCount = BuyResource(terminal, RESOURCE_POWER, 1000 - usedPowerCapacity, terminalSendCount, 1, 1);
             }
             return terminalSendCount;
@@ -130,7 +130,7 @@ const Terminals = {
         function BuyResource(terminal, resourceType, amount, terminalSendCount,
                              avgPrice = 1.5, // set if one wants a another acceptable average price
                              maxPrice = undefined // set if one should use a fixed price to buy under
-        ){
+        ) {
             const resourceHistory = Game.market.getHistory(resourceType);
             const orders = Game.market.getAllOrders(order => order.resourceType === resourceType
                 && order.type === ORDER_SELL
@@ -138,7 +138,7 @@ const Terminals = {
                 && ((resourceHistory[0].avgPrice * avgPrice) >= order.price || maxPrice && maxPrice >= order.price)
                 && order.remainingAmount > 0
             );
-            if(orders.length > 0){
+            if (orders.length > 0) {
                 orders.sort(comparePriceCheapestFirst);
                 Util.Info('Terminals', 'BuyResource', 'WTB ' + amount + ' ' + resourceType + ' from ' + terminal + ' ' + JSON.stringify(orders) + ' avg price ' + resourceHistory[0].avgPrice);
             }
@@ -149,7 +149,7 @@ const Terminals = {
                 const result = Game.market.deal(order.id, amountToBuy, terminal.pos.roomName);
                 Util.InfoLog('Terminals', 'BuyResource', amountToBuy + ' ' + resourceType + ' from ' + terminal.pos.roomName + ' to ' + order.roomName + ' result ' + result + ' terminalSendCount ' + terminalSendCount + ' order.remainingAmount ' + order.remainingAmount + ' price ' + order.price + ' total price ' + (order.price * amountToBuy));
                 terminalSendCount++;
-                if(result === OK){
+                if (result === OK) {
                     amountBought = amountToBuy + amountBought;
                 }
                 if (terminalSendCount >= 10 || amount <= amountBought) {
@@ -160,14 +160,22 @@ const Terminals = {
         }
 
         function comparePriceCheapestFirst(a, b) {
-            if (a.price < b.price) { return -1; }
-            if (a.price > b.price) { return 1; }
+            if (a.price < b.price) {
+                return -1;
+            }
+            if (a.price > b.price) {
+                return 1;
+            }
             return 0;
         }
 
         function comparePriceExpensiveFirst(a, b) {
-            if (a.price > b.price) { return -1; }
-            if (a.price < b.price) { return 1; }
+            if (a.price > b.price) {
+                return -1;
+            }
+            if (a.price < b.price) {
+                return 1;
+            }
             return 0;
         }
     }

@@ -66,8 +66,8 @@ const AssignJobs = {
                 if (idleCreep.pos.roomName === memRoomKey && idleCreep.name.startsWith(roomJob.CreepType)) {
                     // idle creep is in memory room with vacant job and matching job type
                     idleCreep.memory.JobName = roomJobKey;
-                    for(const memoryElementKey in idleCreep.memory){
-                        if(memoryElementKey !== 'JobName'){
+                    for (const memoryElementKey in idleCreep.memory) {
+                        if (memoryElementKey !== 'JobName') {
                             idleCreep.memory[memoryElementKey] = undefined;
                         }
                     }
@@ -133,7 +133,7 @@ const AssignJobs = {
                                         break;
                                     }
                                 }
-                            } else if(roomJob.CreepType === 'B' && gameRoom.storage && gameRoom.storage.store.getUsedCapacity(RESOURCE_ENERGY) > Util.SPAWN_LARGE_B_WHEN_STORAGE_ENERGY){
+                            } else if (roomJob.CreepType === 'B' && gameRoom.storage && gameRoom.storage.store.getUsedCapacity(RESOURCE_ENERGY) > Util.SPAWN_LARGE_B_WHEN_STORAGE_ENERGY) {
                                 spawnLargeVersion = true;
                             }
                         } else {
@@ -233,17 +233,17 @@ const AssignJobs = {
                 if (creepType === 'H' && memRoom.RoomLevel < 3) {
                     maxCreepsInRoom += memRoom.SourceNumber;
                 } else if (creepType === 'B') {
-                    if(memRoom.RoomLevel < 8){
+                    if (memRoom.RoomLevel < 8) {
                         maxCreepsInRoom += 1;
                         if (memRoom.RoomLevel < 3) {
                             maxCreepsInRoom += 1;
                             const spawn = Game.rooms[roomKey].find(FIND_MY_SPAWNS)[0];
-                            if(!spawn){
+                            if (!spawn) {
                                 maxCreepsInRoom = 0;
                                 Util.Warning('AssignJobs', 'ShouldSpawnCreep', 'no spawn = no builder ' + roomKey);
                             }
                         }
-                    }else if(memRoom.RoomLevel === 8 && Game.rooms[roomKey].storage && Game.rooms[roomKey].storage.store[RESOURCE_ENERGY] > 600000){
+                    } else if (memRoom.RoomLevel === 8 && Game.rooms[roomKey].storage && Game.rooms[roomKey].storage.store[RESOURCE_ENERGY] > 600000) {
                         maxCreepsInRoom += 3;
                     }
                 }

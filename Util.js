@@ -1,7 +1,6 @@
-
 const Util = {
     // if over target - terminal should send to another owned room that has under the target
-    TERMINAL_TARGET_RESOURCE : 2000,
+    TERMINAL_TARGET_RESOURCE: 2000,
     TERMINAL_TARGET_ENERGY: 30000,
     // if over max - then try and sell
     TERMINAL_MAX_RESOURCE: 4000,
@@ -62,7 +61,7 @@ const Util = {
         console.log('WARNING! ' + functionParentName + ' ' + functionName + ' | ' + message);
     },
     /**@return {number}*/
-    FreeSpaces: function(pos) { // get the number of free spaces around a pos
+    FreeSpaces: function (pos) { // get the number of free spaces around a pos
         let freeSpaces = 0;
         const terrain = Game.map.getRoomTerrain(pos.roomName);
         for (let x = pos.x - 1; x <= pos.x + 1; x++) {
