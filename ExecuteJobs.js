@@ -1739,12 +1739,21 @@ const ExecuteJobs = {
                             Util.Info('ExecuteJobs', 'JobAttackPowerBank', 'done ' + creep.name + ' ' + jobObject.name);
                         }
                         // generate transport power flags depending on the amount of power that was in the powerBank
-                        const observerRoom = jobObject.name.split(/[_]+/).filter(function (e) {return e;})[3];
-                        const memPowerBank = Memory.MemRooms[observerRoom].PowerBankFlag;
-                        const memPowerBankPower = memPowerBank.Power;
-                        const numOfTransporterFlags = (memPowerBankPower / 1000) + 1;
-                        for(let i = 1; i <= numOfTransporterFlags; i++){
-                            jobObject.room.createFlag(i, 0, i + '_getPower_' + jobObject.pos.roomName, COLOR_ORANGE, COLOR_GREY);
+                        const observerRoomKey = jobObject.name.split(/[_]+/).filter(function (e) {return e;})[3];
+                        const observerRoom = Memory.MemRooms[observerRoomKey];
+                        if(observerRoom){
+                            const memPowerBankFlag = observerRoom.PowerBankFlag;
+                            if(memPowerBankFlag){
+                                const memPowerBankPower = memPowerBankFlag.Power;
+                                const numOfTransporterFlags = (memPowerBankPower / 1000) + 1;
+                                for(let i = 1; i <= numOfTransporterFlags; i++){
+                                    jobObject.room.createFlag(i, 0, i + '_getPower_' + jobObject.pos.roomName, COLOR_ORANGE, COLOR_GREY);
+                                }
+                            }else{
+                                Util.Warning('ExecuteJobs', 'JobAttackPowerBank', 'memPowerBankFlag not found ' + memPowerBankFlag);
+                            }
+                        }else{
+                            Util.Warning('ExecuteJobs', 'JobAttackPowerBank', 'observerRoom not found, observerRoomKey ' + observerRoomKey);
                         }
                         jobObject.remove();
                         result = JOB_IS_DONE;
@@ -1907,8 +1916,8 @@ const ExecuteJobs = {
                             if (powerRuin) {
                                 return creep.withdraw(powerRuin, RESOURCE_POWER);
                             }else{
+                                Util.InfoLog('ExecuteJobs', 'JobTransportPowerBank', 'removing powerbank flag because last power has been picked up! ' + jobObject.pos.roomName);
                                 jobObject.remove();
-                                Util.Info('ExecuteJobs', 'JobTransportPowerBank', 'removing powerbank flag because last power has been picked up!');
                                 return JOB_IS_DONE;
                             }
                         }
@@ -1977,12 +1986,12 @@ const ExecuteJobs = {
                         }
                         if(deposit && deposit.cooldown === 0){
                             return creep.harvest(deposit)
-                        }else if(deposit && deposit.cooldown > 0){
-                            return ERR_BUSY;
                         }else if(deposit && deposit.lastCooldown > 70){
                             Util.InfoLog('ExecuteJobs', 'JobHarvestDeposit', creep.name + ' removed deposit in ' + jobObject.pos.roomName + ' lastCooldown ' + deposit.lastCooldown);
                             jobObject.remove();
                             return JOB_IS_DONE;
+                        }else if(deposit && deposit.cooldown > 0){
+                            return ERR_BUSY;
                         }else{
                             return JOB_IS_DONE;
                         }

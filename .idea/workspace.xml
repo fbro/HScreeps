@@ -3,7 +3,8 @@
   <component name="ChangeListManager">
     <list default="true" id="7b6f36cb-4298-4902-b6a2-ea3816b3b82c" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Terminals.js" beforeDir="false" afterPath="$PROJECT_DIR$/Terminals.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ExecuteJobs.js" beforeDir="false" afterPath="$PROJECT_DIR$/ExecuteJobs.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Observers.js" beforeDir="false" afterPath="$PROJECT_DIR$/Observers.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -119,14 +120,7 @@
       <workItem from="1576011053894" duration="6930000" />
       <workItem from="1576169775768" duration="190690000" />
       <workItem from="1578583491605" duration="22323000" />
-      <workItem from="1579172967628" duration="22814000" />
-    </task>
-    <task id="LOCAL-00093" summary="small changes">
-      <created>1574243210946</created>
-      <option name="number" value="00093" />
-      <option name="presentableId" value="LOCAL-00093" />
-      <option name="project" value="LOCAL" />
-      <updated>1574243210947</updated>
+      <workItem from="1579172967628" duration="33562000" />
     </task>
     <task id="LOCAL-00094" summary="small changes">
       <created>1574880689863</created>
@@ -464,7 +458,14 @@
       <option name="project" value="LOCAL" />
       <updated>1579646361599</updated>
     </task>
-    <option name="localTasksCounter" value="142" />
+    <task id="LOCAL-00142" summary="small changes">
+      <created>1579717438827</created>
+      <option name="number" value="00142" />
+      <option name="presentableId" value="LOCAL-00142" />
+      <option name="project" value="LOCAL" />
+      <updated>1579717438827</updated>
+    </task>
+    <option name="localTasksCounter" value="143" />
     <servers />
   </component>
   <component name="TodoView">
@@ -540,33 +541,37 @@
     <option name="LAST_COMMIT_MESSAGE" value="small changes" />
   </component>
   <component name="WindowStateProjectService">
-    <state x="526" y="130" key="CommitChangelistDialog2" timestamp="1579646360890">
+    <state x="526" y="130" key="CommitChangelistDialog2" timestamp="1579717438173">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="526" y="130" key="CommitChangelistDialog2/0.0.1920.1040@0.0.1920.1040" timestamp="1579646360890" />
+    <state x="526" y="130" key="CommitChangelistDialog2/0.0.1920.1040@0.0.1920.1040" timestamp="1579717438173" />
     <state x="526" y="135" key="CommitChangelistDialog2/0.0.1920.1080@0.0.1920.1080" timestamp="1579120815875" />
-    <state x="92" y="89" width="1736" height="896" key="DiffContextDialog" timestamp="1579443824731">
+    <state x="92" y="89" width="1536" height="858" key="DiffContextDialog" timestamp="1580240647833">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="92" y="89" key="DiffContextDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1579443824731" />
+    <state x="92" y="89" width="1536" height="858" key="DiffContextDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1580240647833" />
     <state x="92" y="92" width="1736" height="896" key="DiffContextDialog/0.0.1920.1080@0.0.1920.1080" timestamp="1578925743864" />
     <state x="461" y="183" key="SettingsEditor" timestamp="1578585185476">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
     <state x="461" y="183" key="SettingsEditor/0.0.1920.1080@0.0.1920.1080" timestamp="1578585185476" />
-    <state x="552" y="264" key="Vcs.Push.Dialog.v2" timestamp="1579646362968">
+    <state x="552" y="264" key="Vcs.Push.Dialog.v2" timestamp="1579717440000">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="552" y="264" key="Vcs.Push.Dialog.v2/0.0.1920.1040@0.0.1920.1040" timestamp="1579646362968" />
+    <state x="552" y="264" key="Vcs.Push.Dialog.v2/0.0.1920.1040@0.0.1920.1040" timestamp="1579717440000" />
     <state x="552" y="274" key="Vcs.Push.Dialog.v2/0.0.1920.1080@0.0.1920.1080" timestamp="1579120936828" />
+    <state x="92" y="92" width="1736" height="856" key="com.intellij.history.integration.ui.views.FileHistoryDialog" timestamp="1580242951295">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="92" y="92" width="1736" height="856" key="com.intellij.history.integration.ui.views.FileHistoryDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1580242951295" />
     <state x="655" y="365" key="com.intellij.ide.util.TipDialog" timestamp="1579176090261">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
     <state x="655" y="365" key="com.intellij.ide.util.TipDialog/0.0.1920.1080@0.0.1920.1080" timestamp="1579176090261" />
-    <state x="769" y="441" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2" timestamp="1579716871627">
+    <state x="769" y="441" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2" timestamp="1580240614108">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="769" y="441" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/0.0.1920.1040@0.0.1920.1040" timestamp="1579716871627" />
+    <state x="769" y="441" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/0.0.1920.1040@0.0.1920.1040" timestamp="1580240614108" />
     <state x="769" y="458" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/0.0.1920.1080@0.0.1920.1080" timestamp="1579113560465" />
     <state x="323" y="58" width="1211" height="927" key="find.popup" timestamp="1578585594377">
       <screen x="0" y="0" width="1920" height="1080" />
