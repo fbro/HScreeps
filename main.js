@@ -83,6 +83,7 @@ module.exports.loop = function () {
 };
 
 // TODOs:
+// TODO harvest power should generate power transporter flags!!
 // lab reactions
 // RenewPowerCreep: only looks for renew sources in the current room
 
