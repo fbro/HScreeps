@@ -41,6 +41,8 @@ const CreateJobs = {
                         // observers handle this flag
                     } else if (secColor === COLOR_PURPLE) { // flag that observers create and put on found power banks and deletes again when deadline is reached
                         jobs = PowerBankJobs(jobs, gameFlagKey, gameFlag);
+                    } else if (secColor === COLOR_GREY) { // flag that is created for each transporter that should fetch the power
+                        jobs = CreateFlagJob(jobs, '1TrnsprtP', gameFlagKey, gameFlag, 'T'); // TODO create the flag in observer or attacking creep
                     } else if (secColor === COLOR_CYAN) { // flag that observers create and put on deposits and deletes again when deadline is reached
                         jobs = CreateFlagJob(jobs, '5HrvstDpst', gameFlagKey, gameFlag, 'D');
                     } else if (secColor === COLOR_GREEN) { // harvester, transporter and builder move to pos
@@ -229,41 +231,10 @@ const CreateJobs = {
         // flag jobs:
 
         function PowerBankJobs(jobs, gameFlagKey, gameFlag) {
-            if (gameFlag.room) { // power bank on low health - get transporters over to the power bank
-                const powerBank = gameFlag.pos.lookFor(LOOK_STRUCTURES)[0];
-                const droppedPower = gameFlag.room.find(FIND_DROPPED_RESOURCES, {
-                    filter: (d) => {
-                        return d.resourceType === RESOURCE_POWER;
-                    }
-                })[0];
-                if (powerBank) {
-                    jobs = CreateFlagJob(jobs, '3AtkP1', gameFlagKey, gameFlag, 'W');
-                    jobs = CreateFlagJob(jobs, '3AtkP2', gameFlagKey, gameFlag, 'W');
-                    jobs = CreateFlagJob(jobs, '3MedP1', gameFlagKey, gameFlag, 'M');
-                    jobs = CreateFlagJob(jobs, '3MedP2', gameFlagKey, gameFlag, 'M');
-                }
-                if ((powerBank && powerBank.hits < 250000) || droppedPower) {
-                    jobs = CreateFlagJob(jobs, '1TrnsprtP1', gameFlagKey, gameFlag, 'T');
-                    Util.Info('CreateJobs', 'PowerBankJobs', '1TrnsprtP1 ' + gameFlag.room.name);
-                    if ((powerBank && powerBank.power > 1000) || (droppedPower && droppedPower.amount > 1000)) {
-                        jobs = CreateFlagJob(jobs, '1TrnsprtP2', gameFlagKey, gameFlag, 'T');
-                        Util.Info('CreateJobs', 'PowerBankJobs', '1TrnsprtP2 ' + gameFlag.room.name);
-                        if ((powerBank && powerBank.power > 2000) || (droppedPower && droppedPower.amount > 2000)) {
-                            jobs = CreateFlagJob(jobs, '1TrnsprtP3', gameFlagKey, gameFlag, 'T');
-                            Util.Info('CreateJobs', 'PowerBankJobs', '1TrnsprtP3 ' + gameFlag.room.name);
-                            if ((powerBank && powerBank.power > 3000) || (droppedPower && droppedPower.amount > 3000)) {
-                                jobs = CreateFlagJob(jobs, '1TrnsprtP4', gameFlagKey, gameFlag, 'T');
-                                Util.Info('CreateJobs', 'PowerBankJobs', '1TrnsprtP4 ' + gameFlag.room.name);
-                            }
-                        }
-                    }
-                }
-            } else { // create the jobs if the room is invisible - not needed if the observer is looking at the room at all ticks
-                jobs = CreateFlagJob(jobs, '3AtkP1', gameFlagKey, gameFlag, 'W');
-                jobs = CreateFlagJob(jobs, '3AtkP2', gameFlagKey, gameFlag, 'W');
-                jobs = CreateFlagJob(jobs, '3MedP1', gameFlagKey, gameFlag, 'M');
-                jobs = CreateFlagJob(jobs, '3MedP2', gameFlagKey, gameFlag, 'M');
-            }
+            jobs = CreateFlagJob(jobs, '3AtkP1', gameFlagKey, gameFlag, 'W');
+            jobs = CreateFlagJob(jobs, '3AtkP2', gameFlagKey, gameFlag, 'W');
+            jobs = CreateFlagJob(jobs, '3MedP1', gameFlagKey, gameFlag, 'M');
+            jobs = CreateFlagJob(jobs, '3MedP2', gameFlagKey, gameFlag, 'M');
             return jobs;
         }
 

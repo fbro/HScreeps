@@ -1738,6 +1738,15 @@ const ExecuteJobs = {
                         } else {
                             Util.Info('ExecuteJobs', 'JobAttackPowerBank', 'done ' + creep.name + ' ' + jobObject.name);
                         }
+                        // generate transport power flags depending on the amount of power that was in the powerBank
+                        const observerRoom = jobObject.name.split(/[_]+/).filter(function (e) {return e;})[3];
+                        const memPowerBank = Memory.MemRooms[observerRoom].PowerBankFlag;
+                        const memPowerBankPower = memPowerBank.Power;
+                        const numOfTransporterFlags = (memPowerBankPower / 1000) + 1;
+                        for(let i = 1; i <= numOfTransporterFlags; i++){
+                            jobObject.room.createFlag(i, 0, i + '_getPower_' + jobObject.pos.roomName, COLOR_ORANGE, COLOR_GREY);
+                        }
+                        jobObject.remove();
                         result = JOB_IS_DONE;
                     }
                     return result;
@@ -1888,25 +1897,25 @@ const ExecuteJobs = {
                     if (!jobObject.room) { // invisible
                         return ERR_NOT_IN_RANGE;
                     }
-                    const powerResource = jobObject.pos.lookFor(LOOK_RESOURCES)[0];
-                    if (powerResource) {
-                        return creep.pickup(powerResource);
-                    } else if (!powerResource && creep.pos.getRangeTo(jobObject) < 6) { // no powerResource on ground and in range to flag
-                        const powerBank = jobObject.pos.lookFor(LOOK_STRUCTURES)[0];
-                        if (powerBank) { // powerBank is still alive - wait for it to get destroyed
-                            creep.say('W8');
-                            return OK;
-                        } else { // no powerResource and no powerBank
-                            Util.Info('ExecuteJobs', 'JobTransportPowerBank', 'waiting at powerbank flag ' + creep.name + ' flag in room ' + jobObject.pos.roomName + ' powerbank is gone and there is no powerResource');
-                            creep.say('W8');
-                            if (creep.store[RESOURCE_POWER] > 0) {
+                    const powerBank = jobObject.room.find(FIND_STRUCTURES, {filter: function (s){return s.structureType === STRUCTURE_POWER_BANK;}})[0];
+                    if(!powerBank){
+                        const powerResource = jobObject.room.find(FIND_DROPPED_RESOURCES, {filter: function (s){return s.resourceType === RESOURCE_POWER;}})[0];
+                        if (powerResource) {
+                            return creep.pickup(powerResource);
+                        } else{
+                            const powerRuin = jobObject.room.find(FIND_RUINS, {filter: function (s){return s.store.getUsedCapacity(RESOURCE_POWER) > 0;}})[0];
+                            if (powerRuin) {
+                                return creep.withdraw(powerRuin, RESOURCE_POWER);
+                            }else{
                                 jobObject.remove();
                                 Util.Info('ExecuteJobs', 'JobTransportPowerBank', 'removing powerbank flag because last power has been picked up!');
+                                return JOB_IS_DONE;
                             }
-                            return OK;
                         }
+                    } else if (creep.pos.getRangeTo(powerBank) < 6) { // no powerResource on ground or powerRuin and in range to powerBank
+                        return ERR_BUSY; // powerBank is still alive - wait for it to get destroyed
                     } else {
-                        return ERR_NOT_IN_RANGE;
+                        return Move(creep, powerBank);
                     }
                 },
                 /**@return {int}*/
