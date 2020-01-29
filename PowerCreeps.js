@@ -244,7 +244,6 @@ const PowerCreeps = {
             return result;
         }
 
-        // TODO only looks for renew sources in the current room
         /**@return {number}*/
         function RenewPowerCreep(powerCreep) {
             let powerSpawnOrBank;
@@ -255,14 +254,28 @@ const PowerCreeps = {
                 }
             }
             if (!powerSpawnOrBank) {
-                powerSpawnOrBank = powerCreep.room.find(FIND_MY_STRUCTURES, {
+                powerSpawnOrBank = powerCreep.room.find(FIND_STRUCTURES, {
                     filter: (s) => {
                         return s.structureType === STRUCTURE_POWER_SPAWN || s.structureType === STRUCTURE_POWER_BANK;
                     }
                 })[0];
-                powerCreep.memory.PowerSpawnOrBankId = powerSpawnOrBank.id;
+                if(!powerSpawnOrBank) { // look in other visible rooms for a renew source
+                    let bestRange = Number.MAX_SAFE_INTEGER;
+                    for (const gameRoomKey in Game.rooms) {
+                        const room = Game.rooms[gameRoomKey];
+                        let s = room.find(FIND_STRUCTURES, {filter: (s) => {return s.structureType === STRUCTURE_POWER_SPAWN && room.controller && room.controller.my || s.structureType === STRUCTURE_POWER_BANK;}})[0];
+                        const range = Game.map.getRoomLinearDistance(powerCreep.pos.roomName, powerSpawnOrBank.pos.roomName);
+                        if(range < bestRange){
+                            powerSpawnOrBank = s;
+                            bestRange = range;
+                        }
+                    }
+                }
+                if(powerSpawnOrBank){
+                    Util.Info('PowerCreeps', 'RenewPowerCreep', powerCreep.name + ' in ' + powerCreep.pos.roomName + ' trying to renew at ' + JSON.stringify(powerSpawnOrBank.pos));
+                    powerCreep.memory.PowerSpawnOrBankId = powerSpawnOrBank.id;
+                }
             }
-
             let result = ERR_INVALID_TARGET;
             if (powerSpawnOrBank) {
                 result = powerCreep.renew(powerSpawnOrBank);

@@ -1736,6 +1736,16 @@ const ExecuteJobs = {
                         if (result === ERR_NO_BODYPART) {
                             result = ERR_TIRED;
                         }
+                        if(powerBank.hits < 200000){
+                            if(!powerBank.room.lookForAt(LOOK_FLAGS, 0, 0)[0]){
+                                Util.Info('ExecuteJobs', 'JobAttackPowerBank', 'generate transport power flags ' + creep.name + ' ' + jobObject.name + ' hits left ' + powerBank.hits);
+                                // generate transport power flags depending on the amount of power that was in the powerBank
+                                const numOfTransporterFlags = (powerBank.power / 1000);
+                                for (let i = 0; i < numOfTransporterFlags; i++) {
+                                    jobObject.room.createFlag(i, 0, i + '_getPower_' + jobObject.pos.roomName, COLOR_ORANGE, COLOR_GREY);
+                                }
+                            }
+                        }
                     } else {
                         const powerResource = jobObject.pos.findInRange(FIND_DROPPED_RESOURCES, 1, {
                             filter: function (power) {
@@ -1746,25 +1756,6 @@ const ExecuteJobs = {
                             Util.Info('ExecuteJobs', 'JobAttackPowerBank', 'done ' + creep.name + ' ' + jobObject.name + ' power ' + powerResource.amount);
                         } else {
                             Util.Info('ExecuteJobs', 'JobAttackPowerBank', 'done ' + creep.name + ' ' + jobObject.name);
-                        }
-                        // generate transport power flags depending on the amount of power that was in the powerBank
-                        const observerRoomKey = jobObject.name.split(/[_]+/).filter(function (e) {
-                            return e;
-                        })[3];
-                        const observerRoom = Memory.MemRooms[observerRoomKey];
-                        if (observerRoom) {
-                            const memPowerBankFlag = observerRoom.PowerBankFlag;
-                            if (memPowerBankFlag) {
-                                const memPowerBankPower = memPowerBankFlag.Power;
-                                const numOfTransporterFlags = (memPowerBankPower / 1000) + 1;
-                                for (let i = 1; i <= numOfTransporterFlags; i++) {
-                                    jobObject.room.createFlag(i, 0, i + '_getPower_' + jobObject.pos.roomName, COLOR_ORANGE, COLOR_GREY);
-                                }
-                            } else {
-                                Util.Warning('ExecuteJobs', 'JobAttackPowerBank', 'memPowerBankFlag not found ' + memPowerBankFlag);
-                            }
-                        } else {
-                            Util.Warning('ExecuteJobs', 'JobAttackPowerBank', 'observerRoom not found, observerRoomKey ' + observerRoomKey);
                         }
                         jobObject.remove();
                         result = JOB_IS_DONE;
@@ -1929,7 +1920,11 @@ const ExecuteJobs = {
                             }
                         })[0];
                         if (powerResource) {
-                            return creep.pickup(powerResource);
+                            let result = creep.pickup(powerResource);
+                            if(result === ERR_NOT_IN_RANGE){
+                                result = Move(creep, powerResource);
+                            }
+                            return result;
                         } else {
                             const powerRuin = jobObject.room.find(FIND_RUINS, {
                                 filter: function (s) {

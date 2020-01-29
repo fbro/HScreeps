@@ -42,7 +42,7 @@ const CreateJobs = {
                     } else if (secColor === COLOR_PURPLE) { // flag that observers create and put on found power banks and deletes again when deadline is reached
                         jobs = PowerBankJobs(jobs, gameFlagKey, gameFlag);
                     } else if (secColor === COLOR_GREY) { // flag that is created for each transporter that should fetch the power
-                        jobs = CreateFlagJob(jobs, '1TrnsprtP', gameFlagKey, gameFlag, 'T'); // TODO create the flag in observer or attacking creep
+                        jobs = CreateFlagJob(jobs, '1TrnsprtP', gameFlagKey, gameFlag, 'T');
                     } else if (secColor === COLOR_CYAN) { // flag that observers create and put on deposits and deletes again when deadline is reached
                         jobs = CreateFlagJob(jobs, '5HrvstDpst', gameFlagKey, gameFlag, 'D');
                     } else if (secColor === COLOR_GREEN) { // harvester, transporter and builder move to pos

@@ -35,7 +35,7 @@ const Terminals = {
                     target = Util.TERMINAL_TARGET_RESOURCE;
                 }
                 for (const toTerminalKey in terminals) {
-                    if (terminalSendCount < 10 && fromAmount > target) { // is allowed to send this resource to another terminal
+                    if (terminalSendCount < 10 && fromAmount > (target + 1000/*buffer to prevent many small send*/)) { // is allowed to send this resource to another terminal
                         const toTerminal = terminals[toTerminalKey];
                         const toAmount = toTerminal.store[resourceType];
                         let shouldSend = false;

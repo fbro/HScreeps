@@ -18,7 +18,7 @@ module.exports.loop = function () {
         if (Game.time % 30 === 0) { // tick burst from https://docs.screeps.com/cpu-limit.html#Bucket
             CreateJobs.run();
             Links.run();
-            if (Game.time % 9000 === 0) {
+            if (Game.time % 15000 === 0) {
                 Util.Info('Main', 'Main', '--------------- main reset of memory ---------------');
                 delete Memory.Paths;
                 const foundCreeps = {};
@@ -83,9 +83,7 @@ module.exports.loop = function () {
 };
 
 // TODOs:
-// TODO harvest power should generate power transporter flags!!
 // lab reactions
-// RenewPowerCreep: only looks for renew sources in the current room
 
 // attack NPC strongholds
 // harvest middle rooms

@@ -30,8 +30,12 @@ console.log(JSON.stringify(Game.rooms['E29S28'].controller.owner));
 // check all flags
 for (const flagKey in Game.flags) {
     const flag = Game.flags[flagKey];
-    console.log(flagKey + ' ' + JSON.stringify(flag));
-}
+    console.log(flagKey + ' ' + JSON.stringify(flag));}
+    //if(flag.name.startsWith('deposit')){
+    //    console.log('removing flag');
+    //    flag.remove()
+    //}
+//}
 
 console.log(Game.rooms['E35S29'].controller.owner);
 
