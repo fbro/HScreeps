@@ -162,6 +162,7 @@ const ExecuteJobs = {
 
                 // creep actions that should always be fired no matter what the creep is doing
                 if (result !== OK && gameCreep) {
+                    result = ERR_NO_RESULT_FOUND;
                     if (gameCreep.store[RESOURCE_ENERGY] > 0) { // fill adjacent spawns, extensions and towers or repair or construct on the road
                         const toFill = gameCreep.pos.findInRange(FIND_MY_STRUCTURES, 1, {
                             filter: (structure) => {
@@ -171,7 +172,7 @@ const ExecuteJobs = {
                             }
                         })[0];
                         if (toFill) { // fill adjacent spawns, extensions
-                            gameCreep.transfer(toFill, RESOURCE_ENERGY); // it may do that 'double' but it really does not matter
+                            result = gameCreep.transfer(toFill, RESOURCE_ENERGY); // it may do that 'double' but it really does not matter
                             //Util.Info('ExecuteJobs', 'ExecuteRoomJobs', creep.name + ' transferred energy to adjacent spawn tower or extension (' + toFill.pos.x + ',' + toFill.pos.y + ',' + toFill.pos.roomName + ')');
                         } else if (gameCreep.name.startsWith('H') || gameCreep.name.startsWith('B') || gameCreep.name.startsWith('D')) { // repair on the road
                             const toRepair = gameCreep.pos.findInRange(FIND_STRUCTURES, 2, {
@@ -181,19 +182,20 @@ const ExecuteJobs = {
                                 }
                             })[0];
                             if (toRepair) { // repair on the road
-                                gameCreep.repair(toRepair);
+                                result = gameCreep.repair(toRepair);
                                 //Util.Info('ExecuteJobs', 'ExecuteRoomJobs', creep.name + ' repaired ' + toRepair.structureType + ' (' + toRepair.pos.x + ',' + toRepair.pos.y + ',' + toRepair.pos.roomName + ',' + toRepair.hits + ',' + toRepair.hitsMax + ')');
                             } else {
                                 const toBuild = gameCreep.pos.findInRange(FIND_CONSTRUCTION_SITES, 2)[0];
                                 if (toBuild) { // construct on the road
-                                    gameCreep.build(toBuild);
+                                    result = gameCreep.build(toBuild);
                                 }
                             }
                         }
-                    } else if (gameCreep.store.getUsedCapacity() < gameCreep.store.getCapacity()) { // pickup adjacent resources
+                    }
+                    if (result === ERR_NO_RESULT_FOUND && gameCreep.store.getUsedCapacity() < gameCreep.store.getCapacity()) { // pickup adjacent resources
                         const drop = gameCreep.pos.findInRange(FIND_DROPPED_RESOURCES, 1)[0];
                         if (drop) {
-                            gameCreep.pickup(drop); // it may do that 'double' but it really does not matter
+                            result = gameCreep.pickup(drop); // it may do that 'double' but it really does not matter
                             //Util.Info('ExecuteJobs', 'ExecuteRoomJobs', creep.name + ' picked up adjacent resource (' + drop.pos.x + ',' + drop.pos.y + ',' + drop.pos.roomName + ',' + drop.amount + ',' + drop.resourceType + ')');
                         } else {
                             const tombstone = gameCreep.pos.findInRange(FIND_TOMBSTONES, 1, {
@@ -203,10 +205,20 @@ const ExecuteJobs = {
                             })[0];
                             if (tombstone) {
                                 for (const resourceType in gameCreep.store) {
-                                    gameCreep.withdraw(drop, resourceType);
+                                    result = gameCreep.withdraw(tombstone, resourceType);
                                     break;
                                 }
                             }
+                        }
+                    }
+                    if((600 / gameCreep.body.length + gameCreep.ticksToLive) <= 1500) {
+                        const spawn = gameCreep.pos.findInRange(FIND_MY_STRUCTURES, 1, {
+                            filter: (s) => {
+                                return s.structureType === STRUCTURE_SPAWN && !s.spawning;
+                            }
+                        })[0];
+                        if(spawn){
+                            result = spawn.renewCreep(gameCreep);
                         }
                     }
                 }
@@ -426,11 +438,10 @@ const ExecuteJobs = {
                 Fetch: function (fetchObject, jobObject) {
                     let result = ERR_NO_RESULT_FOUND;
                     if (fetchObject.structureType === STRUCTURE_SPAWN) {
-                        Util.Info('ExecuteJobs', 'JobSource', creep.name + ' build ' + fetchObject);
                         result = creep.build(fetchObject);
                         if (result === OK) {
                             result = ERR_BUSY;
-                        } else if (result != ERR_NOT_IN_RANGE) {
+                        } else if (result !== ERR_NOT_IN_RANGE) {
                             result = OK;
                         }
                     } else if (fetchObject !== 'DROP') {

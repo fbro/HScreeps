@@ -237,11 +237,6 @@ const AssignJobs = {
                         maxCreepsInRoom += 1;
                         if (memRoom.RoomLevel < 3) {
                             maxCreepsInRoom += 1;
-                            const spawn = Game.rooms[roomKey].find(FIND_MY_SPAWNS)[0];
-                            if (!spawn) {
-                                maxCreepsInRoom = 0;
-                                Util.Warning('AssignJobs', 'ShouldSpawnCreep', 'no spawn = no builder ' + roomKey);
-                            }
                         }
                     } else if (memRoom.RoomLevel === 8 && Game.rooms[roomKey].storage && Game.rooms[roomKey].storage.store[RESOURCE_ENERGY] > 600000) {
                         maxCreepsInRoom += 3;
