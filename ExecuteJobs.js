@@ -108,6 +108,9 @@ const ExecuteJobs = {
                                 }
                                 if(closestOwnedRoom){
                                     const didRemoveMaxCreeps = FindAndRemoveMaxCreeps(roomName, creepName); // remove from the origin room
+                                    if(!Memory.MemRooms[closestOwnedRoom].MaxCreeps[creepName.substring(0, 1)]){
+                                        Memory.MemRooms[closestOwnedRoom].MaxCreeps[creepName.substring(0, 1)] = {};
+                                    }
                                     Memory.MemRooms[closestOwnedRoom].MaxCreeps[creepName.substring(0, 1)][creepName] = creepName; // add to the new home room
                                     gameCreep.memory.MoveHome = closestOwnedRoom;
                                     Util.Info('ExecuteJobs', 'ExecuteRoomJobs', 'idle ' + creepName + ' in ' + gameCreep.pos.roomName + ' moving to ' + closestOwnedRoom);
@@ -217,7 +220,8 @@ const ExecuteJobs = {
                             }
                         }
                     }
-                    if((600 / gameCreep.body.length + gameCreep.ticksToLive) <= 1500) {
+                    // TODO deactivated for now
+                    if(false && (600 / gameCreep.body.length + gameCreep.ticksToLive) <= 1500) { // spawn renew functionality
                         const spawn = gameCreep.pos.findInRange(FIND_MY_STRUCTURES, 1, {
                             filter: (s) => {
                                 return s.structureType === STRUCTURE_SPAWN && !s.spawning;
