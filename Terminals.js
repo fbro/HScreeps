@@ -4,7 +4,7 @@ const Terminals = {
         const terminals = LoadMyTerminals();
         for (const terminalKey in terminals) {
             const terminal = terminals[terminalKey];
-            if (terminal.cooldown === 0) {
+            if (terminal.cooldown === 0 && terminal.store.getUsedCapacity(RESOURCE_ENERGY) >= 10000) {
                 let terminalSendCount = 0;
                 terminalSendCount = DistributeResources(terminal, terminals, terminalSendCount);
                 terminalSendCount = SellExcessResource(terminal, terminalSendCount);
@@ -147,7 +147,11 @@ const Terminals = {
                 const order = orders[orderKey];
                 const amountToBuy = amount - amountBought;
                 const result = Game.market.deal(order.id, amountToBuy, terminal.pos.roomName);
-                Util.InfoLog('Terminals', 'BuyResource', amountToBuy + ' ' + resourceType + ' from ' + terminal.pos.roomName + ' to ' + order.roomName + ' result ' + result + ' terminalSendCount ' + terminalSendCount + ' order.remainingAmount ' + order.remainingAmount + ' price ' + order.price + ' total price ' + (order.price * amountToBuy));
+                if(result === OK){
+                    Util.InfoLog('Terminals', 'BuyResource', amountToBuy + ' ' + resourceType + ' from ' + terminal.pos.roomName + ' to ' + order.roomName + ' result OK terminalSendCount ' + terminalSendCount + ' order.remainingAmount ' + order.remainingAmount + ' price ' + order.price + ' total price ' + (order.price * amountToBuy));
+                }else{
+                    Util.Warning('Terminals', 'BuyResource', amountToBuy + ' ' + resourceType + ' from ' + terminal.pos.roomName + ' to ' + order.roomName + ' result ' + result + ' terminalSendCount ' + terminalSendCount + ' order.remainingAmount ' + order.remainingAmount + ' price ' + order.price + ' total price ' + (order.price * amountToBuy));
+                }
                 terminalSendCount++;
                 if (result === OK) {
                     amountBought = amountToBuy + amountBought;
