@@ -592,22 +592,21 @@ const CreateJobs = {
             if (Memory.MemRooms[gameRoom.name] && Memory.MemRooms[gameRoom.name].CtrlConId) {
                 controllerContainer = Game.getObjectById(Memory.MemRooms[gameRoom.name].CtrlConId);
                 if (!controllerContainer) {
-                    Util.Info('CreateJobs', 'FillControllerContainerJobs', 'removed container id from mem' + gameRoom.name);
+                    Util.InfoLog('CreateJobs', 'FillControllerContainerJobs', 'removed container id from mem' + gameRoom.name);
                     Memory.MemRooms[gameRoom.name].CtrlConId = undefined;
                 }
-            }
-            if (!controllerContainer && Memory.MemRooms[gameRoom.name]) {
+            }else if (!controllerContainer && Memory.MemRooms[gameRoom.name]) {
                 controllerContainer = gameRoom.controller.pos.findInRange(FIND_STRUCTURES, 3, {
                     filter: (s) => {
-                        return s.structureType === STRUCTURE_CONTAINER && s.store.getFreeCapacity() > 0;
+                        return s.structureType === STRUCTURE_CONTAINER;
                     }
                 })[0];
                 if (controllerContainer) {
-                    Util.Info('CreateJobs', 'FillControllerContainerJobs', 'found new container (' + controllerContainer.pos.x + ',' + controllerContainer.pos.y + ',' + controllerContainer.pos.roomName + ') saving in memory');
+                    Util.InfoLog('CreateJobs', 'FillControllerContainerJobs', 'found new container (' + controllerContainer.pos.x + ',' + controllerContainer.pos.y + ',' + controllerContainer.pos.roomName + ') saving in memory');
                     Memory.MemRooms[gameRoom.name].CtrlConId = controllerContainer.id;
                 }
             }
-            if (controllerContainer) {
+            if (controllerContainer && controllerContainer.store.getFreeCapacity > 0) {
                 new RoomVisual(gameRoom.name).text('🔋', controllerContainer.pos.x, controllerContainer.pos.y);
                 AddJob(roomJobs, '2FillCtrlCon(' + controllerContainer.pos.x + ',' + controllerContainer.pos.y + ')' + gameRoom.name, controllerContainer.id, OBJECT_JOB, 'T');
             }
