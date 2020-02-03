@@ -617,13 +617,7 @@ const ExecuteJobs = {
                 },
                 /**@return {int}*/
                 IsJobDone: function (jobObject) {
-                    const numOfWork = creep.getActiveBodyparts(WORK);
-                    if (creep.pos.getRangeTo(jobObject) <= 3 && (jobObject.progress + numOfWork) >= jobObject.progressTotal && creep.store.getUsedCapacity(RESOURCE_ENERGY) >= (jobObject.progressTotal - jobObject.progress) * 5) {
-                        // predict that the creep will be done
-                        return JOB_IS_DONE;
-                    } else {
-                        return this.JobStatus(jobObject);
-                    }
+                    return this.JobStatus(jobObject);
                 },
                 /**@return {object}
                  * @return {undefined}*/

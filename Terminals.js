@@ -68,9 +68,9 @@ const Terminals = {
                 let max;
                 if (resourceType === RESOURCE_ENERGY) {
                     max = Util.TERMINAL_MAX_ENERGY;
-                } else if (resourceType === RESOURCE_PHLEGM) {
-                    max = 0;
-                } else if (resourceType === RESOURCE_POWER) { // will never sell out on power
+                } else if(resourceType === RESOURCE_TISSUE){
+                    max = 0; // right now i am selling out on tissue
+                } else if (resourceType === RESOURCE_POWER || resourceType === RESOURCE_PHLEGM) { // will never sell out on power or phlegm
                     max = Number.MAX_SAFE_INTEGER;
                 } else {
                     max = Util.TERMINAL_MAX_RESOURCE;

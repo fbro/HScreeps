@@ -21,7 +21,8 @@ const Factories = {
                 }
                 if(factory && factory.cooldown === 0){
                     let result;
-                    if(factory.store.getUsedCapacity(RESOURCE_OXIDANT) >= 36
+                    if(factory.level === 1
+                        && factory.store.getUsedCapacity(RESOURCE_OXIDANT) >= 36
                         && factory.store.getUsedCapacity(RESOURCE_CELL) >= 20
                         && factory.store.getUsedCapacity(RESOURCE_LEMERGIUM_BAR) >= 16
                         && factory.store.getUsedCapacity(RESOURCE_ENERGY) >= 8
@@ -30,6 +31,17 @@ const Factories = {
                     ){
                         result = factory.produce(RESOURCE_PHLEGM);
                         Util.Info('Factories', '', factory.pos.roomName + ' producing ' + RESOURCE_PHLEGM + ' ' + factory.store.getUsedCapacity(RESOURCE_PHLEGM) + ' ' + result + ' ' + RESOURCE_LEMERGIUM_BAR + ' ' + factory.store.getUsedCapacity(RESOURCE_LEMERGIUM_BAR) + ' ' + RESOURCE_CELL + ' ' + factory.store.getUsedCapacity(RESOURCE_CELL) + ' ' + RESOURCE_OXIDANT + ' ' + factory.store.getUsedCapacity(RESOURCE_OXIDANT) + ' ' + RESOURCE_ENERGY + ' ' + factory.store.getUsedCapacity(RESOURCE_ENERGY));
+                    }
+                    else if(factory.level === 2
+                        && factory.store.getUsedCapacity(RESOURCE_PHLEGM) >= 10
+                        && factory.store.getUsedCapacity(RESOURCE_CELL) >= 10
+                        && factory.store.getUsedCapacity(RESOURCE_REDUCTANT) >= 110
+                        && factory.store.getUsedCapacity(RESOURCE_ENERGY) >= 16
+                        && factory.store.getUsedCapacity(RESOURCE_TISSUE) < 2000
+                        && factory.effects[0] && factory.effects[0].effect === PWR_OPERATE_FACTORY
+                    ){
+                        result = factory.produce(RESOURCE_TISSUE);
+                        Util.Info('Factories', '', factory.pos.roomName + ' producing ' + RESOURCE_TISSUE + ' ' + factory.store.getUsedCapacity(RESOURCE_TISSUE) + ' ' + result + ' ' + RESOURCE_REDUCTANT + ' ' + factory.store.getUsedCapacity(RESOURCE_REDUCTANT) + ' ' + RESOURCE_CELL + ' ' + factory.store.getUsedCapacity(RESOURCE_CELL) + ' ' + RESOURCE_PHLEGM + ' ' + factory.store.getUsedCapacity(RESOURCE_PHLEGM) + ' ' + RESOURCE_ENERGY + ' ' + factory.store.getUsedCapacity(RESOURCE_ENERGY));
                     }
                     else if(factory.store.getUsedCapacity(RESOURCE_ENERGY) >= 200
                         && factory.store.getUsedCapacity(RESOURCE_LEMERGIUM) >= 500
