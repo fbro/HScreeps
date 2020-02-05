@@ -1950,7 +1950,7 @@ const ExecuteJobs = {
                             if (powerRuin) {
                                 return creep.withdraw(powerRuin, RESOURCE_POWER);
                             } else {
-                                Util.InfoLog('ExecuteJobs', 'JobTransportPowerBank', 'removing powerbank flag because last power has been picked up! ' + jobObject.pos.roomName);
+                                Util.Info('ExecuteJobs', 'JobTransportPowerBank', 'removing powerbank flag because last power has been picked up! ' + jobObject.pos.roomName);
                                 jobObject.remove();
                                 return JOB_IS_DONE;
                             }
