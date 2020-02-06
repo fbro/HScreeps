@@ -10,16 +10,6 @@ const Terminals = {
                     terminalSendCount = DistributeResources(terminal, terminals, terminalSendCount);
                     terminalSendCount = SellExcessResource(terminal, terminalSendCount);
                     terminalSendCount = BuyBasicResources(terminal, terminalSendCount);
-                }else if(terminal.store.getUsedCapacity(RESOURCE_ENERGY) > 0){
-                    // no energy and lots of power - buy some energy!!
-                    const storage = terminal.room.storage;
-                    if (storage.store.getUsedCapacity(RESOURCE_ENERGY) === 0
-                        && storage.store.getUsedCapacity(RESOURCE_POWER) > 1000
-                        && terminal.store.getUsedCapacity(RESOURCE_POWER) > 4000
-                        && terminalSendCount < 10){
-                        terminalSendCount = BuyResource(terminal, RESOURCE_ENERGY, 30000 - terminal.store.getUsedCapacity(RESOURCE_ENERGY), terminalSendCount, 1.5);
-                        Util.Warning('Terminals', 'BuyBasicResources', 'lots of power - buy energy!');
-                    }
                 }
             }
         }
@@ -132,7 +122,7 @@ const Terminals = {
             }
             // buy power - logic here is a bit more custom
             const usedPowerCapacity = terminal.store.getUsedCapacity(RESOURCE_POWER);
-            if (usedPowerCapacity === 0 && terminalSendCount < 10) {
+            if (usedPowerCapacity === 0 && terminalSendCount < 10 && terminal.room.storage.store.getUsedCapacity(RESOURCE_ENERGY) > Util.TERMINAL_STORAGE_ENERGY_LOW_TRANSFER) {
                 terminalSendCount = BuyResource(terminal, RESOURCE_POWER, 1000 - usedPowerCapacity, terminalSendCount, 1, 1);
             }
             return terminalSendCount;
