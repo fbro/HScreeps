@@ -132,7 +132,9 @@ const CreateJobs = {
                     }
                     // Controller
                     new RoomVisual(gameRoom.name).text('🧠', gameRoom.controller.pos.x, gameRoom.controller.pos.y);
-                    AddJob(jobs, '0Ctrl(' + gameRoom.controller.pos.x + ',' + gameRoom.controller.pos.y + ')' + gameRoom.name, gameRoom.controller.id, OBJECT_JOB, 'B');
+                    if(!gameRoom.storage || gameRoom.storage.store.getUsedCapacity(RESOURCE_ENERGY) >= 10000 || gameRoom.controller.ticksToDowngrade < 20000){
+                        AddJob(jobs, '0Ctrl(' + gameRoom.controller.pos.x + ',' + gameRoom.controller.pos.y + ')' + gameRoom.name, gameRoom.controller.id, OBJECT_JOB, 'B');
+                    }
                     if (!gameRoom.storage || gameRoom.storage && gameRoom.storage.store[RESOURCE_ENERGY] > 100000 && gameRoom.controller.level < 8) {
                         AddJob(jobs, '8Ctrl(' + gameRoom.controller.pos.x + ',' + gameRoom.controller.pos.y + ')' + gameRoom.name, gameRoom.controller.id, OBJECT_JOB, 'B');
                         AddJob(jobs, '9Ctrl(' + gameRoom.controller.pos.x + ',' + gameRoom.controller.pos.y + ')' + gameRoom.name, gameRoom.controller.id, OBJECT_JOB, 'B');
@@ -365,7 +367,11 @@ const CreateJobs = {
                         maxResources = LowTransfer;
                     }
                     if (gameRoom.terminal.store[resourceType] < maxResources) {
-                        AddJob(roomJobs, '5FillTerm(' + resourceType + ')' + gameRoom.name, gameRoom.terminal.id, OBJECT_JOB, 'T');
+                        if(resourceType === RESOURCE_ENERGY){
+                            AddJob(roomJobs, '2FillTerm(' + resourceType + ')' + gameRoom.name, gameRoom.terminal.id, OBJECT_JOB, 'T');
+                        }else{
+                            AddJob(roomJobs, '5FillTerm(' + resourceType + ')' + gameRoom.name, gameRoom.terminal.id, OBJECT_JOB, 'T');
+                        }
                     }
                 }
             }

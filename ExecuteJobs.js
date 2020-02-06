@@ -268,7 +268,7 @@ const ExecuteJobs = {
                 case jobKey.startsWith('5ExtrMin'):
                     result = JobExtractMineral(creep, roomJob);
                     break;
-                case jobKey.startsWith('5FillTerm'):
+                case jobKey.startsWith('5FillTerm') || jobKey.startsWith('2FillTerm'):
                     result = JobFillTerminal(creep, roomJob);
                     break;
                 case jobKey.startsWith('5FillFctr'):

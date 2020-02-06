@@ -4,11 +4,23 @@ const Terminals = {
         const terminals = LoadMyTerminals();
         for (const terminalKey in terminals) {
             const terminal = terminals[terminalKey];
-            if (terminal.cooldown === 0 && terminal.store.getUsedCapacity(RESOURCE_ENERGY) >= 10000) {
+            if (terminal.cooldown === 0) {
                 let terminalSendCount = 0;
-                terminalSendCount = DistributeResources(terminal, terminals, terminalSendCount);
-                terminalSendCount = SellExcessResource(terminal, terminalSendCount);
-                terminalSendCount = BuyBasicResources(terminal, terminalSendCount);
+                if(terminal.store.getUsedCapacity(RESOURCE_ENERGY) >= 10000){
+                    terminalSendCount = DistributeResources(terminal, terminals, terminalSendCount);
+                    terminalSendCount = SellExcessResource(terminal, terminalSendCount);
+                    terminalSendCount = BuyBasicResources(terminal, terminalSendCount);
+                }else if(terminal.store.getUsedCapacity(RESOURCE_ENERGY) > 0){
+                    // no energy and lots of power - buy some energy!!
+                    const storage = terminal.room.storage;
+                    if (storage.store.getUsedCapacity(RESOURCE_ENERGY) === 0
+                        && storage.store.getUsedCapacity(RESOURCE_POWER) > 1000
+                        && terminal.store.getUsedCapacity(RESOURCE_POWER) > 4000
+                        && terminalSendCount < 10){
+                        terminalSendCount = BuyResource(terminal, RESOURCE_ENERGY, 30000 - terminal.store.getUsedCapacity(RESOURCE_ENERGY), terminalSendCount, 1.5);
+                        Util.Warning('Terminals', 'BuyBasicResources', 'lots of power - buy energy!');
+                    }
+                }
             }
         }
 
