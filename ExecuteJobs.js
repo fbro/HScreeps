@@ -369,7 +369,6 @@ const ExecuteJobs = {
                     } else {
                         creep.say('✔' + result);
                     }
-
                 }
                 result = JOB_IS_DONE;
             }
@@ -2478,7 +2477,7 @@ const ExecuteJobs = {
                     if (from.roomName === to.roomName) {
                         Util.Warning('ExecuteJobs', 'Move', 'move error MoveErrWait ' + creep.memory.MoveErrWait + ' ' + result + ' ' + creep.name + ' (' + from.x + ',' + from.y + ',' + from.roomName + ') to ' + obj + '(' + to.x + ',' + to.y + ',' + to.roomName + ') ending move!');
                     } else {
-                        Util.ErrorLog('ExecuteJobs', 'Move', 'move error multiple room MoveErrWait ' + creep.memory.MoveErrWait + ' ' + result + ' ' + creep.name + ' (' + from.x + ',' + from.y + ',' + from.roomName + ') to ' + obj + '(' + to.x + ',' + to.y + ',' + to.roomName + ') ending move!');
+                        Util.Warning('ExecuteJobs', 'Move', 'move error multiple room MoveErrWait ' + creep.memory.MoveErrWait + ' ' + result + ' ' + creep.name + ' (' + from.x + ',' + from.y + ',' + from.roomName + ') to ' + obj + '(' + to.x + ',' + to.y + ',' + to.roomName + ') ending move!');
                     }
                     result = JOB_IS_DONE;
                     creep.memory.MoveErrWait = undefined;
