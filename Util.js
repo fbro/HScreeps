@@ -1,27 +1,27 @@
 const Util = {
     // if over target - terminal should send to another owned room that has under the target
-    TERMINAL_TARGET_RESOURCE: 2000,
+    TERMINAL_TARGET_RESOURCE: 3000,
     TERMINAL_TARGET_ENERGY: 30000,
     // if over max - then try and sell
-    TERMINAL_MAX_RESOURCE: 4000,
+    TERMINAL_MAX_RESOURCE: 6000,
     TERMINAL_MAX_ENERGY: 90000,
     // if storage contains more or equal of high then creep should transfer to terminal until high_transfer is in terminal
     TERMINAL_STORAGE_ENERGY_HIGH: 200000,
     TERMINAL_STORAGE_ENERGY_HIGH_TRANSFER: 100000,
     TERMINAL_STORAGE_ENERGY_MEDIUM: 100000,
     TERMINAL_STORAGE_ENERGY_MEDIUM_TRANSFER: 80000,
-    TERMINAL_STORAGE_ENERGY_LOW: 0, // abort transfer when storage is lower than this
+    TERMINAL_STORAGE_ENERGY_LOW: 10000, // abort transfer when storage is lower than this
     TERMINAL_STORAGE_ENERGY_LOW_TRANSFER: 50000,
 
-    TERMINAL_STORAGE_HIGH: 5000,
-    TERMINAL_STORAGE_HIGH_TRANSFER: 5000,
-    TERMINAL_STORAGE_MEDIUM: 4000,
-    TERMINAL_STORAGE_MEDIUM_TRANSFER: 4000,
+    TERMINAL_STORAGE_HIGH: 10000,
+    TERMINAL_STORAGE_HIGH_TRANSFER: 8000,
+    TERMINAL_STORAGE_MEDIUM: 6000,
+    TERMINAL_STORAGE_MEDIUM_TRANSFER: 6000,
     TERMINAL_STORAGE_LOW: 0, // abort transfer when storage is lower than this
-    TERMINAL_STORAGE_LOW_TRANSFER: 3000,
+    TERMINAL_STORAGE_LOW_TRANSFER: 6000,
 
-    SPAWN_LARGE_B_WHEN_STORAGE_ENERGY: 50000, // large builders are only allowed when the room has the required energy - the drawback is that upgrade controller takes alot of energy
-
+    SPAWN_LARGE_B_WHEN_STORAGE_ENERGY: 100000, // large builders are only allowed when the room has the required energy - the drawback is that upgrade controller takes alot of energy
+    SPAWN_EXTRA_B_WHEN_STORAGE_ENERGY: 600000, // allow a spawn of an extra builder when the room is flooding with excess energy
     ErrorLog: function (functionParentName, functionName, message) {
         const messageId = functionParentName + ' ' + functionName;
         console.log('!!--------------- ' + messageId + ' ---------------!!');

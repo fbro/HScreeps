@@ -87,8 +87,7 @@ module.exports.loop = function () {
     // TODO now that creeps get renewed when near a spawn - T creeps will not dissappear and the extra T creeps from Power transport will clog it up. we need to recycle them!
     // TODO solution to this is that once max creeps is exceeded then recycle creeps when maxcreeps is surpassed
 
-// TODO cycle!! 2FillTerm and 5FillStrg-terminal(34,28,energy) can be active at once and mess it all up
-// TODO my terminals are buyng O and L even though i produce it - maybe make a better resource sharing system!
+// TODO by prioritizing jobs, the low prioritized jobs may never begin - that is a problem - maybe try and completely remove prioritization altogether
 
 // lab reactions
 

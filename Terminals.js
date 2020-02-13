@@ -37,7 +37,7 @@ const Terminals = {
                     target = Util.TERMINAL_TARGET_RESOURCE;
                 }
                 for (const toTerminalKey in terminals) {
-                    if (terminalSendCount < 10 && fromAmount > (target + 1000/*buffer to prevent many small send*/)) { // is allowed to send this resource to another terminal
+                    if (terminalSendCount < 10 && fromAmount > (target + 500/*buffer to prevent many small send*/)) { // is allowed to send this resource to another terminal
                         const toTerminal = terminals[toTerminalKey];
                         const toAmount = toTerminal.store[resourceType];
                         let shouldSend = false;
@@ -116,14 +116,14 @@ const Terminals = {
             for (const basicResourceKey in basicResourceList) {
                 const basicResource = basicResourceList[basicResourceKey];
                 const usedCapacity = terminal.store.getUsedCapacity(basicResource);
-                if (usedCapacity < 500 && terminalSendCount < 10) {
-                    terminalSendCount = BuyResource(terminal, basicResource, 500 - usedCapacity, terminalSendCount);
+                if (usedCapacity === 0 && terminalSendCount < 10 && terminal.room.storage.store.getUsedCapacity(basicResource) === 0) {
+                    terminalSendCount = BuyResource(terminal, basicResource, 500, terminalSendCount);
                 }
             }
             // buy power - logic here is a bit more custom
             const usedPowerCapacity = terminal.store.getUsedCapacity(RESOURCE_POWER);
             if (usedPowerCapacity === 0 && terminalSendCount < 10 && terminal.room.storage.store.getUsedCapacity(RESOURCE_ENERGY) > Util.TERMINAL_STORAGE_ENERGY_LOW_TRANSFER) {
-                terminalSendCount = BuyResource(terminal, RESOURCE_POWER, 1000 - usedPowerCapacity, terminalSendCount, 1, 1);
+                terminalSendCount = BuyResource(terminal, RESOURCE_POWER, 1000, terminalSendCount, 1, 1);
             }
             return terminalSendCount;
         }

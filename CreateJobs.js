@@ -344,19 +344,19 @@ const CreateJobs = {
                 for (const resourceType in gameRoom.storage.store) {
                     const storageResourceAmount = gameRoom.storage.store[resourceType];
                     let maxResources = 0;
-                    let High = Util.TERMINAL_STORAGE_HIGH;
-                    let HighTransfer = Util.TERMINAL_STORAGE_HIGH_TRANSFER;
-                    let Medium = Util.TERMINAL_STORAGE_MEDIUM;
-                    let MediumTransfer = Util.TERMINAL_STORAGE_MEDIUM_TRANSFER;
-                    let Low = Util.TERMINAL_STORAGE_LOW;
-                    let LowTransfer = Util.TERMINAL_STORAGE_LOW_TRANSFER;
+                    let High = Util.TERMINAL_STORAGE_HIGH; // 10000
+                    let HighTransfer = Util.TERMINAL_STORAGE_HIGH_TRANSFER; // 5000
+                    let Medium = Util.TERMINAL_STORAGE_MEDIUM; // 4000
+                    let MediumTransfer = Util.TERMINAL_STORAGE_MEDIUM_TRANSFER; // 4000
+                    let Low = Util.TERMINAL_STORAGE_LOW; // 0
+                    let LowTransfer = Util.TERMINAL_STORAGE_LOW_TRANSFER; // 3000
                     if (resourceType === RESOURCE_ENERGY) {
-                        High = Util.TERMINAL_STORAGE_ENERGY_HIGH;
-                        HighTransfer = Util.TERMINAL_STORAGE_ENERGY_HIGH_TRANSFER;
-                        Medium = Util.TERMINAL_STORAGE_ENERGY_MEDIUM;
-                        MediumTransfer = Util.TERMINAL_STORAGE_ENERGY_MEDIUM_TRANSFER;
-                        Low = Util.TERMINAL_STORAGE_ENERGY_LOW;
-                        LowTransfer = Util.TERMINAL_STORAGE_ENERGY_LOW_TRANSFER;
+                        High = Util.TERMINAL_STORAGE_ENERGY_HIGH; // 200000
+                        HighTransfer = Util.TERMINAL_STORAGE_ENERGY_HIGH_TRANSFER; // 100000
+                        Medium = Util.TERMINAL_STORAGE_ENERGY_MEDIUM; // 100000
+                        MediumTransfer = Util.TERMINAL_STORAGE_ENERGY_MEDIUM_TRANSFER; // 80000
+                        Low = Util.TERMINAL_STORAGE_ENERGY_LOW; // 10000
+                        LowTransfer = Util.TERMINAL_STORAGE_ENERGY_LOW_TRANSFER; // 50000
                     }
                     // if storage contains alot of the specified resource then allow the terminal to be filled to an extent where it will sell out
                     if (storageResourceAmount >= High) {
@@ -472,11 +472,11 @@ const CreateJobs = {
                 }
             })[0];
             if (link) {
-                AddJob(roomJobs, '5FillStrg-' + link.structureType + '(' + link.pos.x + ',' + link.pos.y + ',' + RESOURCE_ENERGY + ')' + gameRoom.name, link.id, OBJECT_JOB, 'T');
+                AddJob(roomJobs, '0FillStrg-' + link.structureType + '(' + link.pos.x + ',' + link.pos.y + ',' + RESOURCE_ENERGY + ')' + gameRoom.name, link.id, OBJECT_JOB, 'T');
             }
 
             // terminal
-            if (gameRoom.terminal && (gameRoom.terminal.store[RESOURCE_ENERGY] >= 120000 || gameRoom.storage.store[RESOURCE_ENERGY] < 5000)) {
+            if (gameRoom.terminal && (gameRoom.terminal.store[RESOURCE_ENERGY] >= 120000 || (gameRoom.storage.store[RESOURCE_ENERGY] < 5000 || !gameRoom.storage.store[RESOURCE_ENERGY]) && gameRoom.terminal.store[RESOURCE_ENERGY] >= Util.TERMINAL_TARGET_ENERGY)) {
                 AddJob(roomJobs, '5FillStrg-' + gameRoom.terminal.structureType + '(' + gameRoom.terminal.pos.x + ',' + gameRoom.terminal.pos.y + ',' + RESOURCE_ENERGY + ')' + gameRoom.name, gameRoom.terminal.id, OBJECT_JOB, 'T');
             }
 

@@ -262,7 +262,7 @@ const ExecuteJobs = {
                 case jobKey.startsWith('2FillTwr'):
                     result = JobFillTower(creep, roomJob);
                     break;
-                case jobKey.startsWith('3FillStrg') || jobKey.startsWith('4FillStrg') || jobKey.startsWith('5FillStrg'):
+                case jobKey.startsWith('0FillStrg') || jobKey.startsWith('3FillStrg') || jobKey.startsWith('4FillStrg') || jobKey.startsWith('5FillStrg'):
                     result = JobFillStorage(creep, roomJob);
                     break;
                 case jobKey.startsWith('5ExtrMin'):
@@ -340,20 +340,20 @@ const ExecuteJobs = {
                     Util.ErrorLog('ExecuteJobs', 'JobAction', 'job not found ' + jobKey + ' ' + creep.name);
             }
             if (result === OK) {
-                // job is done everyone is happy, nothing to do.
+                creep.say('OK');// job is done everyone is happy, nothing to do.
             } else if (result === ERR_TIRED) {
                 creep.say('😫 ' + creep.fatigue); // creep has fatigue and is limited in movement
             } else if (result === ERR_BUSY) {
-                // The creep might is still being spawned
+                creep.say('🕒'); // The creep might is still being spawned
             } else if (result === JOB_MOVING) {
                 creep.say('🏃'); // The creep is just moving to its target
             } else { // results where anything else than OK - one should end the job!
                 if (result === ERR_NO_RESULT_FOUND) {
                     Util.ErrorLog('ExecuteJobs', 'JobAction', 'ERR_NO_RESULT_FOUND ' + jobKey + ' ' + result + ' ' + roomJob.Creep);
-                    creep.say('⚠' + result);
+                    creep.say('⚠😞' + result);
                 } else if (result === ERR_INVALID_TARGET || result === ERR_INVALID_ARGS) {
                     Util.ErrorLog('ExecuteJobs', 'JobAction', 'error invalid ' + jobKey + ' ' + result + ' ' + roomJob.Creep);
-                    creep.say('⚠' + result);
+                    creep.say('⚠♿' + result);
                 } else if (result === JOB_OBJ_DISAPPEARED) {
                     creep.say('🙈' + result);
                 } else if (result === NO_FETCH_FOUND) {
@@ -363,8 +363,8 @@ const ExecuteJobs = {
                     if (!result) {
                         Util.Info('ExecuteJobs', 'JobAction', 'removing ' + jobKey + ' ' + result + ' ' + roomJob.Creep);
                         Util.ErrorLog('ExecuteJobs', 'JobAction', 'undefined result ' + creep.name + ' ' + jobKey);
-                    }
-                    if (result === JOB_IS_DONE) {
+                        creep.say('⚠' + result);
+                    }else if (result === JOB_IS_DONE) {
                         creep.say('✔');
                     } else {
                         creep.say('✔' + result);
@@ -1176,7 +1176,6 @@ const ExecuteJobs = {
                 /**@return {int}*/
                 Fetch: function (fetchObject, jobObject) {
                     if (creep.pos.isNearTo(jobObject)) {
-                        creep.say(jobObject.name);
                         return OK;
                     } else {
                         return ERR_NOT_IN_RANGE;
@@ -1291,7 +1290,6 @@ const ExecuteJobs = {
                 /**@return {int}*/
                 Fetch: function (fetchObject, jobObject) {
                     if (creep.pos.x === jobObject.pos.x && creep.pos.y === jobObject.pos.y && creep.pos.roomName === jobObject.pos.roomName) {
-                        creep.say(jobObject.name);
                         return OK;
                     } else {
                         return ERR_NOT_IN_RANGE;
@@ -1341,7 +1339,6 @@ const ExecuteJobs = {
                     if (jobObject !== fetchObject) { // hostileCreep
                         return creep.attack(fetchObject);
                     } else if (creep.pos.isNearTo(jobObject)) {
-                        creep.say(jobObject.name);
                         return OK; // when OK is returned FindFetchObject is checking each tick for new hostileCreeps
                     } else if (jobObject === fetchObject) { // move to flag
                         return ERR_NOT_IN_RANGE;
@@ -1423,7 +1420,6 @@ const ExecuteJobs = {
                         }
                         return result;
                     } else if (creep.pos.isNearTo(jobObject)) {
-                        creep.say(jobObject.name);
                         return OK; // when OK is returned FindFetchObject is checking each tick for new hostileCreeps
                     } else if (jobObject === fetchObject) { // move to flag
                         return ERR_NOT_IN_RANGE;
@@ -1475,7 +1471,6 @@ const ExecuteJobs = {
                             return creep.heal(fetchObject);
                         }
                     } else if (creep.pos.isNearTo(jobObject)) {
-                        creep.say(jobObject.name);
                         return OK; // when OK is returned FindFetchObject is checking each tick for new woundedCreeps
                     } else if (jobObject === fetchObject) { // move to flag
                         return ERR_NOT_IN_RANGE;
@@ -1520,7 +1515,6 @@ const ExecuteJobs = {
                 /**@return {int}*/
                 Fetch: function (fetchObject, jobObject) {
                     if (creep.pos.x === jobObject.pos.x && creep.pos.y === jobObject.pos.y && creep.pos.roomName === jobObject.pos.roomName) {
-                        creep.say(jobObject.name);
                         return OK;
                     } else {
                         return ERR_NOT_IN_RANGE;
@@ -1565,7 +1559,6 @@ const ExecuteJobs = {
                 /**@return {int}*/
                 Fetch: function (fetchObject, jobObject) {
                     if (creep.pos.x === jobObject.pos.x && creep.pos.y === jobObject.pos.y && creep.pos.roomName === jobObject.pos.roomName) {
-                        creep.say(jobObject.name);
                         return OK;
                     } else {
                         return ERR_NOT_IN_RANGE;
@@ -1610,7 +1603,6 @@ const ExecuteJobs = {
                 /**@return {int}*/
                 Fetch: function (fetchObject, jobObject) {
                     if (creep.pos.x === jobObject.pos.x && creep.pos.y === jobObject.pos.y && creep.pos.roomName === jobObject.pos.roomName) {
-                        creep.say(jobObject.name);
                         return OK;
                     } else {
                         return ERR_NOT_IN_RANGE;
@@ -2448,7 +2440,6 @@ const ExecuteJobs = {
             }
 
             if (result === OK) {
-
                 result = JOB_MOVING;
             } else if (result !== ERR_BUSY && result !== ERR_TIRED) {
                 if (creep.pos.x === 0) { // get away from room exits asap
