@@ -36,9 +36,9 @@ const Terminals = {
             for (const resourceType in fromTerminal.store) { // for each resource type
                 let fromAmount = fromTerminal.store.getUsedCapacity(resourceType);
                 let target;
-                if(resourceType === RESOURCE_PHLEGM) { // PHLEGM should only be sent to a terminal that has a factory of level 2
+                if(resourceType === RESOURCE_PHLEGM && fromAmount > 0) { // PHLEGM should only be sent to a terminal that has a factory of level 2
                     terminalSendCount = DistributeFactoryCommodities(terminalSendCount, fromTerminal, resourceType, fromAmount, 2);
-                } else if(resourceType === RESOURCE_BIOMASS
+                } else if(resourceType === RESOURCE_BIOMASS && fromAmount > 0
                     && !fromTerminal.room.find(FIND_MY_STRUCTURES, {filter: function (s) {return s.structureType === STRUCTURE_FACTORY;}})[0]) { // BIOMASS should only be sent to a terminal that has a factory that uses BIOMASS
                     terminalSendCount = DistributeFactoryCommodities(terminalSendCount, fromTerminal, resourceType, fromAmount);
                 } else{
@@ -48,26 +48,24 @@ const Terminals = {
                         target = Util.TERMINAL_TARGET_RESOURCE;
                     }
                     for (const toTerminalKey in terminals) {
-                        if (terminalSendCount < 10 && fromAmount > (target + 500/*buffer to prevent many small send*/)) { // is allowed to send this resource to another terminal
-                            const toTerminal = terminals[toTerminalKey];
-                            const toAmount = toTerminal.store.getUsedCapacity(resourceType);
-                            let shouldSend = false;
-                            if (toAmount < target && toTerminal.id !== fromTerminal.id) {
-                                shouldSend = true;
+                        const toTerminal = terminals[toTerminalKey];
+                        const toAmount = toTerminal.store.getUsedCapacity(resourceType);
+                        if (terminalSendCount < 10
+                            && fromAmount > (target + 500/*buffer to prevent many small send*/)
+                            && toAmount < target
+                            && toTerminal.id !== fromTerminal.id
+                        ) { // is allowed to send this resource to another terminal
+                            let sendAmount = fromAmount - target; // possible send amount
+                            const resourcesNeeded = (toAmount - target) * -1;
+                            if (sendAmount > resourcesNeeded) {
+                                sendAmount = resourcesNeeded; // does not need more resources than this
                             }
-                            if (shouldSend) {
-                                let sendAmount = fromAmount - target; // possible send amount
-                                const resourcesNeeded = (toAmount - target) * -1;
-                                if (sendAmount > resourcesNeeded) {
-                                    sendAmount = resourcesNeeded; // does not need more resources than this
-                                }
-                                const result = fromTerminal.send(resourceType, sendAmount, toTerminal.pos.roomName);
-                                Util.Info('Terminals', 'DistributeResources', sendAmount + ' ' + resourceType + ' from ' + fromTerminal.pos.roomName + ' to ' + toTerminal.pos.roomName + ' result ' + result + ' terminalSendCount ' + terminalSendCount + ' resourcesNeeded ' + resourcesNeeded);
-                                toTerminal.store[resourceType] += sendAmount;
-                                fromTerminal.store[resourceType] -= sendAmount;
-                                fromAmount -= sendAmount;
-                                terminalSendCount++;
-                            }
+                            const result = fromTerminal.send(resourceType, sendAmount, toTerminal.pos.roomName);
+                            Util.Info('Terminals', 'DistributeResources', sendAmount + ' ' + resourceType + ' from ' + fromTerminal.pos.roomName + ' to ' + toTerminal.pos.roomName + ' result ' + result + ' terminalSendCount ' + terminalSendCount + ' resourcesNeeded ' + resourcesNeeded);
+                            toTerminal.store[resourceType] += sendAmount;
+                            fromTerminal.store[resourceType] -= sendAmount;
+                            fromAmount -= sendAmount;
+                            terminalSendCount++;
                         }
                     }
                 }
