@@ -1,18 +1,9 @@
 let Util = require('Util');
 const Terminals = {
     run: function () {
+
         const terminals = LoadMyTerminals();
-        for (const terminalKey in terminals) {
-            const terminal = terminals[terminalKey];
-            if (terminal.cooldown === 0) {
-                let terminalSendCount = 0;
-                if(terminal.store.getUsedCapacity(RESOURCE_ENERGY) >= 10000){
-                    terminalSendCount = DistributeResources(terminal, terminals, terminalSendCount);
-                    terminalSendCount = SellExcessResource(terminal, terminalSendCount);
-                    terminalSendCount = BuyBasicResources(terminal, terminalSendCount);
-                }
-            }
-        }
+        TerminalActions(terminals);
 
         function LoadMyTerminals() {
             let terminals = [];
@@ -25,38 +16,77 @@ const Terminals = {
             return terminals;
         }
 
+        function TerminalActions(terminals){
+            for (const terminalKey in terminals) {
+                const terminal = terminals[terminalKey];
+                if (terminal.cooldown === 0) {
+                    let terminalSendCount = 0;
+                    if(terminal.store.getUsedCapacity(RESOURCE_ENERGY) >= 10000){
+                        terminalSendCount = DistributeResources(terminal, terminals, terminalSendCount);
+                        terminalSendCount = SellExcessResource(terminal, terminalSendCount);
+                        terminalSendCount = BuyBasicResources(terminal, terminalSendCount);
+                    }
+                }
+            }
+        }
+
         // distribute ALL available resources to all terminals 2k each and only to 5k - except with energy 50k each and only to 100k
         /**@return {number}*/
         function DistributeResources(fromTerminal, terminals, terminalSendCount) {
             for (const resourceType in fromTerminal.store) { // for each resource type
                 let fromAmount = fromTerminal.store[resourceType];
                 let target;
-                if (resourceType === RESOURCE_ENERGY) {
-                    target = Util.TERMINAL_TARGET_ENERGY;
+                if(resourceType === RESOURCE_PHLEGM) { // PHLEGM should only be sent to a terminal that has a factory of level 2
+                    terminalSendCount = DistributeFactoryCommodities(terminalSendCount, fromTerminal, resourceType, fromAmount, 2);
                 } else {
-                    target = Util.TERMINAL_TARGET_RESOURCE;
-                }
-                for (const toTerminalKey in terminals) {
-                    if (terminalSendCount < 10 && fromAmount > (target + 500/*buffer to prevent many small send*/)) { // is allowed to send this resource to another terminal
-                        const toTerminal = terminals[toTerminalKey];
-                        const toAmount = toTerminal.store[resourceType];
-                        let shouldSend = false;
-                        if (toAmount < target && toTerminal.id !== fromTerminal.id) {
-                            shouldSend = true;
-                        }
-                        if (shouldSend) {
-                            let sendAmount = fromAmount - target; // possible send amount
-                            const resourcesNeeded = (toAmount - target) * -1;
-                            if (sendAmount > resourcesNeeded) {
-                                sendAmount = resourcesNeeded; // does not need more resources than this
+                    if (resourceType === RESOURCE_ENERGY) {
+                        target = Util.TERMINAL_TARGET_ENERGY;
+                    } else {
+                        target = Util.TERMINAL_TARGET_RESOURCE;
+                    }
+                    for (const toTerminalKey in terminals) {
+                        if (terminalSendCount < 10 && fromAmount > (target + 500/*buffer to prevent many small send*/)) { // is allowed to send this resource to another terminal
+                            const toTerminal = terminals[toTerminalKey];
+                            const toAmount = toTerminal.store[resourceType];
+                            let shouldSend = false;
+                            if (toAmount < target && toTerminal.id !== fromTerminal.id) {
+                                shouldSend = true;
                             }
-                            let result = fromTerminal.send(resourceType, sendAmount, toTerminal.pos.roomName);
-                            Util.Info('Terminals', 'DistributeResources', sendAmount + ' ' + resourceType + ' from ' + fromTerminal.pos.roomName + ' to ' + toTerminal.pos.roomName + ' result ' + result + ' terminalSendCount ' + terminalSendCount + ' resourcesNeeded ' + resourcesNeeded);
-                            toTerminal.store[resourceType] += sendAmount;
-                            fromTerminal.store[resourceType] -= sendAmount;
-                            fromAmount -= sendAmount;
-                            terminalSendCount++;
+                            if (shouldSend) {
+                                let sendAmount = fromAmount - target; // possible send amount
+                                const resourcesNeeded = (toAmount - target) * -1;
+                                if (sendAmount > resourcesNeeded) {
+                                    sendAmount = resourcesNeeded; // does not need more resources than this
+                                }
+                                const result = fromTerminal.send(resourceType, sendAmount, toTerminal.pos.roomName);
+                                Util.Info('Terminals', 'DistributeResources', sendAmount + ' ' + resourceType + ' from ' + fromTerminal.pos.roomName + ' to ' + toTerminal.pos.roomName + ' result ' + result + ' terminalSendCount ' + terminalSendCount + ' resourcesNeeded ' + resourcesNeeded);
+                                toTerminal.store[resourceType] += sendAmount;
+                                fromTerminal.store[resourceType] -= sendAmount;
+                                fromAmount -= sendAmount;
+                                terminalSendCount++;
+                            }
                         }
+                    }
+                }
+            }
+            return terminalSendCount;
+        }
+
+        // factory commodities are not destributed like the other resources should be
+        /**@return {number}*/
+        function DistributeFactoryCommodities(terminalSendCount, fromTerminal, resourceType, fromAmount, factoryLevel = 0) {
+            if(terminalSendCount < 10) {
+                for (const toTerminalKey in terminals) {
+                    const toTerminal = terminals[toTerminalKey];
+                    if (toTerminal.id !== fromTerminal.id && toTerminal.room.find(FIND_MY_STRUCTURES, {
+                        filter: function (s) {
+                            return s.structureType === STRUCTURE_FACTORY && (factoryLevel === s.level || factoryLevel === 0);
+                        }
+                    })[0]) {
+                        const result = fromTerminal.send(resourceType, fromAmount, toTerminal.pos.roomName);
+                        Util.InfoLog('Terminals', 'DistributeResources', fromAmount + ' ' + resourceType + ' from ' + fromTerminal.pos.roomName + ' to ' + toTerminal.pos.roomName + ' result ' + result + ' terminalSendCount ' + terminalSendCount);
+                        terminalSendCount++;
+                        break;
                     }
                 }
             }
@@ -72,7 +102,8 @@ const Terminals = {
                     max = Util.TERMINAL_MAX_ENERGY;
                 } else if(resourceType === RESOURCE_TISSUE){
                     max = 0; // right now i am selling out on tissue
-                } else if (resourceType === RESOURCE_POWER || resourceType === RESOURCE_PHLEGM) { // will never sell out on power or phlegm
+                } else if (resourceType === RESOURCE_POWER
+                    || resourceType === RESOURCE_PHLEGM) { // will never sell out on power or phlegm
                     max = Number.MAX_SAFE_INTEGER;
                 } else {
                     max = Util.TERMINAL_MAX_RESOURCE;

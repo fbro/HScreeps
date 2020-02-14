@@ -49,3 +49,7 @@ const structures = Game.rooms['E32S28'].find(FIND_STRUCTURES, {filter: function 
 for(const structureKey in structures){
     structures[structureKey].destroy();
 }
+
+
+// get something in a rooms memory
+Memory.MemRooms['E29S29'].FctrId = undefined;

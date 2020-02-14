@@ -7,19 +7,9 @@ const CreateJobs = {
         //     MaxCreeps
         //     RoomJobs - JobName - [JobName(x,y)] - user friendly, unique per room, name
         //       JobId - real id
-        //       JobType - int enum - OBJECT_JOB = 1, FLAG_JOB = 2
+        //       JobType - int enum - Util.OBJECT_JOB = 1, Util.FLAG_JOB = 2
         //       CreepType - T, H, B...
         //       Creep - CreepName - H1 or B4... - if job is not taken then the value is vacant
-
-        // job type int enum
-        const OBJECT_JOB = 1;
-        const FLAG_JOB = 2;
-
-        const DO_EXTRACTOR_WHEN_STORAGE_OVER_ENERGY = 50000;
-        const DO_EXTRACTOR_WHEN_STORAGE_UNDER_MINERAL = 150000;
-        const RAMPART_WALL_HITS_U_LVL8 = 100000;
-        const RAMPART_WALL_HITS_O_LVL8 = 2000000;
-        const RAMPART_WALL_MAX_HITS_WHEN_STORAGE_ENERGY = 600000;
 
         let flagJobs = CreateFlagJobs();
         CreateObjJobs(flagJobs);
@@ -100,7 +90,7 @@ const CreateJobs = {
 
         function CreateFlagJob(jobs, jobName, gameFlagKey, gameFlag, creepType) {
             //Util.Info('CreateJobs', 'CreateFlagJob', 'AddJob ' + gameFlagKey);
-            return AddJob(jobs, jobName + '-' + gameFlagKey + '(' + gameFlag.pos.x + ',' + gameFlag.pos.y + ')' + gameFlag.pos.roomName, gameFlagKey, FLAG_JOB, creepType);
+            return AddJob(jobs, jobName + '-' + gameFlagKey + '(' + gameFlag.pos.x + ',' + gameFlag.pos.y + ')' + gameFlag.pos.roomName, gameFlagKey, Util.FLAG_JOB, creepType);
         }
 
         function CreateObjJobs(flagJobs) {
@@ -122,22 +112,22 @@ const CreateJobs = {
                     for (const sourceKey in sources) {
                         const source = sources[sourceKey];
                         new RoomVisual(gameRoom.name).text('🏭', source.pos.x, source.pos.y);
-                        AddJob(jobs, '1Src(' + source.pos.x + ',' + source.pos.y + ')' + gameRoom.name, source.id, OBJECT_JOB, 'H');
+                        AddJob(jobs, '1Src(' + source.pos.x + ',' + source.pos.y + ')' + gameRoom.name, source.id, Util.OBJECT_JOB, 'H');
                         if (gameRoom.controller.level < 3) {
                             const freeSpaces = Util.FreeSpaces(source.pos);
                             if (freeSpaces > 1) {
-                                AddJob(jobs, '5Src(' + source.pos.x + ',' + source.pos.y + ')' + gameRoom.name, source.id, OBJECT_JOB, 'H');
+                                AddJob(jobs, '5Src(' + source.pos.x + ',' + source.pos.y + ')' + gameRoom.name, source.id, Util.OBJECT_JOB, 'H');
                             }
                         }
                     }
                     // Controller
                     new RoomVisual(gameRoom.name).text('🧠', gameRoom.controller.pos.x, gameRoom.controller.pos.y);
                     if(!gameRoom.storage || gameRoom.storage.store.getUsedCapacity(RESOURCE_ENERGY) >= 10000 || gameRoom.controller.ticksToDowngrade < 20000){
-                        AddJob(jobs, '0Ctrl(' + gameRoom.controller.pos.x + ',' + gameRoom.controller.pos.y + ')' + gameRoom.name, gameRoom.controller.id, OBJECT_JOB, 'B');
+                        AddJob(jobs, '0Ctrl(' + gameRoom.controller.pos.x + ',' + gameRoom.controller.pos.y + ')' + gameRoom.name, gameRoom.controller.id, Util.OBJECT_JOB, 'B');
                     }
                     if (!gameRoom.storage || gameRoom.storage && gameRoom.storage.store[RESOURCE_ENERGY] > 100000 && gameRoom.controller.level < 8) {
-                        AddJob(jobs, '8Ctrl(' + gameRoom.controller.pos.x + ',' + gameRoom.controller.pos.y + ')' + gameRoom.name, gameRoom.controller.id, OBJECT_JOB, 'B');
-                        AddJob(jobs, '9Ctrl(' + gameRoom.controller.pos.x + ',' + gameRoom.controller.pos.y + ')' + gameRoom.name, gameRoom.controller.id, OBJECT_JOB, 'B');
+                        AddJob(jobs, '8Ctrl(' + gameRoom.controller.pos.x + ',' + gameRoom.controller.pos.y + ')' + gameRoom.name, gameRoom.controller.id, Util.OBJECT_JOB, 'B');
+                        AddJob(jobs, '9Ctrl(' + gameRoom.controller.pos.x + ',' + gameRoom.controller.pos.y + ')' + gameRoom.name, gameRoom.controller.id, Util.OBJECT_JOB, 'B');
                     }
                     // FillSpawnExtension
                     FillSpawnExtensionJobs(gameRoom, jobs);
@@ -197,9 +187,9 @@ const CreateJobs = {
                         Memory.MemRooms[gameRoom.name].SourceNumber = gameRoom.find(FIND_SOURCES).length;
                         Memory.MemRooms[gameRoom.name].MaxCreeps = {}; // reset - maybe the MaxCreepsInRoom changes with room level
                     }
-                    if (addedNewJob) { // new jobs have been added, now sort the job array
-                        Memory.MemRooms[gameRoom.name].RoomJobs = SortObj(Memory.MemRooms[gameRoom.name].RoomJobs);
-                    }
+                    //if (addedNewJob) { // new jobs have been added, now sort the job array
+                    //    Memory.MemRooms[gameRoom.name].RoomJobs = SortObj(Memory.MemRooms[gameRoom.name].RoomJobs);
+                    //}
                 }
             }
 
@@ -302,7 +292,7 @@ const CreateJobs = {
                     const powerSpawn = powerSpawns[powerSpawnKey];
                     if (powerSpawn && powerSpawn.store[RESOURCE_ENERGY] < powerSpawn.store.getCapacity(RESOURCE_ENERGY)) {
                         new RoomVisual(gameRoom.name).text('⚡', powerSpawn.pos.x, powerSpawn.pos.y);
-                        AddJob(roomJobs, '3FillPSpwnE(' + powerSpawn.pos.x + ',' + powerSpawn.pos.y + ')' + gameRoom.name, powerSpawn.id, OBJECT_JOB, 'T');
+                        AddJob(roomJobs, '3FillPSpwnE(' + powerSpawn.pos.x + ',' + powerSpawn.pos.y + ')' + gameRoom.name, powerSpawn.id, Util.OBJECT_JOB, 'T');
                     }
                 }
             }
@@ -317,7 +307,7 @@ const CreateJobs = {
                 })[0];
                 if (powerSpawn && powerSpawn.store.getFreeCapacity(RESOURCE_POWER) > 0) {
                     new RoomVisual(gameRoom.name).text('🌪️', powerSpawn.pos.x, powerSpawn.pos.y);
-                    AddJob(roomJobs, '3FillPSpwnP(' + powerSpawn.pos.x + ',' + powerSpawn.pos.y + ')' + gameRoom.name, powerSpawn.id, OBJECT_JOB, 'T');
+                    AddJob(roomJobs, '3FillPSpwnP(' + powerSpawn.pos.x + ',' + powerSpawn.pos.y + ')' + gameRoom.name, powerSpawn.id, Util.OBJECT_JOB, 'T');
                 }
             }
         }
@@ -333,7 +323,7 @@ const CreateJobs = {
                     const lab = labs[labKey];
                     if (lab && lab.store[RESOURCE_ENERGY] < lab.store.getCapacity(RESOURCE_ENERGY)) {
                         new RoomVisual(gameRoom.name).text('⚡', lab.pos.x, lab.pos.y);
-                        AddJob(roomJobs, '3FillLabE(' + lab.pos.x + ',' + lab.pos.y + ')' + gameRoom.name, lab.id, OBJECT_JOB, 'T');
+                        AddJob(roomJobs, '3FillLabE(' + lab.pos.x + ',' + lab.pos.y + ')' + gameRoom.name, lab.id, Util.OBJECT_JOB, 'T');
                     }
                 }
             }
@@ -368,9 +358,9 @@ const CreateJobs = {
                     }
                     if (gameRoom.terminal.store[resourceType] < maxResources) {
                         if(resourceType === RESOURCE_ENERGY){
-                            AddJob(roomJobs, '2FillTerm(' + resourceType + ')' + gameRoom.name, gameRoom.terminal.id, OBJECT_JOB, 'T');
+                            AddJob(roomJobs, '2FillTerm(' + resourceType + ')' + gameRoom.name, gameRoom.terminal.id, Util.OBJECT_JOB, 'T');
                         }else{
-                            AddJob(roomJobs, '5FillTerm(' + resourceType + ')' + gameRoom.name, gameRoom.terminal.id, OBJECT_JOB, 'T');
+                            AddJob(roomJobs, '5FillTerm(' + resourceType + ')' + gameRoom.name, gameRoom.terminal.id, Util.OBJECT_JOB, 'T');
                         }
                     }
                 }
@@ -386,24 +376,24 @@ const CreateJobs = {
                 })[0];
                 if (factory) {
                     if (factory.store.getUsedCapacity(RESOURCE_ENERGY) < 10000) {
-                        AddJob(roomJobs, '5FillFctr(' + RESOURCE_ENERGY + ')' + gameRoom.name, factory.id, OBJECT_JOB, 'T');
+                        AddJob(roomJobs, '5FillFctr(' + RESOURCE_ENERGY + ')' + gameRoom.name, factory.id, Util.OBJECT_JOB, 'T');
                     }
                     // Biological chain
                     if (gameRoom.storage.store.getUsedCapacity(RESOURCE_BIOMASS) > 0
                         || gameRoom.terminal.store.getUsedCapacity(RESOURCE_BIOMASS) > 0
                         || factory.store.getUsedCapacity(RESOURCE_BIOMASS) > 0
                         || factory.store.getUsedCapacity(RESOURCE_CELL) > 0) {
-                        roomJobs = AddFillFactoryJob(gameRoom, factory, roomJobs, RESOURCE_BIOMASS);
-                        roomJobs = AddFillFactoryJob(gameRoom, factory, roomJobs, RESOURCE_LEMERGIUM);
-                        roomJobs = AddFillFactoryJob(gameRoom, factory, roomJobs, RESOURCE_LEMERGIUM_BAR);
-                        roomJobs = AddFillFactoryJob(gameRoom, factory, roomJobs, RESOURCE_CELL);
+                        roomJobs = TryAddFillFactoryJob(gameRoom, factory, roomJobs, RESOURCE_BIOMASS);
+                        roomJobs = TryAddFillFactoryJob(gameRoom, factory, roomJobs, RESOURCE_LEMERGIUM);
+                        roomJobs = TryAddFillFactoryJob(gameRoom, factory, roomJobs, RESOURCE_LEMERGIUM_BAR);
+                        roomJobs = TryAddFillFactoryJob(gameRoom, factory, roomJobs, RESOURCE_CELL);
                         if (factory.store.getUsedCapacity(RESOURCE_CELL) > 0 && factory.level === 1) { // level 1 specific
-                            roomJobs = AddFillFactoryJob(gameRoom, factory, roomJobs, RESOURCE_OXYGEN);
-                            roomJobs = AddFillFactoryJob(gameRoom, factory, roomJobs, RESOURCE_OXIDANT);
-                        }else if(factory.store.getUsedCapacity(RESOURCE_PHLEGM) > 0 && factory.level === 2){ // level 2 specific
-                            roomJobs = AddFillFactoryJob(gameRoom, factory, roomJobs, RESOURCE_HYDROGEN);
-                            roomJobs = AddFillFactoryJob(gameRoom, factory, roomJobs, RESOURCE_REDUCTANT);
-                            roomJobs = AddFillFactoryJob(gameRoom, factory, roomJobs, RESOURCE_PHLEGM);
+                            roomJobs = TryAddFillFactoryJob(gameRoom, factory, roomJobs, RESOURCE_OXYGEN);
+                            roomJobs = TryAddFillFactoryJob(gameRoom, factory, roomJobs, RESOURCE_OXIDANT);
+                        }else if(factory.store.getUsedCapacity(RESOURCE_CELL) > 0 && factory.level === 2){ // level 2 specific
+                            roomJobs = TryAddFillFactoryJob(gameRoom, factory, roomJobs, RESOURCE_HYDROGEN);
+                            roomJobs = TryAddFillFactoryJob(gameRoom, factory, roomJobs, RESOURCE_REDUCTANT);
+                            roomJobs = TryAddFillFactoryJob(gameRoom, factory, roomJobs, RESOURCE_PHLEGM);
                         }
                     }
                 }
@@ -411,9 +401,9 @@ const CreateJobs = {
             return roomJobs;
         }
 
-        function AddFillFactoryJob(gameRoom, factory, roomJobs, resource) {
+        function TryAddFillFactoryJob(gameRoom, factory, roomJobs, resource) {
             if (factory.store.getUsedCapacity(resource) < 2000 && (gameRoom.storage.store.getUsedCapacity(resource) > 0 || gameRoom.terminal.store.getUsedCapacity(resource) > 0)) {
-                roomJobs = AddJob(roomJobs, '5FillFctr(' + resource + ')' + gameRoom.name, factory.id, OBJECT_JOB, 'T');
+                roomJobs = AddJob(roomJobs, '5FillFctr(' + resource + ')' + gameRoom.name, factory.id, Util.OBJECT_JOB, 'T');
             }
             return roomJobs;
         }
@@ -424,7 +414,7 @@ const CreateJobs = {
                     return s.mineralAmount > 0;
                 }
             })[0];
-            if (mineral && gameRoom.storage && (gameRoom.storage.store[RESOURCE_ENERGY] > DO_EXTRACTOR_WHEN_STORAGE_OVER_ENERGY && gameRoom.storage.store[mineral.mineralType] < DO_EXTRACTOR_WHEN_STORAGE_UNDER_MINERAL
+            if (mineral && gameRoom.storage && (gameRoom.storage.store[RESOURCE_ENERGY] > Util.DO_EXTRACTING_WHEN_STORAGE_OVER_ENERGY && gameRoom.storage.store[mineral.mineralType] < Util.DO_EXTRACTING_WHEN_STORAGE_UNDER_MINERAL
                 || gameRoom.find(FIND_MY_CREEPS, {
                     filter: (c) => {
                         return c.name.startsWith('E');
@@ -438,7 +428,7 @@ const CreateJobs = {
                 })[0];
                 if (extractMineral) {
                     new RoomVisual(gameRoom.name).text('⛏', extractMineral.pos.x, extractMineral.pos.y);
-                    AddJob(roomJobs, '5ExtrMin-' + mineral.mineralType + '(' + extractMineral.pos.x + ',' + extractMineral.pos.y + ')' + gameRoom.name, mineral.id, OBJECT_JOB, 'E');
+                    AddJob(roomJobs, '5ExtrMin-' + mineral.mineralType + '(' + extractMineral.pos.x + ',' + extractMineral.pos.y + ')' + gameRoom.name, mineral.id, Util.OBJECT_JOB, 'E');
                 }
             }
         }
@@ -460,7 +450,7 @@ const CreateJobs = {
                 new RoomVisual(gameRoom.name).text('📦', container.pos.x, container.pos.y);
                 for (const resourceType in container.store) {
                     if (container.id !== Memory.MemRooms[gameRoom.name].CtrlConId && container.store.getUsedCapacity() >= 600 || resourceType !== RESOURCE_ENERGY) { // do not empty the controller container for energy
-                        AddJob(roomJobs, '5FillStrg-' + container.structureType + '(' + container.pos.x + ',' + container.pos.y + ',' + resourceType + ')' + gameRoom.name, container.id, OBJECT_JOB, 'T');
+                        AddJob(roomJobs, '5FillStrg-' + container.structureType + '(' + container.pos.x + ',' + container.pos.y + ',' + resourceType + ')' + gameRoom.name, container.id, Util.OBJECT_JOB, 'T');
                     }
                 }
             }
@@ -472,12 +462,12 @@ const CreateJobs = {
                 }
             })[0];
             if (link) {
-                AddJob(roomJobs, '0FillStrg-' + link.structureType + '(' + link.pos.x + ',' + link.pos.y + ',' + RESOURCE_ENERGY + ')' + gameRoom.name, link.id, OBJECT_JOB, 'T');
+                AddJob(roomJobs, '0FillStrg-' + link.structureType + '(' + link.pos.x + ',' + link.pos.y + ',' + RESOURCE_ENERGY + ')' + gameRoom.name, link.id, Util.OBJECT_JOB, 'T');
             }
 
             // terminal
             if (gameRoom.terminal && (gameRoom.terminal.store[RESOURCE_ENERGY] >= 120000 || (gameRoom.storage.store[RESOURCE_ENERGY] < 5000 || !gameRoom.storage.store[RESOURCE_ENERGY]) && gameRoom.terminal.store[RESOURCE_ENERGY] >= Util.TERMINAL_TARGET_ENERGY)) {
-                AddJob(roomJobs, '5FillStrg-' + gameRoom.terminal.structureType + '(' + gameRoom.terminal.pos.x + ',' + gameRoom.terminal.pos.y + ',' + RESOURCE_ENERGY + ')' + gameRoom.name, gameRoom.terminal.id, OBJECT_JOB, 'T');
+                AddJob(roomJobs, '5FillStrg-' + gameRoom.terminal.structureType + '(' + gameRoom.terminal.pos.x + ',' + gameRoom.terminal.pos.y + ',' + RESOURCE_ENERGY + ')' + gameRoom.name, gameRoom.terminal.id, Util.OBJECT_JOB, 'T');
             }
 
             // factory
@@ -488,13 +478,13 @@ const CreateJobs = {
             })[0];
             if (factory) {
                 for (const resourceType in factory.store) {
-                    if (resourceType === RESOURCE_PHLEGM && factory.store[resourceType] > 1000 && factory.level === 1
-                        || resourceType === RESOURCE_TISSUE && factory.store[resourceType] > 1000 && factory.level === 2
+                    if (resourceType === RESOURCE_PHLEGM && factory.store[resourceType] > 100 && factory.level === 1
+                        || resourceType === RESOURCE_TISSUE && factory.store[resourceType] > 20 && factory.level === 2
                         || resourceType === RESOURCE_MUSCLE && factory.store[resourceType] > 1000 && factory.level === 3
                         || resourceType === RESOURCE_ORGANOID && factory.store[resourceType] > 1000 && factory.level === 4
                         || resourceType === RESOURCE_ORGANISM && factory.store[resourceType] > 1000 && factory.level === 5) {
                         new RoomVisual(gameRoom.name).text('🏭', factory.pos.x, factory.pos.y);
-                        AddJob(roomJobs, '5FillStrg-' + factory.structureType + '(' + factory.pos.x + ',' + factory.pos.y + ',' + resourceType + ')' + gameRoom.name, factory.id, OBJECT_JOB, 'T');
+                        AddJob(roomJobs, '5FillStrg-' + factory.structureType + '(' + factory.pos.x + ',' + factory.pos.y + ',' + resourceType + ')' + gameRoom.name, factory.id, Util.OBJECT_JOB, 'T');
                     }
                 }
             }
@@ -508,7 +498,7 @@ const CreateJobs = {
             for (const resourceDropKey in resourceDrops) {
                 const resourceDrop = resourceDrops[resourceDropKey];
                 new RoomVisual(gameRoom.name).text('💰', resourceDrop.pos.x, resourceDrop.pos.y);
-                AddJob(roomJobs, '3FillStrg-drop' + '(' + resourceDrop.pos.x + ',' + resourceDrop.pos.y + ',' + resourceDrop.resourceType + ')' + gameRoom.name, resourceDrop.id, OBJECT_JOB, 'T');
+                AddJob(roomJobs, '3FillStrg-drop' + '(' + resourceDrop.pos.x + ',' + resourceDrop.pos.y + ',' + resourceDrop.resourceType + ')' + gameRoom.name, resourceDrop.id, Util.OBJECT_JOB, 'T');
             }
 
             // tombstone
@@ -520,7 +510,7 @@ const CreateJobs = {
             for (const tombstoneDropKey in tombstoneDrops) {
                 const tombstoneDrop = tombstoneDrops[tombstoneDropKey];
                 new RoomVisual(gameRoom.name).text('⚰', tombstoneDrop.pos.x, tombstoneDrop.pos.y);
-                AddJob(roomJobs, '4FillStrg-tomb' + '(' + tombstoneDrop.pos.x + ',' + tombstoneDrop.pos.y + ')' + gameRoom.name, tombstoneDrop.id, OBJECT_JOB, 'T');
+                AddJob(roomJobs, '4FillStrg-tomb' + '(' + tombstoneDrop.pos.x + ',' + tombstoneDrop.pos.y + ')' + gameRoom.name, tombstoneDrop.id, Util.OBJECT_JOB, 'T');
             }
 
             // ruin
@@ -532,7 +522,7 @@ const CreateJobs = {
             for (const ruinDropKey in ruinDrops) {
                 const ruinDrop = ruinDrops[ruinDropKey];
                 new RoomVisual(gameRoom.name).text('🏚️', ruinDrop.pos.x, ruinDrop.pos.y);
-                AddJob(roomJobs, '4FillStrg-ruin' + '(' + ruinDrop.pos.x + ',' + ruinDrop.pos.y + ')' + gameRoom.name, ruinDrop.id, OBJECT_JOB, 'T');
+                AddJob(roomJobs, '4FillStrg-ruin' + '(' + ruinDrop.pos.x + ',' + ruinDrop.pos.y + ')' + gameRoom.name, ruinDrop.id, Util.OBJECT_JOB, 'T');
             }
         }
 
@@ -545,7 +535,7 @@ const CreateJobs = {
             for (const fillTowerKey in fillTowers) {
                 const fillTower = fillTowers[fillTowerKey];
                 new RoomVisual(gameRoom.name).text('🗼', fillTower.pos.x, fillTower.pos.y);
-                AddJob(roomJobs, '2FillTwr(' + fillTower.pos.x + ',' + fillTower.pos.y + ')' + gameRoom.name, fillTower.id, OBJECT_JOB, 'T');
+                AddJob(roomJobs, '2FillTwr(' + fillTower.pos.x + ',' + fillTower.pos.y + ')' + gameRoom.name, fillTower.id, Util.OBJECT_JOB, 'T');
             }
         }
 
@@ -558,7 +548,7 @@ const CreateJobs = {
             for (const fillSpawnExtensionKey in fillSpawnExtensions) {
                 const fillSpawnExtension = fillSpawnExtensions[fillSpawnExtensionKey];
                 new RoomVisual(gameRoom.name).text('🌱', fillSpawnExtension.pos.x, fillSpawnExtension.pos.y);
-                AddJob(roomJobs, '0FillSpwnEx(' + fillSpawnExtension.pos.x + ',' + fillSpawnExtension.pos.y + ')' + gameRoom.name, fillSpawnExtension.id, OBJECT_JOB, 'T');
+                AddJob(roomJobs, '0FillSpwnEx(' + fillSpawnExtension.pos.x + ',' + fillSpawnExtension.pos.y + ')' + gameRoom.name, fillSpawnExtension.id, Util.OBJECT_JOB, 'T');
             }
         }
 
@@ -567,7 +557,7 @@ const CreateJobs = {
             for (const constructionKey in constructions) {
                 const construction = constructions[constructionKey];
                 new RoomVisual(gameRoom.name).text('🏗', construction.pos.x, construction.pos.y);
-                AddJob(roomJobs, '2Constr-' + construction.structureType + '(' + construction.pos.x + ',' + construction.pos.y + ')' + gameRoom.name, construction.id, OBJECT_JOB, 'B');
+                AddJob(roomJobs, '2Constr-' + construction.structureType + '(' + construction.pos.x + ',' + construction.pos.y + ')' + gameRoom.name, construction.id, Util.OBJECT_JOB, 'B');
             }
         }
 
@@ -580,7 +570,7 @@ const CreateJobs = {
                         (
                             (
                                 (s.structureType === STRUCTURE_RAMPART || s.structureType === STRUCTURE_WALL)
-                                && (gameRoom.controller.level < 8 && s.hits < RAMPART_WALL_HITS_U_LVL8 || gameRoom.controller.level === 8 && (s.hits < RAMPART_WALL_HITS_O_LVL8 || gameRoom.storage && gameRoom.storage.store[RESOURCE_ENERGY] > RAMPART_WALL_MAX_HITS_WHEN_STORAGE_ENERGY))
+                                && (gameRoom.controller.level < 8 && s.hits < Util.RAMPART_WALL_HITS_U_LVL8 || gameRoom.controller.level === 8 && (s.hits < Util.RAMPART_WALL_HITS_O_LVL8 || gameRoom.storage && gameRoom.storage.store[RESOURCE_ENERGY] > Util.RAMPART_WALL_MAX_HITS_WHEN_STORAGE_ENERGY))
                                 ||
                                 s.structureType === STRUCTURE_ROAD && s.hits < s.hitsMax / 2
                             )
@@ -597,7 +587,7 @@ const CreateJobs = {
             for (const repairKey in repairs) {
                 const repair = repairs[repairKey];
                 new RoomVisual(gameRoom.name).text('🛠', repair.pos.x, repair.pos.y);
-                AddJob(roomJobs, '3Rep-' + repair.structureType + '(' + repair.pos.x + ',' + repair.pos.y + ')' + gameRoom.name, repair.id, OBJECT_JOB, 'B');
+                AddJob(roomJobs, '3Rep-' + repair.structureType + '(' + repair.pos.x + ',' + repair.pos.y + ')' + gameRoom.name, repair.id, Util.OBJECT_JOB, 'B');
             }
         }
 
@@ -622,7 +612,7 @@ const CreateJobs = {
             }
             if (controllerContainer && controllerContainer.store.getFreeCapacity > 0) {
                 new RoomVisual(gameRoom.name).text('🔋', controllerContainer.pos.x, controllerContainer.pos.y);
-                AddJob(roomJobs, '2FillCtrlCon(' + controllerContainer.pos.x + ',' + controllerContainer.pos.y + ')' + gameRoom.name, controllerContainer.id, OBJECT_JOB, 'T');
+                AddJob(roomJobs, '2FillCtrlCon(' + controllerContainer.pos.x + ',' + controllerContainer.pos.y + ')' + gameRoom.name, controllerContainer.id, Util.OBJECT_JOB, 'T');
             }
         }
 

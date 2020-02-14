@@ -17,6 +17,7 @@ const Factories = {
                     })[0];
                     if(factory) {
                         memRoom.FctrId = factory.id;
+                        Util.InfoLog('Factories', '', 'add new factory in ' + gameRoomKey + ' FctrId ' + memRoom.FctrId);
                     }
                 }
                 if(factory && factory.cooldown === 0){
@@ -57,6 +58,13 @@ const Factories = {
                         result = factory.produce(RESOURCE_OXIDANT);
                         Util.Info('Factories', '', factory.pos.roomName + ' producing ' + RESOURCE_OXIDANT + ' ' + factory.store.getUsedCapacity(RESOURCE_OXIDANT) + ' ' + result + ' ' + RESOURCE_ENERGY + ' ' + factory.store.getUsedCapacity(RESOURCE_ENERGY) + ' ' + RESOURCE_OXYGEN + ' ' + factory.store.getUsedCapacity(RESOURCE_OXYGEN));
                     }
+                    else if(factory.store.getUsedCapacity(RESOURCE_ENERGY) >= 200
+                        && factory.store.getUsedCapacity(RESOURCE_HYDROGEN) >= 500
+                        && factory.store.getUsedCapacity(RESOURCE_OXIDANT) < 500
+                    ){
+                        result = factory.produce(RESOURCE_REDUCTANT);
+                        Util.Info('Factories', '', factory.pos.roomName + ' producing ' + RESOURCE_REDUCTANT + ' ' + factory.store.getUsedCapacity(RESOURCE_REDUCTANT) + ' ' + result + ' ' + RESOURCE_ENERGY + ' ' + factory.store.getUsedCapacity(RESOURCE_ENERGY) + ' ' + RESOURCE_HYDROGEN + ' ' + factory.store.getUsedCapacity(RESOURCE_HYDROGEN));
+                    }
                     else if(factory.store.getUsedCapacity(RESOURCE_LEMERGIUM_BAR) >= 20
                         && factory.store.getUsedCapacity(RESOURCE_BIOMASS) >= 100
                         && factory.store.getUsedCapacity(RESOURCE_ENERGY) >= 40
@@ -67,6 +75,7 @@ const Factories = {
                     }
                 }else if(!factory){ // no factory in this room - set FctrId so that it wont look again
                     memRoom.FctrId = '-';
+                    Util.InfoLog('Factories', '', 'no factory in ' + gameRoomKey + ' FctrId set to -');
                 }
             }
         }
