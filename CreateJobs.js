@@ -357,6 +357,7 @@ const CreateJobs = {
                         maxResources = LowTransfer;
                     }
                     if (gameRoom.terminal.store[resourceType] < maxResources) {
+                        new RoomVisual(gameRoom.name).text('🚄', gameRoom.terminal.pos.x, gameRoom.terminal.pos.y);
                         if(resourceType === RESOURCE_ENERGY){
                             AddJob(roomJobs, '2FillTerm(' + resourceType + ')' + gameRoom.name, gameRoom.terminal.id, Util.OBJECT_JOB, 'T');
                         }else{

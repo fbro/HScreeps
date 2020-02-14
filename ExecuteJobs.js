@@ -475,7 +475,7 @@ const ExecuteJobs = {
                         }
                     } else {
                         for (const resourceType in creep.store) {
-                            if (creep.store[resourceType] > 0) {
+                            if (creep.store.getUsedCapacity(resourceType) > 0) {
                                 result = creep.drop(resourceType);
                                 break;
                             }
@@ -732,7 +732,7 @@ const ExecuteJobs = {
                 Act: function (jobObject) {
                     if (jobObject.structure/*ruin*/ || jobObject.structureType === STRUCTURE_CONTAINER || jobObject.creep/*tombstone*/) {
                         for (const resourceType in jobObject.store) {
-                            if (jobObject.store[resourceType] > 0) {
+                            if (jobObject.store.getUsedCapacity(resourceType) > 0) {
                                 return creep.withdraw(jobObject, resourceType);
                             }
                         }
@@ -745,8 +745,8 @@ const ExecuteJobs = {
                             })[3];
                             creep.memory.resourceType = resourceType;
                         }
-                        if (resourceType && jobObject.store[resourceType] > 500) {
-                            let amountToWithdraw = jobObject.store[resourceType] - 500;
+                        if (resourceType && jobObject.store.getUsedCapacity(resourceType) > 0) {
+                            let amountToWithdraw = jobObject.store.getUsedCapacity(resourceType);
                             if (amountToWithdraw > creep.store.getFreeCapacity()) {
                                 amountToWithdraw = creep.store.getFreeCapacity();
                             }
@@ -857,19 +857,19 @@ const ExecuteJobs = {
                 JobStatus: function (terminal) {
                     const storage = terminal.room.storage;
                     if (!storage ||
-                        storage.store[resourceType] <= Low // low resource in storage abort
+                        storage.store.getUsedCapacity(resourceType) <= Low && resourceType === RESOURCE_ENERGY // low resource in storage abort only if energy
 
-                        || storage.store[resourceType] <= Medium
-                        && terminal.store[resourceType] >= LowTransfer
+                        || storage.store.getUsedCapacity(resourceType) <= Medium
+                        && terminal.store.getUsedCapacity(resourceType) >= LowTransfer
 
-                        || storage.store[resourceType] <= High
-                        && terminal.store[resourceType] >= MediumTransfer
+                        || storage.store.getUsedCapacity(resourceType) <= High
+                        && terminal.store.getUsedCapacity(resourceType) >= MediumTransfer
 
-                        || storage.store[resourceType] >= High
-                        && terminal.store[resourceType] >= HighTransfer
+                        || storage.store.getUsedCapacity(resourceType) >= High
+                        && terminal.store.getUsedCapacity(resourceType) >= HighTransfer
                     ) {
                         return JOB_IS_DONE;
-                    } else if (creep.store[resourceType] === 0) { // fetch
+                    } else if (creep.store.getUsedCapacity(resourceType) === 0) { // fetch
                         return SHOULD_FETCH;
                     } else { // action not done yet
                         return SHOULD_ACT;
@@ -882,17 +882,17 @@ const ExecuteJobs = {
                 /**@return {int}*/
                 IsJobDone: function (terminal) {
                     const storage = terminal.room.storage;
-                    const newAmountInTerminal = creep.store[resourceType] + terminal.store[resourceType];
+                    const newAmountInTerminal = creep.store.getUsedCapacity(resourceType) + terminal.store.getUsedCapacity(resourceType);
                     if (
-                        storage.store[resourceType] <= Low // low resource in storage abort
+                        storage.store.getUsedCapacity(resourceType) <= Low && resourceType === RESOURCE_ENERGY // low resource in storage abort only if energy
 
-                        || storage.store[resourceType] <= Medium
+                        || storage.store.getUsedCapacity(resourceType) <= Medium
                         && newAmountInTerminal >= LowTransfer
 
-                        || storage.store[resourceType] <= High
+                        || storage.store.getUsedCapacity(resourceType) <= High
                         && newAmountInTerminal >= MediumTransfer
 
-                        || storage.store[resourceType] >= High
+                        || storage.store.getUsedCapacity(resourceType) >= High
                         && newAmountInTerminal >= HighTransfer
                     ) {
                         return JOB_IS_DONE;
@@ -905,7 +905,7 @@ const ExecuteJobs = {
                 FindFetchObject: function (jobObject) {
                     if (resourceType === RESOURCE_ENERGY) {
                         return FindFetchResource(creep, jobObject, RESOURCE_ENERGY);
-                    } else if (creep.room.storage && creep.room.storage.store[resourceType] > 0) {
+                    } else if (creep.room.storage && creep.room.storage.store.getUsedCapacity(resourceType) > 0) {
                         return creep.room.storage;
                     } else {
                         return undefined;
@@ -931,11 +931,11 @@ const ExecuteJobs = {
             const result = GenericJobAction(creep, roomJob, {
                 /**@return {int}*/
                 JobStatus: function (jobObject) { // terminal
-                    if (resourceType === RESOURCE_ENERGY && jobObject.store[RESOURCE_ENERGY] >= 10000
-                        || resourceType !== RESOURCE_ENERGY && jobObject.store[resourceType] >= 2000
+                    if (resourceType === RESOURCE_ENERGY && jobObject.store.getUsedCapacity(resourceType) >= 10000
+                        || resourceType !== RESOURCE_ENERGY && jobObject.store.getUsedCapacity(resourceType) >= 2000
                     ) {
                         return JOB_IS_DONE;
-                    } else if (creep.store[resourceType] === 0) { // fetch
+                    } else if (creep.store.getUsedCapacity(resourceType) === 0) { // fetch
                         return SHOULD_FETCH;
                     } else { // action not done yet
                         return SHOULD_ACT;
@@ -947,8 +947,8 @@ const ExecuteJobs = {
                 },
                 /**@return {int}*/
                 IsJobDone: function (jobObject) {
-                    if (resourceType === RESOURCE_ENERGY && (creep.store[resourceType] + jobObject.store[resourceType]) >= 10000
-                        || resourceType !== RESOURCE_ENERGY && (creep.store[resourceType] + jobObject.store[resourceType]) >= 2000) {
+                    if (resourceType === RESOURCE_ENERGY && (creep.store.getUsedCapacity(resourceType) + jobObject.store.getUsedCapacity(resourceType)) >= 10000
+                        || resourceType !== RESOURCE_ENERGY && (creep.store.getUsedCapacity(resourceType) + jobObject.store.getUsedCapacity(resourceType)) >= 2000) {
                         return JOB_IS_DONE;
                     } else {
                         return this.JobStatus(jobObject);
@@ -959,9 +959,9 @@ const ExecuteJobs = {
                 FindFetchObject: function (jobObject) {
                     if (resourceType === RESOURCE_ENERGY) {
                         return FindFetchResource(creep, jobObject, RESOURCE_ENERGY);
-                    } else if (creep.room.storage && creep.room.storage.store[resourceType] > 0) {
+                    } else if (creep.room.storage && creep.room.storage.store.getUsedCapacity(resourceType) > 0) {
                         return creep.room.storage;
-                    } else if (creep.room.terminal && creep.room.terminal.store[resourceType] > 0) {
+                    } else if (creep.room.terminal && creep.room.terminal.store.getUsedCapacity(resourceType) > 0) {
                         return creep.room.terminal;
                     } else {
                         return undefined;
@@ -975,7 +975,7 @@ const ExecuteJobs = {
                     } else {
                         max = 2000;
                     }
-                    return FetchResource(creep, fetchObject, resourceType, max - jobObject.store[resourceType]);
+                    return FetchResource(creep, fetchObject, resourceType, max - jobObject.store.getUsedCapacity(resourceType));
                 },
             });
             return result;
@@ -2259,14 +2259,14 @@ const ExecuteJobs = {
             if (result === ERR_FULL) { // creep store is full with anything other than resourceToFetch - get rid of it asap
                 if (fetchObject.store && fetchObject.store.getFreeCapacity() > 0) {
                     for (const resourceType in creep.store) {
-                        if (creep.store[resourceType] > 0 && resourceType !== resourceToFetch) {
+                        if (creep.store.getUsedCapacity(resourceType) > 0 && resourceType !== resourceToFetch) {
                             result = creep.transfer(fetchObject, resourceType);
                             break;
                         }
                     }
                 } else { // DROP, TOMBSTONE or RUIN
                     for (const resourceType in creep.store) {
-                        if (creep.store[resourceType] > 0 && resourceType !== resourceToFetch) {
+                        if (creep.store.getUsedCapacity(resourceType) > 0 && resourceType !== resourceToFetch) {
                             result = creep.drop(resourceType);
                             break;
                         }
@@ -2283,9 +2283,9 @@ const ExecuteJobs = {
             let countResources = 0;
             let transferredAmount;
             for (const resourceType in creep.store) {
-                if (creep.store[resourceType] > 0 && resourceType !== resourceTypeToKeep) {
+                if (creep.store.getUsedCapacity(resourceType) > 0 && resourceType !== resourceTypeToKeep) {
                     if (countResources === 0) {
-                        transferredAmount = creep.store[resourceType];
+                        transferredAmount = creep.store.getUsedCapacity(resourceType);
                         result = creep.transfer(storeToFillObject, resourceType);
                     }
                     countResources++;
