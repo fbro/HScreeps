@@ -34,11 +34,14 @@ const Terminals = {
         /**@return {number}*/
         function DistributeResources(fromTerminal, terminals, terminalSendCount) {
             for (const resourceType in fromTerminal.store) { // for each resource type
-                let fromAmount = fromTerminal.store[resourceType];
+                let fromAmount = fromTerminal.store.getUsedCapacity(resourceType);
                 let target;
                 if(resourceType === RESOURCE_PHLEGM) { // PHLEGM should only be sent to a terminal that has a factory of level 2
                     terminalSendCount = DistributeFactoryCommodities(terminalSendCount, fromTerminal, resourceType, fromAmount, 2);
-                } else {
+                } else if(resourceType === RESOURCE_BIOMASS
+                    && !fromTerminal.room.find(FIND_MY_STRUCTURES, {filter: function (s) {return s.structureType === STRUCTURE_FACTORY;}})[0]) { // BIOMASS should only be sent to a terminal that has a factory that uses BIOMASS
+                    terminalSendCount = DistributeFactoryCommodities(terminalSendCount, fromTerminal, resourceType, fromAmount);
+                } else{
                     if (resourceType === RESOURCE_ENERGY) {
                         target = Util.TERMINAL_TARGET_ENERGY;
                     } else {
@@ -47,7 +50,7 @@ const Terminals = {
                     for (const toTerminalKey in terminals) {
                         if (terminalSendCount < 10 && fromAmount > (target + 500/*buffer to prevent many small send*/)) { // is allowed to send this resource to another terminal
                             const toTerminal = terminals[toTerminalKey];
-                            const toAmount = toTerminal.store[resourceType];
+                            const toAmount = toTerminal.store.getUsedCapacity(resourceType);
                             let shouldSend = false;
                             if (toAmount < target && toTerminal.id !== fromTerminal.id) {
                                 shouldSend = true;
@@ -96,14 +99,16 @@ const Terminals = {
         /**@return {number}*/
         function SellExcessResource(fromTerminal, terminalSendCount) {
             for (const resourceType in fromTerminal.store) { // for each resource type
-                let fromAmount = fromTerminal.store[resourceType];
+                let fromAmount = fromTerminal.store.getUsedCapacity(resourceType);
                 let max;
                 if (resourceType === RESOURCE_ENERGY) {
                     max = Util.TERMINAL_MAX_ENERGY;
                 } else if(resourceType === RESOURCE_TISSUE){
                     max = 0; // right now i am selling out on tissue
                 } else if (resourceType === RESOURCE_POWER
-                    || resourceType === RESOURCE_PHLEGM) { // will never sell out on power or phlegm
+                    || resourceType === RESOURCE_PHLEGM
+                    || resourceType === RESOURCE_CELL
+                    || resourceType === RESOURCE_BIOMASS) { // will never sell out on these resources
                     max = Number.MAX_SAFE_INTEGER;
                 } else {
                     max = Util.TERMINAL_MAX_RESOURCE;

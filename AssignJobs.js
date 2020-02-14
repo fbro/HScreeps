@@ -238,7 +238,7 @@ const AssignJobs = {
                         if (memRoom.RoomLevel < 3) {
                             maxCreepsInRoom += 1;
                         }
-                    } else if (memRoom.RoomLevel === 8 && Game.rooms[roomKey].storage && Game.rooms[roomKey].storage.store[RESOURCE_ENERGY] > Util.SPAWN_EXTRA_B_WHEN_STORAGE_ENERGY) {
+                    } else if (memRoom.RoomLevel === 8 && Game.rooms[roomKey].storage && Game.rooms[roomKey].storage.store.getUsedCapacity(RESOURCE_ENERGY) > Util.SPAWN_EXTRA_B_WHEN_STORAGE_ENERGY) {
                         maxCreepsInRoom += 3;
                     }
                 }

@@ -12,7 +12,7 @@ const Factories = {
                 if(!factory){
                     factory = gameRoom.find(FIND_MY_STRUCTURES, {
                         filter: function (factory) {
-                            return factory.structureType === STRUCTURE_FACTORY && factory.cooldown === 0 && factory.store[RESOURCE_ENERGY] > 0;
+                            return factory.structureType === STRUCTURE_FACTORY && factory.cooldown === 0 && factory.store.getUsedCapacity(RESOURCE_ENERGY) > 0;
                         }
                     })[0];
                     if(factory) {

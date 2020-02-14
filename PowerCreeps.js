@@ -54,9 +54,9 @@ const PowerCreeps = {
                             result = RegenSource(powerCreep);
                         } else if (powerCreep.memory.RegenMineralCooldown < Game.time && powerCreep.powers[PWR_REGEN_MINERAL] && powerCreep.powers[PWR_REGEN_MINERAL].cooldown === 0) {
                             result = RegenMineral(powerCreep);
-                        } else if (powerCreep.store[RESOURCE_OPS] > 500 || powerCreep.store[RESOURCE_OPS] === powerCreep.store.getCapacity()) {
+                        } else if (powerCreep.store.getUsedCapacity(RESOURCE_OPS) > 500 || powerCreep.store.getUsedCapacity(RESOURCE_OPS) === powerCreep.store.getCapacity()) {
                             result = DepositOps(powerCreep);
-                        } else if (powerCreep.store[RESOURCE_OPS] < 100) {
+                        } else if (powerCreep.store.getUsedCapacity(RESOURCE_OPS) < 100) {
                             result = WithdrawOps(powerCreep);
                         }
                     }
@@ -65,23 +65,23 @@ const PowerCreeps = {
         }
 
         function WithdrawOps(powerCreep) {
-            let amountToWithdraw = (300 - powerCreep.store[RESOURCE_OPS]);
+            let amountToWithdraw = (300 - powerCreep.store.getUsedCapacity(RESOURCE_OPS));
             let result;
             let target;
-            if (powerCreep.room.storage && powerCreep.room.storage.store[RESOURCE_OPS] > 0) {
+            if (powerCreep.room.storage && powerCreep.room.storage.store.getUsedCapacity(RESOURCE_OPS) > 0) {
                 target = powerCreep.room.storage;
-            } else if (powerCreep.room.terminal && powerCreep.room.terminal.store[RESOURCE_OPS] > 0) {
+            } else if (powerCreep.room.terminal && powerCreep.room.terminal.store.getUsedCapacity(RESOURCE_OPS) > 0) {
                 target = powerCreep.room.terminal;
             }
             if (target) {
-                if (amountToWithdraw > target.store[RESOURCE_OPS]) {
-                    amountToWithdraw = target.store[RESOURCE_OPS];
+                if (amountToWithdraw > target.store.getUsedCapacity(RESOURCE_OPS)) {
+                    amountToWithdraw = target.store.getUsedCapacity(RESOURCE_OPS);
                 }
                 if (amountToWithdraw > powerCreep.store.getFreeCapacity()) {
                     amountToWithdraw = powerCreep.store.getFreeCapacity();
                 }
                 result = powerCreep.withdraw(target, RESOURCE_OPS, amountToWithdraw);
-                Util.Info('PowerCreeps', 'WithdrawOps', powerCreep.name + ' ' + result + ' target amount ' + target.store[RESOURCE_OPS]);
+                Util.Info('PowerCreeps', 'WithdrawOps', powerCreep.name + ' ' + result + ' target amount ' + target.store.getUsedCapacity(RESOURCE_OPS));
             }
             if (result === ERR_NOT_IN_RANGE) {
                 result = powerCreep.moveTo(target);
@@ -90,9 +90,9 @@ const PowerCreeps = {
         }
 
         function DepositOps(powerCreep) {
-            let opsToDeposit = powerCreep.store[RESOURCE_OPS] - 100;
+            let opsToDeposit = powerCreep.store.getUsedCapacity(RESOURCE_OPS) - 100;
             let result = powerCreep.transfer(powerCreep.room.storage, RESOURCE_OPS, opsToDeposit);
-            Util.Info('PowerCreeps', 'DepositOps', powerCreep.name + ' ' + result + ' amount ' + powerCreep.store[RESOURCE_OPS]);
+            Util.Info('PowerCreeps', 'DepositOps', powerCreep.name + ' ' + result + ' amount ' + powerCreep.store.getUsedCapacity(RESOURCE_OPS));
             if (result === ERR_NOT_IN_RANGE) {
                 result = powerCreep.moveTo(powerCreep.room.storage);
             }

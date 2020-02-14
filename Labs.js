@@ -5,7 +5,7 @@ const Labs = {
             if (gameRoom.controller && gameRoom.controller.my && gameRoom.controller.level === 8) {
                 const labs = gameRoom.find(FIND_MY_STRUCTURES, {
                     filter: function (lab) {
-                        return lab.structureType === STRUCTURE_LAB && lab.cooldown === 0 && lab.store[RESOURCE_ENERGY] > 0;
+                        return lab.structureType === STRUCTURE_LAB && lab.cooldown === 0 && lab.store.getUsedCapacity(RESOURCE_ENERGY) > 0;
                     }
                 });
                 if (labs) {

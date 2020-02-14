@@ -6,7 +6,7 @@ const PowerSpawns = {
                     return s.structureType === STRUCTURE_POWER_SPAWN;
                 }
             })[0];
-            if (powerSpawn && powerSpawn.store[RESOURCE_POWER] > 0 && powerSpawn.store[RESOURCE_ENERGY] > 0) {
+            if (powerSpawn && powerSpawn.store.getUsedCapacity(RESOURCE_POWER) > 0 && powerSpawn.store.getUsedCapacity(RESOURCE_ENERGY) > 0) {
                 powerSpawn.processPower();
             }
         }
