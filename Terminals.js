@@ -85,7 +85,7 @@ const Terminals = {
                         }
                     })[0]) {
                         const result = fromTerminal.send(resourceType, fromAmount, toTerminal.pos.roomName);
-                        Util.InfoLog('Terminals', 'DistributeResources', fromAmount + ' ' + resourceType + ' from ' + fromTerminal.pos.roomName + ' to ' + toTerminal.pos.roomName + ' result ' + result + ' terminalSendCount ' + terminalSendCount);
+                        Util.Info('Terminals', 'DistributeResources', fromAmount + ' ' + resourceType + ' from ' + fromTerminal.pos.roomName + ' to ' + toTerminal.pos.roomName + ' result ' + result + ' terminalSendCount ' + terminalSendCount);
                         terminalSendCount++;
                         break;
                     }

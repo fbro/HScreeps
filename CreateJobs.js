@@ -282,7 +282,7 @@ const CreateJobs = {
         // in-room jobs:
 
         function FillPowerSpawnEnergyJobs(gameRoom, roomJobs) {
-            if (gameRoom.storage && gameRoom.storage.store.getUsedCapacity(RESOURCE_ENERGY) > 5000) {
+            if (gameRoom.storage && gameRoom.storage.store.getUsedCapacity(RESOURCE_ENERGY) > Util.TERMINAL_STORAGE_ENERGY_LOW) {
                 const powerSpawns = gameRoom.find(FIND_MY_STRUCTURES, {
                     filter: (s) => {
                         return s.structureType === STRUCTURE_POWER_SPAWN;
@@ -290,7 +290,7 @@ const CreateJobs = {
                 });
                 for (const powerSpawnKey in powerSpawns) {
                     const powerSpawn = powerSpawns[powerSpawnKey];
-                    if (powerSpawn && powerSpawn.store.getUsedCapacity(RESOURCE_ENERGY) < powerSpawn.store.getCapacity(RESOURCE_ENERGY)) {
+                    if (powerSpawn && powerSpawn.store.getFreeCapacity(RESOURCE_ENERGY) > 0) {
                         new RoomVisual(gameRoom.name).text('⚡', powerSpawn.pos.x, powerSpawn.pos.y);
                         AddJob(roomJobs, '3FillPSpwnE(' + powerSpawn.pos.x + ',' + powerSpawn.pos.y + ')' + gameRoom.name, powerSpawn.id, Util.OBJECT_JOB, 'T');
                     }
@@ -299,7 +299,7 @@ const CreateJobs = {
         }
 
         function FillPowerSpawnPowerJobs(gameRoom, roomJobs) {
-            if (gameRoom.storage && gameRoom.storage.store.getUsedCapacity(RESOURCE_ENERGY) > 0 || gameRoom.terminal && gameRoom.terminal.store.getUsedCapacity(RESOURCE_ENERGY) > 0) {
+            if (gameRoom.storage && gameRoom.storage.store.getUsedCapacity(RESOURCE_POWER) > 0 || gameRoom.terminal && gameRoom.terminal.store.getUsedCapacity(RESOURCE_POWER) > 0) {
                 const powerSpawn = gameRoom.find(FIND_MY_STRUCTURES, {
                     filter: (s) => {
                         return s.structureType === STRUCTURE_POWER_SPAWN;

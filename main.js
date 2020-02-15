@@ -20,11 +20,11 @@ module.exports.loop = function () {
             Links.run();
             if (Game.time % 15000 === 0) {
                 Util.Info('Main', 'Main', '--------------- main reset of memory ---------------');
-                delete Memory.Paths;
+
                 const foundCreeps = {};
                 for (const memRoomKey in Memory.MemRooms) {
                     const memRoom = Memory.MemRooms[memRoomKey];
-                    memRoom.links = undefined;
+                    memRoom.links = undefined; // remove links - maybe the buildings have been deleted ect.
                     // search through MaxCreeps to see if they all have an alive creep and that there are only one of each creep names in MaxCreeps
                     for (const creepTypesKey in memRoom.MaxCreeps) {
                         for (const creepKey in memRoom.MaxCreeps[creepTypesKey]) {
@@ -66,6 +66,12 @@ module.exports.loop = function () {
                         }
                     }
                 }
+                if(Game.time % 240000 === 0){ // approx every 3 days
+                    delete Memory.Paths; // remove Paths to make room for new paths
+                    delete Memory.ErrorLog;
+                    delete Memory.InfoLog;
+                    Util.InfoLog('Main', 'Main', 'reset memory logs ' + Game.time);
+                }
             }
             Terminals.run();
             Factories.run();
@@ -89,6 +95,7 @@ module.exports.loop = function () {
 
 // TODO by prioritizing jobs, the low prioritized jobs may never begin - that is a problem - maybe try and completely remove prioritization altogether
     // I am currently testing this by commenting out SortObj in CreateJobs.js
+
 
 // lab reactions
 
