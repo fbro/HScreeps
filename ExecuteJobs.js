@@ -241,99 +241,99 @@ const ExecuteJobs = {
             let result = ERR_NO_RESULT_FOUND;
             switch (true) {
                 // obj jobs
-                case jobKey.startsWith('1Src') || jobKey.startsWith('5Src'):
+                case jobKey.startsWith('Src'):
                     result = JobSource(creep, roomJob);
                     break;
-                case jobKey.startsWith('0Ctrl') || jobKey.startsWith('8Ctrl') || jobKey.startsWith('9Ctrl'):
+                case jobKey.startsWith('Ctrl'):
                     result = JobController(creep, roomJob);
                     break;
-                case jobKey.startsWith('2FillCtrlCon'):
+                case jobKey.startsWith('FillCtrlCon'):
                     result = JobFillControllerContainer(creep, roomJob);
                     break;
-                case jobKey.startsWith('3Rep'):
+                case jobKey.startsWith('Rep'):
                     result = JobRepair(creep, roomJob);
                     break;
-                case jobKey.startsWith('2Constr'):
+                case jobKey.startsWith('Constr'):
                     result = JobConstruction(creep, roomJob);
                     break;
-                case jobKey.startsWith('0FillSpwnEx'):
+                case jobKey.startsWith('FillSpwnEx'):
                     result = JobFillSpawnExtension(creep, roomJob);
                     break;
-                case jobKey.startsWith('2FillTwr'):
+                case jobKey.startsWith('FillTwr'):
                     result = JobFillTower(creep, roomJob);
                     break;
-                case jobKey.startsWith('0FillStrg') || jobKey.startsWith('3FillStrg') || jobKey.startsWith('4FillStrg') || jobKey.startsWith('5FillStrg'):
+                case jobKey.startsWith('FillStrg'):
                     result = JobFillStorage(creep, roomJob);
                     break;
-                case jobKey.startsWith('5ExtrMin'):
+                case jobKey.startsWith('ExtrMin'):
                     result = JobExtractMineral(creep, roomJob);
                     break;
-                case jobKey.startsWith('5FillTerm') || jobKey.startsWith('2FillTerm'):
+                case jobKey.startsWith('FillTerm'):
                     result = JobFillTerminal(creep, roomJob);
                     break;
-                case jobKey.startsWith('5FillFctr'):
+                case jobKey.startsWith('FillFctr'):
                     result = JobFillFactory(creep, roomJob);
                     break;
-                case jobKey.startsWith('3FillLabE'):
+                case jobKey.startsWith('FillLabE'):
                     result = JobFillLabEnergy(creep, roomJob);
                     break;
-                case jobKey.startsWith('3FillPSpwnE'):
+                case jobKey.startsWith('FillPSpwnE'):
                     result = JobFillPowerSpawnEnergy(creep, roomJob);
                     break;
-                case jobKey.startsWith('3FillPSpwnP'):
+                case jobKey.startsWith('FillPSpwnP'):
                     result = JobFillPowerSpawnPower(creep, roomJob);
                     break;
 
                 // flag jobs
-                case jobKey.startsWith('4TagCtrl'):
+                case jobKey.startsWith('TagCtrl'):
                     result = JobTagController(creep, roomJob);
                     break;
-                case jobKey.startsWith('5ScoutPos'):
+                case jobKey.startsWith('ScoutPos'):
                     result = JobScoutPosition(creep, roomJob);
                     break;
-                case jobKey.startsWith('1ClaimCtrl'):
+                case jobKey.startsWith('ClaimCtrl'):
                     result = JobClaimController(creep, roomJob);
                     break;
-                case jobKey.startsWith('4ReserveCtrl'):
+                case jobKey.startsWith('ReserveCtrl'):
                     result = JobReserveController(creep, roomJob);
                     break;
-                case jobKey.startsWith('2ClaimPos'):
+                case jobKey.startsWith('ClaimPos'):
                     result = JobClaimerPosition(creep, roomJob);
                     break;
-                case jobKey.startsWith('2GuardPos'):
+                case jobKey.startsWith('GuardPos'):
                     result = JobGuardPosition(creep, roomJob);
                     break;
-                case jobKey.startsWith('2GuardGunPos'):
+                case jobKey.startsWith('GuardGunPos'):
                     result = JobGuardGunnerPosition(creep, roomJob);
                     break;
-                case jobKey.startsWith('2GuardMedPos'):
+                case jobKey.startsWith('GuardMedPos'):
                     result = JobGuardMedicPosition(creep, roomJob);
                     break;
-                case jobKey.startsWith('2HarvestPos'):
+                case jobKey.startsWith('HarvestPos'):
                     result = JobHarvesterPosition(creep, roomJob);
                     break;
-                case jobKey.startsWith('2TransPos'):
+                case jobKey.startsWith('TransPos'):
                     result = JobTransporterPosition(creep, roomJob);
                     break;
-                case jobKey.startsWith('2BuildPos'):
+                case jobKey.startsWith('BuildPos'):
                     result = JobBuilderPosition(creep, roomJob);
                     break;
-                case jobKey.startsWith('6FillLabMin'):
+                case jobKey.startsWith('FillLabMin'):
                     result = JobFillLabMineral(creep, roomJob);
                     break;
-                case jobKey.startsWith('5EmptyLabMin'):
+                case jobKey.startsWith('EmptyLabMin'):
                     result = JobEmptyLabMineral(creep, roomJob);
                     break;
-                case jobKey.startsWith('3AtkP'):
+                case jobKey.startsWith('AtkP'):
                     result = JobAttackPowerBank(creep, roomJob);
                     break;
-                case jobKey.startsWith('3MedP'):
+                case jobKey.startsWith('MedP'):
                     result = JobMedicPowerBank(creep, roomJob);
                     break;
-                case jobKey.startsWith('1TrnsprtP'):
+                case jobKey.startsWith('TrnsprtP'):
                     result = JobTransportPowerBank(creep, roomJob);
                     break;
-                case jobKey.startsWith('5HrvstDpst'):
+                case jobKey.startsWith('HrvstDpst'):
                     result = JobHarvestDeposit(creep, roomJob);
                     break;
                 default:

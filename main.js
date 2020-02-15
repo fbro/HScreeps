@@ -93,10 +93,6 @@ module.exports.loop = function () {
     // TODO now that creeps get renewed when near a spawn - T creeps will not dissappear and the extra T creeps from Power transport will clog it up. we need to recycle them!
     // TODO solution to this is that once max creeps is exceeded then recycle creeps when maxcreeps is surpassed
 
-// TODO by prioritizing jobs, the low prioritized jobs may never begin - that is a problem - maybe try and completely remove prioritization altogether
-    // I am currently testing this by commenting out SortObj in CreateJobs.js
-
-
 // lab reactions
 
 // attack NPC strongholds
