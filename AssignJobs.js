@@ -2,9 +2,6 @@ let Util = require('Util');
 const AssignJobs = {
     run: function () {
 
-        const MINIMUM_ENERGY_REQUIRED = 200; // the smallest creep that a spawn can create
-        const FLAG_JOB = 2;
-
         // assign jobs to creeps or create the creeps like this:
         // look for idle creep with correct type in room
         // if failed then create that creep in room
@@ -37,7 +34,7 @@ const AssignJobs = {
                 }
             });
             const availableSpawns = _.filter(Game.spawns, function (spawn) {
-                return spawn.spawning === null && spawn.room.energyAvailable >= MINIMUM_ENERGY_REQUIRED;
+                return spawn.spawning === null && spawn.room.energyAvailable >= Util.MINIMUM_ENERGY_REQUIRED;
             });
             for (const memRoomKey in Memory.MemRooms) {
                 const memRoom = Memory.MemRooms[memRoomKey];
@@ -82,7 +79,7 @@ const AssignJobs = {
 
         /**@return {boolean}*/
         function AssignCreepOtherRoom(roomJob, idleCreeps, roomJobKey, memRoomKey) {
-            if (roomJob.JobType === FLAG_JOB) {
+            if (roomJob.JobType === Util.FLAG_JOB) {
                 // loop through all creeps of desired creepType and assign the nearest one to the job
                 let nearestCreep;
                 let bestRange = Number.MAX_SAFE_INTEGER;
@@ -155,7 +152,7 @@ const AssignJobs = {
                     const availableSpawn = availableSpawns[availableSpawnCounter];
                     const linearDistance = Game.map.getRoomLinearDistance(availableSpawn.pos.roomName, roomOnJobKey);
                     let energyAvailableModifier = 0;
-                    if (roomJob.JobType === FLAG_JOB) { // on flag jobs one wants to share the load between rooms with more energy
+                    if (roomJob.JobType === Util.FLAG_JOB) { // on flag jobs one wants to share the load between rooms with more energy
                         switch (true) {
                             case availableSpawn.room.energyAvailable < 500:
                                 energyAvailableModifier = -1;
@@ -290,7 +287,7 @@ const AssignJobs = {
                         }
                     }
                 }
-                Util.InfoLog('AssignJobs', 'ShouldSpawnCreep', 'new MaxCreeps ' + creepType + ' ' + roomKey + ' maxCreepsInRoom ' + maxCreepsInRoom + ' addedCreeps ' + addedCreeps);
+                Util.Info('AssignJobs', 'ShouldSpawnCreep', 'new MaxCreeps ' + creepType + ' ' + roomKey + ' maxCreepsInRoom ' + maxCreepsInRoom + ' addedCreeps ' + addedCreeps);
             }
             return (Object.keys(memRoom.MaxCreeps[creepType]).length - 1) < maxCreepsInRoom;
         }

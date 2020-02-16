@@ -53,3 +53,11 @@ for(const structureKey in structures){
 
 // get something in a rooms memory
 Memory.MemRooms['E29S29'].FctrId = undefined;
+
+// test spawn transporters
+Game.spawns['Spawn3'].spawnCreep([CARRY, CARRY, MOVE], 'T51');
+Game.spawns['Spawn17'].spawnCreep([CARRY, CARRY, MOVE], 'T52');
+Game.spawns['Spawn9'].spawnCreep([CARRY, CARRY, MOVE], 'T53');
+
+console.log((Object.keys(Memory.MemRooms['E29S31'].MaxCreeps['T']).length - 1))
+console.log(JSON.stringify(Memory.MemRooms['E29S31'].MaxCreeps['T']['M']))

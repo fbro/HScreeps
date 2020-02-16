@@ -6,7 +6,7 @@ const Util = {
     TERMINAL_MAX_RESOURCE: 6000,
     TERMINAL_MAX_ENERGY: 90000,
     // if storage contains more or equal of high then creep should transfer to terminal until high_transfer is in terminal
-    TERMINAL_STORAGE_ENERGY_HIGH: 200000,
+    TERMINAL_STORAGE_ENERGY_HIGH: 300000,
     TERMINAL_STORAGE_ENERGY_HIGH_TRANSFER: 100000,
     TERMINAL_STORAGE_ENERGY_MEDIUM: 100000,
     TERMINAL_STORAGE_ENERGY_MEDIUM_TRANSFER: 80000,
@@ -26,6 +26,8 @@ const Util = {
     // job type int enum
     OBJECT_JOB : 1,
     FLAG_JOB : 2,
+
+    MINIMUM_ENERGY_REQUIRED : 200,  // the smallest creep that a spawn can create
 
     DO_EXTRACTING_WHEN_STORAGE_OVER_ENERGY : 50000, // do not extract minerals when low on storage energy
     DO_EXTRACTING_WHEN_STORAGE_UNDER_MINERAL : 200000, // stop extracting mineral when one has more than this

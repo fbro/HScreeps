@@ -34,7 +34,7 @@ const Terminals = {
         /**@return {number}*/
         function DistributeResources(fromTerminal, terminals, terminalSendCount) {
             for (const resourceType in fromTerminal.store) { // for each resource type
-                let fromAmount = fromTerminal.store.getUsedCapacity(resourceType);
+                let fromAmount = fromTerminal.store[resourceType];
                 let target;
                 if(resourceType === RESOURCE_PHLEGM && fromAmount > 0) { // PHLEGM should only be sent to a terminal that has a factory of level 2
                     terminalSendCount = DistributeFactoryCommodities(terminalSendCount, fromTerminal, resourceType, fromAmount, 2);
@@ -49,7 +49,7 @@ const Terminals = {
                     }
                     for (const toTerminalKey in terminals) {
                         const toTerminal = terminals[toTerminalKey];
-                        const toAmount = toTerminal.store.getUsedCapacity(resourceType);
+                        const toAmount = toTerminal.store[resourceType];
                         if (terminalSendCount < 10
                             && fromAmount > (target + 500/*buffer to prevent many small send*/)
                             && toAmount < target
@@ -79,7 +79,9 @@ const Terminals = {
             if(terminalSendCount < 10) {
                 for (const toTerminalKey in terminals) {
                     const toTerminal = terminals[toTerminalKey];
-                    if (toTerminal.id !== fromTerminal.id && toTerminal.room.find(FIND_MY_STRUCTURES, {
+                    if (toTerminal.id !== fromTerminal.id
+                        && toTerminal.store.getUsedCapacity(resourceType) < Util.TERMINAL_STORAGE_HIGH_TRANSFER // do not transfer anymore commodities if toTerminal already has more than TERMINAL_STORAGE_HIGH_TRANSFER
+                        && toTerminal.room.find(FIND_MY_STRUCTURES, {
                         filter: function (s) {
                             return s.structureType === STRUCTURE_FACTORY && (factoryLevel === s.level || factoryLevel === 0);
                         }

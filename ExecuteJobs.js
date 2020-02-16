@@ -93,11 +93,14 @@ const ExecuteJobs = {
                                 result = Move(gameCreep, gameCreep.room.storage);
                             }
                             gameCreep.say('idle 📦' + result);
-                        } else if (!gameCreep.room.controller || !gameCreep.room.controller.my || gameCreep.memory.MoveHome) { // I do not own the room the idle creep is in - move it to an owned room!
+                        } else if (!gameCreep.room.controller
+                            || !gameCreep.room.controller.my
+                            || gameCreep.memory.MoveHome
+                            || !Memory.MemRooms[gameCreep.pos.roomName].MaxCreeps[creepName.substring(0, 1)][creepName]) { // I do not own the room the idle creep is in - move it to an owned room!
                             let closestOwnedRoom;
                             if (!gameCreep.memory.MoveHome) {
                                 let bestDistance = Number.MAX_SAFE_INTEGER;
-                                for (const memRoomKey in Memory.MemRooms) { // search for best storage
+                                for (const memRoomKey in Memory.MemRooms) {
                                     if (Game.rooms[memRoomKey] && Game.rooms[memRoomKey].controller && Game.rooms[memRoomKey].controller.my) { // exist and has room
                                         const distance = Game.map.getRoomLinearDistance(gameCreep.pos.roomName, memRoomKey);
                                         if (distance < bestDistance) {
@@ -165,6 +168,24 @@ const ExecuteJobs = {
                                     result = Move(gameCreep, damagedCreep);
                                 }
                             }
+                        } else {
+                            const creepType = creepName.substring(0, 1);
+                            const maxCreeps = Memory.MemRooms[gameCreep.pos.roomName].MaxCreeps;
+                            if ((Object.keys(maxCreeps[creepType]).length - 1) > maxCreeps[creepType]['M']) { // check if creepType is overrepresented in this room - recycle creep
+                                const closestSpawn = gameCreep.pos.findClosestByPath(FIND_MY_STRUCTURES, {
+                                    filter: (s) => {
+                                        return s.structureType === STRUCTURE_SPAWN;
+                                    }
+                                });
+                                if (closestSpawn) {
+                                    result = closestSpawn.recycleCreep(gameCreep);
+                                    if (result === ERR_NOT_IN_RANGE) {
+                                        result = Move(gameCreep, closestSpawn);
+                                    } else {
+                                        Util.Info('ExecuteJobs', 'ExecuteRoomJobs', 'idle ' + gameCreep.name + ' recycled. MaxCreeps ' + maxCreeps[creepType]['M'] + ' current ' + (Object.keys(maxCreeps[creepType]).length - 1) + ' in ' + gameCreep.pos.roomName);
+                                    }
+                                }
+                            }
                         }
                     }
                 }
@@ -220,8 +241,7 @@ const ExecuteJobs = {
                             }
                         }
                     }
-                    // TODO deactivated for now
-                    if(false && (600 / gameCreep.body.length + gameCreep.ticksToLive) <= 1500) { // spawn renew functionality
+                    if((600 / gameCreep.body.length + gameCreep.ticksToLive) <= 1500) { // spawn renew functionality
                         const spawn = gameCreep.pos.findInRange(FIND_MY_STRUCTURES, 1, {
                             filter: (s) => {
                                 return s.structureType === STRUCTURE_SPAWN && !s.spawning;
