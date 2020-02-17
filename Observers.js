@@ -40,8 +40,8 @@ const Observers = {
             const lon = parseInt(lonLat[0], 10);
             const lat = parseInt(lonLat[1], 10);
             let numOfScansFound = 0;
-            for (let o = (-4 + lon); o <= (4 + lon); o++) {
-                for (let a = (-5 + lat); a <= (5 + lat); a++) {
+            for (let o = (-Util.OBSERVER_SCAN_RADIUS_POWER_DEPOSIT + lon); o <= (Util.OBSERVER_SCAN_RADIUS_POWER_DEPOSIT + lon); o++) {
+                for (let a = (-Util.OBSERVER_SCAN_RADIUS_POWER_DEPOSIT + lat); a <= (Util.OBSERVER_SCAN_RADIUS_POWER_DEPOSIT + lat); a++) {
                     let modLonQ = lonLatQuadrant[0];
                     let modLatQ = lonLatQuadrant[1];
                     let modLon = o;

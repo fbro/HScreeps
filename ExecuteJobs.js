@@ -96,7 +96,8 @@ const ExecuteJobs = {
                         } else if (!gameCreep.room.controller
                             || !gameCreep.room.controller.my
                             || gameCreep.memory.MoveHome
-                            || !Memory.MemRooms[gameCreep.pos.roomName].MaxCreeps[creepName.substring(0, 1)][creepName]) { // I do not own the room the idle creep is in - move it to an owned room!
+                            || Memory.MemRooms[gameCreep.pos.roomName].MaxCreeps[creepName.substring(0, 1)]
+                                && !Memory.MemRooms[gameCreep.pos.roomName].MaxCreeps[creepName.substring(0, 1)][creepName]) { // I do not own the room the idle creep is in - move it to an owned room!
                             let closestOwnedRoom;
                             if (!gameCreep.memory.MoveHome) {
                                 let bestDistance = Number.MAX_SAFE_INTEGER;
@@ -171,7 +172,7 @@ const ExecuteJobs = {
                         } else {
                             const creepType = creepName.substring(0, 1);
                             const maxCreeps = Memory.MemRooms[gameCreep.pos.roomName].MaxCreeps;
-                            if ((Object.keys(maxCreeps[creepType]).length - 1) > maxCreeps[creepType]['M']) { // check if creepType is overrepresented in this room - recycle creep
+                            if (maxCreeps && maxCreeps[creepType] && (Object.keys(maxCreeps[creepType]).length - 1) > maxCreeps[creepType]['M']) { // check if creepType is overrepresented in this room - recycle creep
                                 const closestSpawn = gameCreep.pos.findClosestByPath(FIND_MY_STRUCTURES, {
                                     filter: (s) => {
                                         return s.structureType === STRUCTURE_SPAWN;

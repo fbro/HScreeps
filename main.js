@@ -89,6 +89,7 @@ module.exports.loop = function () {
 };
 
 // TODOs:
+// TODO warrior and medics attacking a powerbank must be able to defend against other creeps
 
 // lab reactions
 
