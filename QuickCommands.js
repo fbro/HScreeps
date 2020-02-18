@@ -45,9 +45,9 @@ console.log(Game.rooms['E28S29'].energyAvailable);
 
 console.log('RESOURCE_ENERGY ' + Game.getObjectById('5cf1a7158e8ea635474264ca').store.getUsedCapacity(RESOURCE_POWER));
 
-const structures = Game.rooms['E32S28'].find(FIND_STRUCTURES, {filter: function (s) {return s.structureType === STRUCTURE_EXTENSION;}});
+const structures = Game.rooms['E34S29'].find(FIND_CONSTRUCTION_SITES);
 for(const structureKey in structures){
-    structures[structureKey].destroy();
+    structures[structureKey].remove();
 }
 
 

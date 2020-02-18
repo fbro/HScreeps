@@ -516,7 +516,7 @@ const ExecuteJobs = {
             const result = GenericJobAction(creep, roomJob, {
                 /**@return {int}*/
                 JobStatus: function (jobObject) {
-                    if (creep.store.getUsedCapacity(RESOURCE_ENERGY) === 0) { // fetch
+                    if (creep.store.getUsedCapacity(RESOURCE_ENERGY) === 0 || creep.memory.FetchObjectId) { // fetch
                         return SHOULD_FETCH;
                     } else { // action not done yet
                         return SHOULD_ACT;
@@ -533,10 +533,27 @@ const ExecuteJobs = {
                 /**@return {object}
                  * @return {undefined}*/
                 FindFetchObject: function (jobObject) {
-                    return FindFetchResource(creep, jobObject, RESOURCE_ENERGY);
+                    let energySupply = FindFetchResource(creep, jobObject, RESOURCE_ENERGY);
+                    if(!energySupply && creep.room.controller && creep.room.controller.my && creep.room.controller.level < 3){ // try and harvest
+                        const source = creep.pos.findClosestByPath(FIND_SOURCES_ACTIVE);
+                        if(source){
+                            return source;
+                        }
+                    }
+                    return energySupply
                 },
                 /**@return {int}*/
                 Fetch: function (fetchObject, jobObject) {
+                    if(fetchObject.energyCapacity && creep.room.controller && creep.room.controller.my && creep.room.controller.level < 3){ // this is a source - harvest it
+                        let result = creep.harvest(fetchObject);
+                        if(result === ERR_NOT_IN_RANGE){
+                            result = Move(creep, fetchObject);
+                        }
+                        if(result === OK && creep.store.getFreeCapacity() > 0){
+                            result = ERR_BUSY;
+                        }
+                        return result;
+                    }
                     return FetchResource(creep, fetchObject, RESOURCE_ENERGY);
                 },
             });
@@ -625,7 +642,7 @@ const ExecuteJobs = {
             const result = GenericJobAction(creep, roomJob, {
                 /**@return {int}*/
                 JobStatus: function (jobObject) {
-                    if (creep.store.getUsedCapacity(RESOURCE_ENERGY) === 0) { // fetch
+                    if (creep.store.getUsedCapacity(RESOURCE_ENERGY) === 0 || creep.memory.FetchObjectId) { // fetch
                         return SHOULD_FETCH;
                     } else { // action not done yet
                         return SHOULD_ACT;
@@ -642,10 +659,27 @@ const ExecuteJobs = {
                 /**@return {object}
                  * @return {undefined}*/
                 FindFetchObject: function (jobObject) {
-                    return FindFetchResource(creep, jobObject, RESOURCE_ENERGY);
+                    let energySupply = FindFetchResource(creep, jobObject, RESOURCE_ENERGY);
+                    if(!energySupply && creep.room.controller && creep.room.controller.my && creep.room.controller.level < 3){ // try and harvest
+                        const source = creep.pos.findClosestByPath(FIND_SOURCES_ACTIVE);
+                        if(source){
+                            return source;
+                        }
+                    }
+                    return energySupply
                 },
                 /**@return {int}*/
                 Fetch: function (fetchObject, jobObject) {
+                    if(fetchObject.energyCapacity && creep.room.controller && creep.room.controller.my && creep.room.controller.level < 3){ // this is a source - harvest it
+                        let result = creep.harvest(fetchObject);
+                        if(result === ERR_NOT_IN_RANGE){
+                            result = Move(creep, fetchObject);
+                        }
+                        if(result === OK && creep.store.getFreeCapacity() > 0){
+                            result = ERR_BUSY;
+                        }
+                        return result;
+                    }
                     return FetchResource(creep, fetchObject, RESOURCE_ENERGY);
                 },
             });
@@ -2032,7 +2066,7 @@ const ExecuteJobs = {
                         }
                         if (deposit && deposit.cooldown === 0) {
                             return creep.harvest(deposit)
-                        } else if (deposit && deposit.lastCooldown > 70) {
+                        } else if (deposit && deposit.lastCooldown > Util.DEPOSIT_MAX_LAST_COOLDOWN) {
                             Util.InfoLog('ExecuteJobs', 'JobHarvestDeposit', creep.name + ' removed deposit in ' + jobObject.pos.roomName + ' lastCooldown ' + deposit.lastCooldown);
                             jobObject.remove();
                             return JOB_IS_DONE;

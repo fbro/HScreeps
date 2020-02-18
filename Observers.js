@@ -115,28 +115,17 @@ const Observers = {
                         delete observerRoom.PowerBankFlag;
                     }
 
-                    // DepositFlag
-                    if (!observerRoom.DepositFlag) {
-                        const deposit = LookForDeposit(roomKey, observer, observerRoomKey);
-                        if (deposit) {
-                            if (deposit.LastCooldown < 70 && !shouldVacateHallway) {
-                                observerRoom.DepositFlag = deposit;
-                                const result = Game.rooms[deposit.pos.roomName].createFlag(deposit.pos, CreateFlagName(deposit.Type, deposit.pos.roomName, observerRoomKey), COLOR_ORANGE, COLOR_CYAN);
-                                Util.Info('Observers', 'ScanPowerBanksAndDeposits', 'add ' + deposit.pos.roomName + ' ' + deposit.Type + ' ' + deposit.pos + ' ' + deposit.FreeSpaces + ' result ' + result);
-                            }
+                    const deposits = Game.rooms[roomKey].find(FIND_DEPOSITS, {
+                        filter: function (deposit) {
+                            return deposit.lastCooldown < Util.DEPOSIT_MAX_LAST_COOLDOWN;
                         }
-                    } else if (observerRoom.DepositFlag
-                        && (observerRoom.DepositFlag.LastCooldown > 70
-                            || observerRoom.DepositFlag.pos.roomName === roomKey &&
-                                (!Game.rooms[roomKey].lookForAt(LOOK_DEPOSITS, observerRoom.DepositFlag.pos.x, observerRoom.DepositFlag.pos.y)[0]
-                                || !Game.rooms[roomKey].lookForAt(LOOK_FLAGS, observerRoom.DepositFlag.pos.x, observerRoom.DepositFlag.pos.y)[0])
-                    )) {
-                        Util.Info('Observers', 'ScanPowerBanksAndDeposits', 'delete ' + JSON.stringify(observerRoom.DepositFlag));
-                        delete observerRoom.DepositFlag;
-                    } else if (observerRoom.DepositFlag && observerRoom.DepositFlag.pos.roomName === roomKey) { // if room is the same then update deposit
-                        const deposit = Game.rooms[roomKey].lookForAt(LOOK_DEPOSITS, observerRoom.DepositFlag.pos.x, observerRoom.DepositFlag.pos.y)[0];
-                        if (deposit) {
-                            observerRoom.DepositFlag.LastCooldown = deposit.lastCooldown;
+                    });
+                    for(const depositKey in deposits){
+                        const deposit = deposits[depositKey];
+                        console.log('Test ' + deposit + ' ' + depositKey);
+                        if(!deposit.pos.lookFor(LOOK_FLAGS)[0]){ // if there are no flags on deposit then add a flag
+                            const result = Game.rooms[deposit.pos.roomName].createFlag(deposit.pos, CreateFlagName('deposit', deposit.pos.roomName, observerRoomKey), COLOR_ORANGE, COLOR_CYAN);
+                            Util.Info('Observers', 'ScanPowerBanksAndDeposits', 'add ' + deposit.pos.roomName + ' ' + 'deposit' + ' ' + deposit.pos + ' ' + deposit.FreeSpaces + ' result ' + result);
                         }
                     }
 
@@ -146,29 +135,6 @@ const Observers = {
             }
             if (numOfScansLeft === 0) {
                 observerRoom.MapReScan = true;
-            }
-        }
-
-        function LookForDeposit(roomKey, observer, observerRoomKey) { // room need to be visible!
-            const deposit = Game.rooms[roomKey].find(FIND_DEPOSITS, {
-                filter: function (deposit) {
-                    return deposit.lastCooldown < 70;
-                }
-            })[0];
-            if (deposit && !deposit.pos.lookFor(LOOK_FLAGS)[0]) { // only add flag if no other deposit flags are present
-                const freeSpaces = Util.FreeSpaces(deposit.pos);
-                const depositScan = {
-                    'Type': 'deposit',
-                    'Id': deposit.id,
-                    'pos': deposit.pos,
-                    'Deadline': deposit.ticksToDecay + Game.time,
-                    'DepositType': deposit.depositType,
-                    'LastCooldown': deposit.lastCooldown,
-                    'FreeSpaces': freeSpaces,
-                    'ObserverId': observer.id,
-                    'FlagName': CreateFlagName('deposit', roomKey, observerRoomKey)
-                };
-                return depositScan;
             }
         }
 
