@@ -770,11 +770,12 @@ const ExecuteJobs = {
                 /**@return {int}*/
                 JobStatus: function (jobObject) {
                     let creepSum = creep.store.getUsedCapacity();
-                    if (!jobObject && creepSum === 0) { // if the target is a dropped resource it may just disappear because it was picked up
+                    if (!jobObject && creepSum === 0 // if the target is a dropped resource it may just disappear because it was picked up
+                        || jobObject.structureType === STRUCTURE_TERMINAL && (jobObject.store.getUsedCapacity(RESOURCE_ENERGY) < Util.TERMINAL_STORAGE_ENERGY_MEDIUM_TRANSFER && jobObject.room.storage.store.getUsedCapacity(RESOURCE_ENERGY) >= Util.TERMINAL_STORAGE_ENERGY_LOW)) {
                         return JOB_IS_DONE;
                     } else if (jobObject && (creepSum === 0 || !creep.memory.Depositing && creepSum < creep.store.getCapacity() && creep.pos.getRangeTo(jobObject) <= 1
                         && (jobObject.resourceType || (jobObject.store.getUsedCapacity() > 0
-                            || jobObject.structureType === STRUCTURE_TERMINAL && (jobObject.store.getUsedCapacity(RESOURCE_ENERGY) > 120000 || jobObject.room.storage.store.getUsedCapacity(RESOURCE_ENERGY) < 5000 && jobObject.store.getUsedCapacity(RESOURCE_ENERGY) > 0))))
+                            || jobObject.structureType === STRUCTURE_TERMINAL && (jobObject.store.getUsedCapacity(RESOURCE_ENERGY) >= Util.TERMINAL_STORAGE_ENERGY_HIGH_TRANSFER || jobObject.room.storage.store.getUsedCapacity(RESOURCE_ENERGY) < Util.TERMINAL_STORAGE_ENERGY_LOW && jobObject.store.getUsedCapacity(RESOURCE_ENERGY) > 0))))
                     ) {
                         creep.memory.Depositing = undefined;
                         return SHOULD_ACT; // get resources from target
@@ -2041,11 +2042,11 @@ const ExecuteJobs = {
             const result = GenericFlagAction(creep, roomJob, {
                 /**@return {int}*/
                 JobStatus: function (jobObject) {
-                    if (creep.store.getUsedCapacity() === 0 && creep.ticksToLive < 500) {
+                    if (creep.store.getUsedCapacity() === 0 && creep.ticksToLive < 400) {
                         Util.Info('ExecuteJobs', 'JobHarvestDeposit', creep.name + ' committed suicide creep.ticksToLive ' + creep.ticksToLive + ' JOB_IS_DONE');
                         creep.suicide();
                         return JOB_IS_DONE;
-                    } else if (creep.store.getFreeCapacity() === 0 || creep.memory.FetchObjectId && creep.store.getUsedCapacity() > 0 || creep.ticksToLive < 500) {
+                    } else if (creep.store.getFreeCapacity() === 0 || creep.memory.FetchObjectId && creep.store.getUsedCapacity() > 0 || creep.ticksToLive < 400) {
                         return SHOULD_FETCH;
                     } else {
                         return SHOULD_ACT;

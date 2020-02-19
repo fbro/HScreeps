@@ -47,6 +47,8 @@ module.exports.loop = function () {
                                     Util.ErrorLog('Main', 'Main', 'Lingering MaxCreeps found and removed ' + creepKey + ' in ' + memRoomKey);
                                     memRoom.MaxCreeps[creepTypesKey][creepKey] = undefined;
                                 }
+                            }else{
+                                memRoom.MaxCreeps[creepTypesKey][creepKey] = undefined; // reset
                             }
                         }
                     }
@@ -91,8 +93,6 @@ module.exports.loop = function () {
 // TODOs:
 // TODO warrior and medics attacking a powerbank must be able to defend against other creeps
 // TODO fillstorage and fill terminal energy - it is still possible for both jobs to be present - :(
-// TODO handle deposit harvester better in regards to regen or "re summon" the creep
-// TODO MaxCreeps and removeCreep is clashing where I allow more creeps in the room than MaxCreeps number states
 
 // lab reactions
 

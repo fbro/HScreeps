@@ -227,36 +227,33 @@ const AssignJobs = {
             let maxCreepsInRoom = 3;
             if (memRoom.MaxCreeps[creepType] && memRoom.MaxCreeps[creepType].M) {
                 maxCreepsInRoom = memRoom.MaxCreeps[creepType].M;
-                if (creepType === 'H' && memRoom.RoomLevel < 3) {
-                    maxCreepsInRoom += memRoom.SourceNumber;
-                } else if (creepType === 'B') {
-                    if (memRoom.RoomLevel < 8) {
-                        maxCreepsInRoom += 1;
-                        if (memRoom.RoomLevel < 3) {
-                            maxCreepsInRoom += 1;
-                        }
-                    } else if (memRoom.RoomLevel === 8 && Game.rooms[roomKey].storage && Game.rooms[roomKey].storage.store.getUsedCapacity(RESOURCE_ENERGY) > Util.SPAWN_EXTRA_B_WHEN_STORAGE_ENERGY) {
-                        maxCreepsInRoom += 3;
-                    }
-                }
             } else { // this code should only run when a reset happens
                 switch (creepType) {
                     case 'T': // transporter
-                        if (memRoom.SourceNumber === -1 || memRoom.SourceNumber === 0) {
+                        if (memRoom.SourceNumber === 0) {
                             maxCreepsInRoom = 4;
                         } else {
                             maxCreepsInRoom = memRoom.SourceNumber;
                         }
                         break;
                     case 'H': // harvester
-                        if (memRoom.SourceNumber === -1 || memRoom.SourceNumber === 0) {
+                        if (memRoom.SourceNumber === 0) {
                             maxCreepsInRoom = 3;
                         } else {
                             maxCreepsInRoom = memRoom.SourceNumber;
                         }
+                        if (memRoom.RoomLevel < 3) {
+                            maxCreepsInRoom += memRoom.SourceNumber;
+                        }
                         break;
                     case 'B': // builder
                         maxCreepsInRoom = 2;
+                        if (memRoom.RoomLevel < 8) {
+                            maxCreepsInRoom += 1;
+                            if (memRoom.RoomLevel < 3) {
+                                maxCreepsInRoom += 1;
+                            }
+                        }
                         break;
                     case 'E': // extractor
                         maxCreepsInRoom = 1;
@@ -265,29 +262,30 @@ const AssignJobs = {
                     case 'G': // gunner
                     case 'M': // medic
                     case 'S': // scout
+                        maxCreepsInRoom = 3;
+                        break;
                     case 'C': // claimer
                     case 'R': // reserver
+                        if (!Game.rooms[roomKey] || Game.rooms[roomKey].controller && Game.rooms[roomKey].controller.level === 0) {
+                            maxCreepsInRoom = 1;
+                        } else {
+                            maxCreepsInRoom = 0;
+                        }
+                        break;
                     case 'D': // distantHarvester
-                        maxCreepsInRoom = 3;
+                        if (!Game.rooms[roomKey] && !Game.rooms[roomKey].controller || Game.rooms[roomKey].controller && Game.rooms[roomKey].controller.level === 0) {
+                            maxCreepsInRoom = 6;
+                        } else {
+                            maxCreepsInRoom = 0;
+                        }
                         break;
                     default:
                         Util.ErrorLog('AssignJobs', 'ShouldSpawnCreep', 'creep type not found ' + creepType);
                 }
-                memRoom.MaxCreeps[creepType] = {
-                    'M': maxCreepsInRoom,
-                };
-                // loop through all creeps
-                let addedCreeps = '';
-                for (const creepName in Game.creeps) {
-                    const gameCreep = Game.creeps[creepName];
-                    if (gameCreep.name.substring(0, 1) === creepType) {
-                        if (gameCreep.memory.JobName && gameCreep.memory.JobName.split(')').pop() === roomKey) { // creep that is employed in this room
-                            memRoom.MaxCreeps[creepType][gameCreep.name] = gameCreep.name;
-                            addedCreeps += gameCreep.name + ' '
-                        }
-                    }
+                if(!memRoom.MaxCreeps[creepType]){
+                    memRoom.MaxCreeps[creepType] = {};
                 }
-                Util.Info('AssignJobs', 'ShouldSpawnCreep', 'new MaxCreeps ' + creepType + ' ' + roomKey + ' maxCreepsInRoom ' + maxCreepsInRoom + ' addedCreeps ' + addedCreeps);
+                memRoom.MaxCreeps[creepType]['M'] = maxCreepsInRoom;
             }
             return (Object.keys(memRoom.MaxCreeps[creepType]).length - 1) < maxCreepsInRoom;
         }

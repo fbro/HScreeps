@@ -3,8 +3,10 @@
   <component name="ChangeListManager">
     <list default="true" id="7b6f36cb-4298-4902-b6a2-ea3816b3b82c" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/QuickCommands.js" beforeDir="false" afterPath="$PROJECT_DIR$/QuickCommands.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Terminals.js" beforeDir="false" afterPath="$PROJECT_DIR$/Terminals.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/AssignJobs.js" beforeDir="false" afterPath="$PROJECT_DIR$/AssignJobs.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/CreateJobs.js" beforeDir="false" afterPath="$PROJECT_DIR$/CreateJobs.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ExecuteJobs.js" beforeDir="false" afterPath="$PROJECT_DIR$/ExecuteJobs.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Util.js" beforeDir="false" afterPath="$PROJECT_DIR$/Util.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.js" beforeDir="false" afterPath="$PROJECT_DIR$/main.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -127,13 +129,6 @@
       <workItem from="1576169775768" duration="190690000" />
       <workItem from="1578583491605" duration="22323000" />
       <workItem from="1579172967628" duration="105663000" />
-    </task>
-    <task id="LOCAL-00110" summary="small changes">
-      <created>1576189022629</created>
-      <option name="number" value="00110" />
-      <option name="presentableId" value="LOCAL-00110" />
-      <option name="project" value="LOCAL" />
-      <updated>1576189022630</updated>
     </task>
     <task id="LOCAL-00111" summary="small changes">
       <created>1576272313716</created>
@@ -471,7 +466,14 @@
       <option name="project" value="LOCAL" />
       <updated>1582128099921</updated>
     </task>
-    <option name="localTasksCounter" value="159" />
+    <task id="LOCAL-00159" summary="small changes">
+      <created>1582133311863</created>
+      <option name="number" value="00159" />
+      <option name="presentableId" value="LOCAL-00159" />
+      <option name="project" value="LOCAL" />
+      <updated>1582133311863</updated>
+    </task>
+    <option name="localTasksCounter" value="160" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -539,11 +541,11 @@
     <option name="LAST_COMMIT_MESSAGE" value="small changes" />
   </component>
   <component name="WindowStateProjectService">
-    <state x="526" y="23" width="959" height="921" key="CommitChangelistDialog2" timestamp="1582128099252">
+    <state x="526" y="23" width="959" height="921" key="CommitChangelistDialog2" timestamp="1582133311255">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
     <state x="526" y="130" key="CommitChangelistDialog2/0.0.1920.1040@0.0.1920.1040" timestamp="1581018726375" />
-    <state x="526" y="23" width="959" height="921" key="CommitChangelistDialog2/0.0.1920.1080@0.0.1920.1080" timestamp="1582128099252" />
+    <state x="526" y="23" width="959" height="921" key="CommitChangelistDialog2/0.0.1920.1080@0.0.1920.1080" timestamp="1582133311255" />
     <state x="92" y="89" width="1536" height="858" key="DiffContextDialog" timestamp="1580240647833">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
@@ -553,11 +555,11 @@
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
     <state x="461" y="183" key="SettingsEditor/0.0.1920.1080@0.0.1920.1080" timestamp="1578585185476" />
-    <state x="552" y="274" key="Vcs.Push.Dialog.v2" timestamp="1582128102664">
+    <state x="552" y="274" key="Vcs.Push.Dialog.v2" timestamp="1582133312842">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
     <state x="552" y="264" key="Vcs.Push.Dialog.v2/0.0.1920.1040@0.0.1920.1040" timestamp="1581018728538" />
-    <state x="552" y="274" key="Vcs.Push.Dialog.v2/0.0.1920.1080@0.0.1920.1080" timestamp="1582128102664" />
+    <state x="552" y="274" key="Vcs.Push.Dialog.v2/0.0.1920.1080@0.0.1920.1080" timestamp="1582133312842" />
     <state x="92" y="96" width="1736" height="889" maximized="true" key="com.intellij.history.integration.ui.views.FileHistoryDialog" timestamp="1581697061330">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>

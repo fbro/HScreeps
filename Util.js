@@ -21,7 +21,6 @@ const Util = {
     TERMINAL_STORAGE_LOW_TRANSFER: 6000,
 
     SPAWN_LARGE_B_WHEN_STORAGE_ENERGY: 100000, // large builders are only allowed when the room has the required energy - the drawback is that upgrade controller takes alot of energy
-    SPAWN_EXTRA_B_WHEN_STORAGE_ENERGY: 600000, // allow a spawn of an extra builder when the room is flooding with excess energy
 
     // job type int enum
     OBJECT_JOB : 1,

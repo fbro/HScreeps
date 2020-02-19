@@ -185,7 +185,9 @@ const CreateJobs = {
                     if (gameRoom.controller && Memory.MemRooms[gameRoom.name].RoomLevel !== gameRoom.controller.level) { // room level change
                         Memory.MemRooms[gameRoom.name].RoomLevel = gameRoom.controller.level;
                         Memory.MemRooms[gameRoom.name].SourceNumber = gameRoom.find(FIND_SOURCES).length;
-                        Memory.MemRooms[gameRoom.name].MaxCreeps = {}; // reset - maybe the MaxCreepsInRoom changes with room level
+                        for(const maxCreepKey in Memory.MemRooms[gameRoom.name].MaxCreeps){
+                            Memory.MemRooms[gameRoom.name].MaxCreeps[maxCreepKey].M = undefined; // reset - maybe the MaxCreepsInRoom changes with room level
+                        }
                     }
                 }
             }
@@ -620,7 +622,7 @@ const CreateJobs = {
         function CreateRoom(roomName, jobs) {
             const gameRoom = Game.rooms[roomName];
             let level = -1;
-            let sourceNumber = -1;
+            let sourceNumber = 0;
             if (gameRoom) {
                 if (gameRoom.controller) {
                     level = gameRoom.controller.level;
