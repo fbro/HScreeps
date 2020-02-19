@@ -49,6 +49,9 @@ const Terminals = {
                     for (const toTerminalKey in terminals) {
                         const toTerminal = terminals[toTerminalKey];
                         const toAmount = toTerminal.store[resourceType];
+                        if(toTerminal.pos.roomName === 'E29S31'){
+                            continue; // TODO remove
+                        }
                         if (terminalSendCount < 10
                             && fromAmount > (target + 500/*buffer to prevent many small send*/)
                             && toAmount < target

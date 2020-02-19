@@ -45,9 +45,10 @@ console.log(Game.rooms['E28S29'].energyAvailable);
 
 console.log('RESOURCE_ENERGY ' + Game.getObjectById('5cf1a7158e8ea635474264ca').store.getUsedCapacity(RESOURCE_POWER));
 
-const structures = Game.rooms['E34S29'].find(FIND_CONSTRUCTION_SITES);
+// destroy all structures
+const structures = Game.rooms['E29S31'].find(FIND_STRUCTURES);
 for(const structureKey in structures){
-    structures[structureKey].remove();
+    structures[structureKey].destroy();
 }
 
 
@@ -61,3 +62,15 @@ Game.spawns['Spawn9'].spawnCreep([CARRY, CARRY, MOVE], 'T53');
 
 console.log((Object.keys(Memory.MemRooms['E29S31'].MaxCreeps['T']).length - 1))
 console.log(JSON.stringify(Memory.MemRooms['E29S31'].MaxCreeps['T']['M']))
+
+
+// empty a terminal
+const terminal = Game.getObjectById('5cf1a7158e8ea635474264ca');
+for(const resourceType in terminal.store){
+    const amount = terminal.store[resourceType];
+    if(resourceType !== RESOURCE_ENERGY && amount > 1){
+        terminal.send(resourceType, amount - 1, 'E28S29');
+    }
+}
+const terminal = Game.getObjectById('5cf1a7158e8ea635474264ca');
+terminal.send(RESOURCE_ENERGY, (terminal.store[RESOURCE_ENERGY] * 0.9), 'E28S29');

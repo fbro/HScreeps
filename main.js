@@ -92,6 +92,7 @@ module.exports.loop = function () {
 // TODO warrior and medics attacking a powerbank must be able to defend against other creeps
 // TODO fillstorage and fill terminal energy - it is still possible for both jobs to be present - :(
 // TODO handle deposit harvester better in regards to regen or "re summon" the creep
+// TODO MaxCreeps and removeCreep is clashing where I allow more creeps in the room than MaxCreeps number states
 
 // lab reactions
 
