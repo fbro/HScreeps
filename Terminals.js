@@ -84,7 +84,7 @@ const Terminals = {
                 for (const toTerminalKey in terminals) {
                     const toTerminal = terminals[toTerminalKey];
                     if (toTerminal.id !== fromTerminal.id
-                        && toTerminal.store.getUsedCapacity(resourceType) < Util.TERMINAL_STORAGE_HIGH_TRANSFER // do not transfer anymore commodities if toTerminal already has more than TERMINAL_STORAGE_HIGH_TRANSFER
+                        && toTerminal.store.getUsedCapacity(resourceType) < Util.TERMINAL_STORAGE_LOW_TRANSFER // do not transfer anymore commodities if toTerminal already has more than TERMINAL_STORAGE_HIGH_TRANSFER
                         && toTerminal.room.find(FIND_MY_STRUCTURES, {
                         filter: function (s) {
                             return s.structureType === STRUCTURE_FACTORY && (factoryLevel === s.level || factoryLevel === 0);

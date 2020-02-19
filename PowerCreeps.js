@@ -9,55 +9,58 @@ const PowerCreeps = {
             });
             for (const powerCreepKey in Game.powerCreeps) {
                 const powerCreep = Game.powerCreeps[powerCreepKey];
-                let result;
-                const flagWithCreepName = _.filter(powerCreepSpawnFlags, function (flag) {
-                    return flag.name === powerCreep.name;
-                })[0];
-                if (!flagWithCreepName) { // this creep does not have a flag - skip it
-                    continue;
-                } else if (!powerCreep.room && (!powerCreep.spawnCooldownTime || powerCreep.spawnCooldownTime < Game.time)) { // it has a flag but it is not spawned
-                    const powerSpawn = flagWithCreepName.pos.lookFor(LOOK_STRUCTURES, {
-                        filter: (s) => {
-                            return s.structureType === STRUCTURE_POWER_SPAWN;
-                        }
+                if(!powerCreep.shard || powerCreep.shard === Game.shard.name){ // if the creep is in another shard then just skip
+                    let result;
+                    const flagWithCreepName = _.filter(powerCreepSpawnFlags, function (flag) {
+                        return flag.name === powerCreep.name;
                     })[0];
-                    if (powerSpawn) {
-                        result = powerCreep.spawn(powerSpawn);
-                        Util.InfoLog('PowerCreeps', 'PowerCreepsActions', 'spawning ' + powerCreep.name + ' result ' + result + ' (' + powerSpawn.pos.x + ',' + powerSpawn.pos.y + ',' + powerSpawn.pos.roomName + ')');
-                    } else {
-                        Util.ErrorLog('PowerCreeps', 'PowerCreepsActions', 'removed flag, powerSpawn not found ' + flagWithCreepName.name + ' (' + flagWithCreepName.pos.x + ',' + flagWithCreepName.pos.y + ',' + flagWithCreepName.pos.roomName + ')');
-                        flagWithCreepName.remove();
-                    }
-                } else if (powerCreep.room) { // flag is found and the creep is spawned - do something
-                    if (powerCreep.ticksToLive < 500) { // power creep needs to be renewed
-                        result = RenewPowerCreep(powerCreep);
-                        Util.Info('PowerCreeps', 'PowerCreepsActions', 'trying to renew ' + powerCreep.name + ' result ' + result + ' ticksToLive ' + powerCreep.ticksToLive);
-                    } else if (powerCreep.room.controller && powerCreep.room.controller.my && !powerCreep.room.controller.isPowerEnabled) { // my room is not power enabled
-                        result = EnablePowerInRoom(powerCreep);
-                        Util.Info('PowerCreeps', 'PowerCreepsActions', 'trying to EnablePowerInRoom ' + powerCreep.name + ' ' + powerCreep.pos.roomName);
-                    } else if (powerCreep.className === POWER_CLASS.OPERATOR) { // power creep is not too old and power is enabled in the room
-                        if (!powerCreep.memory.OperateTerminalCooldown || !powerCreep.memory.RegenSource1Cooldown || !powerCreep.memory.RegenSource2Cooldown || !powerCreep.memory.OperateFactoryCooldown || !powerCreep.memory.RegenMineralCooldown) {
-                            powerCreep.memory.OperateTerminalCooldown = 1;
-                            powerCreep.memory.RegenSource1Cooldown = 1;
-                            powerCreep.memory.RegenSource2Cooldown = 1;
-                            powerCreep.memory.OperateFactoryCooldown = 1;
-                            powerCreep.memory.RegenMineralCooldown = 1;
+                    if (!flagWithCreepName && powerCreep.shard) { // this creep does not have a flag and is spawned - despawn it
+                        Util.InfoLog('PowerCreeps', 'PowerCreepsActions', 'no flag for ' + powerCreep.name + ' (' + powerCreep.pos.x + ',' + powerCreep.pos.y + ',' + powerCreep.pos.roomName + ') despawning creep');
+                        powerCreep.suicide();
+                    } else if (flagWithCreepName && !powerCreep.shard && (!powerCreep.spawnCooldownTime || powerCreep.spawnCooldownTime < Game.time)) { // it has a flag but it is not spawned
+                        const powerSpawn = flagWithCreepName.pos.lookFor(LOOK_STRUCTURES, {
+                            filter: (s) => {
+                                return s.structureType === STRUCTURE_POWER_SPAWN;
+                            }
+                        })[0];
+                        if (powerSpawn) {
+                            result = powerCreep.spawn(powerSpawn);
+                            Util.InfoLog('PowerCreeps', 'PowerCreepsActions', 'spawning ' + powerCreep.name + ' result ' + result + ' (' + powerSpawn.pos.x + ',' + powerSpawn.pos.y + ',' + powerSpawn.pos.roomName + ')');
+                        } else {
+                            Util.ErrorLog('PowerCreeps', 'PowerCreepsActions', 'removed flag, powerSpawn not found ' + flagWithCreepName.name + ' (' + flagWithCreepName.pos.x + ',' + flagWithCreepName.pos.y + ',' + flagWithCreepName.pos.roomName + ')');
+                            flagWithCreepName.remove();
                         }
+                    } else if (powerCreep.shard) { // flag is found and the creep is spawned - do something
+                        if (powerCreep.ticksToLive < 500) { // power creep needs to be renewed
+                            result = RenewPowerCreep(powerCreep);
+                            Util.Info('PowerCreeps', 'PowerCreepsActions', 'trying to renew ' + powerCreep.name + ' result ' + result + ' ticksToLive ' + powerCreep.ticksToLive);
+                        } else if (powerCreep.room.controller && powerCreep.room.controller.my && !powerCreep.room.controller.isPowerEnabled) { // my room is not power enabled
+                            result = EnablePowerInRoom(powerCreep);
+                            Util.Info('PowerCreeps', 'PowerCreepsActions', 'trying to EnablePowerInRoom ' + powerCreep.name + ' ' + powerCreep.pos.roomName);
+                        } else if (powerCreep.className === POWER_CLASS.OPERATOR) { // power creep is not too old and power is enabled in the room
+                            if (!powerCreep.memory.OperateTerminalCooldown || !powerCreep.memory.RegenSource1Cooldown || !powerCreep.memory.RegenSource2Cooldown || !powerCreep.memory.OperateFactoryCooldown || !powerCreep.memory.RegenMineralCooldown) {
+                                powerCreep.memory.OperateTerminalCooldown = 1;
+                                powerCreep.memory.RegenSource1Cooldown = 1;
+                                powerCreep.memory.RegenSource2Cooldown = 1;
+                                powerCreep.memory.OperateFactoryCooldown = 1;
+                                powerCreep.memory.RegenMineralCooldown = 1;
+                            }
 
-                        if (powerCreep.powers[PWR_GENERATE_OPS] && powerCreep.powers[PWR_GENERATE_OPS].cooldown === 0 && powerCreep.store.getFreeCapacity() > 0) {
-                            result = powerCreep.usePower(PWR_GENERATE_OPS); // if power creep is an operator - always use this power when available
-                        } else if (powerCreep.memory.OperateFactoryCooldown < Game.time && powerCreep.powers[PWR_OPERATE_FACTORY] && powerCreep.powers[PWR_OPERATE_FACTORY].cooldown === 0 && powerCreep.store.getUsedCapacity(RESOURCE_OPS) >= 100) {
-                            result = OperateFactory(powerCreep);
-                        } /*else if (powerCreep.memory.OperateTerminalCooldown < Game.time && powerCreep.store.getUsedCapacity(RESOURCE_OPS) >= 100 && powerCreep.powers[PWR_OPERATE_TERMINAL].cooldown === 0 && powerCreep.room.terminal && powerCreep.room.terminal.my) {
-                            result = OperateTerminal(powerCreep);
-                        }*/ else if ((powerCreep.memory.RegenSource1Cooldown < Game.time || powerCreep.memory.RegenSource2Cooldown < Game.time) && powerCreep.powers[PWR_REGEN_SOURCE] && powerCreep.powers[PWR_REGEN_SOURCE].cooldown === 0) {
-                            result = RegenSource(powerCreep);
-                        } else if (powerCreep.memory.RegenMineralCooldown < Game.time && powerCreep.powers[PWR_REGEN_MINERAL] && powerCreep.powers[PWR_REGEN_MINERAL].cooldown === 0) {
-                            result = RegenMineral(powerCreep);
-                        } else if (powerCreep.store.getUsedCapacity(RESOURCE_OPS) > 500 || powerCreep.store.getUsedCapacity(RESOURCE_OPS) === powerCreep.store.getCapacity()) {
-                            result = DepositOps(powerCreep);
-                        } else if (powerCreep.store.getUsedCapacity(RESOURCE_OPS) < 100) {
-                            result = WithdrawOps(powerCreep);
+                            if (powerCreep.powers[PWR_GENERATE_OPS] && powerCreep.powers[PWR_GENERATE_OPS].cooldown === 0 && powerCreep.store.getFreeCapacity() > 0) {
+                                result = powerCreep.usePower(PWR_GENERATE_OPS); // if power creep is an operator - always use this power when available
+                            } else if (powerCreep.memory.OperateFactoryCooldown < Game.time && powerCreep.powers[PWR_OPERATE_FACTORY] && powerCreep.powers[PWR_OPERATE_FACTORY].cooldown === 0 && powerCreep.store.getUsedCapacity(RESOURCE_OPS) >= 100) {
+                                result = OperateFactory(powerCreep);
+                            } /*else if (powerCreep.memory.OperateTerminalCooldown < Game.time && powerCreep.store.getUsedCapacity(RESOURCE_OPS) >= 100 && powerCreep.powers[PWR_OPERATE_TERMINAL].cooldown === 0 && powerCreep.room.terminal && powerCreep.room.terminal.my) {
+                                result = OperateTerminal(powerCreep);
+                            }*/ else if ((powerCreep.memory.RegenSource1Cooldown < Game.time || powerCreep.memory.RegenSource2Cooldown < Game.time) && powerCreep.powers[PWR_REGEN_SOURCE] && powerCreep.powers[PWR_REGEN_SOURCE].cooldown === 0) {
+                                result = RegenSource(powerCreep);
+                            } else if (powerCreep.memory.RegenMineralCooldown < Game.time && powerCreep.powers[PWR_REGEN_MINERAL] && powerCreep.powers[PWR_REGEN_MINERAL].cooldown === 0) {
+                                result = RegenMineral(powerCreep);
+                            } else if (powerCreep.store.getUsedCapacity(RESOURCE_OPS) > 500 || powerCreep.store.getUsedCapacity(RESOURCE_OPS) === powerCreep.store.getCapacity()) {
+                                result = DepositOps(powerCreep);
+                            } else if (powerCreep.store.getUsedCapacity(RESOURCE_OPS) < 100) {
+                                result = WithdrawOps(powerCreep);
+                            }
                         }
                     }
                 }

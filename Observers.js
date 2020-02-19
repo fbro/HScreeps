@@ -115,16 +115,30 @@ const Observers = {
                         delete observerRoom.PowerBankFlag;
                     }
 
-                    const deposits = Game.rooms[roomKey].find(FIND_DEPOSITS, {
-                        filter: function (deposit) {
-                            return deposit.lastCooldown < Util.DEPOSIT_MAX_LAST_COOLDOWN;
+                    // DepositFlag
+                    if(!shouldVacateHallway) {
+                        const deposits = Game.rooms[roomKey].find(FIND_DEPOSITS, {
+                            filter: function (deposit) {
+                                return deposit.lastCooldown < Util.DEPOSIT_MAX_LAST_COOLDOWN;
+                            }
+                        });
+                        for (const depositKey in deposits) {
+                            const deposit = deposits[depositKey];
+                            if (!deposit.pos.lookFor(LOOK_FLAGS)[0]) { // if there are no flags on deposit then add a flag
+                                const result = Game.rooms[deposit.pos.roomName].createFlag(deposit.pos, CreateFlagName('deposit', deposit.pos.roomName, observerRoomKey), COLOR_ORANGE, COLOR_CYAN);
+                                Util.Info('Observers', 'ScanPowerBanksAndDeposits', 'add ' + deposit.pos.roomName + ' ' + 'deposit' + ' ' + deposit.pos + ' ' + deposit.FreeSpaces + ' result ' + result);
+                            }
                         }
-                    });
-                    for(const depositKey in deposits){
-                        const deposit = deposits[depositKey];
-                        if(!deposit.pos.lookFor(LOOK_FLAGS)[0]){ // if there are no flags on deposit then add a flag
-                            const result = Game.rooms[deposit.pos.roomName].createFlag(deposit.pos, CreateFlagName('deposit', deposit.pos.roomName, observerRoomKey), COLOR_ORANGE, COLOR_CYAN);
-                            Util.Info('Observers', 'ScanPowerBanksAndDeposits', 'add ' + deposit.pos.roomName + ' ' + 'deposit' + ' ' + deposit.pos + ' ' + deposit.FreeSpaces + ' result ' + result);
+                    }else{ // make sure that there are no flags in the room that should be vacated
+                        const flags = Game.rooms[roomKey].find(FIND_FLAGS, {
+                            filter: function (flag) {
+                                return flag.color === COLOR_ORANGE && flag.color === COLOR_CYAN;
+                            }
+                        });
+                        for (const flagKey in flags){
+                            const flag = flags[flagKey];
+                            flag.remove();
+                            Util.InfoLog('Observers', 'ScanPowerBanksAndDeposits', 'removed flag ' + flag.pos.roomName + ' ' + 'flag' + ' ' + flag.pos + ' shouldVacateHallway ' + shouldVacateHallway);
                         }
                     }
 
