@@ -379,6 +379,22 @@ const CreateJobs = {
                             roomJobs = TryAddFillFactoryJob(gameRoom, factory, roomJobs, RESOURCE_PHLEGM);
                         }
                     }
+                    // Mechanical chain
+                    if (gameRoom.storage.store.getUsedCapacity(RESOURCE_METAL) > 0
+                        || gameRoom.terminal.store.getUsedCapacity(RESOURCE_METAL) > 0
+                        || factory.store.getUsedCapacity(RESOURCE_METAL) > 0
+                        || factory.store.getUsedCapacity(RESOURCE_ALLOY) > 0) {
+                        roomJobs = TryAddFillFactoryJob(gameRoom, factory, roomJobs, RESOURCE_METAL);
+                        roomJobs = TryAddFillFactoryJob(gameRoom, factory, roomJobs, RESOURCE_ZYNTHIUM);
+                        roomJobs = TryAddFillFactoryJob(gameRoom, factory, roomJobs, RESOURCE_ZYNTHIUM_BAR);
+                        roomJobs = TryAddFillFactoryJob(gameRoom, factory, roomJobs, RESOURCE_ALLOY);
+                        if (factory.store.getUsedCapacity(RESOURCE_ALLOY) > 0 && factory.level === 1) { // level 1 specific
+                        }else if(factory.store.getUsedCapacity(RESOURCE_ALLOY) > 0 && factory.level === 2){ // level 2 specific
+                            roomJobs = TryAddFillFactoryJob(gameRoom, factory, roomJobs, RESOURCE_OXYGEN);
+                            roomJobs = TryAddFillFactoryJob(gameRoom, factory, roomJobs, RESOURCE_OXIDANT);
+                            roomJobs = TryAddFillFactoryJob(gameRoom, factory, roomJobs, RESOURCE_TUBE);
+                        }
+                    }
                 }
             }
             return roomJobs;

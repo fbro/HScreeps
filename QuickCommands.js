@@ -52,7 +52,7 @@ for(const structureKey in structures){
 
 
 // get something in a rooms memory
-Memory.MemRooms['E29S29'].FctrId = undefined;
+Memory.MemRooms['E31S31'].FctrId = undefined;
 
 // test spawn transporters
 Game.spawns['Spawn3'].spawnCreep([CARRY, CARRY, MOVE], 'T51');

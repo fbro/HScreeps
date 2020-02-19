@@ -50,7 +50,7 @@ const Observers = {
                         if (modLonQ === 'W') {
                             modLonQ = 'E';
                         } else {
-                            modLonQ = 'W'
+                            modLonQ = 'W';
                         }
                         modLon = Math.abs(modLon) - 1;
                     }
@@ -58,7 +58,7 @@ const Observers = {
                         if (modLatQ === 'S') {
                             modLatQ = 'N';
                         } else {
-                            modLatQ = 'S'
+                            modLatQ = 'S';
                         }
                         modLat = Math.abs(modLat) - 1;
                     }
@@ -122,7 +122,6 @@ const Observers = {
                     });
                     for(const depositKey in deposits){
                         const deposit = deposits[depositKey];
-                        console.log('Test ' + deposit + ' ' + depositKey);
                         if(!deposit.pos.lookFor(LOOK_FLAGS)[0]){ // if there are no flags on deposit then add a flag
                             const result = Game.rooms[deposit.pos.roomName].createFlag(deposit.pos, CreateFlagName('deposit', deposit.pos.roomName, observerRoomKey), COLOR_ORANGE, COLOR_CYAN);
                             Util.Info('Observers', 'ScanPowerBanksAndDeposits', 'add ' + deposit.pos.roomName + ' ' + 'deposit' + ' ' + deposit.pos + ' ' + deposit.FreeSpaces + ' result ' + result);

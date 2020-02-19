@@ -1384,10 +1384,9 @@ const ExecuteJobs = {
                             if (hostileStructure) {
                                 return hostileStructure;
                             }
-                        } else {
-                            return jobObject;
                         }
                     }
+                    return jobObject;
                 },
                 /**@return {int}*/
                 Fetch: function (fetchObject, jobObject) {
@@ -1428,8 +1427,14 @@ const ExecuteJobs = {
                     if (hostileCreep) {
                         return hostileCreep;
                     } else {
-                        return jobObject;
+                        if (jobObject) {
+                            const hostileStructure = jobObject.pos.findClosestByPath(FIND_HOSTILE_STRUCTURES);
+                            if (hostileStructure) {
+                                return hostileStructure;
+                            }
+                        }
                     }
+                    return jobObject;
                 },
                 /**@return {int}*/
                 Fetch: function (fetchObject, jobObject) {

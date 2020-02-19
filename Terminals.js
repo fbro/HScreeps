@@ -36,10 +36,9 @@ const Terminals = {
             for (const resourceType in fromTerminal.store) { // for each resource type
                 let fromAmount = fromTerminal.store[resourceType];
                 let target;
-                if(resourceType === RESOURCE_PHLEGM && fromAmount > 0) { // PHLEGM should only be sent to a terminal that has a factory of level 2
+                if(resourceType === RESOURCE_SWITCH || resourceType === RESOURCE_PHLEGM || resourceType === RESOURCE_TUBE || resourceType === RESOURCE_CONCENTRATE) { // SWITCH, PHLEGM, TUBE or CONCENTRATE should only be sent to a terminal that has a factory of level 2
                     terminalSendCount = DistributeFactoryCommodities(terminalSendCount, fromTerminal, resourceType, fromAmount, 2);
-                } else if(resourceType === RESOURCE_BIOMASS && fromAmount > 0
-                    && !fromTerminal.room.find(FIND_MY_STRUCTURES, {filter: function (s) {return s.structureType === STRUCTURE_FACTORY;}})[0]) { // BIOMASS should only be sent to a terminal that has a factory that uses BIOMASS
+                } else if(resourceType === RESOURCE_SILICON || resourceType === RESOURCE_BIOMASS || resourceType === RESOURCE_METAL || resourceType === RESOURCE_MIST) { // SILICON, BIOMASS, METAL or MIST should only be sent to a terminal that has a factory that uses SILICON, BIOMASS, METAL or MIST
                     terminalSendCount = DistributeFactoryCommodities(terminalSendCount, fromTerminal, resourceType, fromAmount);
                 } else{
                     if (resourceType === RESOURCE_ENERGY) {
@@ -76,7 +75,12 @@ const Terminals = {
         // factory commodities are not destributed like the other resources should be
         /**@return {number}*/
         function DistributeFactoryCommodities(terminalSendCount, fromTerminal, resourceType, fromAmount, factoryLevel = 0) {
-            if(terminalSendCount < 10) {
+            const fromFactory = fromTerminal.room.find(FIND_MY_STRUCTURES, {
+                filter: function (s) {
+                    return s.structureType === STRUCTURE_FACTORY && (factoryLevel === s.level || factoryLevel === 0);
+                }
+            })[0];
+            if(terminalSendCount < 10 && !fromFactory) {
                 for (const toTerminalKey in terminals) {
                     const toTerminal = terminals[toTerminalKey];
                     if (toTerminal.id !== fromTerminal.id
@@ -106,9 +110,22 @@ const Terminals = {
                 } else if(resourceType === RESOURCE_TISSUE){
                     max = 0; // right now i am selling out on tissue
                 } else if (resourceType === RESOURCE_POWER
-                    || resourceType === RESOURCE_PHLEGM
-                    || resourceType === RESOURCE_CELL
-                    || resourceType === RESOURCE_BIOMASS) { // will never sell out on these resources
+                    || resourceType === RESOURCE_SILICON // deposit
+                    || resourceType === RESOURCE_WIRE // factory lvl 0
+                    || resourceType === RESOURCE_SWITCH // factory lvl 1
+
+                    || resourceType === RESOURCE_BIOMASS // deposit
+                    || resourceType === RESOURCE_CELL // factory lvl 0
+                    || resourceType === RESOURCE_PHLEGM // factory lvl 1
+
+                    || resourceType === RESOURCE_METAL // deposit
+                    || resourceType === RESOURCE_ALLOY // factory lvl 0
+                    || resourceType === RESOURCE_TUBE // factory lvl 1
+
+                    || resourceType === RESOURCE_MIST // deposit
+                    || resourceType === RESOURCE_CONDENSATE // factory lvl 0
+                    || resourceType === RESOURCE_CONCENTRATE // factory lvl 1
+                ) { // will never sell out on these resources
                     max = Number.MAX_SAFE_INTEGER;
                 } else {
                     max = Util.TERMINAL_MAX_RESOURCE;
