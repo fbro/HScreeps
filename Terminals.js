@@ -24,7 +24,8 @@ const Terminals = {
                     if(terminal.store.getUsedCapacity(RESOURCE_ENERGY) >= 10000){
                         terminalSendCount = DistributeResources(terminal, terminals, terminalSendCount);
                         terminalSendCount = SellExcessResource(terminal, terminalSendCount);
-                        terminalSendCount = BuyBasicResources(terminal, terminalSendCount);
+                        terminalSendCount = BuyResources(terminal, terminalSendCount);
+                        terminalSendCount = BuyLabResources(terminal, terminalSendCount);
                     }
                 }
             }
@@ -49,9 +50,6 @@ const Terminals = {
                     for (const toTerminalKey in terminals) {
                         const toTerminal = terminals[toTerminalKey];
                         const toAmount = toTerminal.store[resourceType];
-                        if(toTerminal.pos.roomName === 'E29S31'){
-                            continue; // TODO remove
-                        }
                         if (terminalSendCount < 10
                             && fromAmount > (target + 500/*buffer to prevent many small send*/)
                             && toAmount < target
@@ -87,7 +85,7 @@ const Terminals = {
                 for (const toTerminalKey in terminals) {
                     const toTerminal = terminals[toTerminalKey];
                     if (toTerminal.id !== fromTerminal.id
-                        && toTerminal.store.getUsedCapacity(resourceType) < Util.TERMINAL_STORAGE_LOW_TRANSFER // do not transfer anymore commodities if toTerminal already has more than TERMINAL_STORAGE_HIGH_TRANSFER
+                        && toTerminal.store.getUsedCapacity(resourceType) < Util.TERMINAL_TARGET_RESOURCE // do not transfer anymore commodities if toTerminal already has more than TERMINAL_STORAGE_HIGH_TRANSFER
                         && toTerminal.room.find(FIND_MY_STRUCTURES, {
                         filter: function (s) {
                             return s.structureType === STRUCTURE_FACTORY && (factoryLevel === s.level || factoryLevel === 0);
@@ -165,9 +163,9 @@ const Terminals = {
             return terminalSendCount;
         }
 
-        // buy resources to make sure that there are at least 500 Hydrogen, Oxygen, Utrium, Keanium, Lemergium, Zynthium and Catalyst in each terminal
         /**@return {number}*/
-        function BuyBasicResources(terminal, terminalSendCount) {
+        function BuyResources(terminal, terminalSendCount) {
+            // buy resources to make sure that there are at least 500 Hydrogen, Oxygen, Utrium, Keanium, Lemergium, Zynthium and Catalyst in each terminal
             const basicResourceList = [RESOURCE_HYDROGEN, RESOURCE_OXYGEN, RESOURCE_UTRIUM, RESOURCE_KEANIUM, RESOURCE_LEMERGIUM, RESOURCE_ZYNTHIUM, RESOURCE_CATALYST];
             for (const basicResourceKey in basicResourceList) {
                 const basicResource = basicResourceList[basicResourceKey];
@@ -176,13 +174,28 @@ const Terminals = {
                     terminalSendCount = BuyResource(terminal, basicResource, 500, terminalSendCount);
                 }
             }
-            // buy power - logic here is a bit more custom
+            // buy power
             const usedPowerCapacity = terminal.store.getUsedCapacity(RESOURCE_POWER);
             if (usedPowerCapacity === 0 && terminalSendCount < 10 && terminal.room.storage.store.getUsedCapacity(RESOURCE_ENERGY) > Util.TERMINAL_STORAGE_ENERGY_LOW_TRANSFER) {
                 terminalSendCount = BuyResource(terminal, RESOURCE_POWER, 1000, terminalSendCount, 1, 1);
             }
             return terminalSendCount;
         }
+
+        function BuyLabResources(terminal, terminalSendCount){
+            // find FillLabMineralJobs flags
+            const labFlags = terminal.room.find(FIND_FLAGS, {filter : function (flag){return flag.color === COLOR_PURPLE && flag.secondaryColor === COLOR_PURPLE}});
+            for(const labFlagKey in labFlags){
+                const labFlag = labFlags[labFlagKey];
+                const mineral = labFlag.name.substring(4);
+                const usedMineralCapacity = terminal.store.getUsedCapacity(mineral);
+                if (usedMineralCapacity < 500 && terminalSendCount < 10 && terminal.room.storage.store.getUsedCapacity(RESOURCE_ENERGY) > Util.TERMINAL_STORAGE_ENERGY_LOW_TRANSFER) {
+                    terminalSendCount = BuyResource(terminal, mineral, 500 - usedMineralCapacity, terminalSendCount, 4, 4);
+                }
+            }
+        }
+
+
 
         /**@return {number}*/
         function BuyResource(terminal, resourceType, amount, terminalSendCount,
@@ -193,7 +206,7 @@ const Terminals = {
             const orders = Game.market.getAllOrders(order => order.resourceType === resourceType
                 && order.type === ORDER_SELL
                 && Game.market.calcTransactionCost(500, terminal.pos.roomName, order.roomName) <= 500
-                && ((resourceHistory[0].avgPrice * avgPrice) >= order.price || maxPrice && maxPrice >= order.price)
+                && ((resourceHistory[0].avgPrice * avgPrice) >= order.price && (maxPrice && maxPrice >= order.price || !maxPrice))
                 && order.remainingAmount > 0
             );
             if (orders.length > 0) {
@@ -203,16 +216,19 @@ const Terminals = {
             let amountBought = 0;
             for (const orderKey in orders) {
                 const order = orders[orderKey];
-                const amountToBuy = amount - amountBought;
+                let amountToBuy = amount - amountBought;
+                if(order.remainingAmount < amountToBuy){
+                    amountToBuy = order.remainingAmount;
+                }
                 const result = Game.market.deal(order.id, amountToBuy, terminal.pos.roomName);
+                terminalSendCount++;
+                if (result === OK) {
+                    amountBought = amountToBuy + amountBought;
+                }
                 if(result === OK){
                     Util.InfoLog('Terminals', 'BuyResource', amountToBuy + ' ' + resourceType + ' from ' + terminal.pos.roomName + ' to ' + order.roomName + ' result OK terminalSendCount ' + terminalSendCount + ' order.remainingAmount ' + order.remainingAmount + ' price ' + order.price + ' total price ' + (order.price * amountToBuy));
                 }else{
                     Util.Warning('Terminals', 'BuyResource', amountToBuy + ' ' + resourceType + ' from ' + terminal.pos.roomName + ' to ' + order.roomName + ' result ' + result + ' terminalSendCount ' + terminalSendCount + ' order.remainingAmount ' + order.remainingAmount + ' price ' + order.price + ' total price ' + (order.price * amountToBuy));
-                }
-                terminalSendCount++;
-                if (result === OK) {
-                    amountBought = amountToBuy + amountBought;
                 }
                 if (terminalSendCount >= 10 || amount <= amountBought) {
                     break;

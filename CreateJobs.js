@@ -219,13 +219,16 @@ const CreateJobs = {
         }
 
         function FillLabMineralJobs(jobs, gameFlagKey, gameFlag) {
+            const mineral = gameFlagKey.substring(4);
             const lab = gameFlag.pos.findInRange(FIND_MY_STRUCTURES, 0, {filter: function (s) {return s.structureType === STRUCTURE_LAB;}})[0];
-            if (!lab) { // flag must be on top of an existing lab!
+            if (lab && (!lab.mineralType || lab.mineralType === mineral)) {
+                // flagname rules: GET-L = get lemergium from all rooms, BUY-L = get it from all rooms or then buy it from the terminal
+                if(lab.store.getFreeCapacity(mineral) > 0){
+                    jobs = CreateFlagJob(jobs, 'FillLabMin', gameFlagKey, gameFlag, 'T');
+                }
+            }else{ // flag must be on top of an existing lab!
                 gameFlag.remove();
                 Util.ErrorLog('CreateJobs', 'CreateFlagJobs', 'lab gone ' + gameFlagKey);
-            } else if (lab.mineralAmount < LAB_MINERAL_CAPACITY) {
-                // flagname rules: GET-L = get lemergium from all rooms, BUY-L = get it from all rooms or then buy it from the terminal
-                jobs = CreateFlagJob(jobs, 'FillLabMin', gameFlagKey, gameFlag, 'T');
             }
             return jobs;
         }

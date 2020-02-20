@@ -91,9 +91,10 @@ module.exports.loop = function () {
 };
 
 // TODOs:
-// TODO warrior and medics attacking a powerbank must be able to defend against other creeps
 // TODO add flee functionality a function in executejobs that gunner, medics, lone warriors and all other creeps use to flee from an imminent threat
 // TODO buy catalyzed ghodium acid and put it on B creeps that do Ctrl - remember to add creep.memory.B = true
+// TODO lots of harvester src fails
+// TODO I have completeliy misunderstood https://docs.screeps.com/api/#Game.market.deal max 10 deals. its for all terminals in one tick!!!!! change terminal code!
 
 // lab reactions
 

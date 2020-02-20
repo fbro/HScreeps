@@ -79,7 +79,9 @@ const AssignJobs = {
 
         /**@return {boolean}*/
         function AssignCreepOtherRoom(roomJob, idleCreeps, roomJobKey, memRoomKey) {
-            if (roomJob.JobType === Util.FLAG_JOB) {
+            if (roomJob.JobType === Util.FLAG_JOB
+                && (Game.rooms[memRoomKey] && Game.rooms[memRoomKey].controller && Game.rooms[memRoomKey].controller.my && Game.rooms[memRoomKey].controller.level < 8
+                    || !Game.rooms[memRoomKey] || !Game.rooms[memRoomKey].controller || !Game.rooms[memRoomKey].controller.my)) {
                 // loop through all creeps of desired creepType and assign the nearest one to the job
                 let nearestCreep;
                 let bestRange = Number.MAX_SAFE_INTEGER;

@@ -1549,7 +1549,7 @@ const ExecuteJobs = {
                     return jobObject.room.find(FIND_STRUCTURES, {
                         filter: function (s) {
                             return ((s.structureType === STRUCTURE_STORAGE || s.structureType === STRUCTURE_CONTAINER || s.structureType === STRUCTURE_TERMINAL)
-                                && s.getUsedCapacity(creep.memory.Mineral) > 0);
+                                && s.store.getUsedCapacity(creep.memory.Mineral) > 0);
                         }
                     })[0];
                 },
