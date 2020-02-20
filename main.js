@@ -92,7 +92,7 @@ module.exports.loop = function () {
 
 // TODOs:
 // TODO warrior and medics attacking a powerbank must be able to defend against other creeps
-// TODO fillstorage and fill terminal energy - it is still possible for both jobs to be present - :(
+// TODO FillControllerContainerJobs something does not work
 
 // lab reactions
 

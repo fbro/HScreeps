@@ -242,7 +242,7 @@ const ExecuteJobs = {
                             }
                         }
                     }
-                    if((600 / gameCreep.body.length + gameCreep.ticksToLive) <= 1500) { // spawn renew functionality
+                    if(!creepMemory.B/*do not renew if creep is boosted*/ && (600 / gameCreep.body.length + gameCreep.ticksToLive) <= 1500) { // spawn renew functionality
                         const spawn = gameCreep.pos.findInRange(FIND_MY_STRUCTURES, 1, {
                             filter: (s) => {
                                 return s.structureType === STRUCTURE_SPAWN && !s.spawning;

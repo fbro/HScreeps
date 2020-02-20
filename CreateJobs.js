@@ -126,8 +126,8 @@ const CreateJobs = {
                         AddJob(jobs, 'Ctrl(' + gameRoom.controller.pos.x + ',' + gameRoom.controller.pos.y + ')' + gameRoom.name, gameRoom.controller.id, Util.OBJECT_JOB, 'B');
                     }
                     if (!gameRoom.storage || gameRoom.storage && gameRoom.storage.store.getUsedCapacity(RESOURCE_ENERGY) > 100000 && gameRoom.controller.level < 8) {
-                        AddJob(jobs, 'Ctrl(' + gameRoom.controller.pos.x + ',' + gameRoom.controller.pos.y + ')' + gameRoom.name, gameRoom.controller.id, Util.OBJECT_JOB, 'B');
-                        AddJob(jobs, 'Ctrl(' + gameRoom.controller.pos.x + ',' + gameRoom.controller.pos.y + ')' + gameRoom.name, gameRoom.controller.id, Util.OBJECT_JOB, 'B');
+                        AddJob(jobs, 'Ctrl1(' + gameRoom.controller.pos.x + ',' + gameRoom.controller.pos.y + ')' + gameRoom.name, gameRoom.controller.id, Util.OBJECT_JOB, 'B');
+                        AddJob(jobs, 'Ctrl2(' + gameRoom.controller.pos.x + ',' + gameRoom.controller.pos.y + ')' + gameRoom.name, gameRoom.controller.id, Util.OBJECT_JOB, 'B');
                     }
                     // FillSpawnExtension
                     FillSpawnExtensionJobs(gameRoom, jobs);
@@ -218,40 +218,26 @@ const CreateJobs = {
             return jobs;
         }
 
-        function EmptyLabMineralJobs(jobs, gameFlagKey, gameFlag) {
-            if (!gameFlag.pos.findInRange(FIND_MY_STRUCTURES, 0, {
-                filter: function (s) {
-                    return s.structureType === STRUCTURE_LAB;
-                }
-            })) { // flag must be on top of an existing lab!
+        function FillLabMineralJobs(jobs, gameFlagKey, gameFlag) {
+            const lab = gameFlag.pos.findInRange(FIND_MY_STRUCTURES, 0, {filter: function (s) {return s.structureType === STRUCTURE_LAB;}})[0];
+            if (!lab) { // flag must be on top of an existing lab!
                 gameFlag.remove();
                 Util.ErrorLog('CreateJobs', 'CreateFlagJobs', 'lab gone ' + gameFlagKey);
-            } else if (gameFlag.pos.findInRange(FIND_MY_STRUCTURES, 0, {
-                filter: function (s) {
-                    return s.structureType === STRUCTURE_LAB;
-                }
-            })[0].mineralAmount > 0) {
-                // flagname rules: CREATE-GH = CREATE the mineral from the nearby lab to this lab
-                CreateFlagJob(jobs, 'EmptyLabMin', gameFlagKey, gameFlag, 'T');
+            } else if (lab.mineralAmount < LAB_MINERAL_CAPACITY) {
+                // flagname rules: GET-L = get lemergium from all rooms, BUY-L = get it from all rooms or then buy it from the terminal
+                jobs = CreateFlagJob(jobs, 'FillLabMin', gameFlagKey, gameFlag, 'T');
             }
             return jobs;
         }
 
-        function FillLabMineralJobs(jobs, gameFlagKey, gameFlag) {
-            if (!gameFlag.pos.findInRange(FIND_MY_STRUCTURES, 0, {
-                filter: function (s) {
-                    return s.structureType === STRUCTURE_LAB;
-                }
-            })) { // flag must be on top of an existing lab!
+        function EmptyLabMineralJobs(jobs, gameFlagKey, gameFlag) {
+            const lab = gameFlag.pos.findInRange(FIND_MY_STRUCTURES, 0, {filter: function (s) {return s.structureType === STRUCTURE_LAB;}})[0];
+            if (!lab) { // flag must be on top of an existing lab!
                 gameFlag.remove();
                 Util.ErrorLog('CreateJobs', 'CreateFlagJobs', 'lab gone ' + gameFlagKey);
-            } else if (gameFlag.pos.findInRange(FIND_MY_STRUCTURES, 0, {
-                filter: function (s) {
-                    return s.structureType === STRUCTURE_LAB;
-                }
-            })[0].mineralAmount < LAB_MINERAL_CAPACITY) {
-                // flagname rules: GET-L = get lemergium from all rooms, BUY-L = get it from all rooms or then buy it from the terminal
-                jobs = CreateFlagJob(jobs, 'FillLabMin', gameFlagKey, gameFlag, 'T');
+            } else if (lab.mineralAmount > 0) {
+                // flagname rules: CREATE-GH = CREATE the mineral from the nearby lab to this lab
+                CreateFlagJob(jobs, 'EmptyLabMin', gameFlagKey, gameFlag, 'T');
             }
             return jobs;
         }
@@ -592,7 +578,7 @@ const CreateJobs = {
             }
         }
 
-        function FillControllerContainerJobs(gameRoom, roomJobs) {
+        function FillControllerContainerJobs(gameRoom, roomJobs) { // TODO something is off here
             let controllerContainer;
             if (Memory.MemRooms[gameRoom.name] && Memory.MemRooms[gameRoom.name].CtrlConId) {
                 controllerContainer = Game.getObjectById(Memory.MemRooms[gameRoom.name].CtrlConId);
@@ -600,7 +586,7 @@ const CreateJobs = {
                     Util.InfoLog('CreateJobs', 'FillControllerContainerJobs', 'removed container id from mem' + gameRoom.name);
                     Memory.MemRooms[gameRoom.name].CtrlConId = undefined;
                 }
-            }else if (!controllerContainer && Memory.MemRooms[gameRoom.name]) {
+            }else if (!controllerContainer && Memory.MemRooms[gameRoom.name]) { // TODO something is off here
                 controllerContainer = gameRoom.controller.pos.findInRange(FIND_STRUCTURES, 3, {
                     filter: (s) => {
                         return s.structureType === STRUCTURE_CONTAINER;

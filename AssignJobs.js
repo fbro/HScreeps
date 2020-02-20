@@ -273,7 +273,7 @@ const AssignJobs = {
                         }
                         break;
                     case 'D': // distantHarvester
-                        if (!Game.rooms[roomKey] && !Game.rooms[roomKey].controller || Game.rooms[roomKey].controller && Game.rooms[roomKey].controller.level === 0) {
+                        if (!Game.rooms[roomKey] || !Game.rooms[roomKey].controller || Game.rooms[roomKey].controller && Game.rooms[roomKey].controller.level === 0) {
                             maxCreepsInRoom = 6;
                         } else {
                             maxCreepsInRoom = 0;
