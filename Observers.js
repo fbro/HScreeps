@@ -92,8 +92,9 @@ const Observers = {
                             return s.structureType === STRUCTURE_WALL;
                         }
                     });
+                    const hostileCreeps = Game.rooms[roomKey].find(FIND_HOSTILE_CREEPS); // if 4 or more hostile creeps - better to just ignore the room!
                     let shouldVacateHallway = false;
-                    if (walls[0]) { // other factors could be added here like hostile creeps
+                    if (walls[0] || hostileCreeps.length >= 4) { // other factors could be added here like hostile creeps
                         shouldVacateHallway = true;
                     }
 

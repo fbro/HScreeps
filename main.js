@@ -92,7 +92,8 @@ module.exports.loop = function () {
 
 // TODOs:
 // TODO warrior and medics attacking a powerbank must be able to defend against other creeps
-// TODO FillControllerContainerJobs something does not work
+// TODO add flee functionality a function in executejobs that gunner, medics, lone warriors and all other creeps use to flee from an imminent threat
+// TODO buy catalyzed ghodium acid and put it on B creeps that do Ctrl - remember to add creep.memory.B = true
 
 // lab reactions
 

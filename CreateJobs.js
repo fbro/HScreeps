@@ -578,7 +578,7 @@ const CreateJobs = {
             }
         }
 
-        function FillControllerContainerJobs(gameRoom, roomJobs) { // TODO something is off here
+        function FillControllerContainerJobs(gameRoom, roomJobs) {
             let controllerContainer;
             if (Memory.MemRooms[gameRoom.name] && Memory.MemRooms[gameRoom.name].CtrlConId) {
                 controllerContainer = Game.getObjectById(Memory.MemRooms[gameRoom.name].CtrlConId);
@@ -586,7 +586,7 @@ const CreateJobs = {
                     Util.InfoLog('CreateJobs', 'FillControllerContainerJobs', 'removed container id from mem' + gameRoom.name);
                     Memory.MemRooms[gameRoom.name].CtrlConId = undefined;
                 }
-            }else if (!controllerContainer && Memory.MemRooms[gameRoom.name]) { // TODO something is off here
+            }else if (!controllerContainer && Memory.MemRooms[gameRoom.name]) {
                 controllerContainer = gameRoom.controller.pos.findInRange(FIND_STRUCTURES, 3, {
                     filter: (s) => {
                         return s.structureType === STRUCTURE_CONTAINER;
@@ -597,7 +597,7 @@ const CreateJobs = {
                     Memory.MemRooms[gameRoom.name].CtrlConId = controllerContainer.id;
                 }
             }
-            if (controllerContainer && controllerContainer.store.getFreeCapacity > 0) {
+            if (controllerContainer && controllerContainer.store.getFreeCapacity() > 0) {
                 new RoomVisual(gameRoom.name).text('🔋', controllerContainer.pos.x, controllerContainer.pos.y);
                 AddJob(roomJobs, 'FillCtrlCon(' + controllerContainer.pos.x + ',' + controllerContainer.pos.y + ')' + gameRoom.name, controllerContainer.id, Util.OBJECT_JOB, 'T');
             }

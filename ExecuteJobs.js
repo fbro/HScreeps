@@ -1783,6 +1783,15 @@ const ExecuteJobs = {
                 },
                 /**@return {int}*/
                 Act: function (jobObject) {
+                    const hostileCreep = creep.pos.findInRange(FIND_HOSTILE_CREEPS, 3)[0];
+                    if(hostileCreep){
+                        let result = creep.attack(hostileCreep);
+                        if(result === ERR_NOT_IN_RANGE){
+                            Move(creep, hostileCreep);
+                        }
+                        Util.Warning('ExecuteJobs', 'JobAttackPowerBank', 'attacking nearby hostile! ' + creep.name + ' ' + hostileCreep + ' in ' + creep.pos.roomName);
+                        return ERR_BUSY;
+                    }
                     if (!jobObject.room) { // invisible
                         return ERR_NOT_IN_RANGE;
                     }
