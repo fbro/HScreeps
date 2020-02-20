@@ -97,7 +97,7 @@ const ExecuteJobs = {
                             || !gameCreep.room.controller.my
                             || gameCreep.memory.MoveHome
                             || Memory.MemRooms[gameCreep.pos.roomName].MaxCreeps[creepName.substring(0, 1)]
-                                && !Memory.MemRooms[gameCreep.pos.roomName].MaxCreeps[creepName.substring(0, 1)][creepName]) { // I do not own the room the idle creep is in - move it to an owned room!
+                            && !Memory.MemRooms[gameCreep.pos.roomName].MaxCreeps[creepName.substring(0, 1)][creepName]) { // I do not own the room the idle creep is in - move it to an owned room!
                             let closestOwnedRoom;
                             if (!gameCreep.memory.MoveHome) {
                                 let bestDistance = Number.MAX_SAFE_INTEGER;
@@ -110,15 +110,15 @@ const ExecuteJobs = {
                                         }
                                     }
                                 }
-                                if(closestOwnedRoom){
+                                if (closestOwnedRoom) {
                                     const didRemoveMaxCreeps = FindAndRemoveMaxCreeps(roomName, creepName); // remove from the origin room
-                                    if(!Memory.MemRooms[closestOwnedRoom].MaxCreeps[creepName.substring(0, 1)]){
+                                    if (!Memory.MemRooms[closestOwnedRoom].MaxCreeps[creepName.substring(0, 1)]) {
                                         Memory.MemRooms[closestOwnedRoom].MaxCreeps[creepName.substring(0, 1)] = {};
                                     }
                                     Memory.MemRooms[closestOwnedRoom].MaxCreeps[creepName.substring(0, 1)][creepName] = creepName; // add to the new home room
                                     gameCreep.memory.MoveHome = closestOwnedRoom;
                                     Util.Info('ExecuteJobs', 'ExecuteRoomJobs', 'idle ' + creepName + ' in ' + gameCreep.pos.roomName + ' moving to ' + closestOwnedRoom);
-                                }else{
+                                } else {
                                     Util.ErrorLog('ExecuteJobs', 'ExecuteRoomJobs', 'idle ' + creepName + ' in ' + gameCreep.pos.roomName + ' cannot find a new home!');
                                 }
                             } else {
@@ -242,13 +242,13 @@ const ExecuteJobs = {
                             }
                         }
                     }
-                    if(!creepMemory.B/*do not renew if creep is boosted*/ && (600 / gameCreep.body.length + gameCreep.ticksToLive) <= 1500) { // spawn renew functionality
+                    if (!creepMemory.B/*do not renew if creep is boosted*/ && (600 / gameCreep.body.length + gameCreep.ticksToLive) <= 1500) { // spawn renew functionality
                         const spawn = gameCreep.pos.findInRange(FIND_MY_STRUCTURES, 1, {
                             filter: (s) => {
                                 return s.structureType === STRUCTURE_SPAWN && !s.spawning;
                             }
                         })[0];
-                        if(spawn){
+                        if (spawn) {
                             result = spawn.renewCreep(gameCreep);
                         }
                     }
@@ -310,16 +310,17 @@ const ExecuteJobs = {
                     result = JobTagController(creep, roomJob);
                     break;
                 case jobKey.startsWith('ScoutPos'):
-                    result = JobScoutPosition(creep, roomJob);
+                case jobKey.startsWith('BuildPos'):
+                case jobKey.startsWith('ClaimPos'):
+                case jobKey.startsWith('HarvestPos'):
+                case jobKey.startsWith('TransPos'):
+                    result = JobMoveToPosition(creep, roomJob);
                     break;
                 case jobKey.startsWith('ClaimCtrl'):
                     result = JobClaimController(creep, roomJob);
                     break;
                 case jobKey.startsWith('ReserveCtrl'):
                     result = JobReserveController(creep, roomJob);
-                    break;
-                case jobKey.startsWith('ClaimPos'):
-                    result = JobClaimerPosition(creep, roomJob);
                     break;
                 case jobKey.startsWith('GuardPos'):
                     result = JobGuardPosition(creep, roomJob);
@@ -329,15 +330,6 @@ const ExecuteJobs = {
                     break;
                 case jobKey.startsWith('GuardMedPos'):
                     result = JobGuardMedicPosition(creep, roomJob);
-                    break;
-                case jobKey.startsWith('HarvestPos'):
-                    result = JobHarvesterPosition(creep, roomJob);
-                    break;
-                case jobKey.startsWith('TransPos'):
-                    result = JobTransporterPosition(creep, roomJob);
-                    break;
-                case jobKey.startsWith('BuildPos'):
-                    result = JobBuilderPosition(creep, roomJob);
                     break;
                 case jobKey.startsWith('FillLabMin'):
                     result = JobFillLabMineral(creep, roomJob);
@@ -385,7 +377,7 @@ const ExecuteJobs = {
                         Util.Info('ExecuteJobs', 'JobAction', 'removing ' + jobKey + ' ' + result + ' ' + roomJob.Creep);
                         Util.ErrorLog('ExecuteJobs', 'JobAction', 'undefined result ' + creep.name + ' ' + jobKey);
                         creep.say('⚠' + result);
-                    }else if (result === JOB_IS_DONE) {
+                    } else if (result === JOB_IS_DONE) {
                         creep.say('✔');
                     } else {
                         creep.say('✔' + result);
@@ -534,9 +526,9 @@ const ExecuteJobs = {
                  * @return {undefined}*/
                 FindFetchObject: function (jobObject) {
                     let energySupply = FindFetchResource(creep, jobObject, RESOURCE_ENERGY);
-                    if(!energySupply && creep.room.controller && creep.room.controller.my && creep.room.controller.level < 3){ // try and harvest
+                    if (!energySupply && creep.room.controller && creep.room.controller.my && creep.room.controller.level < 3) { // try and harvest
                         const source = creep.pos.findClosestByPath(FIND_SOURCES_ACTIVE);
-                        if(source){
+                        if (source) {
                             return source;
                         }
                     }
@@ -544,12 +536,12 @@ const ExecuteJobs = {
                 },
                 /**@return {int}*/
                 Fetch: function (fetchObject, jobObject) {
-                    if(fetchObject.energyCapacity && creep.room.controller && creep.room.controller.my && creep.room.controller.level < 3){ // this is a source - harvest it
+                    if (fetchObject.energyCapacity && creep.room.controller && creep.room.controller.my && creep.room.controller.level < 3) { // this is a source - harvest it
                         let result = creep.harvest(fetchObject);
-                        if(result === ERR_NOT_IN_RANGE){
+                        if (result === ERR_NOT_IN_RANGE) {
                             result = Move(creep, fetchObject);
                         }
-                        if(result === OK && creep.store.getFreeCapacity() > 0){
+                        if (result === OK && creep.store.getFreeCapacity() > 0) {
                             result = ERR_BUSY;
                         }
                         return result;
@@ -660,9 +652,9 @@ const ExecuteJobs = {
                  * @return {undefined}*/
                 FindFetchObject: function (jobObject) {
                     let energySupply = FindFetchResource(creep, jobObject, RESOURCE_ENERGY);
-                    if(!energySupply && creep.room.controller && creep.room.controller.my && creep.room.controller.level < 3){ // try and harvest
+                    if (!energySupply && creep.room.controller && creep.room.controller.my && creep.room.controller.level < 3) { // try and harvest
                         const source = creep.pos.findClosestByPath(FIND_SOURCES_ACTIVE);
-                        if(source){
+                        if (source) {
                             return source;
                         }
                     }
@@ -670,12 +662,12 @@ const ExecuteJobs = {
                 },
                 /**@return {int}*/
                 Fetch: function (fetchObject, jobObject) {
-                    if(fetchObject.energyCapacity && creep.room.controller && creep.room.controller.my && creep.room.controller.level < 3){ // this is a source - harvest it
+                    if (fetchObject.energyCapacity && creep.room.controller && creep.room.controller.my && creep.room.controller.level < 3) { // this is a source - harvest it
                         let result = creep.harvest(fetchObject);
-                        if(result === ERR_NOT_IN_RANGE){
+                        if (result === ERR_NOT_IN_RANGE) {
                             result = Move(creep, fetchObject);
                         }
-                        if(result === OK && creep.store.getFreeCapacity() > 0){
+                        if (result === OK && creep.store.getFreeCapacity() > 0) {
                             result = ERR_BUSY;
                         }
                         return result;
@@ -1206,42 +1198,6 @@ const ExecuteJobs = {
         }
 
         /**@return {int}*/
-        function JobScoutPosition(creep, roomJob) {
-            const result = GenericFlagAction(creep, roomJob, {
-                /**@return {int}*/
-                JobStatus: function (jobObject) {
-                    if (!jobObject.room) {
-                        return SHOULD_ACT;
-                    } else {
-                        return SHOULD_FETCH
-                    }
-                },
-                /**@return {int}*/
-                Act: function (jobObject) {
-                    return ERR_NOT_IN_RANGE;
-                },
-                /**@return {int}*/
-                IsJobDone: function (jobObject) {
-                    return this.JobStatus(jobObject);
-                },
-                /**@return {object}
-                 * @return {undefined}*/
-                FindFetchObject: function (jobObject) {
-                    return jobObject;
-                },
-                /**@return {int}*/
-                Fetch: function (fetchObject, jobObject) {
-                    if (creep.pos.isNearTo(jobObject)) {
-                        return OK;
-                    } else {
-                        return ERR_NOT_IN_RANGE;
-                    }
-                },
-            });
-            return result;
-        }
-
-        /**@return {int}*/
         function JobClaimController(creep, roomJob) {
             const result = GenericFlagAction(creep, roomJob, {
                 /**@return {int}*/
@@ -1315,41 +1271,6 @@ const ExecuteJobs = {
                 /**@return {int}*/
                 Fetch: function (fetchObject, jobObject) {
                     return creep.reserveController(fetchObject);
-                },
-            });
-            return result;
-        }
-
-        /**@return {int}*/
-        function JobClaimerPosition(creep, roomJob) {
-            const result = GenericFlagAction(creep, roomJob, {
-                /**@return {int}*/
-                JobStatus: function (jobObject) {
-                    if (!jobObject.room) {
-                        return SHOULD_ACT;
-                    } else {
-                        return SHOULD_FETCH
-                    }
-                },
-                /**@return {int}*/
-                Act: function (jobObject) {
-                    return ERR_NOT_IN_RANGE;
-                },
-                /**@return {int}*/
-                IsJobDone: function (jobObject) {
-                    return this.JobStatus(jobObject);
-                },
-                /**@return {object} @return {undefined}*/
-                FindFetchObject: function (jobObject) {
-                    return jobObject;
-                },
-                /**@return {int}*/
-                Fetch: function (fetchObject, jobObject) {
-                    if (creep.pos.x === jobObject.pos.x && creep.pos.y === jobObject.pos.y && creep.pos.roomName === jobObject.pos.roomName) {
-                        return OK;
-                    } else {
-                        return ERR_NOT_IN_RANGE;
-                    }
                 },
             });
             return result;
@@ -1542,7 +1463,7 @@ const ExecuteJobs = {
         }
 
         /**@return {int}*/
-        function JobHarvesterPosition(creep, roomJob) {
+        function JobMoveToPosition(creep, roomJob) {
             const result = GenericFlagAction(creep, roomJob, {
                 /**@return {int}*/
                 JobStatus: function (jobObject) {
@@ -1550,95 +1471,7 @@ const ExecuteJobs = {
                         if (creep.ticksToLive > 1000) {
                             creep.memory.HealthCheck = true;
                         } else {
-                            Util.Info('ExecuteJobs', 'JobHarvesterPosition', creep.name + ' committed suicide ticksToLive ' + creep.ticksToLive);
-                            creep.suicide();
-                            return OK;
-                        }
-                    }
-                    if (!jobObject.room) {
-                        return SHOULD_ACT;
-                    } else {
-                        return SHOULD_FETCH
-                    }
-                },
-                /**@return {int}*/
-                Act: function (jobObject) {
-                    return ERR_NOT_IN_RANGE;
-                },
-                /**@return {int}*/
-                IsJobDone: function (jobObject) {
-                    return this.JobStatus(jobObject);
-                },
-                /**@return {object} @return {undefined}*/
-                FindFetchObject: function (jobObject) {
-                    return jobObject;
-                },
-                /**@return {int}*/
-                Fetch: function (fetchObject, jobObject) {
-                    if (creep.pos.x === jobObject.pos.x && creep.pos.y === jobObject.pos.y && creep.pos.roomName === jobObject.pos.roomName) {
-                        return OK;
-                    } else {
-                        return ERR_NOT_IN_RANGE;
-                    }
-                },
-            });
-            return result;
-        }
-
-        /**@return {int}*/
-        function JobTransporterPosition(creep, roomJob) {
-            const result = GenericFlagAction(creep, roomJob, {
-                /**@return {int}*/
-                JobStatus: function (jobObject) {
-                    if (!creep.memory.HealthCheck) {
-                        if (creep.ticksToLive > 1000) {
-                            creep.memory.HealthCheck = true;
-                        } else {
-                            Util.Info('ExecuteJobs', 'JobTransporterPosition', creep.name + ' committed suicide ticksToLive ' + creep.ticksToLive);
-                            creep.suicide();
-                            return OK;
-                        }
-                    }
-                    if (!jobObject.room) {
-                        return SHOULD_ACT;
-                    } else {
-                        return SHOULD_FETCH
-                    }
-                },
-                /**@return {int}*/
-                Act: function (jobObject) {
-                    return ERR_NOT_IN_RANGE;
-                },
-                /**@return {int}*/
-                IsJobDone: function (jobObject) {
-                    return this.JobStatus(jobObject);
-                },
-                /**@return {object} @return {undefined}*/
-                FindFetchObject: function (jobObject) {
-                    return jobObject;
-                },
-                /**@return {int}*/
-                Fetch: function (fetchObject, jobObject) {
-                    if (creep.pos.x === jobObject.pos.x && creep.pos.y === jobObject.pos.y && creep.pos.roomName === jobObject.pos.roomName) {
-                        return OK;
-                    } else {
-                        return ERR_NOT_IN_RANGE;
-                    }
-                },
-            });
-            return result;
-        }
-
-        /**@return {int}*/
-        function JobBuilderPosition(creep, roomJob) {
-            const result = GenericFlagAction(creep, roomJob, {
-                /**@return {int}*/
-                JobStatus: function (jobObject) {
-                    if (!creep.memory.HealthCheck) {
-                        if (creep.ticksToLive > 1000) {
-                            creep.memory.HealthCheck = true;
-                        } else {
-                            Util.Info('ExecuteJobs', 'JobBuilderPosition', creep.name + ' committed suicide ticksToLive ' + creep.ticksToLive);
+                            Util.Info('ExecuteJobs', 'JobMoveToPosition', creep.name + ' committed suicide ticksToLive ' + creep.ticksToLive);
                             creep.suicide();
                             return OK;
                         }
@@ -1783,16 +1616,21 @@ const ExecuteJobs = {
                 },
                 /**@return {int}*/
                 Act: function (jobObject) {
-                    const hostileCreep = creep.pos.findInRange(FIND_HOSTILE_CREEPS, 3)[0];
-                    if(hostileCreep){
-                        let result = creep.attack(hostileCreep);
-                        if(result === ERR_NOT_IN_RANGE){
-                            Move(creep, hostileCreep);
+                    const hostileCreep = creep.pos.findInRange(FIND_HOSTILE_CREEPS, 4)[0];
+                    if (hostileCreep) {
+                        const nearestHostileCreep = creep.pos.findClosestByPath(FIND_HOSTILE_CREEPS, {
+                            filter: function (hostileCreep) {
+                                return hostileCreep.getActiveBodyparts(ATTACK) || hostileCreep.getActiveBodyparts(RANGED_ATTACK);
+                            }
+                        });
+                        let result = creep.attack(nearestHostileCreep);
+                        if (result === ERR_NOT_IN_RANGE) {
+                            Move(creep, nearestHostileCreep);
                         }
                         Util.Warning('ExecuteJobs', 'JobAttackPowerBank', 'attacking nearby hostile! ' + creep.name + ' ' + hostileCreep + ' in ' + creep.pos.roomName);
                         return ERR_BUSY;
                     }
-                    if (!jobObject.room) { // invisible
+                    if (!jobObject.room) { // room is invisible - not in the room yet
                         return ERR_NOT_IN_RANGE;
                     }
                     let powerBank;
@@ -1811,10 +1649,10 @@ const ExecuteJobs = {
                     } else if (powerBank) {
                         result = creep.attack(powerBank);
                         if (result === ERR_NO_BODYPART) {
-                            result = ERR_TIRED;
+                            creep.suicide();
                         }
-                        if(powerBank.hits < 200000){
-                            if(!powerBank.room.lookForAt(LOOK_FLAGS, 0, 0)[0]){
+                        if (powerBank.hits < 200000) {
+                            if (!powerBank.room.lookForAt(LOOK_FLAGS, 0, 0)[0]) {
                                 Util.Info('ExecuteJobs', 'JobAttackPowerBank', 'generate transport power flags ' + creep.name + ' ' + jobObject.name + ' hits left ' + powerBank.hits);
                                 // generate transport power flags depending on the amount of power that was in the powerBank
                                 const numOfTransporterFlags = (powerBank.power / 1000);
@@ -1998,7 +1836,7 @@ const ExecuteJobs = {
                         })[0];
                         if (powerResource) {
                             let result = creep.pickup(powerResource);
-                            if(result === ERR_NOT_IN_RANGE){
+                            if (result === ERR_NOT_IN_RANGE) {
                                 result = Move(creep, powerResource);
                             }
                             return result;
@@ -2110,6 +1948,11 @@ const ExecuteJobs = {
         }
 
         // helper functions:
+
+        // TODO implement flee functionality
+        function Flee() {
+
+        }
 
         /**@return {boolean}*/
         function FindAndRemoveMaxCreeps(roomName, creepName) {
