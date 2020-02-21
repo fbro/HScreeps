@@ -17,30 +17,29 @@ const Terminals = {
         }
 
         function TerminalActions(terminals){
+            let marketDealSendCount = 0;
             for (const terminalKey in terminals) {
                 const terminal = terminals[terminalKey];
                 if (terminal.cooldown === 0) {
-                    let terminalSendCount = 0;
-                    if(terminal.store.getUsedCapacity(RESOURCE_ENERGY) >= 10000){
-                        terminalSendCount = DistributeResources(terminal, terminals, terminalSendCount);
-                        terminalSendCount = SellExcessResource(terminal, terminalSendCount);
-                        terminalSendCount = BuyResources(terminal, terminalSendCount);
-                        terminalSendCount = BuyLabResources(terminal, terminalSendCount);
+                    if(terminal.store.getUsedCapacity(RESOURCE_ENERGY) >= Util.TERMINAL_STORAGE_ENERGY_LOW){
+                        DistributeResources(terminal, terminals);
+                        marketDealSendCount = SellExcessResource(terminal, marketDealSendCount);
+                        marketDealSendCount = BuyResources(terminal, marketDealSendCount);
+                        marketDealSendCount = BuyLabResources(terminal, marketDealSendCount);
                     }
                 }
             }
         }
 
         // distribute ALL available resources to all terminals 2k each and only to 5k - except with energy 50k each and only to 100k
-        /**@return {number}*/
-        function DistributeResources(fromTerminal, terminals, terminalSendCount) {
+        function DistributeResources(fromTerminal, terminals) {
             for (const resourceType in fromTerminal.store) { // for each resource type
                 let fromAmount = fromTerminal.store[resourceType];
                 let target;
                 if(resourceType === RESOURCE_SWITCH || resourceType === RESOURCE_PHLEGM || resourceType === RESOURCE_TUBE || resourceType === RESOURCE_CONCENTRATE) { // SWITCH, PHLEGM, TUBE or CONCENTRATE should only be sent to a terminal that has a factory of level 2
-                    terminalSendCount = DistributeFactoryCommodities(terminalSendCount, fromTerminal, resourceType, fromAmount, 2);
+                    DistributeFactoryCommodities(fromTerminal, resourceType, fromAmount, 2);
                 } else if(resourceType === RESOURCE_SILICON || resourceType === RESOURCE_BIOMASS || resourceType === RESOURCE_METAL || resourceType === RESOURCE_MIST) { // SILICON, BIOMASS, METAL or MIST should only be sent to a terminal that has a factory that uses SILICON, BIOMASS, METAL or MIST
-                    terminalSendCount = DistributeFactoryCommodities(terminalSendCount, fromTerminal, resourceType, fromAmount);
+                    DistributeFactoryCommodities(fromTerminal, resourceType, fromAmount);
                 } else{
                     if (resourceType === RESOURCE_ENERGY) {
                         target = Util.TERMINAL_TARGET_ENERGY;
@@ -50,8 +49,7 @@ const Terminals = {
                     for (const toTerminalKey in terminals) {
                         const toTerminal = terminals[toTerminalKey];
                         const toAmount = toTerminal.store[resourceType];
-                        if (terminalSendCount < 10
-                            && fromAmount > (target + 500/*buffer to prevent many small send*/)
+                        if (fromAmount > (target + 500/*buffer to prevent many small send*/)
                             && toAmount < target
                             && toTerminal.id !== fromTerminal.id
                         ) { // is allowed to send this resource to another terminal
@@ -61,27 +59,26 @@ const Terminals = {
                                 sendAmount = resourcesNeeded; // does not need more resources than this
                             }
                             const result = fromTerminal.send(resourceType, sendAmount, toTerminal.pos.roomName);
-                            Util.Info('Terminals', 'DistributeResources', sendAmount + ' ' + resourceType + ' from ' + fromTerminal.pos.roomName + ' to ' + toTerminal.pos.roomName + ' result ' + result + ' terminalSendCount ' + terminalSendCount + ' resourcesNeeded ' + resourcesNeeded);
+                            Util.Info('Terminals', 'DistributeResources', sendAmount + ' ' + resourceType + ' from ' + fromTerminal.pos.roomName + ' to ' + toTerminal.pos.roomName + ' result ' + result + ' resourcesNeeded ' + resourcesNeeded);
                             toTerminal.store[resourceType] += sendAmount;
                             fromTerminal.store[resourceType] -= sendAmount;
                             fromAmount -= sendAmount;
-                            terminalSendCount++;
+                            break;
                         }
                     }
                 }
             }
-            return terminalSendCount;
         }
 
-        // factory commodities are not destributed like the other resources should be
+        // factory commodities are not distributed like the other resources should be
         /**@return {number}*/
-        function DistributeFactoryCommodities(terminalSendCount, fromTerminal, resourceType, fromAmount, factoryLevel = 0) {
+        function DistributeFactoryCommodities(fromTerminal, resourceType, fromAmount, factoryLevel = 0) {
             const fromFactory = fromTerminal.room.find(FIND_MY_STRUCTURES, {
                 filter: function (s) {
                     return s.structureType === STRUCTURE_FACTORY && (factoryLevel === s.level || factoryLevel === 0);
                 }
             })[0];
-            if(terminalSendCount < 10 && !fromFactory) {
+            if(!fromFactory) {
                 for (const toTerminalKey in terminals) {
                     const toTerminal = terminals[toTerminalKey];
                     if (toTerminal.id !== fromTerminal.id
@@ -92,17 +89,15 @@ const Terminals = {
                         }
                     })[0]) {
                         const result = fromTerminal.send(resourceType, fromAmount, toTerminal.pos.roomName);
-                        Util.Info('Terminals', 'DistributeResources', fromAmount + ' ' + resourceType + ' from ' + fromTerminal.pos.roomName + ' to ' + toTerminal.pos.roomName + ' result ' + result + ' terminalSendCount ' + terminalSendCount);
-                        terminalSendCount++;
+                        Util.Info('Terminals', 'DistributeResources', fromAmount + ' ' + resourceType + ' from ' + fromTerminal.pos.roomName + ' to ' + toTerminal.pos.roomName + ' result ' + result);
                         break;
                     }
                 }
             }
-            return terminalSendCount;
         }
 
         /**@return {number}*/
-        function SellExcessResource(fromTerminal, terminalSendCount) {
+        function SellExcessResource(fromTerminal, marketDealSendCount) {
             for (const resourceType in fromTerminal.store) { // for each resource type
                 let fromAmount = fromTerminal.store.getUsedCapacity(resourceType);
                 let max;
@@ -131,7 +126,7 @@ const Terminals = {
                 } else {
                     max = Util.TERMINAL_MAX_RESOURCE;
                 }
-                if (terminalSendCount < 10 && fromAmount > max) { // is allowed to sell this resource
+                if (marketDealSendCount <= 10 && fromAmount > max) { // is allowed to sell this resource
                     const resourceHistory = Game.market.getHistory(resourceType);
                     const orders = Game.market.getAllOrders(order => order.resourceType === resourceType
                         && order.type === ORDER_BUY
@@ -141,64 +136,61 @@ const Terminals = {
                     );
                     if (orders.length > 0) {
                         orders.sort(comparePriceExpensiveFirst);
-                    }
-                    for (const orderKey in orders) {
-                        const order = orders[orderKey];
+                        const order = orders[0];
                         let sendAmount = fromAmount - max; // possible send amount
                         if (sendAmount > order.remainingAmount) {
                             sendAmount = order.remainingAmount; // does not need more resources than this
                         }
                         const result = Game.market.deal(order.id, sendAmount, fromTerminal.pos.roomName);
-                        Util.Info('Terminals', 'SellExcessResource', sendAmount + ' ' + resourceType + ' from ' + fromTerminal.pos.roomName + ' to ' + order.roomName + ' result ' + result + ' terminalSendCount ' + terminalSendCount + ' order.remainingAmount ' + order.remainingAmount + ' price ' + order.price + ' total price ' + order.price * sendAmount + ' fromAmount ' + fromAmount);
-                        // the terminals may try and sell to the same order - I will ignore this error
-                        fromTerminal.store[resourceType] -= sendAmount;
-                        fromAmount -= sendAmount;
-                        terminalSendCount++;
-                        if (terminalSendCount >= 10 || fromAmount <= max) {
-                            break;
+                        if(result === OK) {
+                            marketDealSendCount++;
                         }
+                        Util.Info('Terminals', 'SellExcessResource', sendAmount + ' ' + resourceType + ' from ' + fromTerminal.pos.roomName + ' to ' + order.roomName + ' result ' + result + ' marketDealSendCount ' + marketDealSendCount + ' order.remainingAmount ' + order.remainingAmount + ' price ' + order.price + ' total price ' + order.price * sendAmount + ' fromAmount ' + fromAmount);
                     }
                 }
             }
-            return terminalSendCount;
+            return marketDealSendCount;
         }
 
         /**@return {number}*/
-        function BuyResources(terminal, terminalSendCount) {
+        function BuyResources(terminal, marketDealSendCount) {
             // buy resources to make sure that there are at least 500 Hydrogen, Oxygen, Utrium, Keanium, Lemergium, Zynthium and Catalyst in each terminal
             const basicResourceList = [RESOURCE_HYDROGEN, RESOURCE_OXYGEN, RESOURCE_UTRIUM, RESOURCE_KEANIUM, RESOURCE_LEMERGIUM, RESOURCE_ZYNTHIUM, RESOURCE_CATALYST];
             for (const basicResourceKey in basicResourceList) {
                 const basicResource = basicResourceList[basicResourceKey];
                 const usedCapacity = terminal.store.getUsedCapacity(basicResource);
-                if (usedCapacity === 0 && terminalSendCount < 10 && terminal.room.storage.store.getUsedCapacity(basicResource) === 0) {
-                    terminalSendCount = BuyResource(terminal, basicResource, 500, terminalSendCount);
+                if (usedCapacity === 0 && marketDealSendCount <= 10 && terminal.room.storage.store.getUsedCapacity(basicResource) === 0) {
+                    marketDealSendCount = BuyResource(terminal, basicResource, 500, marketDealSendCount);
                 }
             }
             // buy power
             const usedPowerCapacity = terminal.store.getUsedCapacity(RESOURCE_POWER);
-            if (usedPowerCapacity === 0 && terminalSendCount < 10 && terminal.room.storage.store.getUsedCapacity(RESOURCE_ENERGY) > Util.TERMINAL_STORAGE_ENERGY_LOW_TRANSFER) {
-                terminalSendCount = BuyResource(terminal, RESOURCE_POWER, 1000, terminalSendCount, 1, 1);
+            if (usedPowerCapacity === 0 && marketDealSendCount <= 10 && terminal.room.storage.store.getUsedCapacity(RESOURCE_ENERGY) > Util.TERMINAL_STORAGE_ENERGY_LOW_TRANSFER) {
+                marketDealSendCount = BuyResource(terminal, RESOURCE_POWER, 1000, marketDealSendCount, 1, 1);
             }
-            return terminalSendCount;
+            return marketDealSendCount;
         }
 
-        function BuyLabResources(terminal, terminalSendCount){
+        function BuyLabResources(terminal, marketDealSendCount){
             // find FillLabMineralJobs flags
             const labFlags = terminal.room.find(FIND_FLAGS, {filter : function (flag){return flag.color === COLOR_PURPLE && flag.secondaryColor === COLOR_PURPLE}});
             for(const labFlagKey in labFlags){
                 const labFlag = labFlags[labFlagKey];
-                const mineral = labFlag.name.substring(4);
+                const mineral = labFlag.name.split(/[-]+/).filter(function (e) {
+                    return e;
+                })[1];
                 const usedMineralCapacity = terminal.store.getUsedCapacity(mineral);
-                if (usedMineralCapacity < 500 && terminalSendCount < 10 && terminal.room.storage.store.getUsedCapacity(RESOURCE_ENERGY) > Util.TERMINAL_STORAGE_ENERGY_LOW_TRANSFER) {
-                    terminalSendCount = BuyResource(terminal, mineral, 500 - usedMineralCapacity, terminalSendCount, 4, 4);
+                if (usedMineralCapacity < 500 && marketDealSendCount <= 10 && terminal.room.storage.store.getUsedCapacity(mineral) === 0) {
+                    marketDealSendCount = BuyResource(terminal, mineral, 500 - usedMineralCapacity, marketDealSendCount, 4, 4);
                 }
             }
+            return marketDealSendCount;
         }
 
 
 
         /**@return {number}*/
-        function BuyResource(terminal, resourceType, amount, terminalSendCount,
+        function BuyResource(terminal, resourceType, amount, marketDealSendCount,
                              avgPrice = 1.5, // set if one wants a another acceptable average price
                              maxPrice = undefined // set if one should use a fixed price to buy under
         ) {
@@ -212,29 +204,18 @@ const Terminals = {
             if (orders.length > 0) {
                 orders.sort(comparePriceCheapestFirst);
                 Util.Info('Terminals', 'BuyResource', 'WTB ' + amount + ' ' + resourceType + ' from ' + terminal + ' ' + JSON.stringify(orders) + ' avg price ' + resourceHistory[0].avgPrice);
+                const order = orders[0];
+                if(order.remainingAmount < amount){
+                    amount = order.remainingAmount;
+                }
+                const result = Game.market.deal(order.id, amount, terminal.pos.roomName);
+                if(result === OK) {
+                    marketDealSendCount++;
+                }
+                Util.InfoLog('Terminals', 'BuyResource', amount + ' ' + resourceType + ' from ' + terminal.pos.roomName + ' to ' + order.roomName + ' result ' + result + ' marketDealSendCount ' + marketDealSendCount + ' order.remainingAmount ' + order.remainingAmount + ' price ' + order.price + ' total price ' + (order.price * amount));
+
             }
-            let amountBought = 0;
-            for (const orderKey in orders) {
-                const order = orders[orderKey];
-                let amountToBuy = amount - amountBought;
-                if(order.remainingAmount < amountToBuy){
-                    amountToBuy = order.remainingAmount;
-                }
-                const result = Game.market.deal(order.id, amountToBuy, terminal.pos.roomName);
-                terminalSendCount++;
-                if (result === OK) {
-                    amountBought = amountToBuy + amountBought;
-                }
-                if(result === OK){
-                    Util.InfoLog('Terminals', 'BuyResource', amountToBuy + ' ' + resourceType + ' from ' + terminal.pos.roomName + ' to ' + order.roomName + ' result OK terminalSendCount ' + terminalSendCount + ' order.remainingAmount ' + order.remainingAmount + ' price ' + order.price + ' total price ' + (order.price * amountToBuy));
-                }else{
-                    Util.Warning('Terminals', 'BuyResource', amountToBuy + ' ' + resourceType + ' from ' + terminal.pos.roomName + ' to ' + order.roomName + ' result ' + result + ' terminalSendCount ' + terminalSendCount + ' order.remainingAmount ' + order.remainingAmount + ' price ' + order.price + ' total price ' + (order.price * amountToBuy));
-                }
-                if (terminalSendCount >= 10 || amount <= amountBought) {
-                    break;
-                }
-            }
-            return terminalSendCount;
+            return marketDealSendCount;
         }
 
         function comparePriceCheapestFirst(a, b) {

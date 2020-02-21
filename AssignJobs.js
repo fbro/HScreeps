@@ -64,7 +64,7 @@ const AssignJobs = {
                     // idle creep is in memory room with vacant job and matching job type
                     idleCreep.memory.JobName = roomJobKey;
                     for (const memoryElementKey in idleCreep.memory) {
-                        if (memoryElementKey !== 'JobName') {
+                        if (memoryElementKey !== 'JobName' && memoryElementKey !== 'Boost' ) { // creep.memory that should not be deleted
                             idleCreep.memory[memoryElementKey] = undefined;
                         }
                     }

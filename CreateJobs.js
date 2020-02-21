@@ -219,11 +219,13 @@ const CreateJobs = {
         }
 
         function FillLabMineralJobs(jobs, gameFlagKey, gameFlag) {
-            const mineral = gameFlagKey.substring(4);
+            const mineral = gameFlagKey.split(/[-]+/).filter(function (e) {
+                return e;
+            })[1];
             const lab = gameFlag.pos.findInRange(FIND_MY_STRUCTURES, 0, {filter: function (s) {return s.structureType === STRUCTURE_LAB;}})[0];
             if (lab && (!lab.mineralType || lab.mineralType === mineral)) {
-                // flagname rules: GET-L = get lemergium from all rooms, BUY-L = get it from all rooms or then buy it from the terminal
-                if(lab.store.getFreeCapacity(mineral) > 0){
+                // flagname rules: GET-L-roomname = get lemergium from all rooms, BUY-L-roomname = get it from all rooms or then buy it from the terminal
+                if(lab.store.getFreeCapacity(mineral) > 0 && (lab.room.storage.store.getUsedCapacity(mineral) > 0 || lab.room.terminal.store.getUsedCapacity(mineral) > 0)){
                     jobs = CreateFlagJob(jobs, 'FillLabMin', gameFlagKey, gameFlag, 'T');
                 }
             }else{ // flag must be on top of an existing lab!
@@ -560,7 +562,9 @@ const CreateJobs = {
                         (
                             (
                                 (s.structureType === STRUCTURE_RAMPART || s.structureType === STRUCTURE_WALL)
-                                && (gameRoom.controller.level < 8 && s.hits < Util.RAMPART_WALL_HITS_U_LVL8 || gameRoom.controller.level === 8 && (s.hits < Util.RAMPART_WALL_HITS_O_LVL8 || gameRoom.storage && gameRoom.storage.store.getUsedCapacity(RESOURCE_ENERGY) > Util.RAMPART_WALL_MAX_HITS_WHEN_STORAGE_ENERGY))
+                                && (gameRoom.controller.level < 5 && s.hits < Util.RAMPART_WALL_HITS_U_LVL5
+                                    || gameRoom.controller.level >= 5 && gameRoom.controller.level < 8 && s.hits < Util.RAMPART_WALL_HITS_U_LVL8
+                                    || gameRoom.controller.level === 8 && (s.hits < Util.RAMPART_WALL_HITS_O_LVL8 || gameRoom.storage && gameRoom.storage.store.getUsedCapacity(RESOURCE_ENERGY) > Util.RAMPART_WALL_MAX_HITS_WHEN_STORAGE_ENERGY))
                                 ||
                                 s.structureType === STRUCTURE_ROAD && s.hits < s.hitsMax / 2
                             )

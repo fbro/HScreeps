@@ -34,6 +34,7 @@ const Util = {
     DO_EXTRACTING_WHEN_STORAGE_OVER_ENERGY : 50000, // do not extract minerals when low on storage energy
     DO_EXTRACTING_WHEN_STORAGE_UNDER_MINERAL : 200000, // stop extracting mineral when one has more than this
     RAMPART_WALL_MAX_HITS_WHEN_STORAGE_ENERGY : 600000, // when storage energy is over this value then go crazy with upgrading ramparts and walls
+    RAMPART_WALL_HITS_U_LVL5 : 1000,
     RAMPART_WALL_HITS_U_LVL8 : 100000,
     RAMPART_WALL_HITS_O_LVL8 : 2000000,
 

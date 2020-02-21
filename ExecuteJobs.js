@@ -242,7 +242,7 @@ const ExecuteJobs = {
                             }
                         }
                     }
-                    if (!creepMemory.B/*do not renew if creep is boosted*/ && (600 / gameCreep.body.length + gameCreep.ticksToLive) <= 1500) { // spawn renew functionality
+                    if (!creepMemory.Boost/*do not renew if creep is boosted*/ && (600 / gameCreep.body.length + gameCreep.ticksToLive) <= 1500) { // spawn renew functionality
                         const spawn = gameCreep.pos.findInRange(FIND_MY_STRUCTURES, 1, {
                             filter: (s) => {
                                 return s.structureType === STRUCTURE_SPAWN && !s.spawning;
@@ -525,28 +525,39 @@ const ExecuteJobs = {
                 /**@return {object}
                  * @return {undefined}*/
                 FindFetchObject: function (jobObject) {
-                    let energySupply = FindFetchResource(creep, jobObject, RESOURCE_ENERGY);
-                    if (!energySupply && creep.room.controller && creep.room.controller.my && creep.room.controller.level < 3) { // try and harvest
-                        const source = creep.pos.findClosestByPath(FIND_SOURCES_ACTIVE);
-                        if (source) {
-                            return source;
+                    const labThatCanBoost = FindLabThatCanBoost(creep, jobObject, RESOURCE_CATALYZED_GHODIUM_ACID, WORK);
+                    if (labThatCanBoost) {
+                        return labThatCanBoost;
+                    } else {
+                        let energySupply = FindFetchResource(creep, jobObject, RESOURCE_ENERGY);
+                        if (!energySupply && creep.room.controller && creep.room.controller.my && creep.room.controller.level < 3) { // try and harvest
+                            const source = creep.pos.findClosestByPath(FIND_SOURCES_ACTIVE);
+                            if (source) {
+                                return source;
+                            }
                         }
+                        return energySupply
                     }
-                    return energySupply
                 },
                 /**@return {int}*/
                 Fetch: function (fetchObject, jobObject) {
-                    if (fetchObject.energyCapacity && creep.room.controller && creep.room.controller.my && creep.room.controller.level < 3) { // this is a source - harvest it
-                        let result = creep.harvest(fetchObject);
-                        if (result === ERR_NOT_IN_RANGE) {
-                            result = Move(creep, fetchObject);
+                    let result = ERR_NO_RESULT_FOUND;
+                    if (fetchObject.structureType === STRUCTURE_LAB) {
+                        result = BoostCreep(creep, fetchObject, RESOURCE_CATALYZED_GHODIUM_ACID, WORK);
+                    } else {
+                        if (fetchObject.energyCapacity && creep.room.controller && creep.room.controller.my && creep.room.controller.level < 3) { // this is a source - harvest it
+                            result = creep.harvest(fetchObject);
+                            if (result === ERR_NOT_IN_RANGE) {
+                                result = Move(creep, fetchObject);
+                            }
+                            if (result === OK && creep.store.getFreeCapacity() > 0) {
+                                result = ERR_BUSY;
+                            }
+                        }else{
+                            result = FetchResource(creep, fetchObject, RESOURCE_ENERGY);
                         }
-                        if (result === OK && creep.store.getFreeCapacity() > 0) {
-                            result = ERR_BUSY;
-                        }
-                        return result;
                     }
-                    return FetchResource(creep, fetchObject, RESOURCE_ENERGY);
+                    return result;
                 },
             });
             return result;
@@ -609,7 +620,12 @@ const ExecuteJobs = {
                 },
                 /**@return {int}*/
                 IsJobDone: function (jobObject) {
-                    if ((jobObject.hits + (creep.getActiveBodyparts(WORK) * 100)) >= jobObject.hitsMax) {
+                    const newHits = jobObject.hits + (creep.getActiveBodyparts(WORK) * 100);
+                    if (newHits >= jobObject.hitsMax
+                        || ((jobObject.structureType === STRUCTURE_WALL || jobObject.structureType === STRUCTURE_RAMPART)
+                            && (newHits >= Util.RAMPART_WALL_HITS_U_LVL5 && jobObject.room.controller.level < 5
+                                || newHits >= Util.RAMPART_WALL_HITS_U_LVL8 && jobObject.room.controller.level >= 5 && jobObject.room.controller.level < 8
+                                || newHits >= Util.RAMPART_WALL_HITS_O_LVL8 && jobObject.room.controller.level === 8 && (!jobObject.room.storage || jobObject.room.storage && jobObject.room.storage.store.getUsedCapacity(RESOURCE_ENERGY) < Util.RAMPART_WALL_MAX_HITS_WHEN_STORAGE_ENERGY)))) {
                         // predict that the creep will be done
                         return JOB_IS_DONE;
                     } else {
@@ -1513,7 +1529,9 @@ const ExecuteJobs = {
                 /**@return {int}*/
                 JobStatus: function (jobObject) {
                     if (!creep.memory.Mineral) {
-                        creep.memory.Mineral = jobObject.name.split('-').pop();
+                        creep.memory.Mineral = jobObject.name.split(/[-]+/).filter(function (e) {
+                            return e;
+                        })[1];
                         lab = jobObject.pos.findInRange(FIND_MY_STRUCTURES, 0, {
                             filter: function (lab) {
                                 return (lab.structureType === STRUCTURE_LAB);
@@ -1555,7 +1573,8 @@ const ExecuteJobs = {
                 },
                 /**@return {int}*/
                 Fetch: function (fetchObject, jobObject) {
-                    return creep.withdraw(fetchObject, creep.memory.Mineral);
+                    const lab = jobObject.pos.lookFor(LOOK_STRUCTURES)[0];
+                    return FetchResource(creep, fetchObject, creep.memory.Mineral, lab.store.getFreeCapacity(creep.memory.Mineral));
                 },
             });
             return result;
@@ -2126,6 +2145,41 @@ const ExecuteJobs = {
             return resourceSupply;
         }
 
+        /**@return {object}
+         * @return {undefined}*/
+        function FindLabThatCanBoost(creep, jobObject, mineral, bodyTypeToBoost) {
+            if (!creep.memory.Boost || !creep.memory.Boost[bodyTypeToBoost]) {
+                const activeBodyPartsToBoost = creep.getActiveBodyparts(bodyTypeToBoost);
+                const labThatCanBoost = jobObject.room.find(FIND_MY_STRUCTURES, {
+                    filter: function (lab) {
+                        return lab.structureType === STRUCTURE_LAB && lab.store.getUsedCapacity(mineral) >= (activeBodyPartsToBoost * 30) && lab.store.getUsedCapacity(RESOURCE_ENERGY) >= (activeBodyPartsToBoost * 20);
+                    }
+                })[0];
+                return labThatCanBoost;
+            }
+        }
+
+        /**@return {object}
+         * @return {undefined}*/
+        function BoostCreep(creep, labThatCanBoost, mineral, bodyTypeToBoost) {
+            let result = ERR_NO_RESULT_FOUND;
+            if (!creep.memory.Boost || !creep.memory.Boost[bodyTypeToBoost]) {
+                if (labThatCanBoost) {
+                    result = labThatCanBoost.boostCreep(creep);
+                    if (result === OK) {
+                        Util.InfoLog('ExecuteJobs', 'BoostCreep', creep.pos.roomName + ' ' + creep.name + ' body ' + bodyTypeToBoost + ' mineral ' + mineral);
+                        if (!creep.memory.Boost) {
+                            creep.memory.Boost = {};
+                        }
+                        creep.memory.Boost[bodyTypeToBoost] = mineral;
+                    }
+                }
+            }else{
+                result = OK;
+            }
+            return result;
+        }
+
         /**@return {int}*/
         function FetchResource(creep, fetchObject, resourceToFetch, max = -1) {
             let result;
@@ -2344,7 +2398,7 @@ const ExecuteJobs = {
                         Memory.Paths[to.roomName][lastRoom] = roomInRoute.room;
                         lastRoom = roomInRoute.room
                     }
-                    Util.Info('ExecuteJobs', 'Move', 'new path from ' + from.roomName + ' to ' + to.roomName + ' ' + creep.name + ' paths: ' + JSON.stringify(Memory.Paths[to.roomName]));
+                    Util.Info('ExecuteJobs', 'Move', 'new path from ' + from.roomName + ' to ' + to.roomName + ' ' + creep.name + ' paths ' + JSON.stringify(Memory.Paths[to.roomName]));
                 }
                 const nextRoom = Memory.Paths[to.roomName][creep.pos.roomName];
                 const exitDirection = Game.map.findExit(creep.room, nextRoom);
