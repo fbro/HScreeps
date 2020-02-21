@@ -92,7 +92,7 @@ module.exports.loop = function () {
 
 // TODOs:
 // TODO add flee functionality a function in executejobs that gunner, medics, lone warriors and all other creeps use to flee from an imminent threat
-// TODO put boost on creep B that do Ctrl - remember to add creep.memory.B = true
+// TODO boosted creeps should unboostCreep at lab when low on ticksToLive
 // TODO lots of harvester src fails
 
 // lab reactions
