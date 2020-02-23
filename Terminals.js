@@ -181,7 +181,7 @@ const Terminals = {
                 })[1];
                 const usedMineralCapacity = terminal.store.getUsedCapacity(mineral);
                 if (usedMineralCapacity < 500 && marketDealSendCount <= 10 && terminal.room.storage.store.getUsedCapacity(mineral) === 0) {
-                    marketDealSendCount = BuyResource(terminal, mineral, 500 - usedMineralCapacity, marketDealSendCount, 4, 4);
+                    marketDealSendCount = BuyResource(terminal, mineral, 500 - usedMineralCapacity, marketDealSendCount, 2, 2);
                 }
             }
             return marketDealSendCount;
