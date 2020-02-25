@@ -122,10 +122,10 @@ const CreateJobs = {
                     }
                     // Controller
                     new RoomVisual(gameRoom.name).text('🧠', gameRoom.controller.pos.x, gameRoom.controller.pos.y);
-                    if(!gameRoom.storage || gameRoom.storage.store.getUsedCapacity(RESOURCE_ENERGY) >= 10000 || gameRoom.controller.ticksToDowngrade < 20000){
+                    if(!gameRoom.storage || gameRoom.storage.store.getUsedCapacity(RESOURCE_ENERGY) >= Util.STORAGE_ENERGY_LOW || gameRoom.controller.ticksToDowngrade < 20000){
                         AddJob(jobs, 'Ctrl(' + gameRoom.controller.pos.x + ',' + gameRoom.controller.pos.y + ')' + gameRoom.name, gameRoom.controller.id, Util.OBJECT_JOB, 'B');
                     }
-                    if (!gameRoom.storage || gameRoom.storage && gameRoom.storage.store.getUsedCapacity(RESOURCE_ENERGY) > 100000 && gameRoom.controller.level < 8) {
+                    if (!gameRoom.storage || gameRoom.storage && gameRoom.storage.store.getUsedCapacity(RESOURCE_ENERGY) > Util.STORAGE_ENERGY_MEDIUM && gameRoom.controller.level < 8) {
                         AddJob(jobs, 'Ctrl1(' + gameRoom.controller.pos.x + ',' + gameRoom.controller.pos.y + ')' + gameRoom.name, gameRoom.controller.id, Util.OBJECT_JOB, 'B');
                         AddJob(jobs, 'Ctrl2(' + gameRoom.controller.pos.x + ',' + gameRoom.controller.pos.y + ')' + gameRoom.name, gameRoom.controller.id, Util.OBJECT_JOB, 'B');
                     }
@@ -236,13 +236,18 @@ const CreateJobs = {
         }
 
         function EmptyLabMineralJobs(jobs, gameFlagKey, gameFlag) {
+            const mineral = gameFlagKey.split(/[-]+/).filter(function (e) {
+                return e;
+            })[1];
             const lab = gameFlag.pos.findInRange(FIND_MY_STRUCTURES, 0, {filter: function (s) {return s.structureType === STRUCTURE_LAB;}})[0];
-            if (!lab) { // flag must be on top of an existing lab!
+            if(lab && (!lab.mineralType || lab.mineralType === mineral)){
+                // flagname rules: CREATE-GH-roomname = CREATE the mineral from the nearby lab to this lab
+                if (lab.store.getUsedCapacity(mineral) > 0) {
+                    CreateFlagJob(jobs, 'EmptyLabMin', gameFlagKey, gameFlag, 'T');
+                }
+            }else{ // flag must be on top of an existing lab!
                 gameFlag.remove();
                 Util.ErrorLog('CreateJobs', 'CreateFlagJobs', 'lab gone ' + gameFlagKey);
-            } else if (lab.mineralAmount > 0) {
-                // flagname rules: CREATE-GH = CREATE the mineral from the nearby lab to this lab
-                CreateFlagJob(jobs, 'EmptyLabMin', gameFlagKey, gameFlag, 'T');
             }
             return jobs;
         }
@@ -261,7 +266,7 @@ const CreateJobs = {
         // in-room jobs:
 
         function FillPowerSpawnEnergyJobs(gameRoom, roomJobs) {
-            if (gameRoom.storage && gameRoom.storage.store.getUsedCapacity(RESOURCE_ENERGY) > Util.TERMINAL_STORAGE_ENERGY_LOW) {
+            if (gameRoom.storage && gameRoom.storage.store.getUsedCapacity(RESOURCE_ENERGY) > Util.STORAGE_ENERGY_LOW) {
                 const powerSpawns = gameRoom.find(FIND_MY_STRUCTURES, {
                     filter: (s) => {
                         return s.structureType === STRUCTURE_POWER_SPAWN;
@@ -313,19 +318,19 @@ const CreateJobs = {
                 for (const resourceType in gameRoom.storage.store) {
                     const storageResourceAmount = gameRoom.storage.store.getUsedCapacity(resourceType);
                     let maxResources = 0;
-                    let High = Util.TERMINAL_STORAGE_HIGH; // 10000
-                    let HighTransfer = Util.TERMINAL_STORAGE_HIGH_TRANSFER; // 5000
-                    let Medium = Util.TERMINAL_STORAGE_MEDIUM; // 4000
-                    let MediumTransfer = Util.TERMINAL_STORAGE_MEDIUM_TRANSFER; // 4000
-                    let Low = Util.TERMINAL_STORAGE_LOW; // 0
-                    let LowTransfer = Util.TERMINAL_STORAGE_LOW_TRANSFER; // 3000
+                    let High = Util.STORAGE_HIGH; // 10000
+                    let HighTransfer = Util.STORAGE_HIGH_TRANSFER; // 5000
+                    let Medium = Util.STORAGE_MEDIUM; // 4000
+                    let MediumTransfer = Util.STORAGE_MEDIUM_TRANSFER; // 4000
+                    let Low = Util.STORAGE_LOW; // 0
+                    let LowTransfer = Util.STORAGE_LOW_TRANSFER; // 3000
                     if (resourceType === RESOURCE_ENERGY) {
-                        High = Util.TERMINAL_STORAGE_ENERGY_HIGH; // 200000
-                        HighTransfer = Util.TERMINAL_STORAGE_ENERGY_HIGH_TRANSFER; // 100000
-                        Medium = Util.TERMINAL_STORAGE_ENERGY_MEDIUM; // 100000
-                        MediumTransfer = Util.TERMINAL_STORAGE_ENERGY_MEDIUM_TRANSFER; // 80000
-                        Low = Util.TERMINAL_STORAGE_ENERGY_LOW; // 10000
-                        LowTransfer = Util.TERMINAL_STORAGE_ENERGY_LOW_TRANSFER; // 50000
+                        High = Util.STORAGE_ENERGY_HIGH; // 200000
+                        HighTransfer = Util.STORAGE_ENERGY_HIGH_TRANSFER; // 100000
+                        Medium = Util.STORAGE_ENERGY_MEDIUM; // 100000
+                        MediumTransfer = Util.STORAGE_ENERGY_MEDIUM_TRANSFER; // 80000
+                        Low = Util.STORAGE_ENERGY_LOW; // 10000
+                        LowTransfer = Util.STORAGE_ENERGY_LOW_TRANSFER; // 50000
                     }
                     // if storage contains alot of the specified resource then allow the terminal to be filled to an extent where it will sell out
                     if (storageResourceAmount >= High) {
@@ -406,7 +411,7 @@ const CreateJobs = {
                     return s.mineralAmount > 0;
                 }
             })[0];
-            if (mineral && gameRoom.storage && (gameRoom.storage.store.getUsedCapacity(RESOURCE_ENERGY) > Util.DO_EXTRACTING_WHEN_STORAGE_OVER_ENERGY && gameRoom.storage.store.getUsedCapacity(mineral.mineralType) < Util.DO_EXTRACTING_WHEN_STORAGE_UNDER_MINERAL
+            if (mineral && gameRoom.storage && (gameRoom.storage.store.getUsedCapacity(RESOURCE_ENERGY) > Util.STORAGE_ENERGY_MEDIUM/*do not extract minerals when low on storage energy*/ && gameRoom.storage.store.getUsedCapacity(mineral.mineralType) < Util.DO_EXTRACTING_WHEN_STORAGE_UNDER_MINERAL
                 || gameRoom.find(FIND_MY_CREEPS, {
                     filter: (c) => {
                         return c.name.startsWith('E');

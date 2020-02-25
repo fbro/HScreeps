@@ -44,11 +44,11 @@ const AssignJobs = {
                 for (const roomJobKey in memRoom.RoomJobs) {
                     const roomJob = memRoom.RoomJobs[roomJobKey];
                     if (roomJob && roomJob.Creep === 'vacant') {
-                        let creepFound = AssignCreep(roomJob, idleCreeps, roomJobKey, memRoomKey);
+                        let creepFound = AssignCreep(roomJob, idleCreeps, roomJobKey, memRoomKey); // first try and assign a creep from the room the job is in
                         if (!creepFound) {
-                            creepFound = AssignCreepOtherRoom(roomJob, idleCreeps, roomJobKey, memRoomKey);
+                            creepFound = AssignCreepOtherRoom(roomJob, idleCreeps, roomJobKey, memRoomKey); // then see if there are nearby idle creep in other room
                             if (!creepFound) {
-                                creepFound = SpawnCreep(roomJob, availableSpawns, roomJobKey);
+                                creepFound = SpawnCreep(roomJob, availableSpawns, roomJobKey, memRoomKey);
                             }
                         }
                     }
@@ -81,7 +81,9 @@ const AssignJobs = {
         function AssignCreepOtherRoom(roomJob, idleCreeps, roomJobKey, memRoomKey) {
             if (roomJob.JobType === Util.FLAG_JOB
                 && (Game.rooms[memRoomKey] && Game.rooms[memRoomKey].controller && Game.rooms[memRoomKey].controller.my && Game.rooms[memRoomKey].controller.level < 8
-                    || !Game.rooms[memRoomKey] || !Game.rooms[memRoomKey].controller || !Game.rooms[memRoomKey].controller.my)) {
+                    || !Game.rooms[memRoomKey]
+                    || !Game.rooms[memRoomKey].controller
+                    || !Game.rooms[memRoomKey].controller.my)) {
                 // loop through all creeps of desired creepType and assign the nearest one to the job
                 let nearestCreep;
                 let bestRange = Number.MAX_SAFE_INTEGER;
@@ -108,16 +110,15 @@ const AssignJobs = {
         }
 
         /**@return {boolean}*/
-        function SpawnCreep(roomJob, availableSpawns, roomJobKey) {
-            const roomOnJobKey = roomJobKey.split(')').pop();
+        function SpawnCreep(roomJob, availableSpawns, roomJobKey, memRoomKey) {
             // if idle creep not found for vacant job then look if spawn is possible
-            if (ShouldSpawnCreep(roomJob.CreepType, roomOnJobKey)) {
+            if (ShouldSpawnCreep(roomJob.CreepType, memRoomKey)) {
                 const availableName = GetAvailableName(roomJob.CreepType);
                 let bestLinearDistance = 1; // normally creeps should only be spawned in the room they are needed
                 let spawnLargeVersion = false;
                 // job in another room
-                if (Game.rooms[roomOnJobKey]) { // job in invisible room
-                    const gameRoom = Game.rooms[roomOnJobKey];
+                if (Game.rooms[memRoomKey]) { // job in invisible room
+                    const gameRoom = Game.rooms[memRoomKey];
                     if (gameRoom.controller) { // flag in controller-less room
                         if (gameRoom.controller.my) { // only use my room
                             if (gameRoom.find(FIND_MY_SPAWNS).length === 0) { // no spawn in my room
@@ -127,12 +128,12 @@ const AssignJobs = {
                                 const source = gameRoom.find(FIND_SOURCES)[0];
                                 for (const effectKey in source.effects) {
                                     if (source.effects[effectKey].effect === PWR_REGEN_SOURCE) {
-                                        Util.Info('AssignJobs', 'SpawnCreep', 'Harvester spawning uses large version because of PWR_REGEN_SOURCE ' + source.effects[effectKey].effect + ' ' + roomOnJobKey);
+                                        Util.Info('AssignJobs', 'SpawnCreep', 'Harvester spawning uses large version because of PWR_REGEN_SOURCE ' + source.effects[effectKey].effect + ' ' + memRoomKey);
                                         spawnLargeVersion = true;
                                         break;
                                     }
                                 }
-                            } else if (roomJob.CreepType === 'B' && gameRoom.storage && gameRoom.storage.store.getUsedCapacity(RESOURCE_ENERGY) > Util.SPAWN_LARGE_B_WHEN_STORAGE_ENERGY) {
+                            } else if (roomJob.CreepType === 'B' && roomJobKey.startsWith('Ctrl') && gameRoom.storage && gameRoom.storage.store.getUsedCapacity(RESOURCE_ENERGY) > Util.STORAGE_ENERGY_MEDIUM/*large builders are only allowed when the room has the required energy - the drawback is that upgrade controller takes alot of energy*/) {
                                 spawnLargeVersion = true;
                             }
                         } else {
@@ -152,10 +153,13 @@ const AssignJobs = {
                 let bestAvailableSpawnCounter;
                 for (const availableSpawnCounter in availableSpawns) { // find closest spawn
                     const availableSpawn = availableSpawns[availableSpawnCounter];
-                    const linearDistance = Game.map.getRoomLinearDistance(availableSpawn.pos.roomName, roomOnJobKey);
+                    const linearDistance = Game.map.getRoomLinearDistance(availableSpawn.pos.roomName, memRoomKey);
                     let energyAvailableModifier = 0;
                     if (roomJob.JobType === Util.FLAG_JOB) { // on flag jobs one wants to share the load between rooms with more energy
                         switch (true) {
+                            case availableSpawn.room.storage.store.getUsedCapacity(RESOURCE_ENERGY) < Util.STORAGE_ENERGY_MEDIUM: // do not spawn for a flag job when the storage has under STORAGE_ENERGY_MEDIUM
+                                energyAvailableModifier = Number.MAX_SAFE_INTEGER;
+                                break;
                             case availableSpawn.room.energyAvailable < 500:
                                 energyAvailableModifier = -1;
                                 break;
@@ -194,7 +198,7 @@ const AssignJobs = {
                                 break;
                         }
                     }
-                    if ((energyAvailableModifier + linearDistance) < bestLinearDistance) {
+                    if ((energyAvailableModifier + linearDistance) < bestLinearDistance && energyAvailableModifier !== Number.MAX_SAFE_INTEGER) {
                         bestLinearDistance = energyAvailableModifier + linearDistance;
                         bestAvailableSpawn = availableSpawn;
                         bestAvailableSpawnCounter = availableSpawnCounter;
@@ -209,14 +213,14 @@ const AssignJobs = {
                     if (spawnResult === OK) {
                         Game.creeps[availableName].memory.JobName = roomJobKey;
                         roomJob.Creep = availableName;
-                        if (Memory.MemRooms[roomOnJobKey].MaxCreeps[availableName.substring(0, 1)]) {
-                            Memory.MemRooms[roomOnJobKey].MaxCreeps[availableName.substring(0, 1)][availableName] = availableName;
+                        if (Memory.MemRooms[memRoomKey].MaxCreeps[availableName.substring(0, 1)]) {
+                            Memory.MemRooms[memRoomKey].MaxCreeps[availableName.substring(0, 1)][availableName] = availableName;
                         }
-                        Util.Info('AssignJobs', 'SpawnCreep', 'OK ' + availableName + ' assigned to ' + roomJobKey + ' in ' + roomOnJobKey + ' spawn ' + bestAvailableSpawn.name);
+                        Util.Info('AssignJobs', 'SpawnCreep', 'OK ' + availableName + ' assigned to ' + roomJobKey + ' in ' + memRoomKey + ' spawn ' + bestAvailableSpawn.name);
                         delete availableSpawns[bestAvailableSpawnCounter];
                         return true;
                     } else {
-                        Util.Info('AssignJobs', 'SpawnCreep', 'failed ' + availableName + ' assigned to ' + roomJobKey + ' in ' + roomOnJobKey + ' spawnResult ' + spawnResult + ' spawn ' + bestAvailableSpawn.name + ' room energy: ' + Game.rooms[bestAvailableSpawn.pos.roomName].energyAvailable);
+                        Util.Info('AssignJobs', 'SpawnCreep', 'failed ' + availableName + ' assigned to ' + roomJobKey + ' in ' + memRoomKey + ' spawnResult ' + spawnResult + ' spawn ' + bestAvailableSpawn.name + ' room energy: ' + Game.rooms[bestAvailableSpawn.pos.roomName].energyAvailable);
                         return false;
                     }
                 }
@@ -448,61 +452,58 @@ const AssignJobs = {
                     switch (true) {
                         case (energyAvailable >= 2600): // energyCapacityAvailable: 12900
                             body = [
+                                MOVE, MOVE, MOVE, MOVE, MOVE,
+                                MOVE, MOVE, MOVE, MOVE, MOVE,
+                                MOVE, MOVE, MOVE, MOVE, MOVE,
+                                MOVE, MOVE, MOVE, MOVE, MOVE,
                                 ATTACK, ATTACK, ATTACK, ATTACK, ATTACK,
                                 ATTACK, ATTACK, ATTACK, ATTACK, ATTACK,
                                 ATTACK, ATTACK, ATTACK, ATTACK, ATTACK,
-                                ATTACK, ATTACK, ATTACK, ATTACK,
-                                MOVE, MOVE, MOVE, MOVE, MOVE,
-                                MOVE, MOVE, MOVE, MOVE, MOVE,
-                                MOVE, MOVE, MOVE, MOVE, MOVE,
-                                MOVE, MOVE, MOVE, MOVE, MOVE,
-                                ATTACK
+                                ATTACK, ATTACK, ATTACK, ATTACK, ATTACK
                             ];
                             break;
                         case (energyAvailable >= 2340): // energyCapacityAvailable: 5600
                             body = [
-                                ATTACK, ATTACK, ATTACK, ATTACK, ATTACK,
-                                ATTACK, ATTACK, ATTACK, ATTACK, ATTACK,
-                                ATTACK, ATTACK, ATTACK, ATTACK, ATTACK,
-                                ATTACK, ATTACK,
                                 MOVE, MOVE, MOVE, MOVE, MOVE,
                                 MOVE, MOVE, MOVE, MOVE, MOVE,
                                 MOVE, MOVE, MOVE, MOVE, MOVE,
                                 MOVE, MOVE, MOVE,
-                                ATTACK
+                                ATTACK, ATTACK, ATTACK, ATTACK, ATTACK,
+                                ATTACK, ATTACK, ATTACK, ATTACK, ATTACK,
+                                ATTACK, ATTACK, ATTACK, ATTACK, ATTACK,
+                                ATTACK, ATTACK, ATTACK
                             ];
                             break;
                         case (energyAvailable >= 2080): // energyCapacityAvailable: 2300
                             body = [
-                                ATTACK, ATTACK, ATTACK, ATTACK, ATTACK,
-                                ATTACK, ATTACK, ATTACK, ATTACK, ATTACK,
-                                ATTACK, ATTACK, ATTACK, ATTACK, ATTACK,
                                 MOVE, MOVE, MOVE, MOVE, MOVE,
                                 MOVE, MOVE, MOVE, MOVE, MOVE,
                                 MOVE, MOVE, MOVE, MOVE, MOVE,
                                 MOVE,
+                                ATTACK, ATTACK, ATTACK, ATTACK, ATTACK,
+                                ATTACK, ATTACK, ATTACK, ATTACK, ATTACK,
+                                ATTACK, ATTACK, ATTACK, ATTACK, ATTACK,
                                 ATTACK
                             ];
                             break;
                         case (energyAvailable >= 1690): // energyCapacityAvailable: 1800
                             body = [
-                                ATTACK, ATTACK, ATTACK, ATTACK, ATTACK,
-                                ATTACK, ATTACK, ATTACK, ATTACK, ATTACK,
-                                ATTACK, ATTACK,
                                 MOVE, MOVE, MOVE, MOVE, MOVE,
                                 MOVE, MOVE, MOVE, MOVE, MOVE,
                                 MOVE, MOVE, MOVE,
-                                ATTACK
+                                ATTACK, ATTACK, ATTACK, ATTACK, ATTACK,
+                                ATTACK, ATTACK, ATTACK, ATTACK, ATTACK,
+                                ATTACK, ATTACK, ATTACK
                             ];
                             break;
                         case (energyAvailable >= 1300): // energyCapacityAvailable: 1300
-                            body = [ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, ATTACK];
+                            body = [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK];
                             break;
                         case (energyAvailable >= 520): // energyCapacityAvailable: 550
-                            body = [ATTACK, ATTACK, ATTACK, MOVE, MOVE, MOVE, MOVE, ATTACK];
+                            body = [MOVE, MOVE, MOVE, MOVE, ATTACK, ATTACK, ATTACK, ATTACK];
                             break;
                         case (energyAvailable >= 260): // energyCapacityAvailable: 300
-                            body = [ATTACK, MOVE, MOVE, ATTACK];
+                            body = [MOVE, MOVE, ATTACK, ATTACK];
                             break;
                     }
                     break;
@@ -558,7 +559,8 @@ const AssignJobs = {
                                 MOVE, MOVE, MOVE, MOVE, MOVE,
                                 MOVE, MOVE, MOVE, MOVE, MOVE,
                                 MOVE, MOVE, MOVE, MOVE, MOVE,
-                                MOVE, MOVE, MOVE, MOVE, MOVE, HEAL];
+                                MOVE, MOVE, MOVE, MOVE, MOVE,
+                                HEAL];
                             break;
                         case (energyAvailable >= 4800): // energyCapacityAvailable: 5600
                             body = [HEAL, HEAL, HEAL, HEAL, HEAL, HEAL, HEAL, HEAL, HEAL, HEAL, HEAL, HEAL, HEAL, HEAL, HEAL,

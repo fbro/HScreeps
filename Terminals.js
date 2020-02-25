@@ -21,7 +21,7 @@ const Terminals = {
             for (const terminalKey in terminals) {
                 const terminal = terminals[terminalKey];
                 if (terminal.cooldown === 0) {
-                    if(terminal.store.getUsedCapacity(RESOURCE_ENERGY) >= Util.TERMINAL_STORAGE_ENERGY_LOW){
+                    if(terminal.store.getUsedCapacity(RESOURCE_ENERGY) >= Util.STORAGE_ENERGY_LOW){
                         DistributeResources(terminal, terminals);
                         marketDealSendCount = SellExcessResource(terminal, marketDealSendCount);
                         marketDealSendCount = BuyResources(terminal, marketDealSendCount);
@@ -82,7 +82,7 @@ const Terminals = {
                 for (const toTerminalKey in terminals) {
                     const toTerminal = terminals[toTerminalKey];
                     if (toTerminal.id !== fromTerminal.id
-                        && toTerminal.store.getUsedCapacity(resourceType) < Util.TERMINAL_TARGET_RESOURCE // do not transfer anymore commodities if toTerminal already has more than TERMINAL_STORAGE_HIGH_TRANSFER
+                        && toTerminal.store.getUsedCapacity(resourceType) < Util.TERMINAL_TARGET_RESOURCE // do not transfer anymore commodities if toTerminal already has more than STORAGE_HIGH_TRANSFER
                         && toTerminal.room.find(FIND_MY_STRUCTURES, {
                         filter: function (s) {
                             return s.structureType === STRUCTURE_FACTORY && (factoryLevel === s.level || factoryLevel === 0);
@@ -165,7 +165,7 @@ const Terminals = {
             }
             // buy power
             const usedPowerCapacity = terminal.store.getUsedCapacity(RESOURCE_POWER);
-            if (usedPowerCapacity === 0 && marketDealSendCount <= 10 && terminal.room.storage.store.getUsedCapacity(RESOURCE_ENERGY) > Util.TERMINAL_STORAGE_ENERGY_LOW_TRANSFER) {
+            if (usedPowerCapacity === 0 && marketDealSendCount <= 10 && terminal.room.storage.store.getUsedCapacity(RESOURCE_ENERGY) > Util.STORAGE_ENERGY_LOW_TRANSFER) {
                 marketDealSendCount = BuyResource(terminal, RESOURCE_POWER, 1000, marketDealSendCount, 1, 1);
             }
             return marketDealSendCount;

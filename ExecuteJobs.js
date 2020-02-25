@@ -525,7 +525,7 @@ const ExecuteJobs = {
                 /**@return {object}
                  * @return {undefined}*/
                 FindFetchObject: function (jobObject) {
-                    if(creep.room.storage && creep.room.storage.store.getUsedCapacity(RESOURCE_ENERGY) >= Util.TERMINAL_STORAGE_ENERGY_HIGH){ // do not boost upgradeController in rooms with low energy
+                    if(creep.room.storage && creep.room.storage.store.getUsedCapacity(RESOURCE_ENERGY) >= Util.STORAGE_ENERGY_HIGH){ // do not boost upgradeController in rooms with low energy
                         const labThatCanBoost = FindLabThatCanBoost(creep, jobObject, RESOURCE_CATALYZED_GHODIUM_ACID, WORK);
                         if (labThatCanBoost) {
                             return labThatCanBoost;
@@ -780,11 +780,11 @@ const ExecuteJobs = {
                 JobStatus: function (jobObject) {
                     let creepSum = creep.store.getUsedCapacity();
                     if (!jobObject && creepSum === 0 // if the target is a dropped resource it may just disappear because it was picked up
-                        || jobObject.structureType === STRUCTURE_TERMINAL && (jobObject.store.getUsedCapacity(RESOURCE_ENERGY) < Util.TERMINAL_STORAGE_ENERGY_MEDIUM_TRANSFER && jobObject.room.storage.store.getUsedCapacity(RESOURCE_ENERGY) >= Util.TERMINAL_STORAGE_ENERGY_LOW)) {
+                        || jobObject.structureType === STRUCTURE_TERMINAL && (jobObject.store.getUsedCapacity(RESOURCE_ENERGY) < Util.STORAGE_ENERGY_MEDIUM_TRANSFER && jobObject.room.storage.store.getUsedCapacity(RESOURCE_ENERGY) >= Util.STORAGE_ENERGY_LOW)) {
                         return JOB_IS_DONE;
                     } else if (jobObject && (creepSum === 0 || !creep.memory.Depositing && creepSum < creep.store.getCapacity() && creep.pos.getRangeTo(jobObject) <= 1
                         && (jobObject.resourceType || (jobObject.store.getUsedCapacity() > 0
-                            || jobObject.structureType === STRUCTURE_TERMINAL && (jobObject.store.getUsedCapacity(RESOURCE_ENERGY) >= Util.TERMINAL_STORAGE_ENERGY_HIGH_TRANSFER || jobObject.room.storage.store.getUsedCapacity(RESOURCE_ENERGY) < Util.TERMINAL_STORAGE_ENERGY_LOW && jobObject.store.getUsedCapacity(RESOURCE_ENERGY) > 0))))
+                            || jobObject.structureType === STRUCTURE_TERMINAL && (jobObject.store.getUsedCapacity(RESOURCE_ENERGY) >= Util.STORAGE_ENERGY_HIGH_TRANSFER || jobObject.room.storage.store.getUsedCapacity(RESOURCE_ENERGY) < Util.STORAGE_ENERGY_LOW && jobObject.store.getUsedCapacity(RESOURCE_ENERGY) > 0))))
                     ) {
                         creep.memory.Depositing = undefined;
                         return SHOULD_ACT; // get resources from target
@@ -903,19 +903,19 @@ const ExecuteJobs = {
                 })[1];
                 creep.memory.resourceType = resourceType;
             }
-            let Low = Util.TERMINAL_STORAGE_LOW;
-            let LowTransfer = Util.TERMINAL_STORAGE_LOW_TRANSFER;
-            let Medium = Util.TERMINAL_STORAGE_MEDIUM;
-            let MediumTransfer = Util.TERMINAL_STORAGE_MEDIUM_TRANSFER;
-            let High = Util.TERMINAL_STORAGE_HIGH;
-            let HighTransfer = Util.TERMINAL_STORAGE_HIGH_TRANSFER;
+            let Low = Util.STORAGE_LOW;
+            let LowTransfer = Util.STORAGE_LOW_TRANSFER;
+            let Medium = Util.STORAGE_MEDIUM;
+            let MediumTransfer = Util.STORAGE_MEDIUM_TRANSFER;
+            let High = Util.STORAGE_HIGH;
+            let HighTransfer = Util.STORAGE_HIGH_TRANSFER;
             if (resourceType === RESOURCE_ENERGY) {
-                Low = Util.TERMINAL_STORAGE_ENERGY_LOW;
-                LowTransfer = Util.TERMINAL_STORAGE_ENERGY_LOW_TRANSFER;
-                Medium = Util.TERMINAL_STORAGE_ENERGY_MEDIUM;
-                MediumTransfer = Util.TERMINAL_STORAGE_ENERGY_MEDIUM_TRANSFER;
-                High = Util.TERMINAL_STORAGE_ENERGY_HIGH;
-                HighTransfer = Util.TERMINAL_STORAGE_ENERGY_HIGH_TRANSFER;
+                Low = Util.STORAGE_ENERGY_LOW;
+                LowTransfer = Util.STORAGE_ENERGY_LOW_TRANSFER;
+                Medium = Util.STORAGE_ENERGY_MEDIUM;
+                MediumTransfer = Util.STORAGE_ENERGY_MEDIUM_TRANSFER;
+                High = Util.STORAGE_ENERGY_HIGH;
+                HighTransfer = Util.STORAGE_ENERGY_HIGH_TRANSFER;
             }
             const result = GenericJobAction(creep, roomJob, {
                 /**@return {int}*/

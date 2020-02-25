@@ -6,21 +6,19 @@ const Util = {
     TERMINAL_MAX_RESOURCE: 6000,
     TERMINAL_MAX_ENERGY: 90000,
     // if storage contains more or equal of high then creep should transfer to terminal until high_transfer is in terminal
-    TERMINAL_STORAGE_ENERGY_HIGH: 300000,
-    TERMINAL_STORAGE_ENERGY_HIGH_TRANSFER: 100000,
-    TERMINAL_STORAGE_ENERGY_MEDIUM: 100000,
-    TERMINAL_STORAGE_ENERGY_MEDIUM_TRANSFER: 80000,
-    TERMINAL_STORAGE_ENERGY_LOW: 10000, // abort transfer when storage is lower than this
-    TERMINAL_STORAGE_ENERGY_LOW_TRANSFER: 50000,
+    STORAGE_ENERGY_HIGH: 300000,
+    STORAGE_ENERGY_HIGH_TRANSFER: 100000,
+    STORAGE_ENERGY_MEDIUM: 100000,
+    STORAGE_ENERGY_MEDIUM_TRANSFER: 80000,
+    STORAGE_ENERGY_LOW: 10000, // abort transfer when storage is lower than this
+    STORAGE_ENERGY_LOW_TRANSFER: 50000,
 
-    TERMINAL_STORAGE_HIGH: 10000,
-    TERMINAL_STORAGE_HIGH_TRANSFER: 8000,
-    TERMINAL_STORAGE_MEDIUM: 6000,
-    TERMINAL_STORAGE_MEDIUM_TRANSFER: 6000,
-    TERMINAL_STORAGE_LOW: 0, // abort transfer when storage is lower than this
-    TERMINAL_STORAGE_LOW_TRANSFER: 6000,
-
-    SPAWN_LARGE_B_WHEN_STORAGE_ENERGY: 100000, // large builders are only allowed when the room has the required energy - the drawback is that upgrade controller takes alot of energy
+    STORAGE_HIGH: 10000,
+    STORAGE_HIGH_TRANSFER: 8000,
+    STORAGE_MEDIUM: 6000,
+    STORAGE_MEDIUM_TRANSFER: 6000,
+    STORAGE_LOW: 0, // abort transfer when storage is lower than this
+    STORAGE_LOW_TRANSFER: 6000,
 
     // job type int enum
     OBJECT_JOB : 1,
@@ -31,7 +29,6 @@ const Util = {
     OBSERVER_SCAN_RADIUS_POWER_DEPOSIT : 5, // the radius around the flagged observer when scanning for power banks or deposits
     DEPOSIT_MAX_LAST_COOLDOWN : 80, // if the deposit is over this value then ignore it and end the deposit job
 
-    DO_EXTRACTING_WHEN_STORAGE_OVER_ENERGY : 50000, // do not extract minerals when low on storage energy
     DO_EXTRACTING_WHEN_STORAGE_UNDER_MINERAL : 200000, // stop extracting mineral when one has more than this
     RAMPART_WALL_MAX_HITS_WHEN_STORAGE_ENERGY : 600000, // when storage energy is over this value then go crazy with upgrading ramparts and walls
     RAMPART_WALL_HITS_U_LVL5 : 1000,
