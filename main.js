@@ -70,7 +70,6 @@ module.exports.loop = function () {
                 }
                 if(Game.time % 240000 === 0){ // approx every 3 days
                     delete Memory.Paths; // remove Paths to make room for new paths
-                    delete Memory.ErrorLog;
                     delete Memory.InfoLog;
                     Util.InfoLog('Main', 'Main', 'reset memory logs ' + Game.time);
                 }
@@ -93,6 +92,7 @@ module.exports.loop = function () {
 // TODOs:
 // TODO add flee functionality a function in executejobs that gunner, medics, lone warriors and all other creeps use to flee from an imminent threat
 // TODO boosted creeps should unboostCreep at lab when low on ticksToLive
+// TODO despawn idle creeps
 
 // lab reactions
 

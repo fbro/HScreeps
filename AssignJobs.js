@@ -268,7 +268,11 @@ const AssignJobs = {
                     case 'G': // gunner
                     case 'M': // medic
                     case 'S': // scout
-                        maxCreepsInRoom = 3;
+                        if (!Game.rooms[roomKey] || !Game.rooms[roomKey].controller || Game.rooms[roomKey].controller.level === 0) {
+                            maxCreepsInRoom = 3;
+                        } else {
+                            maxCreepsInRoom = 0;
+                        }
                         break;
                     case 'C': // claimer
                     case 'R': // reserver

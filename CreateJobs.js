@@ -90,6 +90,7 @@ const CreateJobs = {
 
         function CreateFlagJob(jobs, jobName, gameFlagKey, gameFlag, creepType) {
             //Util.Info('CreateJobs', 'CreateFlagJob', 'AddJob ' + gameFlagKey);
+            IncreaseMaxCreeps(gameFlag.pos.roomName, creepType);
             return AddJob(jobs, jobName + '-' + gameFlagKey + '(' + gameFlag.pos.x + ',' + gameFlag.pos.y + ')' + gameFlag.pos.roomName, gameFlagKey, Util.FLAG_JOB, creepType);
         }
 
@@ -616,6 +617,15 @@ const CreateJobs = {
         }
 
         // util:
+
+        /**@return {boolean}*/
+        function IncreaseMaxCreeps(roomKey, creepType, amount = 1){
+            if(Memory.MemRooms[roomKey] && Memory.MemRooms[roomKey].MaxCreeps && Memory.MemRooms[roomKey].MaxCreeps[creepType] && Memory.MemRooms[roomKey].MaxCreeps[creepType].M){
+                Memory.MemRooms[roomKey].MaxCreeps[creepType].M += amount;
+                return true;
+            }
+            return false;
+        }
 
         function CreateRoom(roomName, jobs) {
             const gameRoom = Game.rooms[roomName];

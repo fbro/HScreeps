@@ -50,9 +50,7 @@ const PowerCreeps = {
                                 result = powerCreep.usePower(PWR_GENERATE_OPS); // if power creep is an operator - always use this power when available
                             } else if (powerCreep.memory.OperateFactoryCooldown < Game.time && powerCreep.powers[PWR_OPERATE_FACTORY] && powerCreep.powers[PWR_OPERATE_FACTORY].cooldown === 0 && powerCreep.store.getUsedCapacity(RESOURCE_OPS) >= 100) {
                                 result = OperateFactory(powerCreep);
-                            } /*else if (powerCreep.memory.OperateTerminalCooldown < Game.time && powerCreep.store.getUsedCapacity(RESOURCE_OPS) >= 100 && powerCreep.powers[PWR_OPERATE_TERMINAL].cooldown === 0 && powerCreep.room.terminal && powerCreep.room.terminal.my) {
-                                result = OperateTerminal(powerCreep);
-                            }*/ else if ((powerCreep.memory.RegenSource1Cooldown < Game.time || powerCreep.memory.RegenSource2Cooldown < Game.time) && powerCreep.powers[PWR_REGEN_SOURCE] && powerCreep.powers[PWR_REGEN_SOURCE].cooldown === 0) {
+                            } else if ((powerCreep.memory.RegenSource1Cooldown < Game.time || powerCreep.memory.RegenSource2Cooldown < Game.time) && powerCreep.powers[PWR_REGEN_SOURCE] && powerCreep.powers[PWR_REGEN_SOURCE].cooldown === 0) {
                                 result = RegenSource(powerCreep);
                             } else if (powerCreep.memory.RegenMineralCooldown < Game.time && powerCreep.powers[PWR_REGEN_MINERAL] && powerCreep.powers[PWR_REGEN_MINERAL].cooldown === 0) {
                                 result = RegenMineral(powerCreep);
@@ -60,7 +58,11 @@ const PowerCreeps = {
                                 result = DepositOps(powerCreep);
                             } else if (powerCreep.store.getUsedCapacity(RESOURCE_OPS) < 100) {
                                 result = WithdrawOps(powerCreep);
-                            }
+                            } /*else if (powerCreep.memory.OperateTerminalCooldown < Game.time && powerCreep.store.getUsedCapacity(RESOURCE_OPS) >= 100 && powerCreep.powers[PWR_OPERATE_TERMINAL] && powerCreep.powers[PWR_OPERATE_TERMINAL].cooldown === 0 && powerCreep.room.terminal && powerCreep.room.terminal.my) {
+                                result = OperateTerminal(powerCreep);
+                            }*/ /*else if ((!powerCreep.memory.spawns || _.filter(powerCreep.memory.spawns, function (s) {return s < Game.time;}).length > 0) && powerCreep.store.getUsedCapacity(RESOURCE_OPS) >= 100 && powerCreep.powers[PWR_OPERATE_SPAWN] && powerCreep.powers[PWR_OPERATE_SPAWN].cooldown === 0) {
+                                result = OperateSpawn(powerCreep);
+                            }*/
                         }
                     }
                 }
@@ -123,6 +125,44 @@ const PowerCreeps = {
                     powerCreep.memory.OperateTerminalCooldown = Game.time + 1000; // add duration
                 }
             }
+            return result;
+        }
+
+        function OperateSpawn(powerCreep) {
+            let result;
+            if(!powerCreep.memory.spawns){
+                const spawns = powerCreep.room.find(FIND_MY_SPAWNS);
+                const spawnIDs = {};
+                for(const spawnKey in spawns){
+                    const spawn = spawns[spawnKey];
+                    spawnIDs[spawn.id] = 1;
+                }
+                powerCreep.memory.spawns = spawnIDs;
+            }
+            for(const spawnId in powerCreep.memory.spawns){
+                const spawn = Game.getObjectById(spawnId);
+                if(spawn){
+                    let spawnHasBuff = false;
+                    for (const effectKey in spawn.effects) {
+                        const effect = spawn.effects[effectKey];
+                        if (effect.effect === PWR_OPERATE_SPAWN && effect.ticksRemaining > 30) {
+                            spawnHasBuff = true;
+                            break;
+                        }
+                    }
+                    if(!spawnHasBuff){
+                        result = powerCreep.usePower(PWR_OPERATE_SPAWN, spawn);
+                        Util.Info('PowerCreeps', 'OperateSpawn', powerCreep.name + ' on (' + spawn.pos.x + ',' + spawn.pos.y + ',' + spawn.pos.roomName + ')');
+                        if (result === ERR_NOT_IN_RANGE) {
+                            result = powerCreep.moveTo(spawn);
+                        } else if (result === OK) {
+                            powerCreep.memory.spawns[spawn.id] = Game.time + 1000; // add duration
+                        }
+                        break;
+                    }
+                }
+            }
+
             return result;
         }
 
