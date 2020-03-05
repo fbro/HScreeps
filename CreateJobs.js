@@ -88,9 +88,12 @@ const CreateJobs = {
             return jobs;
         }
 
-        function CreateFlagJob(jobs, jobName, gameFlagKey, gameFlag, creepType) {
+        function CreateFlagJob(jobs, jobName, gameFlagKey, gameFlag, creepType, amount = 1) {
             //Util.Info('CreateJobs', 'CreateFlagJob', 'AddJob ' + gameFlagKey);
-            IncreaseMaxCreeps(gameFlag.pos.roomName, creepType);
+            // increase MaxCreeps.M for when flag jobs are created
+            if(Memory.MemRooms[gameFlag.pos.roomName] && Memory.MemRooms[gameFlag.pos.roomName].MaxCreeps && Memory.MemRooms[gameFlag.pos.roomName].MaxCreeps[creepType] && Memory.MemRooms[gameFlag.pos.roomName].MaxCreeps[creepType].M){
+                Memory.MemRooms[gameFlag.pos.roomName].MaxCreeps[creepType].M += amount;
+            }
             return AddJob(jobs, jobName + '-' + gameFlagKey + '(' + gameFlag.pos.x + ',' + gameFlag.pos.y + ')' + gameFlag.pos.roomName, gameFlagKey, Util.FLAG_JOB, creepType);
         }
 
@@ -227,7 +230,7 @@ const CreateJobs = {
             if (lab && (!lab.mineralType || lab.mineralType === mineral)) {
                 // flagname rules: GET-L-roomname = get lemergium from all rooms, BUY-L-roomname = get it from all rooms or then buy it from the terminal
                 if(lab.store.getFreeCapacity(mineral) > 0 && (lab.room.storage.store.getUsedCapacity(mineral) > 0 || lab.room.terminal.store.getUsedCapacity(mineral) > 0)){
-                    jobs = CreateFlagJob(jobs, 'FillLabMin', gameFlagKey, gameFlag, 'T');
+                    jobs = CreateFlagJob(jobs, 'FillLabMin', gameFlagKey, gameFlag, 'T', 0);
                 }
             }else{ // flag must be on top of an existing lab!
                 gameFlag.remove();
@@ -244,7 +247,7 @@ const CreateJobs = {
             if(lab && (!lab.mineralType || lab.mineralType === mineral)){
                 // flagname rules: CREATE-GH-roomname = CREATE the mineral from the nearby lab to this lab
                 if (lab.store.getUsedCapacity(mineral) > 0) {
-                    CreateFlagJob(jobs, 'EmptyLabMin', gameFlagKey, gameFlag, 'T');
+                    CreateFlagJob(jobs, 'EmptyLabMin', gameFlagKey, gameFlag, 'T', 0);
                 }
             }else{ // flag must be on top of an existing lab!
                 gameFlag.remove();
@@ -617,15 +620,6 @@ const CreateJobs = {
         }
 
         // util:
-
-        /**@return {boolean}*/
-        function IncreaseMaxCreeps(roomKey, creepType, amount = 1){
-            if(Memory.MemRooms[roomKey] && Memory.MemRooms[roomKey].MaxCreeps && Memory.MemRooms[roomKey].MaxCreeps[creepType] && Memory.MemRooms[roomKey].MaxCreeps[creepType].M){
-                Memory.MemRooms[roomKey].MaxCreeps[creepType].M += amount;
-                return true;
-            }
-            return false;
-        }
 
         function CreateRoom(roomName, jobs) {
             const gameRoom = Game.rooms[roomName];

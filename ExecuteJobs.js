@@ -29,7 +29,7 @@ const ExecuteJobs = {
                     continue;
                 }
                 const roomName = creepMemory.JobName.split(')').pop();
-                let result;
+                let result = ERR_NO_RESULT_FOUND;
                 if (!creepMemory.JobName.startsWith('idle') && Memory.MemRooms[roomName]) { // creep is not idle
                     const job = Memory.MemRooms[roomName].RoomJobs[creepMemory.JobName];
                     if (!job && gameCreep) { // job is outdated and removed from Memory and creep is still alive
@@ -126,7 +126,7 @@ const ExecuteJobs = {
                             }
 
                             if (closestOwnedRoom && (closestOwnedRoom !== gameCreep.pos.roomName || gameCreep.pos.getRangeTo(Game.rooms[closestOwnedRoom].controller) > 4)) {
-                                Move(gameCreep, Game.rooms[closestOwnedRoom].controller);
+                                result = Move(gameCreep, Game.rooms[closestOwnedRoom].controller);
                                 gameCreep.say('🏠🏃');
                             } else {
                                 gameCreep.memory.MoveHome = undefined;
@@ -169,7 +169,8 @@ const ExecuteJobs = {
                                     result = Move(gameCreep, damagedCreep);
                                 }
                             }
-                        } else {
+                        }
+                        if(result === ERR_NO_RESULT_FOUND) {
                             const creepType = creepName.substring(0, 1);
                             const maxCreeps = Memory.MemRooms[gameCreep.pos.roomName].MaxCreeps;
                             if (maxCreeps && maxCreeps[creepType] && (Object.keys(maxCreeps[creepType]).length - 1) > maxCreeps[creepType]['M']) { // check if creepType is overrepresented in this room - recycle creep
@@ -525,10 +526,15 @@ const ExecuteJobs = {
                 /**@return {object}
                  * @return {undefined}*/
                 FindFetchObject: function (jobObject) {
-                    if(creep.room.storage && creep.room.storage.store.getUsedCapacity(RESOURCE_ENERGY) >= Util.STORAGE_ENERGY_HIGH){ // do not boost upgradeController in rooms with low energy
+                    if(creep.ticksToLive > 1300 && (!creep.memory.Boost || creep.memory.Boost && !creep.memory.Boost[WORK]) && creep.room.storage && creep.room.storage.store.getUsedCapacity(RESOURCE_ENERGY) >= Util.STORAGE_ENERGY_MEDIUM){ // do not boost upgradeController in rooms with low energy
                         const labThatCanBoost = FindLabThatCanBoost(creep, jobObject, RESOURCE_CATALYZED_GHODIUM_ACID, WORK);
                         if (labThatCanBoost) {
                             return labThatCanBoost;
+                        }
+                    }else if(creep.memory.Boost && creep.memory.Boost[WORK] && creep.ticksToLive < 200){ // unboost the creep before the mineral is lost
+                        const labThatCanUnBoost = FindLabThatCanUnBoost(jobObject);
+                        if (labThatCanUnBoost) {
+                            return labThatCanUnBoost;
                         }
                     }
                     let energySupply = FindFetchResource(creep, jobObject, RESOURCE_ENERGY);
@@ -544,7 +550,11 @@ const ExecuteJobs = {
                 Fetch: function (fetchObject, jobObject) {
                     let result = ERR_NO_RESULT_FOUND;
                     if (fetchObject.structureType === STRUCTURE_LAB) {
-                        result = BoostCreep(creep, fetchObject, RESOURCE_CATALYZED_GHODIUM_ACID, WORK);
+                        if(creep.ticksToLive > 200){
+                            result = BoostCreep(creep, fetchObject, RESOURCE_CATALYZED_GHODIUM_ACID, WORK);
+                        }else{
+                            result = UnBoostCreep(creep, fetchObject, RESOURCE_CATALYZED_GHODIUM_ACID, WORK);
+                        }
                     } else {
                         if (fetchObject.energyCapacity && creep.room.controller && creep.room.controller.my && creep.room.controller.level < 3) { // this is a source - harvest it
                             result = creep.harvest(fetchObject);
@@ -2160,6 +2170,17 @@ const ExecuteJobs = {
             }
         }
 
+        /**@return {object}
+         * @return {undefined}*/
+        function FindLabThatCanUnBoost(jobObject) {
+            const labThatCanBoost = jobObject.room.find(FIND_MY_STRUCTURES, {
+                filter: function (lab) {
+                    return lab.structureType === STRUCTURE_LAB && lab.cooldown === 0;
+                }
+            })[0];
+            return labThatCanBoost;
+        }
+
         /**@return {number}*/
         function BoostCreep(creep, labThatCanBoost, mineral, bodyTypeToBoost) {
             let result = ERR_NO_RESULT_FOUND;
@@ -2180,7 +2201,6 @@ const ExecuteJobs = {
             return result;
         }
 
-        // TODO add UnBoostCreep to controller jobs
         /**@return {number}*/
         function UnBoostCreep(creep, labThatCanUnBoost, mineral, bodyTypeToUnBoost) {
             let result = ERR_NO_RESULT_FOUND;
@@ -2200,7 +2220,6 @@ const ExecuteJobs = {
             }
             return result;
         }
-
 
         /**@return {int}*/
         function FetchResource(creep, fetchObject, resourceToFetch, max = -1) {

@@ -48,7 +48,7 @@ module.exports.loop = function () {
                                     memRoom.MaxCreeps[creepTypesKey][creepKey] = undefined;
                                 }
                             }else{
-                                memRoom.MaxCreeps[creepTypesKey][creepKey] = undefined; // reset
+                                delete memRoom.MaxCreeps[creepTypesKey][creepKey]; // reset
                             }
                         }
                     }
@@ -91,8 +91,6 @@ module.exports.loop = function () {
 
 // TODOs:
 // TODO add flee functionality a function in executejobs that gunner, medics, lone warriors and all other creeps use to flee from an imminent threat
-// TODO boosted creeps should unboostCreep at lab when low on ticksToLive
-// TODO despawn idle creeps
 
 // lab reactions
 
