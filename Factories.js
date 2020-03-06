@@ -27,6 +27,8 @@ const Factories = {
                         result = Produce(factory, RESOURCE_PHLEGM, 2000, RESOURCE_OXIDANT, 36, RESOURCE_CELL, 20, RESOURCE_LEMERGIUM_BAR, 16, RESOURCE_ENERGY, 8);
                         if(result !== OK) {
                             result = Produce(factory, RESOURCE_TUBE, 2000, RESOURCE_ALLOY, 40, RESOURCE_ZYNTHIUM_BAR, 16, RESOURCE_ENERGY, 8);
+                        }else if(result !== OK){
+                            result = Produce(factory, RESOURCE_COMPOSITE, 1000, RESOURCE_UTRIUM_BAR, 20, RESOURCE_ZYNTHIUM_BAR, 20, RESOURCE_ENERGY, 20);
                         }
                     }else if(factory.level === 2 && hasOperateFactoryEffect){
                         result = Produce(factory, RESOURCE_TISSUE, 2000, RESOURCE_REDUCTANT, 110, RESOURCE_CELL, 10, RESOURCE_PHLEGM, 10, RESOURCE_ENERGY, 16);
@@ -45,12 +47,9 @@ const Factories = {
                                     if (result !== OK) {
                                         result = Produce(factory, RESOURCE_REDUCTANT, 1000, RESOURCE_HYDROGEN, 500, RESOURCE_ENERGY, 200);
                                         if (result !== OK) {
-                                            result = Produce(factory, RESOURCE_COMPOSITE, 1000, RESOURCE_UTRIUM_BAR, 20, RESOURCE_ZYNTHIUM_BAR, 20, RESOURCE_ENERGY, 20);
+                                            result = Produce(factory, RESOURCE_CELL, 1000, RESOURCE_BIOMASS, 100, RESOURCE_LEMERGIUM_BAR, 20, RESOURCE_ENERGY, 40);
                                             if (result !== OK) {
-                                                result = Produce(factory, RESOURCE_CELL, 1000, RESOURCE_BIOMASS, 100, RESOURCE_LEMERGIUM_BAR, 20, RESOURCE_ENERGY, 40);
-                                                if (result !== OK) {
-                                                    result = Produce(factory, RESOURCE_ALLOY, 1000, RESOURCE_METAL, 100, RESOURCE_ZYNTHIUM_BAR, 20, RESOURCE_ENERGY, 40);
-                                                }
+                                                result = Produce(factory, RESOURCE_ALLOY, 1000, RESOURCE_METAL, 100, RESOURCE_ZYNTHIUM_BAR, 20, RESOURCE_ENERGY, 40);
                                             }
                                         }
                                     }

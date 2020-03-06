@@ -482,7 +482,9 @@ const CreateJobs = {
             if (factory) {
                 for (const resourceType in factory.store) {
                     if (resourceType === RESOURCE_PHLEGM && factory.store.getUsedCapacity(resourceType) > 100 && factory.level === 1
+                        || resourceType === RESOURCE_TUBE && factory.store.getUsedCapacity(resourceType) > 100 && factory.level === 1
                         || resourceType === RESOURCE_TISSUE && factory.store.getUsedCapacity(resourceType) > 20 && factory.level === 2
+                        || resourceType === RESOURCE_FIXTURES && factory.store.getUsedCapacity(resourceType) > 20 && factory.level === 2
                         || resourceType === RESOURCE_MUSCLE && factory.store.getUsedCapacity(resourceType) > 1000 && factory.level === 3
                         || resourceType === RESOURCE_ORGANOID && factory.store.getUsedCapacity(resourceType) > 1000 && factory.level === 4
                         || resourceType === RESOURCE_ORGANISM && factory.store.getUsedCapacity(resourceType) > 1000 && factory.level === 5) {

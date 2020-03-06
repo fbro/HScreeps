@@ -36,7 +36,7 @@ const Terminals = {
             for (const resourceType in fromTerminal.store) { // for each resource type
                 let fromAmount = fromTerminal.store[resourceType];
                 let target;
-                if(resourceType === RESOURCE_SWITCH || resourceType === RESOURCE_PHLEGM || resourceType === RESOURCE_TUBE || resourceType === RESOURCE_CONCENTRATE) { // SWITCH, PHLEGM, TUBE or CONCENTRATE should only be sent to a terminal that has a factory of level 2
+                if(resourceType === RESOURCE_SWITCH || resourceType === RESOURCE_PHLEGM || resourceType === RESOURCE_CONCENTRATE) { // SWITCH, PHLEGM or CONCENTRATE should only be sent to a terminal that has a factory of level 2
                     DistributeFactoryCommodities(fromTerminal, resourceType, fromAmount, 2);
                 } else if(resourceType === RESOURCE_SILICON || resourceType === RESOURCE_BIOMASS || resourceType === RESOURCE_METAL || resourceType === RESOURCE_MIST) { // SILICON, BIOMASS, METAL or MIST should only be sent to a terminal that has a factory that uses SILICON, BIOMASS, METAL or MIST
                     DistributeFactoryCommodities(fromTerminal, resourceType, fromAmount);
