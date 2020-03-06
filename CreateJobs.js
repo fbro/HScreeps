@@ -394,7 +394,9 @@ const CreateJobs = {
                         }else if(factory.store.getUsedCapacity(RESOURCE_ALLOY) > 0 && factory.level === 2){ // level 2 specific
                             roomJobs = TryAddFillFactoryJob(gameRoom, factory, roomJobs, RESOURCE_OXYGEN);
                             roomJobs = TryAddFillFactoryJob(gameRoom, factory, roomJobs, RESOURCE_OXIDANT);
-                            roomJobs = TryAddFillFactoryJob(gameRoom, factory, roomJobs, RESOURCE_TUBE);
+                            roomJobs = TryAddFillFactoryJob(gameRoom, factory, roomJobs, RESOURCE_UTRIUM);
+                            roomJobs = TryAddFillFactoryJob(gameRoom, factory, roomJobs, RESOURCE_UTRIUM_BAR);
+                            roomJobs = TryAddFillFactoryJob(gameRoom, factory, roomJobs, RESOURCE_COMPOSITE);
                         }
                     }
                 }
