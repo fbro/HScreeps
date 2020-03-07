@@ -391,12 +391,12 @@ const CreateJobs = {
                         roomJobs = TryAddFillFactoryJob(gameRoom, factory, roomJobs, RESOURCE_ZYNTHIUM_BAR);
                         roomJobs = TryAddFillFactoryJob(gameRoom, factory, roomJobs, RESOURCE_ALLOY);
                         if (factory.store.getUsedCapacity(RESOURCE_ALLOY) > 0 && factory.level === 1) { // level 1 specific
+                            roomJobs = TryAddFillFactoryJob(gameRoom, factory, roomJobs, RESOURCE_UTRIUM);
+                            roomJobs = TryAddFillFactoryJob(gameRoom, factory, roomJobs, RESOURCE_UTRIUM_BAR);
+                            roomJobs = TryAddFillFactoryJob(gameRoom, factory, roomJobs, RESOURCE_COMPOSITE); // used for lvl 2 FIXTURES
                         }else if(factory.store.getUsedCapacity(RESOURCE_ALLOY) > 0 && factory.level === 2){ // level 2 specific
                             roomJobs = TryAddFillFactoryJob(gameRoom, factory, roomJobs, RESOURCE_OXYGEN);
                             roomJobs = TryAddFillFactoryJob(gameRoom, factory, roomJobs, RESOURCE_OXIDANT);
-                            roomJobs = TryAddFillFactoryJob(gameRoom, factory, roomJobs, RESOURCE_UTRIUM);
-                            roomJobs = TryAddFillFactoryJob(gameRoom, factory, roomJobs, RESOURCE_UTRIUM_BAR);
-                            roomJobs = TryAddFillFactoryJob(gameRoom, factory, roomJobs, RESOURCE_COMPOSITE);
                         }
                     }
                 }
@@ -481,13 +481,16 @@ const CreateJobs = {
             })[0];
             if (factory) {
                 for (const resourceType in factory.store) {
-                    if (resourceType === RESOURCE_PHLEGM && factory.store.getUsedCapacity(resourceType) > 100 && factory.level === 1
-                        || resourceType === RESOURCE_TUBE && factory.store.getUsedCapacity(resourceType) > 100 && factory.level === 1
-                        || resourceType === RESOURCE_TISSUE && factory.store.getUsedCapacity(resourceType) > 20 && factory.level === 2
-                        || resourceType === RESOURCE_FIXTURES && factory.store.getUsedCapacity(resourceType) > 20 && factory.level === 2
-                        || resourceType === RESOURCE_MUSCLE && factory.store.getUsedCapacity(resourceType) > 1000 && factory.level === 3
-                        || resourceType === RESOURCE_ORGANOID && factory.store.getUsedCapacity(resourceType) > 1000 && factory.level === 4
-                        || resourceType === RESOURCE_ORGANISM && factory.store.getUsedCapacity(resourceType) > 1000 && factory.level === 5) {
+                    const amount = factory.store.getUsedCapacity(resourceType);
+                    if (   resourceType === RESOURCE_PHLEGM    && amount >  100 && factory.level === 1
+                        || resourceType === RESOURCE_TUBE      && amount >  100 && factory.level === 1
+                        || resourceType === RESOURCE_COMPOSITE && amount >  100 && factory.level === 1
+                        || resourceType === RESOURCE_TISSUE    && amount >   20 && factory.level === 2
+                        || resourceType === RESOURCE_FIXTURES  && amount >   20 && factory.level === 2
+
+                        || resourceType === RESOURCE_MUSCLE    && amount > 1000 && factory.level === 3
+                        || resourceType === RESOURCE_ORGANOID  && amount > 1000 && factory.level === 4
+                        || resourceType === RESOURCE_ORGANISM  && amount > 1000 && factory.level === 5) {
                         new RoomVisual(gameRoom.name).text('🏭', factory.pos.x, factory.pos.y);
                         AddJob(roomJobs, 'FillStrg-' + factory.structureType + '(' + factory.pos.x + ',' + factory.pos.y + ',' + resourceType + ')' + gameRoom.name, factory.id, Util.OBJECT_JOB, 'T');
                     }

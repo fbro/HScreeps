@@ -36,10 +36,10 @@ const Terminals = {
             for (const resourceType in fromTerminal.store) { // for each resource type
                 let fromAmount = fromTerminal.store[resourceType];
                 let target;
-                if(resourceType === RESOURCE_SWITCH || resourceType === RESOURCE_PHLEGM || resourceType === RESOURCE_CONCENTRATE) { // SWITCH, PHLEGM or CONCENTRATE should only be sent to a terminal that has a factory of level 2
-                    DistributeFactoryCommodities(fromTerminal, resourceType, fromAmount, 2);
+                if(resourceType === RESOURCE_SWITCH || resourceType === RESOURCE_PHLEGM || resourceType === RESOURCE_COMPOSITE || resourceType === RESOURCE_CONCENTRATE) { // SWITCH, PHLEGM, COMPOSITE or CONCENTRATE should only be sent to a terminal that has a factory of level 2
+                    DistributeFactoryCommodities(fromTerminal, resourceType, fromAmount, 2); // only send to factories that are of lvl 2
                 } else if(resourceType === RESOURCE_SILICON || resourceType === RESOURCE_BIOMASS || resourceType === RESOURCE_METAL || resourceType === RESOURCE_MIST) { // SILICON, BIOMASS, METAL or MIST should only be sent to a terminal that has a factory that uses SILICON, BIOMASS, METAL or MIST
-                    DistributeFactoryCommodities(fromTerminal, resourceType, fromAmount);
+                    DistributeFactoryCommodities(fromTerminal, resourceType, fromAmount); // send to any level factory
                 } else{
                     if (resourceType === RESOURCE_ENERGY) {
                         target = Util.TERMINAL_TARGET_ENERGY;
@@ -72,20 +72,20 @@ const Terminals = {
 
         // factory commodities are not distributed like the other resources should be
         /**@return {number}*/
-        function DistributeFactoryCommodities(fromTerminal, resourceType, fromAmount, factoryLevel = 0) {
+        function DistributeFactoryCommodities(fromTerminal, resourceType, fromAmount, sendToFactoryLevel = 0) {
             const fromFactory = fromTerminal.room.find(FIND_MY_STRUCTURES, {
                 filter: function (s) {
-                    return s.structureType === STRUCTURE_FACTORY && (factoryLevel === s.level || factoryLevel === 0);
+                    return s.structureType === STRUCTURE_FACTORY && (sendToFactoryLevel === s.level || sendToFactoryLevel === 0);
                 }
             })[0];
-            if(!fromFactory) {
+            if(!fromFactory) { // only send the resource if the factory lvl in sender room is not the same as sendToFactoryLevel
                 for (const toTerminalKey in terminals) {
                     const toTerminal = terminals[toTerminalKey];
                     if (toTerminal.id !== fromTerminal.id
                         && toTerminal.store.getUsedCapacity(resourceType) < Util.TERMINAL_TARGET_RESOURCE // do not transfer anymore commodities if toTerminal already has more than STORAGE_HIGH_TRANSFER
                         && toTerminal.room.find(FIND_MY_STRUCTURES, {
                         filter: function (s) {
-                            return s.structureType === STRUCTURE_FACTORY && (factoryLevel === s.level || factoryLevel === 0);
+                            return s.structureType === STRUCTURE_FACTORY && (sendToFactoryLevel === s.level || sendToFactoryLevel === 0);
                         }
                     })[0]) {
                         const result = fromTerminal.send(resourceType, fromAmount, toTerminal.pos.roomName);
