@@ -393,10 +393,10 @@ const CreateJobs = {
                         if (factory.store.getUsedCapacity(RESOURCE_ALLOY) > 0 && factory.level === 1) { // level 1 specific
                             roomJobs = TryAddFillFactoryJob(gameRoom, factory, roomJobs, RESOURCE_UTRIUM);
                             roomJobs = TryAddFillFactoryJob(gameRoom, factory, roomJobs, RESOURCE_UTRIUM_BAR);
-                            roomJobs = TryAddFillFactoryJob(gameRoom, factory, roomJobs, RESOURCE_COMPOSITE); // used for lvl 2 FIXTURES
                         }else if(factory.store.getUsedCapacity(RESOURCE_ALLOY) > 0 && factory.level === 2){ // level 2 specific
                             roomJobs = TryAddFillFactoryJob(gameRoom, factory, roomJobs, RESOURCE_OXYGEN);
                             roomJobs = TryAddFillFactoryJob(gameRoom, factory, roomJobs, RESOURCE_OXIDANT);
+                            roomJobs = TryAddFillFactoryJob(gameRoom, factory, roomJobs, RESOURCE_COMPOSITE); // used for lvl 2 FIXTURES
                         }
                     }
                 }
