@@ -24,7 +24,8 @@ module.exports.loop = function () {
                 const foundCreeps = {};
                 for (const memRoomKey in Memory.MemRooms) {
                     const memRoom = Memory.MemRooms[memRoomKey];
-                    memRoom.links = undefined; // remove links - maybe the buildings have been deleted ect.
+                    delete memRoom.links; // remove links - maybe the buildings have been deleted ect.
+                    delete memRoom.FctrId; // remove FctrId - maybe the buildings have been deleted ect.
                     // search through MaxCreeps to see if they all have an alive creep and that there are only one of each creep names in MaxCreeps
                     for (const creepTypesKey in memRoom.MaxCreeps) {
                         for (const creepKey in memRoom.MaxCreeps[creepTypesKey]) {

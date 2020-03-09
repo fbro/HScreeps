@@ -913,11 +913,12 @@ const ExecuteJobs = {
                 })[1];
                 creep.memory.resourceType = resourceType;
             }
-            let Low = Util.STORAGE_LOW;
+            const creepCarry = creep.store.getCapacity(); // when a creep withdraws from storage then the amount is diminished - the job might end because of that diminish - it should not
+            let Low = Util.STORAGE_LOW - creepCarry;
             let LowTransfer = Util.STORAGE_LOW_TRANSFER;
-            let Medium = Util.STORAGE_MEDIUM;
+            let Medium = Util.STORAGE_MEDIUM - creepCarry;
             let MediumTransfer = Util.STORAGE_MEDIUM_TRANSFER;
-            let High = Util.STORAGE_HIGH;
+            let High = Util.STORAGE_HIGH - creepCarry;
             let HighTransfer = Util.STORAGE_HIGH_TRANSFER;
             if (resourceType === RESOURCE_ENERGY) {
                 Low = Util.STORAGE_ENERGY_LOW;
@@ -2477,6 +2478,10 @@ const ExecuteJobs = {
                         Util.Warning('ExecuteJobs', 'Move', 'move error MoveErrWait ' + creep.memory.MoveErrWait + ' ' + result + ' ' + creep.name + ' (' + from.x + ',' + from.y + ',' + from.roomName + ') to ' + obj + '(' + to.x + ',' + to.y + ',' + to.roomName + ') ending move!');
                     } else {
                         Util.Warning('ExecuteJobs', 'Move', 'move error multiple room MoveErrWait ' + creep.memory.MoveErrWait + ' ' + result + ' ' + creep.name + ' (' + from.x + ',' + from.y + ',' + from.roomName + ') to ' + obj + '(' + to.x + ',' + to.y + ',' + to.roomName + ') ending move!');
+                    }
+                    if(result === ERR_NO_BODYPART){ // no MOVE bodypart
+                        Util.InfoLog('ExecuteJobs', 'Move', creep.name + ' ERR_NO_BODYPART ' + creep.pos.roomName);
+                        creep.suicide();
                     }
                     result = JOB_IS_DONE;
                     creep.memory.MoveErrWait = undefined;

@@ -323,9 +323,9 @@ const CreateJobs = {
                     const storageResourceAmount = gameRoom.storage.store.getUsedCapacity(resourceType);
                     let maxResources = 0;
                     let High = Util.STORAGE_HIGH; // 10000
-                    let HighTransfer = Util.STORAGE_HIGH_TRANSFER; // 5000
+                    let HighTransfer = Util.STORAGE_HIGH_TRANSFER; // 8000
                     let Medium = Util.STORAGE_MEDIUM; // 4000
-                    let MediumTransfer = Util.STORAGE_MEDIUM_TRANSFER; // 4000
+                    let MediumTransfer = Util.STORAGE_MEDIUM_TRANSFER; // 6000
                     let Low = Util.STORAGE_LOW; // 0
                     let LowTransfer = Util.STORAGE_LOW_TRANSFER; // 3000
                     if (resourceType === RESOURCE_ENERGY) {

@@ -74,3 +74,5 @@ for(const resourceType in terminal.store){
 }
 const terminal = Game.getObjectById('5cf1a7158e8ea635474264ca');
 terminal.send(RESOURCE_ENERGY, (terminal.store[RESOURCE_ENERGY] * 0.9), 'E28S29');
+
+delete Memory.MemRooms['E29S29'].FctrId;
