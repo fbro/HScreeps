@@ -103,8 +103,8 @@ const Terminals = {
                 let max;
                 if (resourceType === RESOURCE_ENERGY) {
                     max = Util.TERMINAL_MAX_ENERGY;
-                } else if(resourceType === RESOURCE_TISSUE){
-                    max = 0; // right now i am selling out on tissue
+                } else if(resourceType === RESOURCE_TISSUE || resourceType === RESOURCE_FIXTURES){
+                    max = 0; // right now i am selling out on tissue and fixtures - both factory lvl 2 items
                 } else if (resourceType === RESOURCE_POWER
                     || resourceType === RESOURCE_SILICON // deposit
                     || resourceType === RESOURCE_WIRE // factory lvl 0
@@ -121,6 +121,10 @@ const Terminals = {
                     || resourceType === RESOURCE_MIST // deposit
                     || resourceType === RESOURCE_CONDENSATE // factory lvl 0
                     || resourceType === RESOURCE_CONCENTRATE // factory lvl 1
+
+                    || resourceType === RESOURCE_COMPOSITE // factory lvl 1
+                    || resourceType === RESOURCE_CRYSTAL // factory lvl 2
+                    || resourceType === RESOURCE_LIQUID // factory lvl 3
                 ) { // will never sell out on these resources
                     max = Number.MAX_SAFE_INTEGER;
                 } else {
@@ -131,7 +135,7 @@ const Terminals = {
                     const orders = Game.market.getAllOrders(order => order.resourceType === resourceType
                         && order.type === ORDER_BUY
                         /*&& Game.market.calcTransactionCost(500, fromTerminal.pos.roomName, order.roomName) <= 500*/
-                        && (!resourceHistory[0] || resourceHistory[0].avgPrice <= order.price || resourceType === RESOURCE_ENERGY && fromTerminal.room.storage && fromTerminal.room.storage[RESOURCE_ENERGY] > 800000)
+                        && (!resourceHistory[0] || (resourceHistory[0].avgPrice / 1.1) <= order.price || resourceType === RESOURCE_ENERGY && fromTerminal.room.storage && fromTerminal.room.storage[RESOURCE_ENERGY] > Util.STORAGE_ENERGY_HIGH)
                         && order.remainingAmount > 0
                     );
                     if (orders.length > 0) {

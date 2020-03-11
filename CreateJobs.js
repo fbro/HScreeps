@@ -474,25 +474,23 @@ const CreateJobs = {
             }
 
             // factory
-            const factory = gameRoom.find(FIND_STRUCTURES, {
-                filter: (f) => {
-                    return f.structureType === STRUCTURE_FACTORY;
-                }
-            })[0];
-            if (factory) {
-                for (const resourceType in factory.store) {
-                    const amount = factory.store.getUsedCapacity(resourceType);
-                    if (   resourceType === RESOURCE_PHLEGM    && amount >  100 && factory.level === 1
-                        || resourceType === RESOURCE_TUBE      && amount >  100 && factory.level === 1
-                        || resourceType === RESOURCE_COMPOSITE && amount >  100 && factory.level === 1
-                        || resourceType === RESOURCE_TISSUE    && amount >   20 && factory.level === 2
-                        || resourceType === RESOURCE_FIXTURES  && amount >   20 && factory.level === 2
+            if(Memory.MemRooms[gameRoom.name].FctrId && Memory.MemRooms[gameRoom.name].FctrId !== '-'){
+                const factory = Game.getObjectById(Memory.MemRooms[gameRoom.name].FctrId);
+                if (factory) {
+                    for (const resourceType in factory.store) {
+                        const amount = factory.store.getUsedCapacity(resourceType);
+                        if (   resourceType === RESOURCE_PHLEGM    && amount >=  100 && factory.level === 1
+                            || resourceType === RESOURCE_TUBE      && amount >=  100 && factory.level === 1
+                            || resourceType === RESOURCE_COMPOSITE && amount >=  100 && factory.level === 1
+                            || resourceType === RESOURCE_TISSUE    && amount >=   50 && factory.level === 2
+                            || resourceType === RESOURCE_FIXTURES  && amount >=   50 && factory.level === 2
 
-                        || resourceType === RESOURCE_MUSCLE    && amount > 1000 && factory.level === 3
-                        || resourceType === RESOURCE_ORGANOID  && amount > 1000 && factory.level === 4
-                        || resourceType === RESOURCE_ORGANISM  && amount > 1000 && factory.level === 5) {
-                        new RoomVisual(gameRoom.name).text('🏭', factory.pos.x, factory.pos.y);
-                        AddJob(roomJobs, 'FillStrg-' + factory.structureType + '(' + factory.pos.x + ',' + factory.pos.y + ',' + resourceType + ')' + gameRoom.name, factory.id, Util.OBJECT_JOB, 'T');
+                            || resourceType === RESOURCE_MUSCLE    && amount >= 1000 && factory.level === 3
+                            || resourceType === RESOURCE_ORGANOID  && amount >= 1000 && factory.level === 4
+                            || resourceType === RESOURCE_ORGANISM  && amount >= 1000 && factory.level === 5) {
+                            new RoomVisual(gameRoom.name).text('🏭', factory.pos.x, factory.pos.y);
+                            AddJob(roomJobs, 'FillStrg-' + factory.structureType + '(' + factory.pos.x + ',' + factory.pos.y + ',' + resourceType + ')' + gameRoom.name, factory.id, Util.OBJECT_JOB, 'T');
+                        }
                     }
                 }
             }
