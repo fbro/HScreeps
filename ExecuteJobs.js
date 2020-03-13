@@ -2315,9 +2315,9 @@ const ExecuteJobs = {
             } else if (result === OK && countResources > 1) { // if there are more to be transferred then set creep to busy
                 result = ERR_BUSY;
             } else if (result === ERR_FULL) {
-                Util.ErrorLog('ExecuteJobs', 'DepositCreepStore', 'unexpected ERR_FULL! ' + result + ' ' + creep.name + '(' + creep.pos.x + ',' + creep.pos.y + ',' + creep.pos.roomName + ')' + ' storeToFill(' + storeToFillObject.pos.x + ',' + storeToFillObject.pos.y + ',' + storeToFillObject.pos.roomName + ')' + (storeToEmptyObject?' storeToEmptyObject ' + storeToEmptyObject + ' ':' ') + (resourceTypeToKeep?' resourceTypeToKeep ' + resourceTypeToKeep:''));
+                Util.ErrorLog('ExecuteJobs', 'DepositCreepStore', 'unexpected ERR_FULL! ' + result + ' ' + creep.name + '(' + creep.pos.x + ',' + creep.pos.y + ',' + creep.pos.roomName + ',' + creep.hits + ',' + creep.hitsMax + ') carry ' + creep.store.getUsedCapacity() + ' storeToFill(' + storeToFillObject.pos.x + ',' + storeToFillObject.pos.y + ',' + storeToFillObject.pos.roomName + ')' + (storeToEmptyObject?' storeToEmptyObject ' + storeToEmptyObject + ' ':' ') + (resourceTypeToKeep?' resourceTypeToKeep ' + resourceTypeToKeep:''));
             } else {
-                Util.ErrorLog('ExecuteJobs', 'DepositCreepStore', 'unexpected result! '   + result + ' ' + creep.name + '(' + creep.pos.x + ',' + creep.pos.y + ',' + creep.pos.roomName + ')' + ' storeToFill(' + storeToFillObject.pos.x + ',' + storeToFillObject.pos.y + ',' + storeToFillObject.pos.roomName + ')' + (storeToEmptyObject?' storeToEmptyObject ' + storeToEmptyObject + ' ':' ') + (resourceTypeToKeep?' resourceTypeToKeep ' + resourceTypeToKeep:''));
+                Util.ErrorLog('ExecuteJobs', 'DepositCreepStore', 'unexpected result! '   + result + ' ' + creep.name + '(' + creep.pos.x + ',' + creep.pos.y + ',' + creep.pos.roomName + ',' + creep.hits + ',' + creep.hitsMax + ') carry ' + creep.store.getUsedCapacity() + ' storeToFill(' + storeToFillObject.pos.x + ',' + storeToFillObject.pos.y + ',' + storeToFillObject.pos.roomName + ')' + (storeToEmptyObject?' storeToEmptyObject ' + storeToEmptyObject + ' ':' ') + (resourceTypeToKeep?' resourceTypeToKeep ' + resourceTypeToKeep:''));
             }
             return result;
         }
