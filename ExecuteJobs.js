@@ -15,6 +15,7 @@ const ExecuteJobs = {
 
         function ExecuteRoomJobs() {
             for (const creepName in Memory.creeps) {
+                //const startCpu = Game.cpu.getUsed();
                 const creepMemory = Memory.creeps[creepName];
                 const gameCreep = Game.creeps[creepName];
                 if (!creepMemory.JobName) {
@@ -254,6 +255,10 @@ const ExecuteJobs = {
                         }
                     }
                 }
+                /*const elapsed = Game.cpu.getUsed() - startCpu;
+                if(elapsed > 2){
+                    Util.Info('ExecuteJobs', 'CPU', creepName + ' ' + elapsed);
+                }*/
             }
         }
 
@@ -261,100 +266,107 @@ const ExecuteJobs = {
         function JobAction(creep, roomJob) {
             const jobKey = creep.memory.JobName;
             let result = ERR_NO_RESULT_FOUND;
-            switch (true) {
-                // obj jobs
-                case jobKey.startsWith('Src'):
-                    result = JobSource(creep, roomJob);
-                    break;
-                case jobKey.startsWith('Ctrl'):
-                    result = JobController(creep, roomJob);
-                    break;
-                case jobKey.startsWith('FillCtrlCon'):
-                    result = JobFillControllerContainer(creep, roomJob);
-                    break;
-                case jobKey.startsWith('Rep'):
-                    result = JobRepair(creep, roomJob);
-                    break;
-                case jobKey.startsWith('Constr'):
-                    result = JobConstruction(creep, roomJob);
-                    break;
-                case jobKey.startsWith('FillSpwnEx'):
-                    result = JobFillSpawnExtension(creep, roomJob);
-                    break;
-                case jobKey.startsWith('FillTwr'):
-                    result = JobFillTower(creep, roomJob);
-                    break;
-                case jobKey.startsWith('FillStrg'):
-                    result = JobFillStorage(creep, roomJob);
-                    break;
-                case jobKey.startsWith('ExtrMin'):
-                    result = JobExtractMineral(creep, roomJob);
-                    break;
-                case jobKey.startsWith('FillTerm'):
-                    result = JobFillTerminal(creep, roomJob);
-                    break;
-                case jobKey.startsWith('FillFctr'):
-                    result = JobFillFactory(creep, roomJob);
-                    break;
-                case jobKey.startsWith('FillLabE'):
-                    result = JobFillLabEnergy(creep, roomJob);
-                    break;
-                case jobKey.startsWith('FillPSpwnE'):
-                    result = JobFillPowerSpawnEnergy(creep, roomJob);
-                    break;
-                case jobKey.startsWith('FillPSpwnP'):
-                    result = JobFillPowerSpawnPower(creep, roomJob);
-                    break;
-
-                // flag jobs
-                case jobKey.startsWith('TagCtrl'):
-                    result = JobTagController(creep, roomJob);
-                    break;
-                case jobKey.startsWith('ScoutPos'):
-                case jobKey.startsWith('BuildPos'):
-                case jobKey.startsWith('ClaimPos'):
-                case jobKey.startsWith('HarvestPos'):
-                case jobKey.startsWith('TransPos'):
-                    result = JobMoveToPosition(creep, roomJob);
-                    break;
-                case jobKey.startsWith('ClaimCtrl'):
-                    result = JobClaimController(creep, roomJob);
-                    break;
-                case jobKey.startsWith('ReserveCtrl'):
-                    result = JobReserveController(creep, roomJob);
-                    break;
-                case jobKey.startsWith('GuardPos'):
-                    result = JobGuardPosition(creep, roomJob);
-                    break;
-                case jobKey.startsWith('GuardGunPos'):
-                    result = JobGuardGunnerPosition(creep, roomJob);
-                    break;
-                case jobKey.startsWith('GuardMedPos'):
-                    result = JobGuardMedicPosition(creep, roomJob);
-                    break;
-                case jobKey.startsWith('FillLabMin'):
-                    result = JobFillLabMineral(creep, roomJob);
-                    break;
-                case jobKey.startsWith('EmptyLabMin'):
-                    result = JobEmptyLabMineral(creep, roomJob);
-                    break;
-                case jobKey.startsWith('AtkP'):
-                    result = JobAttackPowerBank(creep, roomJob);
-                    break;
-                case jobKey.startsWith('MedP'):
-                    result = JobMedicPowerBank(creep, roomJob);
-                    break;
-                case jobKey.startsWith('TrnsprtP'):
-                    result = JobTransportPowerBank(creep, roomJob);
-                    break;
-                case jobKey.startsWith('HrvstDpst'):
-                    result = JobHarvestDeposit(creep, roomJob);
-                    break;
-                default:
-                    Util.ErrorLog('ExecuteJobs', 'JobAction', 'job not found ' + jobKey + ' ' + creep.name);
+            if(roomJob.JobType === Util.OBJECT_JOB){
+                switch (true) {
+                    // obj jobs
+                    case jobKey.startsWith('Src'):
+                        result = JobSource(creep, roomJob);
+                        break;
+                    case jobKey.startsWith('Ctrl'):
+                        result = JobController(creep, roomJob);
+                        break;
+                    case jobKey.startsWith('FillCtrlCon'):
+                        result = JobFillControllerContainer(creep, roomJob);
+                        break;
+                    case jobKey.startsWith('Rep'):
+                        result = JobRepair(creep, roomJob);
+                        break;
+                    case jobKey.startsWith('Constr'):
+                        result = JobConstruction(creep, roomJob);
+                        break;
+                    case jobKey.startsWith('FillSpwnEx'):
+                        result = JobFillSpawnExtension(creep, roomJob);
+                        break;
+                    case jobKey.startsWith('FillTwr'):
+                        result = JobFillTower(creep, roomJob);
+                        break;
+                    case jobKey.startsWith('FillStrg'):
+                        result = JobFillStorage(creep, roomJob);
+                        break;
+                    case jobKey.startsWith('ExtrMin'):
+                        result = JobExtractMineral(creep, roomJob);
+                        break;
+                    case jobKey.startsWith('FillTerm'):
+                        result = JobFillTerminal(creep, roomJob);
+                        break;
+                    case jobKey.startsWith('FillFctr'):
+                        result = JobFillFactory(creep, roomJob);
+                        break;
+                    case jobKey.startsWith('FillLabE'):
+                        result = JobFillLabEnergy(creep, roomJob);
+                        break;
+                    case jobKey.startsWith('FillPSpwnE'):
+                        result = JobFillPowerSpawnEnergy(creep, roomJob);
+                        break;
+                    case jobKey.startsWith('FillPSpwnP'):
+                        result = JobFillPowerSpawnPower(creep, roomJob);
+                        break;
+                    default:
+                        Util.ErrorLog('ExecuteJobs', 'JobAction', 'object type job not found ' + jobKey + ' ' + creep.name);
+                }
+            }else{ // roomJob.JobType === Util.FLAG_JOB
+                switch (true) {
+                    // flag jobs
+                    case jobKey.startsWith('TagCtrl'):
+                        result = JobTagController(creep, roomJob);
+                        break;
+                    case jobKey.startsWith('ScoutPos'):
+                    case jobKey.startsWith('BuildPos'):
+                    case jobKey.startsWith('ClaimPos'):
+                    case jobKey.startsWith('HarvestPos'):
+                    case jobKey.startsWith('TransPos'):
+                        result = JobMoveToPosition(creep, roomJob);
+                        break;
+                    case jobKey.startsWith('ClaimCtrl'):
+                        result = JobClaimController(creep, roomJob);
+                        break;
+                    case jobKey.startsWith('ReserveCtrl'):
+                        result = JobReserveController(creep, roomJob);
+                        break;
+                    case jobKey.startsWith('GuardPos'):
+                        result = JobGuardPosition(creep, roomJob);
+                        break;
+                    case jobKey.startsWith('GuardGunPos'):
+                        result = JobGuardGunnerPosition(creep, roomJob);
+                        break;
+                    case jobKey.startsWith('GuardMedPos'):
+                        result = JobGuardMedicPosition(creep, roomJob);
+                        break;
+                    case jobKey.startsWith('FillLabMin'):
+                        result = JobFillLabMineral(creep, roomJob);
+                        break;
+                    case jobKey.startsWith('EmptyLabMin'):
+                        result = JobEmptyLabMineral(creep, roomJob);
+                        break;
+                    case jobKey.startsWith('AtkP'):
+                        result = JobAttackPowerBank(creep, roomJob);
+                        break;
+                    case jobKey.startsWith('MedP'):
+                        result = JobMedicPowerBank(creep, roomJob);
+                        break;
+                    case jobKey.startsWith('TrnsprtP'):
+                        result = JobTransportPowerBank(creep, roomJob);
+                        break;
+                    case jobKey.startsWith('HrvstDpst'):
+                        result = JobHarvestDeposit(creep, roomJob);
+                        break;
+                    default:
+                        Util.ErrorLog('ExecuteJobs', 'JobAction', 'flag type job not found ' + jobKey + ' ' + creep.name);
+                }
             }
+
             if (result === OK) {
-                creep.say('OK');// job is done everyone is happy, nothing to do.
+                creep.say('OK'); // job is done everyone is happy, nothing to do.
             } else if (result === ERR_TIRED) {
                 creep.say('😫 ' + creep.fatigue); // creep has fatigue and is limited in movement
             } else if (result === ERR_BUSY) {

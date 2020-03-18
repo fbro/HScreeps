@@ -637,26 +637,22 @@ const CreateJobs = {
                 sourceNumber = gameRoom.find(FIND_SOURCES).length;
             }
             Memory.MemRooms[roomName] = {
-                'RoomLevel': level,
-                'RoomJobs': jobs,
-                'MaxCreeps': {},
-                'SourceNumber': sourceNumber,
+                'RoomLevel': level, // 0 to 8 or if there are NO controller then -1
+                'RoomJobs': jobs, // JobName - [JobName(x,y)] - user friendly, unique per room, name
+                'MaxCreeps': {}, // object that gives information on how many of each type of creep may be in the room and what creeps of that type is in the room
+                'SourceNumber': sourceNumber, // number of sources in room
             };
             Util.Info('CreateJobs', 'CreateRoom', 'add new room ' + roomName + ' level ' + level + ' sourceNumber ' + sourceNumber + ' jobs ' + JSON.stringify(jobs))
         }
 
         function AddJob(roomJobs, jobName, jobId, jobType, creepType) {
-            roomJobs[jobName] = CreateJob(jobId, jobType, creepType);
-            return roomJobs;
-        }
-
-        function CreateJob(jobId, jobType, creepType) {
-            return {
-                'JobId': jobId,
-                'JobType': jobType,
-                'CreepType': creepType,
-                'Creep': 'vacant'
+            roomJobs[jobName] = { // create job - RoomJobs - JobName - [JobName(x,y)] - user friendly, unique per room, name
+                'JobId': jobId, // real id
+                'JobType': jobType, // int enum - Util.OBJECT_JOB = 1, Util.FLAG_JOB = 2
+                'CreepType': creepType, // T, H, B...
+                'Creep': 'vacant' // CreepName - H1 or B4... - if job is not taken then the value is vacant
             };
+            return roomJobs;
         }
     }
 };
