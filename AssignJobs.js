@@ -157,7 +157,7 @@ const AssignJobs = {
                     let energyAvailableModifier = 0;
                     if (roomJob.JobType === Util.FLAG_JOB) { // on flag jobs one wants to share the load between rooms with more energy
                         switch (true) {
-                            case availableSpawn.room.storage.store.getUsedCapacity(RESOURCE_ENERGY) < Util.STORAGE_ENERGY_MEDIUM: // do not spawn for a flag job when the storage has under STORAGE_ENERGY_MEDIUM
+                            case !availableSpawn.room.storage || availableSpawn.room.storage.store.getUsedCapacity(RESOURCE_ENERGY) < Util.STORAGE_ENERGY_MEDIUM: // do not spawn for a flag job when the storage has under STORAGE_ENERGY_MEDIUM
                                 energyAvailableModifier = Number.MAX_SAFE_INTEGER;
                                 break;
                             case availableSpawn.room.energyAvailable < 500:

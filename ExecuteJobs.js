@@ -13,6 +13,8 @@ const ExecuteJobs = {
 
         ExecuteRoomJobs();
 
+        //region Execute jobs
+
         function ExecuteRoomJobs() {
             for (const creepName in Memory.creeps) {
                 //const startCpu = Game.cpu.getUsed();
@@ -401,7 +403,9 @@ const ExecuteJobs = {
             return result;
         }
 
-        // obj jobs:
+        //endregion
+
+        //region object jobs
 
         /**@return {int}*/
         function JobSource(creep, roomJob) {
@@ -1192,7 +1196,9 @@ const ExecuteJobs = {
             return result;
         }
 
-        // flag jobs:
+        //endregion
+
+        //region flag jobs
 
         /**@return {int}*/
         function JobTagController(creep, roomJob) {
@@ -1990,7 +1996,9 @@ const ExecuteJobs = {
             return result;
         }
 
-        // helper functions:
+        //endregion
+
+        //region Helper functions
 
         // TODO implement flee functionality
         function Flee() {
@@ -2326,10 +2334,17 @@ const ExecuteJobs = {
 
             } else if (result === OK && countResources > 1) { // if there are more to be transferred then set creep to busy
                 result = ERR_BUSY;
-            } else if (result === ERR_FULL) {
-                Util.ErrorLog('ExecuteJobs', 'DepositCreepStore', 'unexpected ERR_FULL! ' + result + ' ' + creep.name + '(' + creep.pos.x + ',' + creep.pos.y + ',' + creep.pos.roomName + ',' + creep.hits + ',' + creep.hitsMax + ') carry ' + creep.store.getUsedCapacity() + ' storeToFill(' + storeToFillObject.pos.x + ',' + storeToFillObject.pos.y + ',' + storeToFillObject.pos.roomName + ')' + (storeToEmptyObject?' storeToEmptyObject ' + storeToEmptyObject + ' ':' ') + (resourceTypeToKeep?' resourceTypeToKeep ' + resourceTypeToKeep:''));
-            } else {
-                Util.ErrorLog('ExecuteJobs', 'DepositCreepStore', 'unexpected result! '   + result + ' ' + creep.name + '(' + creep.pos.x + ',' + creep.pos.y + ',' + creep.pos.roomName + ',' + creep.hits + ',' + creep.hitsMax + ') carry ' + creep.store.getUsedCapacity() + ' storeToFill(' + storeToFillObject.pos.x + ',' + storeToFillObject.pos.y + ',' + storeToFillObject.pos.roomName + ')' + (storeToEmptyObject?' storeToEmptyObject ' + storeToEmptyObject + ' ':' ') + (resourceTypeToKeep?' resourceTypeToKeep ' + resourceTypeToKeep:''));
+            } else{
+                let errorMessage = 'unexpected result! ' + result + ' ' + creep.name + '(' + creep.pos.x + ',' + creep.pos.y + ',' + creep.pos.roomName + ',' + creep.hits + ',' + creep.hitsMax + ') carry ' + creep.store.getUsedCapacity() + ' storeToFill(' + storeToFillObject.pos.x + ',' + storeToFillObject.pos.y + ',' + storeToFillObject.pos.roomName + ')' + (storeToEmptyObject?' storeToEmptyObject ' + storeToEmptyObject + ' ':' ') + (resourceTypeToKeep?' resourceTypeToKeep ' + resourceTypeToKeep:'');
+                if (result === ERR_FULL) {
+                    Util.ErrorLog('ExecuteJobs', 'DepositCreepStore', errorMessage);
+                } else {
+                    if(!creep.getActiveBodyparts('CARRY')){
+                        Util.Warning('ExecuteJobs', 'DepositCreepStore', errorMessage + ' no CARRY');
+                    }else{
+                        Util.ErrorLog('ExecuteJobs', 'DepositCreepStore', errorMessage);
+                    }
+                }
             }
             return result;
         }
@@ -2501,6 +2516,8 @@ const ExecuteJobs = {
             }
             return result;
         }
+
+        //endregion
     }
 };
 module.exports = ExecuteJobs;
