@@ -33,235 +33,252 @@ const ExecuteJobs = {
                 }
                 const jobRoomName = creepMemory.JobName.split(')').pop();
                 let result = ERR_NO_RESULT_FOUND;
-                if (!creepMemory.JobName.startsWith('idle') && Memory.MemRooms[jobRoomName]) { // creep is not idle
-                    const job = Memory.MemRooms[jobRoomName].RoomJobs[creepMemory.JobName];
-                    if (!job && gameCreep) { // job is outdated and removed from Memory and creep is still alive
-                        creepMemory.JobName = 'idle(' + gameCreep.pos.x + ',' + gameCreep.pos.y + ')' + gameCreep.pos.roomName;
-                    } else if (job && !gameCreep) { // job exists and creep is dead
-                        if (Memory.MemRooms[jobRoomName].RoomJobs[creepMemory.JobName]) {
-                            Memory.MemRooms[jobRoomName].RoomJobs[creepMemory.JobName] = undefined;
-                        } else {
-                            Util.ErrorLog('ExecuteJobs', 'ExecuteRoomJobs', 'creep dead delete job failed ' + gameCreep.name + ' ' + jobRoomName + ' ' + creepMemory.JobName + ' gameCreep.pos.roomName ' + gameCreep.pos.roomName);
-                        }
-                        const didRemoveMaxCreeps = FindAndRemoveMaxCreeps(jobRoomName, creepName);
-                        delete Memory.creeps[creepName];
-                    } else if (job && gameCreep) { // creep is alive and its job is found
-                        if (!gameCreep.spawning) {
-                            result = JobAction(gameCreep, job);
-                            if (result === JOB_IS_DONE) {
-                                if (Memory.MemRooms[jobRoomName].RoomJobs[creepMemory.JobName]) {
-                                    Memory.MemRooms[jobRoomName].RoomJobs[creepMemory.JobName] = undefined;
-                                } else {
-                                    Util.ErrorLog('ExecuteJobs', 'ExecuteRoomJobs', 'job done delete failed ' + gameCreep.name + ' ' + jobRoomName + ' ' + creepMemory.JobName + ' gameCreep.pos.roomName ' + gameCreep.pos.roomName);
-                                }
-                                let assignedToNewJob = false;
-                                for (const roomJobKey in Memory.MemRooms[jobRoomName].RoomJobs) {
-                                    let roomJob = Memory.MemRooms[jobRoomName].RoomJobs[roomJobKey];
-                                    if (roomJob && roomJob.Creep === 'vacant' && creepName.startsWith(roomJob.CreepType)) {
-                                        assignedToNewJob = true;
-                                        for (const memoryElementKey in creepMemory) {
-                                            if (memoryElementKey !== 'JobName') {
-                                                creepMemory[memoryElementKey] = undefined;
-                                            }
-                                        }
-                                        creepMemory.JobName = roomJobKey;
-                                        roomJob.Creep = creepName;
-                                        break;
-                                    }
-                                }
-                                if (!assignedToNewJob) {
-                                    creepMemory.JobName = 'idle(' + gameCreep.pos.x + ',' + gameCreep.pos.y + ')' + gameCreep.pos.roomName;
-                                }
-                                if (creepMemory.JobName === undefined) {
-                                    Util.ErrorLog('ExecuteJobs', ' ExecuteRoomJobs', 'creep job is undefined! ' + creepName + ' ' + gameCreep.pos.roomName);
-                                }
-                            }
-                        }
-                    } else { // both job and creep is gone
-                        Util.Info('ExecuteJobs', 'ExecuteRoomJobs', creepName + ' on ' + creepMemory.JobName + ' in ' + jobRoomName + ' has died and the job has disappeared');
-                        Util.InfoLog('ExecuteJobs', 'ExecuteRoomJobs', 'both creep and job gone ' + creepName + ' on ' + creepMemory.JobName + ' in ' + jobRoomName);
-                        const didRemoveMaxCreeps = FindAndRemoveMaxCreeps(jobRoomName, creepName);
-                        delete Memory.creeps[creepName];
-                    }
+                if (!creepMemory.JobName.startsWith('idle') && Memory.MemRooms[jobRoomName]) {
+                    result = CreepNotIdle(jobRoomName, creepMemory, gameCreep, creepName, result);
                 }
-                if (creepMemory.JobName.startsWith('idle')) { // idle creep
-                    if (!gameCreep) { // idle creep is dead
-                        const didRemoveMaxCreeps = FindAndRemoveMaxCreeps(jobRoomName, creepName);
-                        delete Memory.creeps[creepName];
-                    } else { // idle creep is alive
-                        // if idle creep is carrying something - move it to storage
-                        if (gameCreep.room.storage && gameCreep.room.storage.store.getUsedCapacity() < gameCreep.room.storage.store.getCapacity() && gameCreep.store.getUsedCapacity() > 0) {
-                            result = DepositCreepStore(gameCreep, gameCreep.room.storage);
-                            if (result === ERR_NOT_IN_RANGE) {
-                                result = Move(gameCreep, gameCreep.room.storage);
-                            }
-                            gameCreep.say('idle 📦' + result);
-                        } else if (!gameCreep.room.controller
-                            || !gameCreep.room.controller.my
-                            || gameCreep.memory.MoveHome
-                            || Memory.MemRooms[gameCreep.pos.roomName].MaxCreeps[creepName.substring(0, 1)]
-                            && !Memory.MemRooms[gameCreep.pos.roomName].MaxCreeps[creepName.substring(0, 1)][creepName]) { // I do not own the room the idle creep is in - move it to an owned room!
-                            let closestOwnedRoom;
-                            if (!gameCreep.memory.MoveHome) {
-                                let bestDistance = Number.MAX_SAFE_INTEGER;
-                                for (const memRoomKey in Memory.MemRooms) {
-                                    if (Game.rooms[memRoomKey] && Game.rooms[memRoomKey].controller && Game.rooms[memRoomKey].controller.my) { // exist and has room
-                                        const distance = Game.map.getRoomLinearDistance(gameCreep.pos.roomName, memRoomKey);
-                                        if (distance < bestDistance) {
-                                            closestOwnedRoom = memRoomKey;
-                                            bestDistance = distance;
-                                        }
-                                    }
-                                }
-                                if (closestOwnedRoom) {
-                                    const didRemoveMaxCreeps = FindAndRemoveMaxCreeps(jobRoomName, creepName); // remove from the origin room
-                                    if (!Memory.MemRooms[closestOwnedRoom].MaxCreeps[creepName.substring(0, 1)]) {
-                                        Memory.MemRooms[closestOwnedRoom].MaxCreeps[creepName.substring(0, 1)] = {};
-                                    }
-                                    Memory.MemRooms[closestOwnedRoom].MaxCreeps[creepName.substring(0, 1)][creepName] = creepName; // add to the new home room
-                                    gameCreep.memory.MoveHome = closestOwnedRoom;
-                                    Util.Info('ExecuteJobs', 'ExecuteRoomJobs', 'idle ' + creepName + ' in ' + gameCreep.pos.roomName + ' moving to ' + closestOwnedRoom);
-                                } else {
-                                    Util.ErrorLog('ExecuteJobs', 'ExecuteRoomJobs', 'idle ' + creepName + ' in ' + gameCreep.pos.roomName + ' cannot find a new home!');
-                                }
-                            } else {
-                                closestOwnedRoom = gameCreep.memory.MoveHome;
-                            }
-
-                            if (closestOwnedRoom && (closestOwnedRoom !== gameCreep.pos.roomName || gameCreep.pos.getRangeTo(Game.rooms[closestOwnedRoom].controller) > 4)) {
-                                result = Move(gameCreep, Game.rooms[closestOwnedRoom].controller);
-                                gameCreep.say('🏠🏃');
-                            } else {
-                                gameCreep.memory.MoveHome = undefined;
-                                gameCreep.say('🏠🏃✔');
-                            }
-                        } else if (gameCreep.getActiveBodyparts(ATTACK)) { // idle creep can attack
-                            const hostileCreeps = gameCreep.room.find(FIND_HOSTILE_CREEPS);
-                            if (hostileCreeps[0]) {
-                                const hostileCreep = hostileCreeps[0];
-                                Util.Info('ExecuteJobs', 'ExecuteRoomJobs', 'idle ' + gameCreep.name + ' found ' + hostileCreeps.length + ' hostile creeps! targeting ' + hostileCreep + ' attack');
-                                gameCreep.say('ATK ' + hostileCreep);
-                                result = gameCreep.attack(hostileCreep);
-                                if (result === ERR_NOT_IN_RANGE) {
-                                    result = Move(gameCreep, hostileCreep);
-                                }
-                            }
-                        } else if (gameCreep.getActiveBodyparts(RANGED_ATTACK)) { // idle creep can ranged attack
-                            const hostileCreeps = gameCreep.room.find(FIND_HOSTILE_CREEPS);
-                            if (hostileCreeps[0]) {
-                                const hostileCreep = hostileCreeps[0];
-                                Util.Info('ExecuteJobs', 'ExecuteRoomJobs', 'idle ' + gameCreep.name + ' found ' + hostileCreeps.length + ' hostile creeps! targeting ' + hostileCreep + ' ranged attack');
-                                gameCreep.say('RATK ' + hostileCreep);
-                                result = gameCreep.rangedAttack(hostileCreep);
-                                if (result === ERR_NOT_IN_RANGE) {
-                                    result = Move(gameCreep, hostileCreep);
-                                }
-                            }
-                        } else if (gameCreep.getActiveBodyparts(RANGED_ATTACK)) { // idle creep can heal
-                            const damagedCreeps = gameCreep.room.find(FIND_MY_CREEPS, {
-                                filter: (creep) => {
-                                    return creep.hits < creep.hitsMax;
-                                }
-                            });
-                            if (damagedCreeps[0]) {
-                                const damagedCreep = damagedCreeps[0];
-                                Util.Info('ExecuteJobs', 'ExecuteRoomJobs', 'idle ' + gameCreep.name + ' found ' + damagedCreeps.length + ' damaged creeps! targeting ' + damagedCreep + ' heal');
-                                gameCreep.say('HEAL ' + damagedCreep);
-                                result = gameCreep.heal(damagedCreep);
-                                if (result === ERR_NOT_IN_RANGE) {
-                                    result = Move(gameCreep, damagedCreep);
-                                }
-                            }
-                        }
-                        if(result === ERR_NO_RESULT_FOUND) {
-                            const creepType = creepName.substring(0, 1);
-                            const maxCreeps = Memory.MemRooms[gameCreep.pos.roomName].MaxCreeps;
-                            if (maxCreeps && maxCreeps[creepType] && ((Object.keys(maxCreeps[creepType]).length - 1) > maxCreeps[creepType]['M'] || !maxCreeps[creepType]['M'])) { // check if creepType is overrepresented in this room - recycle creep
-                                const closestSpawn = gameCreep.pos.findClosestByPath(FIND_MY_STRUCTURES, {
-                                    filter: (s) => {
-                                        return s.structureType === STRUCTURE_SPAWN;
-                                    }
-                                });
-                                if (closestSpawn) {
-                                    result = closestSpawn.recycleCreep(gameCreep);
-                                    if (result === ERR_NOT_IN_RANGE) {
-                                        result = Move(gameCreep, closestSpawn);
-                                    } else {
-                                        Util.Info('ExecuteJobs', 'ExecuteRoomJobs', 'idle ' + gameCreep.name + ' recycled. MaxCreeps ' + maxCreeps[creepType]['M'] + ' current ' + (Object.keys(maxCreeps[creepType]).length - 1) + ' in ' + gameCreep.pos.roomName);
-                                    }
-                                }
-                            }
-                        }
-                    }
+                if (creepMemory.JobName.startsWith('idle')) {
+                    result = CreepIdle(jobRoomName, gameCreep, creepName, result);
                 }
 
-                // creep actions that should always be fired no matter what the creep is doing
                 if (result !== OK && gameCreep) {
-                    result = ERR_NO_RESULT_FOUND;
-                    if (gameCreep.store.getUsedCapacity(RESOURCE_ENERGY) > 0) { // fill adjacent spawns, extensions and towers or repair or construct on the road
-                        const toFill = gameCreep.pos.findInRange(FIND_MY_STRUCTURES, 1, {
-                            filter: (structure) => {
-                                return (structure.structureType === STRUCTURE_SPAWN
-                                    || structure.structureType === STRUCTURE_EXTENSION
-                                    || structure.structureType === STRUCTURE_TOWER) && structure.store.getUsedCapacity(RESOURCE_ENERGY) < structure.store.getCapacity(RESOURCE_ENERGY);
-                            }
-                        })[0];
-                        if (toFill) { // fill adjacent spawns, extensions
-                            result = gameCreep.transfer(toFill, RESOURCE_ENERGY); // it may do that 'double' but it really does not matter
-                            //Util.Info('ExecuteJobs', 'ExecuteRoomJobs', creep.name + ' transferred energy to adjacent spawn tower or extension (' + toFill.pos.x + ',' + toFill.pos.y + ',' + toFill.pos.roomName + ')');
-                        } else if (gameCreep.name.startsWith('H') || gameCreep.name.startsWith('B') || gameCreep.name.startsWith('D')) { // repair on the road
-                            const toRepair = gameCreep.pos.findInRange(FIND_STRUCTURES, 2, {
-                                filter: (structure) => {
-                                    return (structure.structureType !== STRUCTURE_WALL
-                                        && structure.structureType !== STRUCTURE_RAMPART) && structure.hits < structure.hitsMax;
-                                }
-                            })[0];
-                            if (toRepair) { // repair on the road
-                                result = gameCreep.repair(toRepair);
-                                //Util.Info('ExecuteJobs', 'ExecuteRoomJobs', creep.name + ' repaired ' + toRepair.structureType + ' (' + toRepair.pos.x + ',' + toRepair.pos.y + ',' + toRepair.pos.roomName + ',' + toRepair.hits + ',' + toRepair.hitsMax + ')');
-                            } else {
-                                const toBuild = gameCreep.pos.findInRange(FIND_CONSTRUCTION_SITES, 2)[0];
-                                if (toBuild) { // construct on the road
-                                    result = gameCreep.build(toBuild);
-                                }
-                            }
-                        }
-                    }
-                    if (result === ERR_NO_RESULT_FOUND && gameCreep.store.getUsedCapacity() < gameCreep.store.getCapacity()) { // pickup adjacent resources
-                        const drop = gameCreep.pos.findInRange(FIND_DROPPED_RESOURCES, 1)[0];
-                        if (drop) {
-                            result = gameCreep.pickup(drop); // it may do that 'double' but it really does not matter
-                            //Util.Info('ExecuteJobs', 'ExecuteRoomJobs', creep.name + ' picked up adjacent resource (' + drop.pos.x + ',' + drop.pos.y + ',' + drop.pos.roomName + ',' + drop.amount + ',' + drop.resourceType + ')');
-                        } else {
-                            const tombstone = gameCreep.pos.findInRange(FIND_TOMBSTONES, 1, {
-                                filter: (t) => {
-                                    return t.store.getUsedCapacity() > 0;
-                                }
-                            })[0];
-                            if (tombstone) {
-                                for (const resourceType in gameCreep.store) {
-                                    result = gameCreep.withdraw(tombstone, resourceType);
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                    if (!creepMemory.Boost/*do not renew if creep is boosted*/ && (600 / gameCreep.body.length + gameCreep.ticksToLive) <= 1500) { // spawn renew functionality
-                        const spawn = gameCreep.pos.findInRange(FIND_MY_STRUCTURES, 1, {
-                            filter: (s) => {
-                                return s.structureType === STRUCTURE_SPAWN && !s.spawning;
-                            }
-                        })[0];
-                        if (spawn) {
-                            result = spawn.renewCreep(gameCreep);
-                        }
-                    }
+                    result = ConstantCreepActions(creepMemory, gameCreep); // creep actions that should always be fired no matter what the creep is doing
                 }
                 /*const elapsed = Game.cpu.getUsed() - startCpu;
                 if(elapsed > 2){
                     Util.Info('ExecuteJobs', 'CPU', creepName + ' ' + elapsed);
                 }*/
             }
+        }
+
+        /**@return {number}*/
+        function CreepNotIdle(jobRoomName, creepMemory, gameCreep, creepName, result){
+            const job = Memory.MemRooms[jobRoomName].RoomJobs[creepMemory.JobName];
+            if (!job && gameCreep) { // job is outdated and removed from Memory and creep is still alive
+                creepMemory.JobName = 'idle(' + gameCreep.pos.x + ',' + gameCreep.pos.y + ')' + gameCreep.pos.roomName;
+            } else if (job && !gameCreep) { // job exists and creep is dead
+                if (Memory.MemRooms[jobRoomName].RoomJobs[creepMemory.JobName]) {
+                    Memory.MemRooms[jobRoomName].RoomJobs[creepMemory.JobName] = undefined;
+                } else {
+                    Util.ErrorLog('ExecuteJobs', 'ExecuteRoomJobs', 'creep dead delete job failed ' + gameCreep.name + ' ' + jobRoomName + ' ' + creepMemory.JobName + ' gameCreep.pos.roomName ' + gameCreep.pos.roomName);
+                }
+                const didRemoveMaxCreeps = FindAndRemoveMaxCreeps(jobRoomName, creepName);
+                delete Memory.creeps[creepName];
+            } else if (job && gameCreep) { // creep is alive and its job is found
+                if (!gameCreep.spawning) {
+                    result = JobAction(gameCreep, job);
+                    if (result === JOB_IS_DONE) {
+                        if (Memory.MemRooms[jobRoomName].RoomJobs[creepMemory.JobName]) {
+                            Memory.MemRooms[jobRoomName].RoomJobs[creepMemory.JobName] = undefined;
+                        } else {
+                            Util.ErrorLog('ExecuteJobs', 'ExecuteRoomJobs', 'job done delete failed ' + gameCreep.name + ' ' + jobRoomName + ' ' + creepMemory.JobName + ' gameCreep.pos.roomName ' + gameCreep.pos.roomName);
+                        }
+                        let assignedToNewJob = false;
+                        for (const roomJobKey in Memory.MemRooms[jobRoomName].RoomJobs) {
+                            let roomJob = Memory.MemRooms[jobRoomName].RoomJobs[roomJobKey];
+                            if (roomJob && roomJob.Creep === 'vacant' && creepName.startsWith(roomJob.CreepType)) {
+                                assignedToNewJob = true;
+                                for (const memoryElementKey in creepMemory) {
+                                    if (memoryElementKey !== 'JobName') {
+                                        creepMemory[memoryElementKey] = undefined;
+                                    }
+                                }
+                                creepMemory.JobName = roomJobKey;
+                                roomJob.Creep = creepName;
+                                break;
+                            }
+                        }
+                        if (!assignedToNewJob) {
+                            creepMemory.JobName = 'idle(' + gameCreep.pos.x + ',' + gameCreep.pos.y + ')' + gameCreep.pos.roomName;
+                        }
+                        if (creepMemory.JobName === undefined) {
+                            Util.ErrorLog('ExecuteJobs', ' ExecuteRoomJobs', 'creep job is undefined! ' + creepName + ' ' + gameCreep.pos.roomName);
+                        }
+                    }
+                }
+            } else { // both job and creep is gone
+                Util.Info('ExecuteJobs', 'ExecuteRoomJobs', creepName + ' on ' + creepMemory.JobName + ' in ' + jobRoomName + ' has died and the job has disappeared');
+                Util.InfoLog('ExecuteJobs', 'ExecuteRoomJobs', 'both creep and job gone ' + creepName + ' on ' + creepMemory.JobName + ' in ' + jobRoomName);
+                const didRemoveMaxCreeps = FindAndRemoveMaxCreeps(jobRoomName, creepName);
+                delete Memory.creeps[creepName];
+            }
+            return result;
+        }
+
+        /**@return {number}*/
+        function CreepIdle(jobRoomName, gameCreep, creepName, result){
+            if (!gameCreep) { // idle creep is dead
+                const didRemoveMaxCreeps = FindAndRemoveMaxCreeps(jobRoomName, creepName);
+                delete Memory.creeps[creepName];
+            } else { // idle creep is alive
+                // if idle creep is carrying something - move it to storage
+                if (gameCreep.room.storage && gameCreep.room.storage.store.getUsedCapacity() < gameCreep.room.storage.store.getCapacity() && gameCreep.store.getUsedCapacity() > 0) {
+                    result = DepositCreepStore(gameCreep, gameCreep.room.storage);
+                    if (result === ERR_NOT_IN_RANGE) {
+                        result = Move(gameCreep, gameCreep.room.storage);
+                    }
+                    gameCreep.say('idle 📦' + result);
+                } else if (!gameCreep.room.controller
+                    || !gameCreep.room.controller.my
+                    || gameCreep.memory.MoveHome
+                    || Memory.MemRooms[gameCreep.pos.roomName].MaxCreeps[creepName.substring(0, 1)]
+                    && !Memory.MemRooms[gameCreep.pos.roomName].MaxCreeps[creepName.substring(0, 1)][creepName]) { // I do not own the room the idle creep is in - move it to an owned room!
+                    let closestOwnedRoom;
+                    if (!gameCreep.memory.MoveHome) {
+                        let bestDistance = Number.MAX_SAFE_INTEGER;
+                        for (const memRoomKey in Memory.MemRooms) {
+                            if (Game.rooms[memRoomKey] && Game.rooms[memRoomKey].controller && Game.rooms[memRoomKey].controller.my) { // exist and has room
+                                const distance = Game.map.getRoomLinearDistance(gameCreep.pos.roomName, memRoomKey);
+                                if (distance < bestDistance) {
+                                    closestOwnedRoom = memRoomKey;
+                                    bestDistance = distance;
+                                }
+                            }
+                        }
+                        if (closestOwnedRoom) {
+                            const didRemoveMaxCreeps = FindAndRemoveMaxCreeps(jobRoomName, creepName); // remove from the origin room
+                            if (!Memory.MemRooms[closestOwnedRoom].MaxCreeps[creepName.substring(0, 1)]) {
+                                Memory.MemRooms[closestOwnedRoom].MaxCreeps[creepName.substring(0, 1)] = {};
+                            }
+                            Memory.MemRooms[closestOwnedRoom].MaxCreeps[creepName.substring(0, 1)][creepName] = creepName; // add to the new home room
+                            gameCreep.memory.MoveHome = closestOwnedRoom;
+                            Util.Info('ExecuteJobs', 'ExecuteRoomJobs', 'idle ' + creepName + ' in ' + gameCreep.pos.roomName + ' moving to ' + closestOwnedRoom);
+                        } else {
+                            Util.ErrorLog('ExecuteJobs', 'ExecuteRoomJobs', 'idle ' + creepName + ' in ' + gameCreep.pos.roomName + ' cannot find a new home!');
+                        }
+                    } else {
+                        closestOwnedRoom = gameCreep.memory.MoveHome;
+                    }
+
+                    if (closestOwnedRoom && (closestOwnedRoom !== gameCreep.pos.roomName || gameCreep.pos.getRangeTo(Game.rooms[closestOwnedRoom].controller) > 4)) {
+                        result = Move(gameCreep, Game.rooms[closestOwnedRoom].controller);
+                        gameCreep.say('🏠🏃');
+                    } else {
+                        gameCreep.memory.MoveHome = undefined;
+                        gameCreep.say('🏠🏃✔');
+                    }
+                } else if (gameCreep.getActiveBodyparts(ATTACK)) { // idle creep can attack
+                    const hostileCreeps = gameCreep.room.find(FIND_HOSTILE_CREEPS);
+                    if (hostileCreeps[0]) {
+                        const hostileCreep = hostileCreeps[0];
+                        Util.Info('ExecuteJobs', 'ExecuteRoomJobs', 'idle ' + gameCreep.name + ' found ' + hostileCreeps.length + ' hostile creeps! targeting ' + hostileCreep + ' attack');
+                        gameCreep.say('ATK ' + hostileCreep);
+                        result = gameCreep.attack(hostileCreep);
+                        if (result === ERR_NOT_IN_RANGE) {
+                            result = Move(gameCreep, hostileCreep);
+                        }
+                    }
+                } else if (gameCreep.getActiveBodyparts(RANGED_ATTACK)) { // idle creep can ranged attack
+                    const hostileCreeps = gameCreep.room.find(FIND_HOSTILE_CREEPS);
+                    if (hostileCreeps[0]) {
+                        const hostileCreep = hostileCreeps[0];
+                        Util.Info('ExecuteJobs', 'ExecuteRoomJobs', 'idle ' + gameCreep.name + ' found ' + hostileCreeps.length + ' hostile creeps! targeting ' + hostileCreep + ' ranged attack');
+                        gameCreep.say('RATK ' + hostileCreep);
+                        result = gameCreep.rangedAttack(hostileCreep);
+                        if (result === ERR_NOT_IN_RANGE) {
+                            result = Move(gameCreep, hostileCreep);
+                        }
+                    }
+                } else if (gameCreep.getActiveBodyparts(RANGED_ATTACK)) { // idle creep can heal
+                    const damagedCreeps = gameCreep.room.find(FIND_MY_CREEPS, {
+                        filter: (creep) => {
+                            return creep.hits < creep.hitsMax;
+                        }
+                    });
+                    if (damagedCreeps[0]) {
+                        const damagedCreep = damagedCreeps[0];
+                        Util.Info('ExecuteJobs', 'ExecuteRoomJobs', 'idle ' + gameCreep.name + ' found ' + damagedCreeps.length + ' damaged creeps! targeting ' + damagedCreep + ' heal');
+                        gameCreep.say('HEAL ' + damagedCreep);
+                        result = gameCreep.heal(damagedCreep);
+                        if (result === ERR_NOT_IN_RANGE) {
+                            result = Move(gameCreep, damagedCreep);
+                        }
+                    }
+                }
+                if(result === ERR_NO_RESULT_FOUND) {
+                    const creepType = creepName.substring(0, 1);
+                    const maxCreeps = Memory.MemRooms[gameCreep.pos.roomName].MaxCreeps;
+                    if (maxCreeps && maxCreeps[creepType] && ((Object.keys(maxCreeps[creepType]).length - 1) > maxCreeps[creepType]['M'] || !maxCreeps[creepType]['M'])) { // check if creepType is overrepresented in this room - recycle creep
+                        const closestSpawn = gameCreep.pos.findClosestByPath(FIND_MY_STRUCTURES, {
+                            filter: (s) => {
+                                return s.structureType === STRUCTURE_SPAWN;
+                            }
+                        });
+                        if (closestSpawn) {
+                            result = closestSpawn.recycleCreep(gameCreep);
+                            if (result === ERR_NOT_IN_RANGE) {
+                                result = Move(gameCreep, closestSpawn);
+                            } else {
+                                Util.Info('ExecuteJobs', 'ExecuteRoomJobs', 'idle ' + gameCreep.name + ' recycled. MaxCreeps ' + maxCreeps[creepType]['M'] + ' current ' + (Object.keys(maxCreeps[creepType]).length - 1) + ' in ' + gameCreep.pos.roomName);
+                            }
+                        }
+                    }
+                }
+            }
+            return result;
+        }
+
+        /**@return {number}*/
+        function ConstantCreepActions(creepMemory, gameCreep){
+            let result = ERR_NO_RESULT_FOUND;
+            if (gameCreep.store.getUsedCapacity(RESOURCE_ENERGY) > 0) { // fill adjacent spawns, extensions and towers or repair or construct on the road
+                const toFill = gameCreep.pos.findInRange(FIND_MY_STRUCTURES, 1, {
+                    filter: (structure) => {
+                        return (structure.structureType === STRUCTURE_SPAWN
+                            || structure.structureType === STRUCTURE_EXTENSION
+                            || structure.structureType === STRUCTURE_TOWER) && structure.store.getUsedCapacity(RESOURCE_ENERGY) < structure.store.getCapacity(RESOURCE_ENERGY);
+                    }
+                })[0];
+                if (toFill) { // fill adjacent spawns, extensions
+                    result = gameCreep.transfer(toFill, RESOURCE_ENERGY); // it may do that 'double' but it really does not matter
+                    //Util.Info('ExecuteJobs', 'ExecuteRoomJobs', creep.name + ' transferred energy to adjacent spawn tower or extension (' + toFill.pos.x + ',' + toFill.pos.y + ',' + toFill.pos.roomName + ')');
+                } else if (gameCreep.name.startsWith('H') || gameCreep.name.startsWith('B') || gameCreep.name.startsWith('D')) { // repair on the road
+                    const toRepair = gameCreep.pos.findInRange(FIND_STRUCTURES, 2, {
+                        filter: (structure) => {
+                            return (structure.structureType !== STRUCTURE_WALL
+                                && structure.structureType !== STRUCTURE_RAMPART) && structure.hits < structure.hitsMax;
+                        }
+                    })[0];
+                    if (toRepair) { // repair on the road
+                        result = gameCreep.repair(toRepair);
+                        //Util.Info('ExecuteJobs', 'ExecuteRoomJobs', creep.name + ' repaired ' + toRepair.structureType + ' (' + toRepair.pos.x + ',' + toRepair.pos.y + ',' + toRepair.pos.roomName + ',' + toRepair.hits + ',' + toRepair.hitsMax + ')');
+                    } else {
+                        const toBuild = gameCreep.pos.findInRange(FIND_CONSTRUCTION_SITES, 2)[0];
+                        if (toBuild) { // construct on the road
+                            result = gameCreep.build(toBuild);
+                        }
+                    }
+                }
+            }
+            if (result === ERR_NO_RESULT_FOUND && gameCreep.store.getUsedCapacity() < gameCreep.store.getCapacity()) { // pickup adjacent resources
+                const drop = gameCreep.pos.findInRange(FIND_DROPPED_RESOURCES, 1)[0];
+                if (drop) {
+                    result = gameCreep.pickup(drop); // it may do that 'double' but it really does not matter
+                    //Util.Info('ExecuteJobs', 'ExecuteRoomJobs', creep.name + ' picked up adjacent resource (' + drop.pos.x + ',' + drop.pos.y + ',' + drop.pos.roomName + ',' + drop.amount + ',' + drop.resourceType + ')');
+                } else {
+                    const tombstone = gameCreep.pos.findInRange(FIND_TOMBSTONES, 1, {
+                        filter: (t) => {
+                            return t.store.getUsedCapacity() > 0;
+                        }
+                    })[0];
+                    if (tombstone) {
+                        for (const resourceType in gameCreep.store) {
+                            result = gameCreep.withdraw(tombstone, resourceType);
+                            break;
+                        }
+                    }
+                }
+            }
+            if (!creepMemory.Boost/*do not renew if creep is boosted*/ && (600 / gameCreep.body.length + gameCreep.ticksToLive) <= 1500) { // spawn renew functionality
+                const spawn = gameCreep.pos.findInRange(FIND_MY_STRUCTURES, 1, {
+                    filter: (s) => {
+                        return s.structureType === STRUCTURE_SPAWN && !s.spawning;
+                    }
+                })[0];
+                if (spawn) {
+                    result = spawn.renewCreep(gameCreep);
+                }
+            }
+            return result;
         }
 
         /**@return {number}*/
@@ -1968,7 +1985,7 @@ const ExecuteJobs = {
                         }
                         if (deposit && deposit.cooldown === 0) {
                             return creep.harvest(deposit)
-                        } else if (deposit && deposit.lastCooldown > Util.DEPOSIT_MAX_LAST_COOLDOWN) {
+                        } else if (deposit && deposit.lastCooldown >= Util.DEPOSIT_MAX_LAST_COOLDOWN) {
                             Util.InfoLog('ExecuteJobs', 'JobHarvestDeposit', creep.name + ' removed deposit in ' + jobObject.pos.roomName + ' lastCooldown ' + deposit.lastCooldown);
                             jobObject.remove();
                             return JOB_IS_DONE;
@@ -2340,7 +2357,7 @@ const ExecuteJobs = {
                     Util.ErrorLog('ExecuteJobs', 'DepositCreepStore', errorMessage);
                 } else {
                     if(!creep.getActiveBodyparts('CARRY')){
-                        Util.Warning('ExecuteJobs', 'DepositCreepStore', errorMessage + ' no CARRY');
+                        Util.InfoLog('ExecuteJobs', 'DepositCreepStore', errorMessage + ' no CARRY');
                     }else{
                         Util.ErrorLog('ExecuteJobs', 'DepositCreepStore', errorMessage);
                     }

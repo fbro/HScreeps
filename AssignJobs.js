@@ -554,17 +554,16 @@ const AssignJobs = {
                     switch (true) {
                         case (energyAvailable >= 7500): // energyCapacityAvailable: 12900
                             body = [
+                                MOVE, MOVE, MOVE, MOVE, MOVE,
+                                MOVE, MOVE, MOVE, MOVE, MOVE,
+                                MOVE, MOVE, MOVE, MOVE, MOVE,
+                                MOVE, MOVE, MOVE, MOVE, MOVE,
+                                MOVE, MOVE, MOVE, MOVE, MOVE,
                                 HEAL, HEAL, HEAL, HEAL, HEAL,
                                 HEAL, HEAL, HEAL, HEAL, HEAL,
                                 HEAL, HEAL, HEAL, HEAL, HEAL,
                                 HEAL, HEAL, HEAL, HEAL, HEAL,
-                                HEAL, HEAL, HEAL, HEAL,
-                                MOVE, MOVE, MOVE, MOVE, MOVE,
-                                MOVE, MOVE, MOVE, MOVE, MOVE,
-                                MOVE, MOVE, MOVE, MOVE, MOVE,
-                                MOVE, MOVE, MOVE, MOVE, MOVE,
-                                MOVE, MOVE, MOVE, MOVE, MOVE,
-                                HEAL];
+                                HEAL, HEAL, HEAL, HEAL, HEAL];
                             break;
                         case (energyAvailable >= 4800): // energyCapacityAvailable: 5600
                             body = [HEAL, HEAL, HEAL, HEAL, HEAL, HEAL, HEAL, HEAL, HEAL, HEAL, HEAL, HEAL, HEAL, HEAL, HEAL,
