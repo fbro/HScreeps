@@ -1681,7 +1681,10 @@ const ExecuteJobs = {
                     return SHOULD_ACT;
                 },
                 /**@return {int}*/
-                Act: function (jobObject) {
+                Act: function (jobObject) { // TODO not very efficient hostile creep handling!
+                    // TODO search for any hostilities - if any go to function that handles attacking
+                    const nearbyHostileCreep = creep.pos.findInRange(FIND_HOSTILE_CREEPS, 1)[0];
+                    let result = creep.attack(nearbyHostileCreep);
                     const hostileCreep = creep.pos.findInRange(FIND_HOSTILE_CREEPS, 4)[0];
                     if (hostileCreep) {
                         const nearestHostileCreep = creep.pos.findClosestByPath(FIND_HOSTILE_CREEPS, {
@@ -1689,9 +1692,10 @@ const ExecuteJobs = {
                                 return hostileCreep.getActiveBodyparts(ATTACK) || hostileCreep.getActiveBodyparts(RANGED_ATTACK);
                             }
                         });
-                        let result = creep.attack(nearestHostileCreep);
+                        result = creep.attack(nearestHostileCreep);
                         if (result === ERR_NOT_IN_RANGE) {
                             Move(creep, nearestHostileCreep);
+
                         }
                         Util.Warning('ExecuteJobs', 'JobAttackPowerBank', 'attacking nearby hostile! ' + creep.name + ' ' + hostileCreep + ' in ' + creep.pos.roomName);
                         return ERR_BUSY;
@@ -1709,7 +1713,7 @@ const ExecuteJobs = {
                             creep.memory.PowerBankId = powerBank.id;
                         }
                     }
-                    let result = ERR_NO_RESULT_FOUND;
+                    result = ERR_NO_RESULT_FOUND;
                     if (creep.hits < 100) {
                         result = ERR_TIRED;
                     } else if (powerBank) {
@@ -2448,50 +2452,74 @@ const ExecuteJobs = {
             if (from.roomName === to.roomName) {
                 result = creep.moveTo(to, opts);
             } else { // not in the same room - make a map in mem
-                opts.reusePath = 50; // movement between rooms should reuse path more
-                if (!Memory.Paths) {
-                    Memory.Paths = {};
+                if(creep.memory._move && creep.pos.roomName === creep.memory._move.room) { // movement between rooms should reuse path more
+                    result = creep.moveByPath(creep.memory._move.path);
+                    if(result !== OK && result !== ERR_TIRED){
+                        Util.Warning('ExecuteJobs', 'Move', 'using old path failed ' + creep.name + ' ' + creep.pos.roomName + ' ' + result);
+                        result = ERR_NO_RESULT_FOUND;
+                    }
                 }
-                let shouldCalculate = true;
-                if (Memory.Paths[to.roomName] && Memory.Paths[to.roomName][from.roomName]) {
-                    shouldCalculate = false;
+                if(result === ERR_NO_RESULT_FOUND) { // calculate path
+                    generateOuterRoomPath(to, from, creep); // saves result in Memory.Paths
+                    const exitPosition = generateInnerRoomPath(to, creep);
+                    result = creep.moveTo(exitPosition, opts);
                 }
-                if (shouldCalculate) { // Use `findRoute` to calculate a high-level plan for this path,
-                    // prioritizing highways and owned rooms
-                    const route = Game.map.findRoute(from.roomName, to.roomName, {
-                        routeCallback(roomName) {
-                            const parsed = /^[WE]([0-9]+)[NS]([0-9]+)$/.exec(roomName);
-                            const isHighway = (parsed[1] % 10 === 0) || (parsed[2] % 10 === 0);
-                            let isMyRoom = false;
-                            if (Game.rooms[roomName] && Game.rooms[roomName].controller) {
-                                if (Game.rooms[roomName].controller.my) {
-                                    isMyRoom = true;
-                                }
-                            }
-                            if (isHighway || isMyRoom) {
-                                return 1;
-                            } else {
-                                return 10;
+            }
+            result = MoveAnalysis(to, from, creep, result);
+
+            return result;
+        }
+
+        function generateOuterRoomPath(to, from, creep){
+            if (!Memory.Paths) {
+                Memory.Paths = {};
+            }
+            let shouldCalculate = true;
+            if (Memory.Paths[to.roomName] && Memory.Paths[to.roomName][from.roomName]) {
+                shouldCalculate = false;
+            }
+            if (shouldCalculate) { // Use `findRoute` to calculate a high-level plan for this path,
+                // prioritizing highways and owned rooms
+                const route = Game.map.findRoute(from.roomName, to.roomName, {
+                    routeCallback(roomName) {
+                        const parsed = /^[WE]([0-9]+)[NS]([0-9]+)$/.exec(roomName);
+                        const isHighway = (parsed[1] % 10 === 0) || (parsed[2] % 10 === 0);
+                        let isMyRoom = false;
+                        if (Game.rooms[roomName] && Game.rooms[roomName].controller) {
+                            if (Game.rooms[roomName].controller.my) {
+                                isMyRoom = true;
                             }
                         }
-                    });
-                    if (!Memory.Paths[to.roomName]) {
-                        Memory.Paths[to.roomName] = {};
+                        if (isHighway || isMyRoom) {
+                            return 1;
+                        } else {
+                            return 10;
+                        }
                     }
-                    let lastRoom = from.roomName;
-                    for (const roomInRouteKey in route) {
-                        const roomInRoute = route[roomInRouteKey];
-                        Memory.Paths[to.roomName][lastRoom] = roomInRoute.room;
-                        lastRoom = roomInRoute.room
-                    }
-                    Util.Info('ExecuteJobs', 'Move', 'new path from ' + from.roomName + ' to ' + to.roomName + ' ' + creep.name + ' paths ' + JSON.stringify(Memory.Paths[to.roomName]));
+                });
+                if (!Memory.Paths[to.roomName]) {
+                    Memory.Paths[to.roomName] = {};
                 }
-                const nextRoom = Memory.Paths[to.roomName][creep.pos.roomName];
-                const exitDirection = Game.map.findExit(creep.room, nextRoom);
-                const exitPosition = creep.pos.findClosestByPath(exitDirection);
-                result = creep.moveTo(exitPosition, opts);
+                let lastRoom = from.roomName;
+                for (const roomInRouteKey in route) {
+                    const roomInRoute = route[roomInRouteKey];
+                    Memory.Paths[to.roomName][lastRoom] = roomInRoute.room;
+                    lastRoom = roomInRoute.room
+                }
+                Util.Info('ExecuteJobs', 'Move', 'new path from ' + from.roomName + ' to ' + to.roomName + ' ' + creep.name + ' paths ' + JSON.stringify(Memory.Paths[to.roomName]));
             }
+        }
 
+        function generateInnerRoomPath(to, creep){
+            const nextRoom = Memory.Paths[to.roomName][creep.pos.roomName];
+            const exitDirection = Game.map.findExit(creep.room, nextRoom);
+            const exitPosition = creep.pos.findClosestByPath(exitDirection);
+            return exitPosition;
+        }
+
+        /**@return {number}*/
+        function MoveAnalysis(to, from, creep, result){
+            // make an analysis of the move results
             if (result === OK) {
                 result = JOB_MOVING;
             } else if (result !== ERR_BUSY && result !== ERR_TIRED) {
@@ -2504,7 +2532,7 @@ const ExecuteJobs = {
                 } else if (creep.pos.y === 49) {
                     creep.move(TOP);
                 }
-                if (!creep.memory.MoveErrWait) {
+                if (!creep.memory.MoveErrWait) { // maybe wait a couple of ticks to see if the obstacle has disappeared
                     creep.memory.MoveErrWait = 1;
                     creep.memory.MoveErrLastWait = Game.time;
                     result = JOB_MOVING;
@@ -2524,7 +2552,7 @@ const ExecuteJobs = {
                         Util.Warning('ExecuteJobs', 'Move', 'move error multiple room MoveErrWait ' + creep.memory.MoveErrWait + ' ' + result + ' ' + creep.name + ' (' + from.x + ',' + from.y + ',' + from.roomName + ') to ' + obj + '(' + to.x + ',' + to.y + ',' + to.roomName + ') ending move!');
                     }
                     if(result === ERR_NO_BODYPART){ // no MOVE bodypart
-                        Util.InfoLog('ExecuteJobs', 'Move', creep.name + ' ERR_NO_BODYPART ' + creep.pos.roomName);
+                        Util.InfoLog('ExecuteJobs', 'Move', creep.name + ' ERR_NO_BODYPART ' + creep.pos.roomName + ' committing suicide');
                         creep.suicide();
                     }
                     result = JOB_IS_DONE;
@@ -2533,7 +2561,6 @@ const ExecuteJobs = {
             }
             return result;
         }
-
         //endregion
     }
 };
