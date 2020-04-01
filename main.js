@@ -100,6 +100,4 @@ module.exports.loop = function () {
 
 // if doing long distance work creep should make sure it has enough timeToLive to do the job
 // add constructions
-// add renewCreep functionality
-// recycle creeps if there are many idle!
 // monitor creeps and see if they can work more quickly by optimizing its actions - remove 'pausing' ticks
