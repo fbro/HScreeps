@@ -78,7 +78,7 @@ const Terminals = {
                     return s.structureType === STRUCTURE_FACTORY && (sendToFactoryLevel === s.level || sendToFactoryLevel === 0);
                 }
             })[0];
-            if(!fromFactory) { // only send the resource if the factory lvl in sender room is not the same as sendToFactoryLevel
+            if(!fromFactory || fromTerminal.room.storage.store.getUsedCapacity(resourceType) > Util.STORAGE_HIGH) { // only send the resource if the factory lvl in sender room is not the same as sendToFactoryLevel unless there is a surplus
                 for (const toTerminalKey in terminals) {
                     const toTerminal = terminals[toTerminalKey];
                     if (toTerminal.id !== fromTerminal.id
@@ -149,7 +149,11 @@ const Terminals = {
                         if(result === OK) {
                             marketDealSendCount++;
                         }
-                        Util.Info('Terminals', 'SellExcessResource', sendAmount + ' ' + resourceType + ' from ' + fromTerminal.pos.roomName + ' to ' + order.roomName + ' result ' + result + ' marketDealSendCount ' + marketDealSendCount + ' order.remainingAmount ' + order.remainingAmount + ' price ' + order.price + ' total price ' + order.price * sendAmount + ' fromAmount ' + fromAmount);
+                        if(resourceType === RESOURCE_TISSUE || resourceType === RESOURCE_FIXTURES){
+                            Util.InfoLog('Terminals', 'SellExcessResource', sendAmount + ' ' + resourceType + ' from ' + fromTerminal.pos.roomName + ' to ' + order.roomName + ' result ' + result + ' marketDealSendCount ' + marketDealSendCount + ' order.remainingAmount ' + order.remainingAmount + ' price ' + order.price + ' total price ' + order.price * sendAmount + ' fromAmount ' + fromAmount);
+                        }else{
+                            Util.Info('Terminals', 'SellExcessResource', sendAmount + ' ' + resourceType + ' from ' + fromTerminal.pos.roomName + ' to ' + order.roomName + ' result ' + result + ' marketDealSendCount ' + marketDealSendCount + ' order.remainingAmount ' + order.remainingAmount + ' price ' + order.price + ' total price ' + order.price * sendAmount + ' fromAmount ' + fromAmount);
+                        }
                     }
                 }
             }
@@ -170,7 +174,7 @@ const Terminals = {
             // buy power
             const usedPowerCapacity = terminal.store.getUsedCapacity(RESOURCE_POWER);
             if (usedPowerCapacity === 0 && marketDealSendCount <= 10 && terminal.room.storage.store.getUsedCapacity(RESOURCE_ENERGY) > Util.STORAGE_ENERGY_LOW_TRANSFER) {
-                marketDealSendCount = BuyResource(terminal, RESOURCE_POWER, 1000, marketDealSendCount, 1, 1);
+                marketDealSendCount = BuyResource(terminal, RESOURCE_POWER, 1000, marketDealSendCount, 1, 2);
             }
             return marketDealSendCount;
         }

@@ -91,7 +91,6 @@ module.exports.loop = function () {
 };
 
 // TODOs:
-// TODO add flee functionality a function in executejobs that gunner, medics, lone warriors and all other creeps use to flee from an imminent threat
 
 // lab reactions
 
