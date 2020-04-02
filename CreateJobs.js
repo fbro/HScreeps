@@ -14,6 +14,8 @@ const CreateJobs = {
         let flagJobs = CreateFlagJobs();
         CreateObjJobs(flagJobs);
 
+        //region create jobs
+
         // this method is not just run in the Game.rooms loop because flags may be in 'invisible' rooms
         function CreateFlagJobs() {
             let jobs = {};
@@ -111,6 +113,10 @@ const CreateJobs = {
                     }
                 }
                 if (gameRoom.controller && gameRoom.controller.my) { // create all the jobs in this room
+                    if(!gameRoom.controller.pos.lookFor(LOOK_FLAGS) && (!gameRoom.controller.sign || gameRoom.controller.sign.text !== 'Maul my homebrewed code @ github.com/fbro/HScreeps ' + gameRoom.name)){
+                        const result = gameRoom.createFlag(gameRoom.controller.pos, 'Maul my homebrewed code @ github.com/fbro/HScreeps ' + gameRoom.name, COLOR_ORANGE, COLOR_ORANGE);
+                        Util.InfoLog('CreateJobs', 'CreateObjJobs', 'createFlag sign flag ' + gameRoom.controller.pos + ' ' + result);
+                    }
                     // Source
                     const sources = gameRoom.find(FIND_SOURCES);
                     for (const sourceKey in sources) {
@@ -212,7 +218,9 @@ const CreateJobs = {
             }
         }
 
-        // flag jobs:
+        //endregion
+
+        //region flag jobs
 
         function PowerBankJobs(jobs, gameFlagKey, gameFlag) {
             jobs = CreateFlagJob(jobs, 'AtkP1', gameFlagKey, gameFlag, 'W');
@@ -267,7 +275,9 @@ const CreateJobs = {
             return jobs;
         }
 
-        // in-room jobs:
+        //endregion
+
+        //region room jobs
 
         function FillPowerSpawnEnergyJobs(gameRoom, roomJobs) {
             if (gameRoom.storage && gameRoom.storage.store.getUsedCapacity(RESOURCE_ENERGY) > Util.STORAGE_ENERGY_LOW) {
@@ -624,7 +634,9 @@ const CreateJobs = {
             }
         }
 
-        // util:
+        //endregion
+
+        //region helper functions
 
         function CreateRoom(roomName, jobs) {
             const gameRoom = Game.rooms[roomName];
@@ -654,6 +666,8 @@ const CreateJobs = {
             };
             return roomJobs;
         }
+
+        //endregion
     }
 };
 module.exports = CreateJobs;

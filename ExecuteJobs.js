@@ -427,7 +427,7 @@ const ExecuteJobs = {
 
         //endregion
 
-        //region object jobs
+        //region room jobs
 
         /**@return {int}*/
         function JobSource(creep, roomJob) {
@@ -1382,7 +1382,7 @@ const ExecuteJobs = {
                 Fetch: function (fetchObject, jobObject) {
                     if (jobObject !== fetchObject) { // hostileCreep
                         return creep.attack(fetchObject);
-                    } else if (creep.pos.isNearTo(jobObject)) {
+                    } else if (creep.pos.isEqualTo(jobObject)) {
                         return OK; // when OK is returned FindFetchObject is checking each tick for new hostileCreeps
                     } else if (jobObject === fetchObject) { // move to flag
                         return ERR_NOT_IN_RANGE;
@@ -1469,7 +1469,7 @@ const ExecuteJobs = {
                             }
                         }
                         return result;
-                    } else if (creep.pos.isNearTo(jobObject)) {
+                    } else if (creep.pos.isEqualTo(jobObject)) {
                         return OK; // when OK is returned FindFetchObject is checking each tick for new hostileCreeps
                     } else if (jobObject === fetchObject) { // move to flag
                         return ERR_NOT_IN_RANGE;
@@ -1520,7 +1520,7 @@ const ExecuteJobs = {
                         } else {
                             return creep.heal(fetchObject);
                         }
-                    } else if (creep.pos.isNearTo(jobObject)) {
+                    } else if (creep.pos.isEqualTo(jobObject)) {
                         return OK; // when OK is returned FindFetchObject is checking each tick for new woundedCreeps
                     } else if (jobObject === fetchObject) { // move to flag
                         return ERR_NOT_IN_RANGE;
@@ -1564,7 +1564,7 @@ const ExecuteJobs = {
                 },
                 /**@return {int}*/
                 Fetch: function (fetchObject, jobObject) {
-                    if (creep.pos.x === jobObject.pos.x && creep.pos.y === jobObject.pos.y && creep.pos.roomName === jobObject.pos.roomName) {
+                    if (creep.pos.isEqualTo(jobObject)) {
                         return OK;
                     } else {
                         return ERR_NOT_IN_RANGE;
@@ -2009,7 +2009,7 @@ const ExecuteJobs = {
 
         //endregion
 
-        //region Helper functions
+        //region helper functions
 
         /**@return {boolean}*/
         function FindAndRemoveMaxCreeps(jobRoomName, creepName) {
