@@ -95,6 +95,8 @@ const CreateJobs = {
             // increase MaxCreeps.M for when flag jobs are created
             if(Memory.MemRooms[gameFlag.pos.roomName] && Memory.MemRooms[gameFlag.pos.roomName].MaxCreeps && Memory.MemRooms[gameFlag.pos.roomName].MaxCreeps[creepType] && Memory.MemRooms[gameFlag.pos.roomName].MaxCreeps[creepType].M){
                 Memory.MemRooms[gameFlag.pos.roomName].MaxCreeps[creepType].M += amount;
+            }else{
+                // TODO increase!
             }
             return AddJob(jobs, jobName + '-' + gameFlagKey + '(' + gameFlag.pos.x + ',' + gameFlag.pos.y + ')' + gameFlag.pos.roomName, gameFlagKey, Util.FLAG_JOB, creepType);
         }
