@@ -25,6 +25,12 @@ const ExecuteJobs = {
                 //const startCpu = Game.cpu.getUsed();
                 const creepMemory = Memory.creeps[creepName];
                 const gameCreep = Game.creeps[creepName];
+                if(gameCreep){ // creep alive
+                    if(gameCreep.fatigue){
+                        gameCreep.say('😪 ' + gameCreep.fatigue);
+                        continue;
+                    }
+                }
                 if (!creepMemory.JobName) {
                     Util.ErrorLog('ExecuteJobs', 'ExecuteRoomJobs', 'creep JobName is undefined ' + creepName);
                     if (!gameCreep) {

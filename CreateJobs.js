@@ -93,10 +93,19 @@ const CreateJobs = {
         function CreateFlagJob(jobs, jobName, gameFlagKey, gameFlag, creepType, amount = 1) {
             //Util.Info('CreateJobs', 'CreateFlagJob', 'AddJob ' + gameFlagKey);
             // increase MaxCreeps.M for when flag jobs are created
-            if(Memory.MemRooms[gameFlag.pos.roomName] && Memory.MemRooms[gameFlag.pos.roomName].MaxCreeps && Memory.MemRooms[gameFlag.pos.roomName].MaxCreeps[creepType] && Memory.MemRooms[gameFlag.pos.roomName].MaxCreeps[creepType].M){
+            if(Memory.MemRooms[gameFlag.pos.roomName]){
+                if(Memory.MemRooms[gameFlag.pos.roomName].MaxCreeps){
+                    if(Memory.MemRooms[gameFlag.pos.roomName].MaxCreeps[creepType]){
+                        if(!Memory.MemRooms[gameFlag.pos.roomName].MaxCreeps[creepType].M){
+                            Memory.MemRooms[gameFlag.pos.roomName].MaxCreeps[creepType]['M'] = 0;
+                        }
+                    }else{
+                        Memory.MemRooms[gameFlag.pos.roomName].MaxCreeps[creepType] = {'M' : 0};
+                    }
+                }else{
+                    Memory.MemRooms[gameFlag.pos.roomName].MaxCreeps = {creepType : {'M' : 0}};
+                }
                 Memory.MemRooms[gameFlag.pos.roomName].MaxCreeps[creepType].M += amount;
-            }else{
-                // TODO increase!
             }
             return AddJob(jobs, jobName + '-' + gameFlagKey + '(' + gameFlag.pos.x + ',' + gameFlag.pos.y + ')' + gameFlag.pos.roomName, gameFlagKey, Util.FLAG_JOB, creepType);
         }
@@ -115,7 +124,7 @@ const CreateJobs = {
                     }
                 }
                 if (gameRoom.controller && gameRoom.controller.my) { // create all the jobs in this room
-                    if(!gameRoom.controller.pos.lookFor(LOOK_FLAGS) && (!gameRoom.controller.sign || gameRoom.controller.sign.text !== 'Maul my homebrewed code @ github.com/fbro/HScreeps ' + gameRoom.name)){
+                    if(!gameRoom.controller.pos.lookFor(LOOK_FLAGS)[0] && (!gameRoom.controller.sign || gameRoom.controller.sign.text !== 'Maul my homebrewed code @ github.com/fbro/HScreeps ' + gameRoom.name)){
                         const result = gameRoom.createFlag(gameRoom.controller.pos, 'Maul my homebrewed code @ github.com/fbro/HScreeps ' + gameRoom.name, COLOR_ORANGE, COLOR_ORANGE);
                         Util.InfoLog('CreateJobs', 'CreateObjJobs', 'createFlag sign flag ' + gameRoom.controller.pos + ' ' + result);
                     }
