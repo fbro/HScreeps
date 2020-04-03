@@ -1954,7 +1954,7 @@ const ExecuteJobs = {
                     if(result === ERR_NOT_IN_RANGE){
                         result =  Move(creep, powerTarget);
                     }else if(result === OK){
-                        delete creep.Memory._move;
+                        creep.Memory._move = undefined;
                     }else{
                         Util.Info('ExecuteJobs', 'JobTransportPowerBank', 'removing powerbank flag because last power has been picked up! ' + jobObject.pos.roomName);
                         jobObject.remove();
