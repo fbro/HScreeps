@@ -22,7 +22,7 @@ const ExecuteJobs = {
 
         function ExecuteRoomJobs() {
             for (const creepName in Memory.creeps) {
-                //const startCpu = Game.cpu.getUsed();
+                //const startCpu = Game.cpu.getUsed(); // TODO cputest
                 const creepMemory = Memory.creeps[creepName];
                 const gameCreep = Game.creeps[creepName];
                 if(gameCreep){ // creep alive
@@ -54,10 +54,11 @@ const ExecuteJobs = {
                 if (result !== OK && gameCreep) {
                     result = ConstantCreepActions(creepMemory, gameCreep); // creep actions that should always be fired no matter what the creep is doing
                 }
-                /*const elapsed = Game.cpu.getUsed() - startCpu;
-                if(elapsed > 2){
-                    Util.Info('ExecuteJobs', 'CPU', creepName + ' ' + elapsed);
-                }*/
+
+                //const elapsed = Game.cpu.getUsed() - startCpu; // TODO cputest
+                //if(elapsed > 2 && gameCreep && creepMemory){ // only print heavy tasks
+                //    Util.Info('ExecuteJobs', 'CPU', creepName + '(' + gameCreep.pos.x + ',' + gameCreep.pos.y + ',' + gameCreep.pos.roomName + ') ' + elapsed + ' ' + creepMemory.JobName);
+                //}
             }
         }
 

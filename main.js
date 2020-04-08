@@ -26,48 +26,8 @@ module.exports.loop = function () {
                     const memRoom = Memory.MemRooms[memRoomKey];
                     delete memRoom.links; // remove links - maybe the buildings have been deleted ect.
                     delete memRoom.FctrId; // remove FctrId - maybe the buildings have been deleted ect.
-                    // search through MaxCreeps to see if they all have an alive creep and that there are only one of each creep names in MaxCreeps
-                    for (const creepTypesKey in memRoom.MaxCreeps) {
-                        for (const creepKey in memRoom.MaxCreeps[creepTypesKey]) {
-                            if (creepKey !== 'M') {
-                                let foundCreep = false;
-                                for (const creepName in Memory.creeps) {
-                                    if (creepName === creepKey) {
-                                        foundCreep = true;
-                                        for (const foundCreepsKey in foundCreeps) {
-                                            if (foundCreepsKey === creepKey) {
-                                                foundCreep = false;
-                                                break;
-                                            }
-                                        }
-                                        foundCreeps[creepKey] = memRoomKey;
-                                        break;
-                                    }
-                                }
-                                if (!foundCreep) {
-                                    Util.ErrorLog('Main', 'Main', 'Lingering MaxCreeps found and removed ' + creepKey + ' in ' + memRoomKey);
-                                    memRoom.MaxCreeps[creepTypesKey][creepKey] = undefined;
-                                }
-                            }else{
-                                delete memRoom.MaxCreeps[creepTypesKey][creepKey]; // reset
-                            }
-                        }
-                    }
-                    if (memRoom.RoomLevel <= 0 && Object.keys(memRoom.RoomJobs).length === 0) {
-                        let foundCreep = false;
-                        for (const creepType in memRoom.MaxCreeps) {
-                            const maxCreep = memRoom.MaxCreeps[creepType];
-                            if (Object.keys(maxCreep).length > 1) { // more than 'M' is present - a creep is still attached to the room. wait until it dies
-                                foundCreep = true;
-                                break;
-                            }
-                        }
-                        if (!foundCreep) {
-                            // room is unowned and there are no jobs in it - remove the room
-                            Memory.MemRooms[memRoomKey] = undefined;
-                            Util.InfoLog('Main', 'Main', 'removed unused room ' + memRoomKey);
-                        }
-                    }
+                    MaxCreepsCleanup(memRoomKey, memRoom, foundCreeps);
+                    UnusedRoomsCleanup(memRoomKey, memRoom);
                 }
                 if(Game.time % 240000 === 0){ // approx every 3 days
                     delete Memory.Paths; // remove Paths to make room for new paths
@@ -88,9 +48,60 @@ module.exports.loop = function () {
         PowerSpawns.run(gameRoom);
     }
     PowerCreeps.run();
+
+    function MaxCreepsCleanup(memRoomKey, memRoom, foundCreeps){
+        // search through MaxCreeps to see if they all have an alive creep and that there are only one of each creep names in MaxCreeps
+        for (const creepTypesKey in memRoom.MaxCreeps) {
+            for (const creepKey in memRoom.MaxCreeps[creepTypesKey]) {
+                if (creepKey !== 'M') {
+                    let foundCreep = false;
+                    for (const creepName in Memory.creeps) {
+                        if (creepName === creepKey) {
+                            foundCreep = true;
+                            for (const foundCreepsKey in foundCreeps) {
+                                if (foundCreepsKey === creepKey) {
+                                    foundCreep = false;
+                                    break;
+                                }
+                            }
+                            foundCreeps[creepKey] = memRoomKey;
+                            break;
+                        }
+                    }
+                    if (!foundCreep) {
+                        Util.ErrorLog('Main', 'Main', 'Lingering MaxCreeps found and removed ' + creepKey + ' in ' + memRoomKey);
+                        // this bug might happen when there are an error somewhere in the code that prevents the normal creep memory cleanup
+                        memRoom.MaxCreeps[creepTypesKey][creepKey] = undefined;
+                    }
+                }else{
+                    delete memRoom.MaxCreeps[creepTypesKey][creepKey]; // reset
+                }
+            }
+        }
+        return foundCreeps;
+    }
+
+    function UnusedRoomsCleanup(memRoomKey, memRoom){
+        if (memRoom.RoomLevel <= 0 && Object.keys(memRoom.RoomJobs).length === 0) {
+            let foundCreep = false;
+            for (const creepType in memRoom.MaxCreeps) {
+                const maxCreep = memRoom.MaxCreeps[creepType];
+                if (Object.keys(maxCreep).length > 1) { // more than 'M' is present - a creep is still attached to the room. wait until it dies
+                    foundCreep = true;
+                    break;
+                }
+            }
+            if (!foundCreep) {
+                // room is unowned and there are no jobs in it - remove the room
+                Memory.MemRooms[memRoomKey] = undefined;
+                Util.InfoLog('Main', 'Main', 'removed unused room ' + memRoomKey);
+            }
+        }
+    }
 };
 
 // TODOs:
+// TODO FillStrg-container can be very expensive!
 
 // lab reactions
 
