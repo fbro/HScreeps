@@ -124,8 +124,8 @@ const CreateJobs = {
                     }
                 }
                 if (gameRoom.controller && gameRoom.controller.my) { // create all the jobs in this room
-                    if(!gameRoom.controller.pos.lookFor(LOOK_FLAGS)[0] && (!gameRoom.controller.sign || gameRoom.controller.sign.text !== 'Maul my homebrewed code @ github.com/fbro/HScreeps ' + gameRoom.name)){
-                        const result = gameRoom.createFlag(gameRoom.controller.pos, 'Maul my homebrewed code @ github.com/fbro/HScreeps ' + gameRoom.name, COLOR_ORANGE, COLOR_ORANGE);
+                    if(!gameRoom.controller.pos.lookFor(LOOK_FLAGS)[0] && (!gameRoom.controller.sign || gameRoom.controller.sign.text !== 'Homebrewed code @ github.com/fbro/HScreeps ' + gameRoom.name)){
+                        const result = gameRoom.createFlag(gameRoom.controller.pos, 'Homebrewed code @ github.com/fbro/HScreeps ' + gameRoom.name, COLOR_ORANGE, COLOR_ORANGE);
                         Util.InfoLog('CreateJobs', 'CreateObjJobs', 'createFlag sign flag ' + gameRoom.controller.pos + ' ' + result);
                     }
                     // Source

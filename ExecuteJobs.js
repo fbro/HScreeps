@@ -65,17 +65,7 @@ const ExecuteJobs = {
         /**@return {number}*/
         function CreepNotIdle(jobRoomName, creepMemory, gameCreep, creepName, result){
             const job = Memory.MemRooms[jobRoomName].RoomJobs[creepMemory.JobName];
-            if (!job && gameCreep) { // job is outdated and removed from Memory and creep is still alive
-                creepMemory.JobName = 'idle(' + gameCreep.pos.x + ',' + gameCreep.pos.y + ')' + gameCreep.pos.roomName;
-            } else if (job && !gameCreep) { // job exists and creep is dead
-                if (Memory.MemRooms[jobRoomName].RoomJobs[creepMemory.JobName]) {
-                    Memory.MemRooms[jobRoomName].RoomJobs[creepMemory.JobName] = undefined;
-                } else {
-                    Util.ErrorLog('ExecuteJobs', 'ExecuteRoomJobs', 'creep dead delete job failed ' + gameCreep.name + ' ' + jobRoomName + ' ' + creepMemory.JobName + ' gameCreep.pos.roomName ' + gameCreep.pos.roomName);
-                }
-                const didRemoveMaxCreeps = FindAndRemoveMaxCreeps(jobRoomName, creepName);
-                delete Memory.creeps[creepName];
-            } else if (job && gameCreep) { // creep is alive and its job is found
+            if (job && gameCreep) { // creep is alive and its job is found
                 if (!gameCreep.spawning) {
                     result = JobAction(gameCreep, job);
                     if (result === JOB_IS_DONE) {
@@ -107,13 +97,23 @@ const ExecuteJobs = {
                         }
                     }
                 }
-            } else { // both job and creep is gone
-                Util.Info('ExecuteJobs', 'ExecuteRoomJobs', creepName + ' on ' + creepMemory.JobName + ' in ' + jobRoomName + ' has died and the job has disappeared');
-                Util.InfoLog('ExecuteJobs', 'ExecuteRoomJobs', 'both creep and job gone ' + creepName + ' on ' + creepMemory.JobName + ' in ' + jobRoomName);
+            } else { // creep is not able to do the job
+                ActiveCreepCleanup(job, gameCreep, creepMemory, creepName, jobRoomName)
+            }
+            return result;
+        }
+
+        function ActiveCreepCleanup(job, gameCreep, creepMemory, creepName, jobRoomName){
+            if (!job && gameCreep) { // job is outdated and removed from Memory and creep is still alive
+                Util.ErrorLog('ExecuteJobs', ' ActiveCreepCleanup', creepName + ' job unexpectedly disappeared! ' + creepMemory.JobName);
+                creepMemory.JobName = 'idle(' + gameCreep.pos.x + ',' + gameCreep.pos.y + ')' + gameCreep.pos.roomName;
+            } else { // creep is dead
+                if (job && !gameCreep) { // job exists and creep is dead, remove job
+                    Memory.MemRooms[jobRoomName].RoomJobs[creepMemory.JobName] = undefined;
+                }
                 const didRemoveMaxCreeps = FindAndRemoveMaxCreeps(jobRoomName, creepName);
                 delete Memory.creeps[creepName];
             }
-            return result;
         }
 
         /**@return {number}*/

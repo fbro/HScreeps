@@ -11,47 +11,53 @@ let Observers = require('Observers');
 let PowerCreeps = require('PowerCreeps');
 
 module.exports.loop = function () {
-    if (!Memory.MemRooms) {
-        Memory.MemRooms = {};
-    }
-    if (Game.time % 10 === 0) {
-        if (Game.time % 30 === 0) { // tick burst from https://docs.screeps.com/cpu-limit.html#Bucket
-            CreateJobs.run();
-            Links.run();
-            if (Game.time % 15000 === 0) {
-                Util.Info('Main', 'Main', '--------------- main reset of memory ---------------');
 
-                const foundCreeps = {};
-                for (const memRoomKey in Memory.MemRooms) {
-                    const memRoom = Memory.MemRooms[memRoomKey];
-                    delete memRoom.links; // remove links - maybe the buildings have been deleted ect.
-                    delete memRoom.FctrId; // remove FctrId - maybe the buildings have been deleted ect.
-                    MaxCreepsCleanup(memRoomKey, memRoom, foundCreeps);
-                    UnusedRoomsCleanup(memRoomKey, memRoom);
-                }
-                if(Game.time % 240000 === 0){ // approx every 3 days
-                    delete Memory.Paths; // remove Paths to make room for new paths
-                    delete Memory.InfoLog;
-                    Util.InfoLog('Main', 'Main', 'reset memory logs ' + Game.time);
-                }
-            }
-            Terminals.run();
-            Factories.run();
+    Controller();
+
+    function Controller(){
+        if (!Memory.MemRooms) {
+            Memory.MemRooms = {};
         }
-        AssignJobs.run();
+        if (Game.time % 10 === 0) {
+            if (Game.time % 30 === 0) { // tick burst from https://docs.screeps.com/cpu-limit.html#Bucket
+                CreateJobs.run();
+                Links.run();
+                if (Game.time % 15000 === 0) {
+                    Util.Info('Main', 'Main', '--------------- main reset of memory ---------------');
+
+                    const foundCreeps = {};
+                    for (const memRoomKey in Memory.MemRooms) {
+                        const memRoom = Memory.MemRooms[memRoomKey];
+                        delete memRoom.links; // remove links - maybe the buildings have been deleted ect.
+                        delete memRoom.FctrId; // remove FctrId - maybe the buildings have been deleted ect.
+                        MaxCreepsCleanup(memRoomKey, memRoom, foundCreeps);
+                        UnusedRoomsCleanup(memRoomKey, memRoom);
+                    }
+                    if(Game.time % 240000 === 0){ // approx every 3 days
+                        delete Memory.Paths; // remove Paths to make room for new paths
+                        delete Memory.InfoLog;
+                        Util.InfoLog('Main', 'Main', 'reset memory logs ' + Game.time);
+                    }
+                }
+                Terminals.run();
+                Factories.run();
+            }
+            AssignJobs.run();
+        }
+        ExecuteJobs.run();
+        for (const gameRoomKey in Game.rooms) {
+            const gameRoom = Game.rooms[gameRoomKey];
+            Towers.run(gameRoom);
+            Observers.run(gameRoom, gameRoomKey);
+            PowerSpawns.run(gameRoom);
+        }
+        PowerCreeps.run();
     }
-    ExecuteJobs.run();
-    for (const gameRoomKey in Game.rooms) {
-        const gameRoom = Game.rooms[gameRoomKey];
-        Towers.run(gameRoom);
-        Observers.run(gameRoom, gameRoomKey);
-        PowerSpawns.run(gameRoom);
-    }
-    PowerCreeps.run();
 
     function MaxCreepsCleanup(memRoomKey, memRoom, foundCreeps){
         // search through MaxCreeps to see if they all have an alive creep and that there are only one of each creep names in MaxCreeps
         for (const creepTypesKey in memRoom.MaxCreeps) {
+            let creepOfTypeFound = false;
             for (const creepKey in memRoom.MaxCreeps[creepTypesKey]) {
                 if (creepKey !== 'M') {
                     let foundCreep = false;
@@ -72,10 +78,15 @@ module.exports.loop = function () {
                         Util.ErrorLog('Main', 'Main', 'Lingering MaxCreeps found and removed ' + creepKey + ' in ' + memRoomKey);
                         // this bug might happen when there are an error somewhere in the code that prevents the normal creep memory cleanup
                         memRoom.MaxCreeps[creepTypesKey][creepKey] = undefined;
+                    }else{
+                        creepOfTypeFound = true;
                     }
                 }else{
-                    delete memRoom.MaxCreeps[creepTypesKey][creepKey]; // reset
+                    memRoom.MaxCreeps[creepTypesKey][creepKey] = undefined; // reset - remove M
                 }
+            }
+            if(!creepOfTypeFound){
+                memRoom.MaxCreeps[creepTypesKey] = undefined; // remove creep type altogether
             }
         }
         return foundCreeps;
