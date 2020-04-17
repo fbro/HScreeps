@@ -101,8 +101,10 @@ const Terminals = {
             for (const resourceType in fromTerminal.store) { // for each resource type
                 let fromAmount = fromTerminal.store.getUsedCapacity(resourceType);
                 let max;
+                let lowestSellingValue = 1;
                 if (resourceType === RESOURCE_ENERGY) {
                     max = Util.TERMINAL_MAX_ENERGY;
+                    lowestSellingValue = 0;
                 } else if(resourceType === RESOURCE_TISSUE || resourceType === RESOURCE_FIXTURES){
                     max = 0; // right now i am selling out on tissue and fixtures - both factory lvl 2 items
                 } else if (resourceType === RESOURCE_POWER
@@ -135,7 +137,9 @@ const Terminals = {
                     const orders = Game.market.getAllOrders(order => order.resourceType === resourceType
                         && order.type === ORDER_BUY
                         /*&& Game.market.calcTransactionCost(500, fromTerminal.pos.roomName, order.roomName) <= 500*/
-                        && (!resourceHistory[0] || (resourceHistory[0].avgPrice / 1.1) <= order.price || resourceType === RESOURCE_ENERGY && fromTerminal.room.storage && fromTerminal.room.storage[RESOURCE_ENERGY] > Util.STORAGE_ENERGY_HIGH)
+                        && (!resourceHistory[0] || (resourceHistory[0].avgPrice / 1.1/*minor price fall is okay*/) <= order.price
+                            || resourceType === RESOURCE_ENERGY && fromTerminal.room.storage && fromTerminal.room.storage[RESOURCE_ENERGY] > Util.STORAGE_ENERGY_HIGH // hard sellout because storage is full
+                        )
                         && order.remainingAmount > 0
                     );
                     if (orders.length > 0) {

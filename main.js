@@ -97,7 +97,7 @@ module.exports.loop = function () {
             let foundCreep = false;
             for (const creepType in memRoom.MaxCreeps) {
                 const maxCreep = memRoom.MaxCreeps[creepType];
-                if (Object.keys(maxCreep).length > 1) { // more than 'M' is present - a creep is still attached to the room. wait until it dies
+                if (maxCreep && Object.keys(maxCreep).length > 1) { // more than 'M' is present - a creep is still attached to the room. wait until it dies
                     foundCreep = true;
                     break;
                 }
@@ -113,6 +113,8 @@ module.exports.loop = function () {
 
 // TODOs:
 // TODO FillStrg-container can be very expensive!
+// TODO terminal should not sell excess when the sell price is ridiculously low
+// TODO maxcreeps M is way higher than it should be - when flag in room creep spawn is used
 
 // lab reactions
 
