@@ -92,7 +92,9 @@ const Observers = {
                             return s.structureType === STRUCTURE_WALL;
                         }
                     });
-                    const hostileCreeps = Game.rooms[roomKey].find(FIND_HOSTILE_CREEPS); // if 4 or more hostile creeps - better to just ignore the room!
+                    const hostileCreeps = Game.rooms[roomKey].find(FIND_HOSTILE_CREEPS, {filter:function(h){
+                        return h.getActiveBodyparts(ATTACK) || h.getActiveBodyparts(RANGED_ATTACK) || h.getActiveBodyparts(HEAL)
+                        }}); // if 4 or more hostile creeps - better to just ignore the room!
                     let shouldVacateHallway = false;
                     if (walls[0] || hostileCreeps.length >= 4) { // other factors could be added here like hostile creeps
                         shouldVacateHallway = true;
@@ -133,7 +135,7 @@ const Observers = {
                     }else{ // make sure that there are no flags in the room that should be vacated
                         const flags = Game.rooms[roomKey].find(FIND_FLAGS, {
                             filter: function (flag) {
-                                return flag.color === COLOR_ORANGE && flag.color === COLOR_CYAN;
+                                return flag.color === COLOR_ORANGE && flag.secondaryColor === COLOR_CYAN || flag.color === COLOR_ORANGE && flag.secondaryColor === COLOR_PURPLE;
                             }
                         });
                         for (const flagKey in flags){
