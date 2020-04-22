@@ -29,6 +29,9 @@ const Util = {
     OBSERVER_SCAN_RADIUS_POWER_DEPOSIT : 5, // the radius around the flagged observer when scanning for power banks or deposits
     DEPOSIT_MAX_LAST_COOLDOWN : 80, // if the deposit is over this value then ignore it and end the deposit job
 
+    TRANSPORTER_MAX_CARRY : 1000, // used in JobAttackPowerBank to generate JobTransportPowerBank
+    GENERATE_TRANSPORTER_WHEN_POWERBANK_HITS_UNDER : 200000, // used in JobAttackPowerBank to determine when powerbank hit is low when to generate transporter jobs
+
     DO_EXTRACTING_WHEN_STORAGE_UNDER_MINERAL : 200000, // stop extracting mineral when one has more than this
     RAMPART_WALL_MAX_HITS_WHEN_STORAGE_ENERGY : 600000, // when storage energy is over this value then go crazy with upgrading ramparts and walls
     RAMPART_WALL_HITS_U_LVL5 : 1000,

@@ -1751,11 +1751,11 @@ const ExecuteJobs = {
                         if (result === ERR_NO_BODYPART) {
                             creep.suicide();
                         }
-                        if (powerBank.hits < 200000) {
+                        if (powerBank.hits < Util.GENERATE_TRANSPORTER_WHEN_POWERBANK_HITS_UNDER) {
                             if (!powerBank.room.lookForAt(LOOK_FLAGS, 0, 0)[0]) {
                                 Util.Info('ExecuteJobs', 'JobAttackPowerBank', 'generate transport power flags ' + creep.name + ' ' + jobObject.name + ' hits left ' + powerBank.hits);
                                 // generate transport power flags depending on the amount of power that was in the powerBank
-                                const numOfTransporterFlags = (powerBank.power / 1000);
+                                const numOfTransporterFlags = (powerBank.power / Util.TRANSPORTER_MAX_CARRY);
                                 for (let i = 0; i < numOfTransporterFlags; i++) {
                                     jobObject.room.createFlag(i, 0, i + '_getPower_' + jobObject.pos.roomName, COLOR_ORANGE, COLOR_GREY);
                                 }

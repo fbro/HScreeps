@@ -116,7 +116,6 @@ module.exports.loop = function () {
 // TODO maxcreeps M is way higher than it should be - when flag in room creep spawn is used
 
 // lab reactions
-
 // attack NPC strongholds
 // harvest middle rooms
 // harvest neutral rooms
