@@ -137,7 +137,7 @@ const Terminals = {
                         && order.type === ORDER_BUY
                         /*&& Game.market.calcTransactionCost(500, fromTerminal.pos.roomName, order.roomName) <= 500*/
                         && ((!resourceHistory[0] || (resourceHistory[0].avgPrice / 1.1/*minor price fall is okay*/) <= order.price) && lowestSellingValue >= order.price
-                            || resourceType === RESOURCE_ENERGY && fromTerminal.room.storage && fromTerminal.room.storage[RESOURCE_ENERGY] > Util.STORAGE_ENERGY_HIGH // hard sellout because storage is full
+                            || resourceType === RESOURCE_ENERGY && fromTerminal.room.storage && fromTerminal.room.storage.store[RESOURCE_ENERGY] > Util.STORAGE_ENERGY_HIGH // hard sellout because storage is full with energy
                         )
                         && order.remainingAmount > 0
                     );

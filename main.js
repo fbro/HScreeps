@@ -113,7 +113,6 @@ module.exports.loop = function () {
 
 // TODOs:
 // TODO FillStrg-container can be very expensive!
-// TODO terminal should not sell excess when the sell price is ridiculously low
 // TODO maxcreeps M is way higher than it should be - when flag in room creep spawn is used
 
 // lab reactions
@@ -121,6 +120,7 @@ module.exports.loop = function () {
 // attack NPC strongholds
 // harvest middle rooms
 // harvest neutral rooms
+// move creeps in formation
 
 // if doing long distance work creep should make sure it has enough timeToLive to do the job
 // add constructions
