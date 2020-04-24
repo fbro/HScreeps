@@ -30,6 +30,7 @@ module.exports.loop = function () {
                         const memRoom = Memory.MemRooms[memRoomKey];
                         delete memRoom.links; // remove links - maybe the buildings have been deleted ect.
                         delete memRoom.FctrId; // remove FctrId - maybe the buildings have been deleted ect.
+                        delete memRoom.PowerSpawnId; // remove PowerSpawnId - maybe the buildings have been deleted ect.
                         MaxCreepsCleanup(memRoomKey, memRoom, foundCreeps);
                         UnusedRoomsCleanup(memRoomKey, memRoom);
                     }
