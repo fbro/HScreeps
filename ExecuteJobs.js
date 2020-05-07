@@ -25,12 +25,6 @@ const ExecuteJobs = {
                 //const startCpu = Game.cpu.getUsed(); // TODO cputest
                 const creepMemory = Memory.creeps[creepName];
                 const gameCreep = Game.creeps[creepName];
-                if(gameCreep){ // creep alive
-                    if(gameCreep.fatigue && !gameCreep.getActiveBodyparts(HEAL) && !gameCreep.getActiveBodyparts(ATTACK) && !gameCreep.getActiveBodyparts(RANGED_ATTACK)){
-                        gameCreep.say('😪 ' + gameCreep.fatigue);
-                        continue;
-                    }
-                }
                 if (!creepMemory.JobName) {
                     Util.ErrorLog('ExecuteJobs', 'ExecuteRoomJobs', 'creep JobName is undefined ' + creepName);
                     if (!gameCreep) {
@@ -46,12 +40,11 @@ const ExecuteJobs = {
                 let result = ERR_NO_RESULT_FOUND;
                 if (!creepMemory.JobName.startsWith('idle') && Memory.MemRooms[jobRoomName]) {
                     result = CreepNotIdle(jobRoomName, creepMemory, gameCreep, creepName, result);
-                }
-                if (creepMemory.JobName.startsWith('idle')) {
+                } else {
                     result = CreepIdle(jobRoomName, gameCreep, creepName, result);
                 }
 
-                if (result !== OK && gameCreep) {
+                if (result !== OK && gameCreep) { // ConstantCreepActions should mostly be run when a creep is on the move, if it did an action it should not be cancelled by a newer action
                     result = ConstantCreepActions(creepMemory, gameCreep); // creep actions that should always be fired no matter what the creep is doing
                 }
 
