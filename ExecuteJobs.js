@@ -488,14 +488,28 @@ const ExecuteJobs = {
                 /**@return {int}*/
                 IsJobDone: function (jobObject) {
                     if (creep.store.getFreeCapacity() <= creep.getActiveBodyparts(WORK)) { // predict that creep will be full and make a transfer that wont stop the harvesting flow
-                        let fetchObject = Game.getObjectById(creep.memory.ClosestFreeStoreId);
-                        if (fetchObject) {
-                            const result = creep.transfer(fetchObject, RESOURCE_ENERGY);
-                            if (result === OK) {
-                                creep.memory.FetchObjectId = undefined;
+                        let fetchObject;
+                        let result = ERR_NO_RESULT_FOUND;
+                        if(creep.memory.LinkId){
+                            fetchObject = Game.getObjectById(creep.memory.LinkId);
+                            if (fetchObject) {
+                                result = creep.transfer(fetchObject, RESOURCE_ENERGY);
                             }
+                        }
+
+                        if(result !== OK){
+                            fetchObject = Game.getObjectById(creep.memory.ClosestFreeStoreId);
+                            if (fetchObject) {
+                                result = creep.transfer(fetchObject, RESOURCE_ENERGY);
+
+                            }
+                        }
+
+                        if (result === OK) {
+                            creep.memory.FetchObjectId = undefined;
                             return SHOULD_ACT;
                         }
+
                     }
                     return this.JobStatus(jobObject);
                 },
