@@ -89,6 +89,12 @@ const Util = {
             }
         }
         return freeSpaces;
+    },
+
+    /**@return {boolean}*/
+    IsHighway: function(roomName){
+        const parsed = /^[WE]([0-9]+)[NS]([0-9]+)$/.exec(roomName);
+        return (parsed[1] % 10 === 0) || (parsed[2] % 10 === 0);
     }
 };
 module.exports = Util;
