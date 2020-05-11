@@ -1,3 +1,4 @@
+let Util = require('Util');
 const Towers = {
     run: function (gameRoom) {
         if(gameRoom.controller){
@@ -8,8 +9,8 @@ const Towers = {
             });
 
             const hostileTargets = gameRoom.find(FIND_HOSTILE_CREEPS, {
-                filter: function (c) {
-                    return c.getActiveBodyparts(HEAL) < 5 || c.getActiveBodyparts(ATTACK) || c.getActiveBodyparts(RANGED_ATTACK);
+                filter: function (hostile) {
+                    return hostile.hits < hostile.hitsMax || hostile.pos.findInRange(FIND_STRUCTURES, 4).length > 0;
                 }
             });
 
@@ -31,7 +32,7 @@ const Towers = {
                         ||
                         ((structure.structureType === STRUCTURE_RAMPART
                             || structure.structureType === STRUCTURE_WALL)
-                            && structure.hits < 1000);
+                            && structure.hits < Util.RAMPART_WALL_HITS_U_LVL5);
                 }
             });
 

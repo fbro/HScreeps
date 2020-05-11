@@ -92,22 +92,6 @@ const CreateJobs = {
 
         function CreateFlagJob(jobs, jobName, gameFlagKey, gameFlag, creepType, amount = 1) {
             //Util.Info('CreateJobs', 'CreateFlagJob', 'AddJob ' + gameFlagKey);
-            // increase MaxCreeps.M for when flag jobs are created
-            if(Memory.MemRooms[gameFlag.pos.roomName]){
-                if(Memory.MemRooms[gameFlag.pos.roomName].MaxCreeps){
-                    if(Memory.MemRooms[gameFlag.pos.roomName].MaxCreeps[creepType]){
-                        if(!Memory.MemRooms[gameFlag.pos.roomName].MaxCreeps[creepType].M){
-                            Memory.MemRooms[gameFlag.pos.roomName].MaxCreeps[creepType]['M'] = 0;
-                        }
-                    }else{
-                        Memory.MemRooms[gameFlag.pos.roomName].MaxCreeps[creepType] = {'M' : 0};
-                    }
-                }else{
-                    Memory.MemRooms[gameFlag.pos.roomName].MaxCreeps = {};
-                    Memory.MemRooms[gameFlag.pos.roomName].MaxCreeps[creepType] = {'M' : 0};
-                }
-                Memory.MemRooms[gameFlag.pos.roomName].MaxCreeps[creepType].M += amount;
-            }
             return AddJob(jobs, jobName + '-' + gameFlagKey + '(' + gameFlag.pos.x + ',' + gameFlag.pos.y + ')' + gameFlag.pos.roomName, gameFlagKey, Util.FLAG_JOB, creepType);
         }
 
@@ -193,7 +177,7 @@ const CreateJobs = {
                         if (!Memory.MemRooms[gameRoom.name].RoomJobs[newJobKey]) { // new job does not already exist
                             Memory.MemRooms[gameRoom.name].RoomJobs[newJobKey] = jobs[newJobKey]; // save it
                             //Util.Info('CreateJobs', 'CreateObjJobs', 'new job added ' + newJobKey);
-                            // TODO add M if new flag job
+                            IncrementMaxCreepsMForFlagJob(jobs[newJobKey], gameRoom.name);// increment M if it is a new flag job
                             addedNewJob = true;
                         }
                     }
@@ -201,8 +185,10 @@ const CreateJobs = {
                     for (const oldJobKey in Memory.MemRooms[gameRoom.name].RoomJobs) { // loop through old jobs
                         const oldJob = Memory.MemRooms[gameRoom.name].RoomJobs[oldJobKey];
                         if (oldJob.Creep === 'vacant' && !jobs[oldJobKey]) { // old job is vacant and old job id not in the new job array
+                            DecrementMaxCreepsMForFlagJob(Memory.MemRooms[gameRoom.name].RoomJobs[oldJobKey], gameRoom.name); // readjust M if flag job is gone
                             Memory.MemRooms[gameRoom.name].RoomJobs[oldJobKey] = undefined; // delete old vacant disappeared job
-                            // TODO readjust M if flag job is gone
+                            // TODO this method should be called everytime a flag job is deleted in mem
+                            // TODO because right now we may delete jobs in other parts of the code, this deletion should be consolidated to one place
                             //Util.Info('CreateJobs', 'CreateObjJobs', 'old job deleted ' + oldJobKey);
                         }
                     }
@@ -217,6 +203,7 @@ const CreateJobs = {
             }
 
             // now some flag jobs might still be unplaced, loop trough them and add them maybe also create the room object
+            // they might still be unplaced because they are in a room that is not in MemRooms
             for (const flagJobKey in flagJobs) {
                 const roomName = flagJobKey.split(')').pop();
                 const flagJob = flagJobs[flagJobKey];
@@ -228,6 +215,36 @@ const CreateJobs = {
                     const jobs = {};
                     jobs[flagJobKey] = flagJob;
                     CreateRoom(roomName, jobs);
+                }
+            }
+        }
+
+        function IncrementMaxCreepsMForFlagJob(job, roomName){
+            // increase MaxCreeps.M for when flag jobs are created
+            if(Memory.MemRooms[roomName] && job.JobType === Util.FLAG_JOB && job.CreepType !== 'T' && job.CreepType !== 'B' && job.CreepType !== 'H') {
+                if(Memory.MemRooms[roomName].MaxCreeps){
+                    if(Memory.MemRooms[roomName].MaxCreeps[job.CreepType]){
+                        if(!Memory.MemRooms[roomName].MaxCreeps[job.CreepType].M){
+                            Memory.MemRooms[roomName].MaxCreeps[job.CreepType]['M'] = 0;
+                        }
+                    }else{
+                        Memory.MemRooms[roomName].MaxCreeps[job.CreepType] = {'M' : 0};
+                    }
+                }else{
+                    Memory.MemRooms[roomName].MaxCreeps = {};
+                    Memory.MemRooms[roomName].MaxCreeps[job.CreepType] = {'M' : 0};
+                }
+                Memory.MemRooms[roomName].MaxCreeps[job.CreepType].M += 1;
+            }
+        }
+
+        function DecrementMaxCreepsMForFlagJob(job, roomName){
+            if(Memory.MemRooms[roomName] && job.JobType === Util.FLAG_JOB && job.CreepType !== 'T' && job.CreepType !== 'B') {
+                if(Memory.MemRooms[roomName].MaxCreeps
+                && Memory.MemRooms[roomName].MaxCreeps[job.CreepType]
+                && Memory.MemRooms[roomName].MaxCreeps[job.CreepType].M
+                && Memory.MemRooms[roomName].MaxCreeps[job.CreepType].M > 0){
+                    Memory.MemRooms[roomName].MaxCreeps[job.CreepType].M -= 1;
                 }
             }
         }
