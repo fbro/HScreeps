@@ -37,13 +37,13 @@ const Towers = {
             });
 
             for (let i = 0; i < towers.length; i++) {
-                if (damagedCreeps.length > 0) {
-                    const val = ((i + 1) % damagedCreeps.length);
-                    towers[i].heal(damagedCreeps[val]);
-                } else if (hostileTargets.length > 0) {
+                if (hostileTargets.length > 0) {
                     const val = ((i + 1) % hostileTargets.length);
                     towers[i].attack(hostileTargets[val]);
-                } else if (damagedStructures.length > 0 && towers[i].store.getUsedCapacity(RESOURCE_ENERGY) > 700) {
+                } else if (damagedCreeps.length > 0) {
+                    const val = ((i + 1) % damagedCreeps.length);
+                    towers[i].heal(damagedCreeps[val]);
+                }else if (damagedStructures.length > 0 && towers[i].store.getUsedCapacity(RESOURCE_ENERGY) > 700) {
                     const val = ((i + 1) % damagedStructures.length);
                     towers[i].repair(damagedStructures[val]);
                 }

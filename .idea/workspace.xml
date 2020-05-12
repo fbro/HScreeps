@@ -3,8 +3,6 @@
   <component name="ChangeListManager">
     <list default="true" id="7b6f36cb-4298-4902-b6a2-ea3816b3b82c" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/CreateJobs.js" beforeDir="false" afterPath="$PROJECT_DIR$/CreateJobs.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ExecuteJobs.js" beforeDir="false" afterPath="$PROJECT_DIR$/ExecuteJobs.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Towers.js" beforeDir="false" afterPath="$PROJECT_DIR$/Towers.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -148,14 +146,7 @@
       <workItem from="1586928386848" duration="5350000" />
       <workItem from="1587100185538" duration="5060000" />
       <workItem from="1587284854375" duration="35321000" />
-      <workItem from="1588228530812" duration="32276000" />
-    </task>
-    <task id="LOCAL-00145" summary="small changes">
-      <created>1580330261904</created>
-      <option name="number" value="00145" />
-      <option name="presentableId" value="LOCAL-00145" />
-      <option name="project" value="LOCAL" />
-      <updated>1580330261904</updated>
+      <workItem from="1588228530812" duration="33901000" />
     </task>
     <task id="LOCAL-00146" summary="small changes">
       <created>1580514329340</created>
@@ -493,7 +484,14 @@
       <option name="project" value="LOCAL" />
       <updated>1589178360687</updated>
     </task>
-    <option name="localTasksCounter" value="194" />
+    <task id="LOCAL-00194" summary="small changes">
+      <created>1589197852757</created>
+      <option name="number" value="00194" />
+      <option name="presentableId" value="LOCAL-00194" />
+      <option name="project" value="LOCAL" />
+      <updated>1589197852757</updated>
+    </task>
+    <option name="localTasksCounter" value="195" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -567,19 +565,19 @@
     </state>
     <state x="721" y="325" key="#com.intellij.openapi.updateSettings.impl.PluginUpdateInfoDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1586630081891" />
     <state x="961" y="438" key="#com.intellij.openapi.updateSettings.impl.PluginUpdateInfoDialog/3840.1065.1920.1020/0.0.2560.1400@0.0.2560.1400" timestamp="1586383746639" />
-    <state x="526" y="130" width="959" height="921" key="CommitChangelistDialog2" timestamp="1589178360111">
+    <state x="26" y="14" width="1888" height="1014" key="CommitChangelistDialog2" timestamp="1589197852167">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="526" y="130" key="CommitChangelistDialog2/0.0.1920.1040@0.0.1920.1040" timestamp="1589178360111" />
+    <state x="26" y="14" width="1888" height="1014" key="CommitChangelistDialog2/0.0.1920.1040@0.0.1920.1040" timestamp="1589197852167" />
     <state x="526" y="23" width="959" height="921" key="CommitChangelistDialog2/0.0.1920.1080@0.0.1920.1080" timestamp="1583763717257" />
     <state x="92" y="89" width="1536" height="858" key="DiffContextDialog" timestamp="1589178391547">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="92" y="89" width="1536" height="858" key="DiffContextDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1589178391547" />
-    <state x="552" y="264" key="Vcs.Push.Dialog.v2" timestamp="1589178363699">
+    <state x="552" y="264" key="Vcs.Push.Dialog.v2" timestamp="1589197854128">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="552" y="264" key="Vcs.Push.Dialog.v2/0.0.1920.1040@0.0.1920.1040" timestamp="1589178363699" />
+    <state x="552" y="264" key="Vcs.Push.Dialog.v2/0.0.1920.1040@0.0.1920.1040" timestamp="1589197854128" />
     <state x="552" y="274" key="Vcs.Push.Dialog.v2/0.0.1920.1080@0.0.1920.1080" timestamp="1583763719274" />
     <state x="92" y="92" width="1736" height="856" key="com.intellij.history.integration.ui.views.FileHistoryDialog" timestamp="1589132193920">
       <screen x="0" y="0" width="1920" height="1040" />
