@@ -3,14 +3,15 @@ const Labs = {
         for (const gameRoomKey in Game.rooms) {
             const gameRoom = Game.rooms[gameRoomKey];
             if (gameRoom.controller && gameRoom.controller.my && gameRoom.controller.level === 8) {
+                // TODO change to all primary purple flags and then lookat lab underneath
+                
                 const labs = gameRoom.find(FIND_MY_STRUCTURES, {
                     filter: function (lab) {
                         return lab.structureType === STRUCTURE_LAB && lab.cooldown === 0 && lab.store.getUsedCapacity(RESOURCE_ENERGY) > 0;
                     }
                 });
                 if (labs) {
-                    // in one lvl 8 room - E28S29 - my old room
-                    // decide all by flags - a provider flag with color and text decide a mineral and creator flag decides what should be created
+                    // decide all by flags
                     // TODO create ghodium hydride to upgrade work part for my builders
                     //  TODO move Hydrogen
                     //  TODO create ghodium

@@ -63,7 +63,7 @@ const ExecuteJobs = {
                     result = JobAction(gameCreep, job);
                     if (result === JOB_IS_DONE) {
                         if (Memory.MemRooms[jobRoomName].RoomJobs[creepMemory.JobName]) {
-                            Memory.MemRooms[jobRoomName].RoomJobs[creepMemory.JobName] = undefined;
+                            Util.DeleteJob(job, creepMemory.JobName, jobRoomName);
                         } else {
                             Util.ErrorLog('ExecuteJobs', 'ExecuteRoomJobs', 'job done delete failed ' + gameCreep.name + ' ' + jobRoomName + ' ' + creepMemory.JobName + ' gameCreep.pos.roomName ' + gameCreep.pos.roomName);
                         }
@@ -102,7 +102,7 @@ const ExecuteJobs = {
                 creepMemory.JobName = 'idle(' + gameCreep.pos.x + ',' + gameCreep.pos.y + ')' + gameCreep.pos.roomName;
             } else { // creep is dead
                 if (job && !gameCreep) { // job exists and creep is dead, remove job
-                    Memory.MemRooms[jobRoomName].RoomJobs[creepMemory.JobName] = undefined;
+                    Util.DeleteJob(job, creepMemory.JobName, jobRoomName);
                 }
                 const didRemoveMaxCreeps = FindAndRemoveMaxCreeps(jobRoomName, creepName);
                 delete Memory.creeps[creepName];
@@ -1645,7 +1645,10 @@ const ExecuteJobs = {
 
         /**@return {int}*/
         function JobFillLabMineral(creep, roomJob) {
-            let lab = Game.getObjectById(creep.memory.LabId);
+            let lab;
+            if(creep.memory.LabId){
+                lab = Game.getObjectById(creep.memory.LabId);
+            }
             const result = GenericFlagAction(creep, roomJob, {
                 /**@return {int}*/
                 JobStatus: function (jobObject) {
@@ -1653,22 +1656,26 @@ const ExecuteJobs = {
                         creep.memory.Mineral = jobObject.name.split(/[-]+/).filter(function (e) {
                             return e;
                         })[1];
-                        lab = jobObject.pos.findInRange(FIND_MY_STRUCTURES, 0, {
-                            filter: function (lab) {
-                                return (lab.structureType === STRUCTURE_LAB);
+                        if (!lab) {
+                            lab = jobObject.pos.findInRange(FIND_MY_STRUCTURES, 0, {
+                                filter: function (lab) {
+                                    return (lab.structureType === STRUCTURE_LAB);
+                                }
+                            })[0];
+                            if (!lab) { // lab does not exist - delete flag and remove job
+                                jobObject.remove();
+                                Util.ErrorLog('ExecuteJobs', 'JobFillLabMineral', 'lab gone ' + jobObject.pos.roomName + ' ' + creep.name);
+                                return ERR_NO_RESULT_FOUND;
                             }
-                        })[0];
-                        if (!lab) { // lab does not exist - delete flag and remove job
-                            jobObject.remove();
-                            Util.ErrorLog('ExecuteJobs', 'JobFillLabMineral', 'lab gone ' + jobObject.pos.roomName + ' ' + creep.name);
-                            return ERR_NO_RESULT_FOUND;
+                            creep.memory.LabId = lab.id;
                         }
-                        creep.memory.LabId = lab.id;
                     }
-                    if (creep.store.getUsedCapacity(creep.memory.Mineral) > 0) {
-                        return SHOULD_ACT;
+                    if(!lab.store.getFreeCapacity(creep.memory.Mineral)){
+                        return JOB_IS_DONE; // lab is full with said mineral - job is done
+                    } else if (creep.store.getUsedCapacity(creep.memory.Mineral) > 0) {
+                        return SHOULD_ACT; // transfer to lab
                     } else {
-                        return SHOULD_FETCH
+                        return SHOULD_FETCH // withdraw desired resource nearby
                     }
                 },
                 /**@return {int}*/
@@ -1703,28 +1710,35 @@ const ExecuteJobs = {
 
         /**@return {int}*/
         function JobEmptyLabMineral(creep, roomJob) {
-            let lab = Game.getObjectById(creep.memory.LabId);
+            let lab;
+            if(creep.memory.LabId){
+                lab = Game.getObjectById(creep.memory.LabId);
+            }
             const result = GenericFlagAction(creep, roomJob, {
                 /**@return {int}*/
                 JobStatus: function (jobObject) {
                     if (!creep.memory.Mineral) {
                         creep.memory.Mineral = jobObject.name.split('-').pop();
-                        lab = jobObject.pos.findInRange(FIND_MY_STRUCTURES, 0, {
-                            filter: function (lab) {
-                                return (lab.structureType === STRUCTURE_LAB);
+                        if (!lab) {
+                            lab = jobObject.pos.findInRange(FIND_MY_STRUCTURES, 0, {
+                                filter: function (lab) {
+                                    return (lab.structureType === STRUCTURE_LAB);
+                                }
+                            })[0];
+                            if (!lab) { // lab does not exist - delete flag and remove job
+                                jobObject.remove();
+                                Util.ErrorLog('ExecuteJobs', 'JobEmptyLabMineral', 'lab gone ' + jobObject.pos.roomName + ' ' + creep.name);
+                                return ERR_NO_RESULT_FOUND;
                             }
-                        })[0];
-                        if (!lab) { // lab does not exist - delete flag and remove job
-                            jobObject.remove();
-                            Util.ErrorLog('ExecuteJobs', 'JobEmptyLabMineral', 'lab gone ' + jobObject.pos.roomName + ' ' + creep.name);
-                            return ERR_NO_RESULT_FOUND;
+                            creep.memory.LabId = lab.id;
                         }
-                        creep.memory.LabId = lab.id;
                     }
-                    if (creep.store.getFreeCapacity() > 0) {
-                        return SHOULD_ACT;
+                    if(!lab.store.getUsedCapacity(creep.memory.Mineral)){
+                        return JOB_IS_DONE; // nothing in lab - job is done
+                    } else if (creep.store.getFreeCapacity() > 0) {
+                        return SHOULD_ACT; // withdraw from lab
                     } else {
-                        return SHOULD_FETCH
+                        return SHOULD_FETCH // transfer to storage
                     }
                 },
                 /**@return {int}*/

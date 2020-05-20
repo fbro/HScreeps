@@ -90,7 +90,7 @@ const CreateJobs = {
             return jobs;
         }
 
-        function CreateFlagJob(jobs, jobName, gameFlagKey, gameFlag, creepType, amount = 1) {
+        function CreateFlagJob(jobs, jobName, gameFlagKey, gameFlag, creepType) {
             //Util.Info('CreateJobs', 'CreateFlagJob', 'AddJob ' + gameFlagKey);
             return AddJob(jobs, jobName + '-' + gameFlagKey + '(' + gameFlag.pos.x + ',' + gameFlag.pos.y + ')' + gameFlag.pos.roomName, gameFlagKey, Util.FLAG_JOB, creepType);
         }
@@ -185,11 +185,7 @@ const CreateJobs = {
                     for (const oldJobKey in Memory.MemRooms[gameRoom.name].RoomJobs) { // loop through old jobs
                         const oldJob = Memory.MemRooms[gameRoom.name].RoomJobs[oldJobKey];
                         if (oldJob.Creep === 'vacant' && !jobs[oldJobKey]) { // old job is vacant and old job id not in the new job array
-                            DecrementMaxCreepsMForFlagJob(Memory.MemRooms[gameRoom.name].RoomJobs[oldJobKey], gameRoom.name); // readjust M if flag job is gone
-                            Memory.MemRooms[gameRoom.name].RoomJobs[oldJobKey] = undefined; // delete old vacant disappeared job
-                            // TODO this method should be called everytime a flag job is deleted in mem
-                            // TODO because right now we may delete jobs in other parts of the code, this deletion should be consolidated to one place
-                            //Util.Info('CreateJobs', 'CreateObjJobs', 'old job deleted ' + oldJobKey);
+                            Util.DeleteJob(oldJob, oldJobKey, gameRoom.name);
                         }
                     }
                     if (gameRoom.controller && Memory.MemRooms[gameRoom.name].RoomLevel !== gameRoom.controller.level) { // room level change
@@ -221,7 +217,7 @@ const CreateJobs = {
 
         function IncrementMaxCreepsMForFlagJob(job, roomName){
             // increase MaxCreeps.M for when flag jobs are created
-            if(Memory.MemRooms[roomName] && job.JobType === Util.FLAG_JOB && job.CreepType !== 'T' && job.CreepType !== 'B' && job.CreepType !== 'H') {
+            if(Memory.MemRooms[roomName] && job.JobType === Util.FLAG_JOB && job.CreepType !== 'T' && job.CreepType !== 'B') {
                 if(Memory.MemRooms[roomName].MaxCreeps){
                     if(Memory.MemRooms[roomName].MaxCreeps[job.CreepType]){
                         if(!Memory.MemRooms[roomName].MaxCreeps[job.CreepType].M){
@@ -235,17 +231,6 @@ const CreateJobs = {
                     Memory.MemRooms[roomName].MaxCreeps[job.CreepType] = {'M' : 0};
                 }
                 Memory.MemRooms[roomName].MaxCreeps[job.CreepType].M += 1;
-            }
-        }
-
-        function DecrementMaxCreepsMForFlagJob(job, roomName){
-            if(Memory.MemRooms[roomName] && job.JobType === Util.FLAG_JOB && job.CreepType !== 'T' && job.CreepType !== 'B') {
-                if(Memory.MemRooms[roomName].MaxCreeps
-                && Memory.MemRooms[roomName].MaxCreeps[job.CreepType]
-                && Memory.MemRooms[roomName].MaxCreeps[job.CreepType].M
-                && Memory.MemRooms[roomName].MaxCreeps[job.CreepType].M > 0){
-                    Memory.MemRooms[roomName].MaxCreeps[job.CreepType].M -= 1;
-                }
             }
         }
 
@@ -267,13 +252,13 @@ const CreateJobs = {
             })[1];
             const lab = gameFlag.pos.findInRange(FIND_MY_STRUCTURES, 0, {filter: function (s) {return s.structureType === STRUCTURE_LAB;}})[0];
             if (lab && (!lab.mineralType || lab.mineralType === mineral)) {
-                // flagname rules: GET-L-roomname = get lemergium from all rooms, BUY-L-roomname = get it from all rooms or then buy it from the terminal
+                // flagname rules: GET-L-roomname = get lemergium from all rooms, BUY-L-roomname = get lemergium from all rooms or then buy it from the terminal
                 if(lab.store.getFreeCapacity(mineral) > 0 && (lab.room.storage.store.getUsedCapacity(mineral) > 0 || lab.room.terminal.store.getUsedCapacity(mineral) > 0)){
-                    jobs = CreateFlagJob(jobs, 'FillLabMin', gameFlagKey, gameFlag, 'T', 0);
+                    jobs = CreateFlagJob(jobs, 'FillLabMin', gameFlagKey, gameFlag, 'T');
                 }
             }else{ // flag must be on top of an existing lab!
+                Util.ErrorLog('CreateJobs', 'CreateFlagJobs', 'lab not found! ' + gameFlagKey);
                 gameFlag.remove();
-                Util.ErrorLog('CreateJobs', 'CreateFlagJobs', 'lab gone ' + gameFlagKey);
             }
             return jobs;
         }
@@ -284,13 +269,13 @@ const CreateJobs = {
             })[1];
             const lab = gameFlag.pos.findInRange(FIND_MY_STRUCTURES, 0, {filter: function (s) {return s.structureType === STRUCTURE_LAB;}})[0];
             if(lab && (!lab.mineralType || lab.mineralType === mineral)){
-                // flagname rules: CREATE-GH-roomname = CREATE the mineral from the nearby lab to this lab
+                // flagname rules: EMPTY-GH-roomname = create the mineral and allows it to be emptied from the nearby lab to this lab
                 if (lab.store.getUsedCapacity(mineral) > 0) {
-                    CreateFlagJob(jobs, 'EmptyLabMin', gameFlagKey, gameFlag, 'T', 0);
+                    CreateFlagJob(jobs, 'EmptyLabMin', gameFlagKey, gameFlag, 'T');
                 }
             }else{ // flag must be on top of an existing lab!
+                Util.ErrorLog('CreateJobs', 'CreateFlagJobs', 'lab not found! ' + gameFlagKey);
                 gameFlag.remove();
-                Util.ErrorLog('CreateJobs', 'CreateFlagJobs', 'lab gone ' + gameFlagKey);
             }
             return jobs;
         }

@@ -95,6 +95,20 @@ const Util = {
     IsHighway: function(roomName){
         const parsed = /^[WE]([0-9]+)[NS]([0-9]+)$/.exec(roomName);
         return (parsed[1] % 10 === 0) || (parsed[2] % 10 === 0);
+    },
+
+    DeleteJob: function(job, jobKey, roomName){
+        // this.Info('Util', 'DeleteJob', 'job deleted ' + jobKey);
+        if(Memory.MemRooms[roomName] && job.JobType === this.FLAG_JOB && job.CreepType !== 'T' && job.CreepType !== 'B') {
+            // if job is a flag job then remember to decrease the number og allowed creeps in the room creeptype T and B should never be changed
+            if(Memory.MemRooms[roomName].MaxCreeps
+                && Memory.MemRooms[roomName].MaxCreeps[job.CreepType]
+                && Memory.MemRooms[roomName].MaxCreeps[job.CreepType].M
+                && Memory.MemRooms[roomName].MaxCreeps[job.CreepType].M > 0){
+                Memory.MemRooms[roomName].MaxCreeps[job.CreepType].M -= 1;
+            }
+        }
+        Memory.MemRooms[roomName].RoomJobs[jobKey] = undefined;
     }
 };
 module.exports = Util;

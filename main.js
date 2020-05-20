@@ -114,7 +114,6 @@ module.exports.loop = function () {
 
 // TODOs:
 // TODO FillStrg-container can be very expensive!
-// TODO maxcreeps M is way higher than it should be - when flag in room creep spawn is used
 
 // lab reactions
 // attack NPC strongholds

@@ -184,7 +184,7 @@ const Terminals = {
 
         function BuyLabResources(terminal, marketDealSendCount){
             // find FillLabMineralJobs flags
-            const labFlags = terminal.room.find(FIND_FLAGS, {filter : function (flag){return flag.color === COLOR_PURPLE && flag.secondaryColor === COLOR_PURPLE}});
+            const labFlags = terminal.room.find(FIND_FLAGS, {filter : function (flag){return flag.color === COLOR_PURPLE && flag.secondaryColor === COLOR_PURPLE && flag.name.split('-') === 'BUY'}});
             for(const labFlagKey in labFlags){
                 const labFlag = labFlags[labFlagKey];
                 const mineral = labFlag.name.split(/[-]+/).filter(function (e) {
@@ -209,7 +209,7 @@ const Terminals = {
             const orders = Game.market.getAllOrders(order => order.resourceType === resourceType
                 && order.type === ORDER_SELL
                 && Game.market.calcTransactionCost(500, terminal.pos.roomName, order.roomName) <= 500
-                && ((resourceHistory[0].avgPrice * avgPrice) >= order.price && (maxPrice && maxPrice >= order.price || !maxPrice))
+                && (!resourceHistory[0] || (resourceHistory[0].avgPrice * avgPrice) >= order.price && (maxPrice && maxPrice >= order.price || !maxPrice))
                 && order.remainingAmount > 0
             );
             if (orders.length > 0) {
