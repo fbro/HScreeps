@@ -14,7 +14,7 @@ const Labs = {
                     const lab = flag.pos.lookFor(LOOK_STRUCTURES)[0];
                     if (!lab.cooldown) {
                         const mineral = flag.name.split('-')[1];
-                        if ((!lab.store || lab.store.getFreeCapacity(mineral) > 5)) {
+                        if ((!lab.store || lab.store.getFreeCapacity(mineral) >= 5)) {
                             let result;
                             switch (true) {
                                 case (mineral === RESOURCE_ZYNTHIUM_KEANITE) :

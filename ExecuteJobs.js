@@ -1670,7 +1670,7 @@ const ExecuteJobs = {
                             creep.memory.LabId = lab.id;
                         }
                     }
-                    if(!lab.store.getFreeCapacity(creep.memory.Mineral)){
+                    if(lab.store.getFreeCapacity(creep.memory.Mineral) < 500){
                         return JOB_IS_DONE; // lab is full with said mineral - job is done
                     } else if (creep.store.getUsedCapacity(creep.memory.Mineral) > 0) {
                         return SHOULD_ACT; // transfer to lab
@@ -1717,8 +1717,10 @@ const ExecuteJobs = {
             const result = GenericFlagAction(creep, roomJob, {
                 /**@return {int}*/
                 JobStatus: function (jobObject) {
-                    if (!creep.memory.Mineral) {
-                        creep.memory.Mineral = jobObject.name.split('-').pop();
+                    let mineral = creep.memory.Mineral;
+                    if (!mineral) {
+                        mineral = jobObject.name.split('-')[1];
+                        creep.memory.Mineral = mineral;
                         if (!lab) {
                             lab = jobObject.pos.findInRange(FIND_MY_STRUCTURES, 0, {
                                 filter: function (lab) {
@@ -1733,7 +1735,8 @@ const ExecuteJobs = {
                             creep.memory.LabId = lab.id;
                         }
                     }
-                    if(!lab.store.getUsedCapacity(creep.memory.Mineral)){
+                    if(lab.store.getUsedCapacity(mineral) < 500){
+                        //Util.Info('ExecuteJobs', 'JobEmptyLabMineral', 'JOB_IS_DONE ' + ' mineral ' + mineral + ' lab.store ' + lab.store.getUsedCapacity(mineral));
                         return JOB_IS_DONE; // nothing in lab - job is done
                     } else if (creep.store.getFreeCapacity() > 0) {
                         return SHOULD_ACT; // withdraw from lab
@@ -1758,6 +1761,7 @@ const ExecuteJobs = {
                     return creep.transfer(fetchObject, creep.memory.Mineral);
                 },
             });
+            Util.Info('ExecuteJobs', 'JobEmptyLabMineral', result + ' ');
             return result;
         }
 
