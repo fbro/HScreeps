@@ -9,6 +9,7 @@ let PowerSpawns = require('PowerSpawns');
 let Util = require('Util');
 let Observers = require('Observers');
 let PowerCreeps = require('PowerCreeps');
+let Labs = require('Labs');
 
 module.exports.loop = function () {
 
@@ -42,8 +43,10 @@ module.exports.loop = function () {
                 }
                 Terminals.run();
                 Factories.run();
+
             }
             AssignJobs.run();
+            Labs.run();
         }
         ExecuteJobs.run();
         for (const gameRoomKey in Game.rooms) {
@@ -51,6 +54,7 @@ module.exports.loop = function () {
             Towers.run(gameRoom);
             Observers.run(gameRoom, gameRoomKey);
             PowerSpawns.run(gameRoom);
+
         }
         PowerCreeps.run();
     }

@@ -1,32 +1,56 @@
+let Util = require('Util');
 const Labs = {
     run: function () {
         for (const gameRoomKey in Game.rooms) {
             const gameRoom = Game.rooms[gameRoomKey];
             if (gameRoom.controller && gameRoom.controller.my && gameRoom.controller.level === 8) {
-                // TODO change to all primary purple flags and then lookat lab underneath
-                
-                const labs = gameRoom.find(FIND_MY_STRUCTURES, {
-                    filter: function (lab) {
-                        return lab.structureType === STRUCTURE_LAB && lab.cooldown === 0 && lab.store.getUsedCapacity(RESOURCE_ENERGY) > 0;
+                const flags = gameRoom.find(FIND_FLAGS, {
+                    filter: function (flag) {
+                        return flag.color === COLOR_PURPLE;
                     }
                 });
-                if (labs) {
-                    // decide all by flags
-                    // TODO create ghodium hydride to upgrade work part for my builders
-                    //  TODO move Hydrogen
-                    //  TODO create ghodium
-                    //   TODO create zynthium keanite
-                    //    TODO buy zynthium
-                    //    TODO move keanium
-                    //   TODO create utrium lemergite
-                    //    TODO buy lemergium
-                    //    TODO move utrium
-                    // after ghodium hydride is created it should be distributed to all the other rooms
+                for (const flagKey in flags) {
+                    const flag = flags[flagKey];
+                    const lab = flag.pos.lookFor(LOOK_STRUCTURES)[0];
+                    if (!lab.cooldown) {
+                        const mineral = flag.name.split('-')[1];
+                        if ((!lab.store || lab.store.getFreeCapacity(mineral) > 5)) {
+                            let result;
+                            switch (true) {
+                                case (mineral === RESOURCE_ZYNTHIUM_KEANITE) :
+                                    result = Reaction(lab, RESOURCE_ZYNTHIUM, RESOURCE_KEANIUM);
+                                    break;
+                                case (mineral === RESOURCE_UTRIUM_LEMERGITE) :
+                                    result = Reaction(lab, RESOURCE_UTRIUM, RESOURCE_LEMERGIUM);
+                                    break;
+                                case (mineral === RESOURCE_GHODIUM) :
+                                    result = Reaction(lab, RESOURCE_ZYNTHIUM_KEANITE, RESOURCE_UTRIUM_LEMERGITE);
+                                    break;
+                                case (mineral === RESOURCE_GHODIUM_HYDRIDE) :
+                                    result = Reaction(lab, RESOURCE_GHODIUM, RESOURCE_HYDROGEN);
+                                    break;
+                                case (mineral === RESOURCE_HYDROXIDE) :
+                                    result = Reaction(lab, RESOURCE_HYDROGEN, RESOURCE_OXYGEN);
+                                    break;
+                                case (mineral === RESOURCE_GHODIUM_ACID) :
+                                    result = Reaction(lab, RESOURCE_GHODIUM_HYDRIDE, RESOURCE_HYDROXIDE);
+                                    break;
+                                case (mineral === RESOURCE_CATALYZED_GHODIUM_ACID) :
+                                    result = Reaction(lab, RESOURCE_CATALYST, RESOURCE_GHODIUM_ACID);
+                                    break;
+                            }
+                        }
+                    }
                 }
-
-
-                // Z+K + U+L = G
-                // G + H = GH --> ghodium hydride
+            }
+        }
+        function Reaction(lab, resource1, resource2) {
+            const lab1 = lab.pos.findInRange(FIND_MY_STRUCTURES, 2, {filter: function (l) {return l.store && l.store[resource1] >= 5;}})[0];
+            if(lab1){
+                const lab2 = lab.pos.findInRange(FIND_MY_STRUCTURES, 2, {filter: function (l) {return l.store && l.store[resource2] >= 5;}})[0];
+                if(lab2){
+                    return lab.runReaction(lab1, lab2);
+                }
             }
         }
     }
