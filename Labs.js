@@ -12,12 +12,12 @@ const Labs = {
                 for (const flagKey in flags) {
                     const flag = flags[flagKey];
                     const lab = flag.pos.lookFor(LOOK_STRUCTURES)[0];
-                    TryPossibleReactionLab(lab);
+                    TryPossibleReactionLab(lab, flag);
                 }
             }
         }
 
-        function TryPossibleReactionLab(lab){
+        function TryPossibleReactionLab(lab, flag){
             if (!lab.cooldown) {
                 const mineral = flag.name.split('-')[1];
                 if ((!lab.store || lab.store.getFreeCapacity(mineral) >= 5)) {

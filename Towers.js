@@ -1,17 +1,39 @@
 let Util = require('Util');
 const Towers = {
     run: function (gameRoom) {
-        if(gameRoom.controller){
-            const towers = gameRoom.find(FIND_MY_STRUCTURES, {
-                filter: function (tower) {
-                    return tower.structureType === STRUCTURE_TOWER && tower.store.getUsedCapacity(RESOURCE_ENERGY) > 0;
+        if(gameRoom.controller && Memory.MemRooms[gameRoom.name]){
+            let anyHostiles = Memory.MemRooms[gameRoom.name].AnyHostiles;
+            if(anyHostiles || Game.time % 2 === 0){
+                const towers = FindTowers(gameRoom);
+                anyHostiles = HostileCreeps(towers);
+                if(!anyHostiles && Game.time % 30 === 0){
+                    EmergencyRepair(towers);
                 }
-            });
-            // TODO optimize tower computations!
-            // TODO only repair every 30 tick
-            EmergencyRepair(towers);
-            // TODO check every other tick but then if hostiles attack everytime
-            HostileCreeps(towers);
+                if(anyHostiles !== Memory.MemRooms[gameRoom.name].AnyHostiles){
+                    Memory.MemRooms[gameRoom.name].AnyHostiles = anyHostiles;
+                }
+            }
+        }
+
+        function FindTowers(gameRoom){
+            let towers = [];
+            if(Memory.MemRooms[gameRoom.name].TowerIds){
+                for(let i = 0; i < Memory.MemRooms[gameRoom.name].TowerIds.length; i++){
+                    towers[i] = Game.getObjectById(Memory.MemRooms[gameRoom.name].TowerIds[i]);
+                }
+            }else{
+                towers = gameRoom.find(FIND_MY_STRUCTURES, {
+                    filter: function (tower) {
+                        return tower.structureType === STRUCTURE_TOWER && tower.store.getUsedCapacity(RESOURCE_ENERGY) > 0;
+                    }
+                });
+                let towerIds = [];
+                for(let i = 0; i < towers.length; i++){
+                    towerIds[i] = towers[i].id;
+                }
+                Memory.MemRooms[gameRoom.name].TowerIds = towerIds;
+            }
+            return towers;
         }
 
         function EmergencyRepair(towers){
