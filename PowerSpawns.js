@@ -1,7 +1,7 @@
 let Util = require('Util');
 const PowerSpawns = {
     run: function (gameRoom) {
-        if (gameRoom.controller && gameRoom.controller.my && gameRoom.controller.level === 8 && Memory.MemRooms[gameRoom.name]) {
+        if ((Memory.MemRooms[gameRoom.name].IsPowerSpawnActive || Game.time % 30 === 0)) {
             if(!Memory.MemRooms[gameRoom.name].PowerSpawnId){
                  const foundPowerSpawn = gameRoom.find(FIND_MY_STRUCTURES, {
                     filter: (s) => {
@@ -16,8 +16,13 @@ const PowerSpawns = {
             }
             const powerSpawn = Game.getObjectById(Memory.MemRooms[gameRoom.name].PowerSpawnId);
             if (powerSpawn){
-                if(powerSpawn.store.getUsedCapacity(RESOURCE_POWER) > 0 && powerSpawn.store.getUsedCapacity(RESOURCE_ENERGY) > 0) {
+                if(powerSpawn.store.getUsedCapacity(RESOURCE_POWER) > 0 && powerSpawn.store.getUsedCapacity(RESOURCE_ENERGY) >= 50) {
                     powerSpawn.processPower();
+                    if(!Memory.MemRooms[gameRoom.name].IsPowerSpawnActive){
+                        Memory.MemRooms[gameRoom.name].IsPowerSpawnActive = true;
+                    }
+                }else{
+                    Memory.MemRooms[gameRoom.name].IsPowerSpawnActive = false;
                 }
             }else{
                 Util.ErrorLog('PowerSpawns','PowerSpawns','Power spawn gone in ' + gameRoom.name + ' ' + Memory.MemRooms[gameRoom.name].PowerSpawnId);

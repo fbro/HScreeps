@@ -198,8 +198,6 @@ const Terminals = {
             return marketDealSendCount;
         }
 
-
-
         /**@return {number}*/
         function BuyResource(terminal, resourceType, amount, marketDealSendCount,
                              avgPrice = 1.5, // set if one wants a another acceptable average price
@@ -224,7 +222,6 @@ const Terminals = {
                     marketDealSendCount++;
                 }
                 Util.InfoLog('Terminals', 'BuyResource', amount + ' ' + resourceType + ' from ' + terminal.pos.roomName + ' to ' + order.roomName + ' result ' + result + ' marketDealSendCount ' + marketDealSendCount + ' order.remainingAmount ' + order.remainingAmount + ' price ' + order.price + ' total price ' + (order.price * amount));
-
             }
             return marketDealSendCount;
         }

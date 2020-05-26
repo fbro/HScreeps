@@ -4,26 +4,24 @@ const Observers = {
         ObserversActions(gameRoom, observerRoomKey);
 
         function ObserversActions(gameRoom, observerRoomKey) {
-            if (gameRoom.controller && gameRoom.controller.my && gameRoom.controller.level === 8) {
-                const observer = gameRoom.find(FIND_MY_STRUCTURES, {
-                    filter: function (observer) {
-                        return observer.structureType === STRUCTURE_OBSERVER;
+            const observer = gameRoom.find(FIND_MY_STRUCTURES, {
+                filter: function (observer) {
+                    return observer.structureType === STRUCTURE_OBSERVER;
+                }
+            })[0];
+            if (observer) {
+                const flagAtObserver = observer.pos.lookFor(LOOK_FLAGS)[0];
+                // observer is dedicated to scanning for power banks or deposits
+                if (Memory.MemRooms[observerRoomKey] && flagAtObserver && flagAtObserver.color === COLOR_ORANGE) {
+                    //Memory.MemRooms[observerRoomKey].MapScan = undefined;
+                    //Memory.MemRooms[observerRoomKey].PowerBankFlag = undefined;
+                    //Memory.MemRooms[observerRoomKey].DepositFlag = undefined;
+                    //Memory.MemRooms[observerRoomKey].MapReScan = undefined;
+                    if (!Memory.MemRooms[observerRoomKey].MapScan || Memory.MemRooms[observerRoomKey].MapReScan) {
+                        CreateScan(observerRoomKey);
                     }
-                })[0];
-                if (observer) {
-                    const flagAtObserver = observer.pos.lookFor(LOOK_FLAGS)[0];
-                    // observer is dedicated to scanning for power banks or deposits
-                    if (Memory.MemRooms[observerRoomKey] && flagAtObserver && flagAtObserver.color === COLOR_ORANGE) {
-                        //Memory.MemRooms[observerRoomKey].MapScan = undefined;
-                        //Memory.MemRooms[observerRoomKey].PowerBankFlag = undefined;
-                        //Memory.MemRooms[observerRoomKey].DepositFlag = undefined;
-                        //Memory.MemRooms[observerRoomKey].MapReScan = undefined;
-                        if (!Memory.MemRooms[observerRoomKey].MapScan || Memory.MemRooms[observerRoomKey].MapReScan) {
-                            CreateScan(observerRoomKey);
-                        }
-                        if (flagAtObserver.secondaryColor === COLOR_RED) {
-                            ScanPowerBanksAndDeposits(observerRoomKey, observer);
-                        }
+                    if (flagAtObserver.secondaryColor === COLOR_RED) {
+                        ScanPowerBanksAndDeposits(observerRoomKey, observer);
                     }
                 }
             }

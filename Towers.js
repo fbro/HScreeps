@@ -1,17 +1,15 @@
 let Util = require('Util');
 const Towers = {
     run: function (gameRoom) {
-        if(gameRoom.controller && Memory.MemRooms[gameRoom.name]){
-            let anyHostiles = Memory.MemRooms[gameRoom.name].AnyHostiles;
-            if(anyHostiles || Game.time % 2 === 0){
-                const towers = FindTowers(gameRoom);
-                anyHostiles = HostileCreeps(towers);
-                if(!anyHostiles && Game.time % 30 === 0){
-                    EmergencyRepair(towers);
-                }
-                if(anyHostiles !== Memory.MemRooms[gameRoom.name].AnyHostiles){
-                    Memory.MemRooms[gameRoom.name].AnyHostiles = anyHostiles;
-                }
+        let anyHostiles = Memory.MemRooms[gameRoom.name].AnyHostiles;
+        if(anyHostiles || Game.time % 2 === 0){
+            const towers = FindTowers(gameRoom);
+            anyHostiles = HostileCreeps(towers);
+            if(!anyHostiles && Game.time % 30 === 0){
+                EmergencyRepair(towers);
+            }
+            if(anyHostiles !== Memory.MemRooms[gameRoom.name].AnyHostiles){
+                Memory.MemRooms[gameRoom.name].AnyHostiles = anyHostiles;
             }
         }
 
