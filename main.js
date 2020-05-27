@@ -32,7 +32,8 @@ module.exports.loop = function () {
                         delete memRoom.links; // remove links - maybe the buildings have been deleted ect.
                         delete memRoom.FctrId; // remove FctrId - maybe the buildings have been deleted ect.
                         delete memRoom.PowerSpawnId; // remove PowerSpawnId - maybe the buildings have been deleted ect.
-                        delete memRoom.TowerIds; // remove towerId - maybe the tower have been deleted ect.
+                        delete memRoom.TowerIds; // remove TowerIds - maybe a tower have been deleted ect.
+                        delete memRoom.ObserverId; // remove ObserverId - maybe an observer have been deleted ect.
                         MaxCreepsCleanup(memRoomKey, memRoom, foundCreeps);
                         UnusedRoomsCleanup(memRoomKey, memRoom);
                     }
@@ -123,7 +124,6 @@ module.exports.loop = function () {
 // TODOs:
 // TODO FillStrg-container can be very expensive!
 
-// lab reactions
 // attack NPC strongholds
 // harvest middle rooms
 // harvest neutral rooms

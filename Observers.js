@@ -4,23 +4,24 @@ const Observers = {
         ObserversActions(gameRoom, observerRoomKey);
 
         function ObserversActions(gameRoom, observerRoomKey) {
-            const observer = gameRoom.find(FIND_MY_STRUCTURES, {
-                filter: function (observer) {
-                    return observer.structureType === STRUCTURE_OBSERVER;
-                }
-            })[0];
+            let observer;
+            if(Memory.MemRooms[observerRoomKey].ObserverId){
+                observer = Game.getObjectById(Memory.MemRooms[observerRoomKey].ObserverId);
+            }else{
+                observer = gameRoom.find(FIND_MY_STRUCTURES, {
+                    filter: function (observer) {
+                        return observer.structureType === STRUCTURE_OBSERVER;
+                    }
+                })[0];
+                Memory.MemRooms[observerRoomKey].ObserverId = observer.id;
+            }
             if (observer) {
                 const flagAtObserver = observer.pos.lookFor(LOOK_FLAGS)[0];
-                // observer is dedicated to scanning for power banks or deposits
-                if (Memory.MemRooms[observerRoomKey] && flagAtObserver && flagAtObserver.color === COLOR_ORANGE) {
-                    //Memory.MemRooms[observerRoomKey].MapScan = undefined;
-                    //Memory.MemRooms[observerRoomKey].PowerBankFlag = undefined;
-                    //Memory.MemRooms[observerRoomKey].DepositFlag = undefined;
-                    //Memory.MemRooms[observerRoomKey].MapReScan = undefined;
+                if (flagAtObserver && flagAtObserver.color === COLOR_ORANGE) {
                     if (!Memory.MemRooms[observerRoomKey].MapScan || Memory.MemRooms[observerRoomKey].MapReScan) {
                         CreateScan(observerRoomKey);
                     }
-                    if (flagAtObserver.secondaryColor === COLOR_RED) {
+                    if (flagAtObserver.secondaryColor === COLOR_RED) { // observer is dedicated to scanning for power banks or deposits
                         ScanPowerBanksAndDeposits(observerRoomKey, observer);
                     }
                 }
