@@ -1761,7 +1761,6 @@ const ExecuteJobs = {
                     return creep.transfer(fetchObject, creep.memory.Mineral);
                 },
             });
-            Util.Info('ExecuteJobs', 'JobEmptyLabMineral', result + ' ');
             return result;
         }
 
@@ -2207,7 +2206,6 @@ const ExecuteJobs = {
             }
             return result;
         }
-
 
         /**@return {number}*/
         function CreepHostileAction(creep, hostileCreeps){
