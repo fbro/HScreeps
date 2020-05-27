@@ -19,35 +19,37 @@ module.exports.loop = function () {
         if (!Memory.MemRooms) {
             Memory.MemRooms = {};
         }
-        if (Game.time % 10 === 0) {
-            if (Game.time % 30 === 0) { // tick burst from https://docs.screeps.com/cpu-limit.html#Bucket
-                CreateJobs.run();
-                Links.run();
-                if (Game.time % 15000 === 0) {
-                    Util.Info('Main', 'Main', '--------------- main reset of memory ---------------');
+        if(Game.time % 5 === 0){
+            if (Game.time % 10 === 0) {
+                if (Game.time % 30 === 0) { // tick burst from https://docs.screeps.com/cpu-limit.html#Bucket
+                    CreateJobs.run();
+                    Links.run();
+                    if (Game.time % 15000 === 0) {
+                        Util.Info('Main', 'Main', '--------------- main reset of memory ---------------');
 
-                    const foundCreeps = {};
-                    for (const memRoomKey in Memory.MemRooms) {
-                        const memRoom = Memory.MemRooms[memRoomKey];
-                        delete memRoom.links; // remove links - maybe the buildings have been deleted ect.
-                        delete memRoom.FctrId; // remove FctrId - maybe the buildings have been deleted ect.
-                        delete memRoom.PowerSpawnId; // remove PowerSpawnId - maybe the buildings have been deleted ect.
-                        delete memRoom.TowerIds; // remove TowerIds - maybe a tower have been deleted ect.
-                        delete memRoom.ObserverId; // remove ObserverId - maybe an observer have been deleted ect.
-                        MaxCreepsCleanup(memRoomKey, memRoom, foundCreeps);
-                        UnusedRoomsCleanup(memRoomKey, memRoom);
+                        const foundCreeps = {};
+                        for (const memRoomKey in Memory.MemRooms) {
+                            const memRoom = Memory.MemRooms[memRoomKey];
+                            delete memRoom.links; // remove links - maybe the buildings have been deleted ect.
+                            delete memRoom.FctrId; // remove FctrId - maybe the buildings have been deleted ect.
+                            delete memRoom.PowerSpawnId; // remove PowerSpawnId - maybe the buildings have been deleted ect.
+                            delete memRoom.TowerIds; // remove TowerIds - maybe a tower have been deleted ect.
+                            delete memRoom.ObserverId; // remove ObserverId - maybe an observer have been deleted ect.
+                            MaxCreepsCleanup(memRoomKey, memRoom, foundCreeps);
+                            UnusedRoomsCleanup(memRoomKey, memRoom);
+                        }
+                        if(Game.time % 240000 === 0){ // approx every 3 days
+                            delete Memory.Paths; // remove Paths to make room for new paths
+                            delete Memory.InfoLog;
+                            Util.InfoLog('Main', 'Main', 'reset memory logs ' + Game.time);
+                        }
                     }
-                    if(Game.time % 240000 === 0){ // approx every 3 days
-                        delete Memory.Paths; // remove Paths to make room for new paths
-                        delete Memory.InfoLog;
-                        Util.InfoLog('Main', 'Main', 'reset memory logs ' + Game.time);
-                    }
+                    Terminals.run();
+                    Factories.run();
+
                 }
-                Terminals.run();
-                Factories.run();
-
+                AssignJobs.run();
             }
-            AssignJobs.run();
             Labs.run();
         }
         ExecuteJobs.run();
