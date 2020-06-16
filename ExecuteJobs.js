@@ -633,16 +633,9 @@ const ExecuteJobs = {
                 /**@return {object}
                  * @return {undefined}*/
                 FindFetchObject: function (jobObject) {
-                    if(creep.ticksToLive > 1300 && (!creep.memory.Boost || creep.memory.Boost && !creep.memory.Boost[WORK]) && creep.room.storage && creep.room.storage.store.getUsedCapacity(RESOURCE_ENERGY) >= Util.STORAGE_ENERGY_MEDIUM){ // do not boost upgradeController in rooms with low energy
-                        const labThatCanBoost = FindLabThatCanBoost(creep, jobObject, RESOURCE_CATALYZED_GHODIUM_ACID, WORK);
-                        if (labThatCanBoost) {
-                            return labThatCanBoost;
-                        }
-                    }else if(creep.memory.Boost && creep.memory.Boost[WORK] && creep.ticksToLive < 200){ // unboost the creep before the mineral is lost
-                        const labThatCanUnBoost = FindLabThatCanUnBoost(jobObject);
-                        if (labThatCanUnBoost) {
-                            return labThatCanUnBoost;
-                        }
+                    const labThatCanBoostOrUnBoost = HandleCreepBoost(creep, jobObject, RESOURCE_CATALYZED_GHODIUM_ACID, WORK);
+                    if(labThatCanBoostOrUnBoost){
+                        return labThatCanBoostOrUnBoost;
                     }
                     let energySupply = FindFetchResource(creep, jobObject, RESOURCE_ENERGY);
                     if (!energySupply && creep.room.controller && creep.room.controller.my && creep.room.controller.level < 3) { // try and harvest
@@ -657,9 +650,9 @@ const ExecuteJobs = {
                 Fetch: function (fetchObject, jobObject) {
                     let result = ERR_NO_RESULT_FOUND;
                     if (fetchObject.structureType === STRUCTURE_LAB) {
-                        if(creep.ticksToLive > 200){
+                        if(creep.ticksToLive > 1000){
                             result = BoostCreep(creep, fetchObject, RESOURCE_CATALYZED_GHODIUM_ACID, WORK);
-                        }else{
+                        }else if(creep.ticksToLive < 200){
                             result = UnBoostCreep(creep, fetchObject, RESOURCE_CATALYZED_GHODIUM_ACID, WORK);
                         }
                     } else {
@@ -2219,7 +2212,7 @@ const ExecuteJobs = {
                 Util.Info('ExecuteJobs', 'CreepHostileAction', 'harmless hostile - attack ' + creep.name + ' ' + creep.pos.roomName);
                 return CREEP_ATTACKED_HOSTILE; // no threat but can attack it - just do it
             }else if(hostileCreepsWithAttack.length === 0){
-                Util.Info('ExecuteJobs', 'CreepHostileAction', 'no hostiles with ATK - ignore ' + creep.name + ' ' + creep.pos.roomName + ' hostileCreepsWithAttack ' + JSON.stringify(hostileCreepsWithAttack));
+                //Util.Info('ExecuteJobs', 'CreepHostileAction', 'no hostiles with ATK - ' + creep.name + ' will ignore it in ' + creep.pos.roomName);
                 return CREEP_IGNORED_HOSTILE; // no threat
             }
 
@@ -2584,6 +2577,27 @@ const ExecuteJobs = {
                 }
             }
             return resourceSupply;
+        }
+
+        function HandleCreepBoost(creep, jobObject, boostingMineral, bodyPartToBoost, ticksToLiveToBoost = 1300, ticksToLiveToUnBoost = 200){
+            if(!creep.memory.Boost || creep.memory.Boost[bodyPartToBoost] !== "-"){ // only look once - after that it is too late
+                if(creep.ticksToLive > ticksToLiveToBoost && (!creep.memory.Boost || creep.memory.Boost && !creep.memory.Boost[bodyPartToBoost])){
+                    const labThatCanBoost = FindLabThatCanBoost(creep, jobObject, boostingMineral, bodyPartToBoost);
+                    if (labThatCanBoost) {
+                        return labThatCanBoost;
+                    }else{
+                        if (!creep.memory.Boost) {
+                            creep.memory.Boost = {};
+                        }
+                        creep.memory.Boost[bodyPartToBoost] = "-";
+                    }
+                }else if(creep.memory.Boost && creep.memory.Boost[bodyPartToBoost] && creep.ticksToLive < ticksToLiveToUnBoost){ // unboost the creep before the mineral is lost
+                    const labThatCanUnBoost = FindLabThatCanUnBoost(jobObject);
+                    if (labThatCanUnBoost) {
+                        return labThatCanUnBoost;
+                    }
+                }
+            }
         }
 
         /**@return {object}

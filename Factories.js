@@ -7,7 +7,7 @@ const Factories = {
             if (memRoom && memRoom.FctrId !== '-' && gameRoom.controller && gameRoom.controller.my && gameRoom.controller.level === 8) {
                 let factory;
                 if(memRoom.FctrId){
-                    factory = Game.getObjectById(memRoom.FctrId)
+                    factory = Game.getObjectById(memRoom.FctrId);
                 }
                 if(!factory){
                     factory = gameRoom.find(FIND_MY_STRUCTURES, {
@@ -24,16 +24,17 @@ const Factories = {
                     let result;
                     const hasOperateFactoryEffect = factory.effects && factory.effects[0] && factory.effects[0].effect === PWR_OPERATE_FACTORY;
                     if(factory.level === 1 && hasOperateFactoryEffect){
-                        result = Produce(factory, RESOURCE_PHLEGM, 1000, RESOURCE_OXIDANT, 36, RESOURCE_CELL, 20, RESOURCE_LEMERGIUM_BAR, 16, RESOURCE_ENERGY, 8);
+                        result = Produce(factory, RESOURCE_PHLEGM, 2000, RESOURCE_OXIDANT, 36, RESOURCE_CELL, 20, RESOURCE_LEMERGIUM_BAR, 16, RESOURCE_ENERGY, 8);
                         if(result !== OK) {
-                            result = Produce(factory, RESOURCE_COMPOSITE, 1000, RESOURCE_UTRIUM_BAR, 20, RESOURCE_ZYNTHIUM_BAR, 20, RESOURCE_ENERGY, 20);
-                        }else if(result !== OK){
-                            result = Produce(factory, RESOURCE_TUBE, 1000, RESOURCE_ALLOY, 40, RESOURCE_ZYNTHIUM_BAR, 16, RESOURCE_ENERGY, 8);
+                            result = Produce(factory, RESOURCE_COMPOSITE, 2000, RESOURCE_UTRIUM_BAR, 20, RESOURCE_ZYNTHIUM_BAR, 20, RESOURCE_ENERGY, 20);
+                            if(result !== OK){
+                                result = Produce(factory, RESOURCE_TUBE, 2000, RESOURCE_ALLOY, 40, RESOURCE_ZYNTHIUM_BAR, 16, RESOURCE_ENERGY, 8);
+                            }
                         }
                     }else if(factory.level === 2 && hasOperateFactoryEffect){
-                        result = Produce(factory, RESOURCE_TISSUE, 1000, RESOURCE_REDUCTANT, 110, RESOURCE_CELL, 10, RESOURCE_PHLEGM, 10, RESOURCE_ENERGY, 16);
+                        result = Produce(factory, RESOURCE_TISSUE, 2000, RESOURCE_REDUCTANT, 110, RESOURCE_CELL, 10, RESOURCE_PHLEGM, 10, RESOURCE_ENERGY, 16);
                         if(result !== OK) {
-                            result = Produce(factory, RESOURCE_FIXTURES, 1000, RESOURCE_COMPOSITE, 20, RESOURCE_ALLOY, 41, RESOURCE_OXIDANT, 161, RESOURCE_ENERGY, 8);
+                            result = Produce(factory, RESOURCE_FIXTURES, 2000, RESOURCE_COMPOSITE, 20, RESOURCE_ALLOY, 41, RESOURCE_OXIDANT, 161, RESOURCE_ENERGY, 8);
                         }
                     }
                     if(result !== OK) {

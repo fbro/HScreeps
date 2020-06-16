@@ -136,8 +136,16 @@ const Terminals = {
                     const orders = Game.market.getAllOrders(order => order.resourceType === resourceType
                         && order.type === ORDER_BUY
                         /*&& Game.market.calcTransactionCost(500, fromTerminal.pos.roomName, order.roomName) <= 500*/
-                        && ((!resourceHistory[0] || (resourceHistory[0].avgPrice / 1.1/*minor price fall is okay*/) <= order.price) && lowestSellingValue >= order.price
-                            || resourceType === RESOURCE_ENERGY && fromTerminal.room.storage && fromTerminal.room.storage.store[RESOURCE_ENERGY] > Util.STORAGE_ENERGY_HIGH // hard sellout because storage is full with energy
+                        &&
+                        (
+                            (!resourceHistory[0]
+                                || IsOutdated(resourceHistory[resourceHistory.length - 1].date)
+                                || (resourceHistory[resourceHistory.length - 1].avgPrice / 1.5/*medium price fall is okay*/) <= order.price
+                            ) && lowestSellingValue <= order.price
+                            ||
+                            resourceType === RESOURCE_ENERGY
+                            && fromTerminal.room.storage
+                            && fromTerminal.room.storage.store[RESOURCE_ENERGY] > Util.STORAGE_ENERGY_HIGH // hard sellout because storage is full with energy
                         )
                         && order.remainingAmount > 0
                     );
@@ -161,6 +169,16 @@ const Terminals = {
                 }
             }
             return marketDealSendCount;
+        }
+
+        /**@return {boolean}*/
+        function IsOutdated(date1, date2 = Date.now(), millisecondsToWait = 86400000/*24h*/){
+            const elapsed = date2 - Date.parse(date1); // date1 format: "2019-06-24"
+            if(elapsed > millisecondsToWait){
+                //Util.Info('Terminals', 'IsOutdated', 'date ' + date1 + ' elapsed ' + elapsed + ' parsed date ' + Date.parse(date1) + ' now ' + date2);
+                return true;
+            }
+            return false;
         }
 
         /**@return {number}*/

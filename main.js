@@ -46,7 +46,6 @@ module.exports.loop = function () {
                     }
                     Terminals.run();
                     Factories.run();
-
                 }
                 AssignJobs.run();
             }
