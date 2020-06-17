@@ -652,7 +652,7 @@ const ExecuteJobs = {
                     if (fetchObject.structureType === STRUCTURE_LAB) {
                         if(creep.ticksToLive > 1000){
                             result = BoostCreep(creep, fetchObject, RESOURCE_CATALYZED_GHODIUM_ACID, WORK);
-                        }else if(creep.ticksToLive < 200){
+                        }else if(creep.ticksToLive < 100){
                             result = UnBoostCreep(creep, fetchObject, RESOURCE_CATALYZED_GHODIUM_ACID, WORK);
                         }
                     } else {
@@ -2579,7 +2579,7 @@ const ExecuteJobs = {
             return resourceSupply;
         }
 
-        function HandleCreepBoost(creep, jobObject, boostingMineral, bodyPartToBoost, ticksToLiveToBoost = 1300, ticksToLiveToUnBoost = 200){
+        function HandleCreepBoost(creep, jobObject, boostingMineral, bodyPartToBoost, ticksToLiveToBoost = 1300, ticksToLiveToUnBoost = 100){
             if(!creep.memory.Boost || creep.memory.Boost[bodyPartToBoost] !== "-"){ // only look once - after that it is too late
                 if(creep.ticksToLive > ticksToLiveToBoost && (!creep.memory.Boost || creep.memory.Boost && !creep.memory.Boost[bodyPartToBoost])){
                     const labThatCanBoost = FindLabThatCanBoost(creep, jobObject, boostingMineral, bodyPartToBoost);

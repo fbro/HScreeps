@@ -124,6 +124,7 @@ module.exports.loop = function () {
 
 // TODOs:
 // TODO FillStrg-container can be very expensive!
+// TODO possible optimization: when a creep is looking for spawnOrExtensions nearby it might as well do the spawn replenish at that point and remove the dedicated spawn look for creeps to replenish
 
 // attack NPC strongholds
 // harvest middle rooms
