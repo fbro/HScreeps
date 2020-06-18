@@ -25,7 +25,7 @@ module.exports.loop = function () {
                     CreateJobs.run();
                     Links.run();
                     if (Game.time % 15000 === 0) {
-                        Util.Info('Main', 'Main', '--------------- main reset of memory ---------------');
+                        Util.Info('Main', 'Controller', '--------------- main reset of memory ---------------');
 
                         const foundCreeps = {};
                         for (const memRoomKey in Memory.MemRooms) {
@@ -41,7 +41,7 @@ module.exports.loop = function () {
                         if(Game.time % 240000 === 0){ // approx every 3 days
                             delete Memory.Paths; // remove Paths to make room for new paths
                             delete Memory.InfoLog;
-                            Util.InfoLog('Main', 'Main', 'reset memory logs ' + Game.time);
+                            Util.InfoLog('Main', 'Controller', 'reset memory logs ' + Game.time);
                         }
                     }
                     Terminals.run();
@@ -63,6 +63,10 @@ module.exports.loop = function () {
             }
         }
         PowerCreeps.run();
+        if (Game.cpu.bucket >= 9000){
+            //Util.Info('Main', 'Controller', 'Game.cpu.bucket ' + Game.cpu.bucket);
+            Game.cpu.generatePixel();
+        }
     }
 
     function MaxCreepsCleanup(memRoomKey, memRoom, foundCreeps){
