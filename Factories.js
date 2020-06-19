@@ -36,6 +36,8 @@ const Factories = {
                         if(result !== OK) {
                             result = Produce(factory, RESOURCE_FIXTURES, 2000, RESOURCE_COMPOSITE, 20, RESOURCE_ALLOY, 41, RESOURCE_OXIDANT, 161, RESOURCE_ENERGY, 8);
                         }
+                    }else if(factory.level === 3 && hasOperateFactoryEffect){
+                        result = Produce(factory, RESOURCE_FRAME, 2000, RESOURCE_FIXTURES, 2, RESOURCE_TUBE, 4, RESOURCE_REDUCTANT, 330, RESOURCE_ZYNTHIUM_BAR, 31, RESOURCE_ENERGY, 16);
                     }
                     if(result !== OK) {
                         result = Produce(factory, RESOURCE_LEMERGIUM_BAR, 1000, RESOURCE_LEMERGIUM, 500, RESOURCE_ENERGY, 200);

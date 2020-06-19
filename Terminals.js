@@ -36,7 +36,9 @@ const Terminals = {
             for (const resourceType in fromTerminal.store) { // for each resource type
                 let fromAmount = fromTerminal.store[resourceType];
                 let target;
-                if(resourceType === RESOURCE_SWITCH || resourceType === RESOURCE_PHLEGM || resourceType === RESOURCE_COMPOSITE || resourceType === RESOURCE_CONCENTRATE) { // SWITCH, PHLEGM, COMPOSITE or CONCENTRATE should only be sent to a terminal that has a factory of level 2
+                if(resourceType === RESOURCE_FIXTURES || resourceType === RESOURCE_TUBE){
+                    DistributeFactoryCommodities(fromTerminal, resourceType, fromAmount, 3); // only send to factories that are of lvl 3
+                } else if(resourceType === RESOURCE_SWITCH || resourceType === RESOURCE_PHLEGM || resourceType === RESOURCE_COMPOSITE || resourceType === RESOURCE_CONCENTRATE) { // SWITCH, PHLEGM, COMPOSITE or CONCENTRATE should only be sent to a terminal that has a factory of level 2
                     DistributeFactoryCommodities(fromTerminal, resourceType, fromAmount, 2); // only send to factories that are of lvl 2
                 } else if(resourceType === RESOURCE_SILICON || resourceType === RESOURCE_BIOMASS || resourceType === RESOURCE_METAL || resourceType === RESOURCE_MIST) { // SILICON, BIOMASS, METAL or MIST should only be sent to a terminal that has a factory that uses SILICON, BIOMASS, METAL or MIST
                     DistributeFactoryCommodities(fromTerminal, resourceType, fromAmount); // send to any level factory
@@ -104,8 +106,8 @@ const Terminals = {
                 let lowestSellingValue = 0.1; // if the mineral has a lower selling value than this then it is not worth the computational value to mine and sell
                 if (resourceType === RESOURCE_ENERGY) {
                     max = Util.TERMINAL_MAX_ENERGY;
-                } else if(resourceType === RESOURCE_TISSUE || resourceType === RESOURCE_FIXTURES){
-                    max = 0; // right now i am selling out on tissue and fixtures - both factory lvl 2 items
+                } else if(resourceType === RESOURCE_TISSUE || resourceType === RESOURCE_FRAME){
+                    max = 0; // right now i am selling out on tissue and frame
                 } else if (resourceType === RESOURCE_POWER
                     || resourceType === RESOURCE_SILICON // deposit
                     || resourceType === RESOURCE_WIRE // factory lvl 0
@@ -118,6 +120,7 @@ const Terminals = {
                     || resourceType === RESOURCE_METAL // deposit
                     || resourceType === RESOURCE_ALLOY // factory lvl 0
                     || resourceType === RESOURCE_TUBE // factory lvl 1
+                    || resourceType === RESOURCE_FIXTURES // factory lvl 2
 
                     || resourceType === RESOURCE_MIST // deposit
                     || resourceType === RESOURCE_CONDENSATE // factory lvl 0

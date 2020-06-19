@@ -2374,132 +2374,75 @@ const ExecuteJobs = {
             if(creep.getActiveBodyparts(RANGED_ATTACK) > 0){
                 creep.rangedAttack(closestHostileCreep);
             }
-
-            let result = ERR_NO_RESULT_FOUND;
             switch (true) {
                 case creep.pos.x < closestHostileCreep.pos.x && creep.pos.y < closestHostileCreep.pos.y:
-                    result = creep.move(TOP_LEFT);
-                    if(result === ERR_INVALID_ARGS){
-                        result = creep.move(LEFT);
-                        if(result === ERR_INVALID_ARGS){
-                            result = creep.move(TOP);
-                            if(result === ERR_INVALID_ARGS){
-                                result = creep.move(TOP_RIGHT);
-                                if(result === ERR_INVALID_ARGS){
-                                    result = creep.move(BOTTOM_LEFT);
-                                }
-                            }
+                    if(!FleeMove(creep, -1, -1, TOP_LEFT)){
+                        if(!FleeMove(creep, 0, -1, TOP)){
+                            FleeMove(creep, -1, 0, LEFT);
                         }
                     }
                     break;
                 case creep.pos.x > closestHostileCreep.pos.x && creep.pos.y < closestHostileCreep.pos.y:
-                    result = creep.move(TOP_RIGHT);
-                    if(result === ERR_INVALID_ARGS){
-                        result = creep.move(RIGHT);
-                        if(result === ERR_INVALID_ARGS){
-                            result = creep.move(TOP);
-                            if(result === ERR_INVALID_ARGS){
-                                result = creep.move(TOP_LEFT);
-                                if(result === ERR_INVALID_ARGS){
-                                    result = creep.move(BOTTOM_RIGHT);
-                                }
-                            }
+                    if(!FleeMove(creep, 1, -1, TOP_RIGHT)){
+                        if(!FleeMove(creep, 0, -1, TOP)){
+                            FleeMove(creep, 1, 0, RIGHT);
                         }
                     }
                     break;
                 case creep.pos.x > closestHostileCreep.pos.x && creep.pos.y > closestHostileCreep.pos.y:
-                    result = creep.move(BOTTOM_RIGHT);
-                    if(result === ERR_INVALID_ARGS){
-                        result = creep.move(RIGHT);
-                        if(result === ERR_INVALID_ARGS){
-                            result = creep.move(BOTTOM);
-                            if(result === ERR_INVALID_ARGS){
-                                result = creep.move(TOP_RIGHT);
-                                if(result === ERR_INVALID_ARGS){
-                                    result = creep.move(BOTTOM_LEFT);
-                                }
-                            }
+                    if(!FleeMove(creep, 1, 1, BOTTOM_RIGHT)){
+                        if(!FleeMove(creep, 0, 1, BOTTOM)){
+                            FleeMove(creep, 1, 0, RIGHT);
                         }
                     }
                     break;
                 case creep.pos.x < closestHostileCreep.pos.x && creep.pos.y > closestHostileCreep.pos.y:
-                    result = creep.move(BOTTOM_LEFT);
-                    if(result === ERR_INVALID_ARGS){
-                        result = creep.move(LEFT);
-                        if(result === ERR_INVALID_ARGS){
-                            result = creep.move(BOTTOM);
-                            if(result === ERR_INVALID_ARGS){
-                                result = creep.move(TOP_LEFT);
-                                if(result === ERR_INVALID_ARGS){
-                                    result = creep.move(BOTTOM_RIGHT);
-                                }
-                            }
+                    if(!FleeMove(creep, -1, 1, BOTTOM_LEFT)){
+                        if(!FleeMove(creep, 0, 1, BOTTOM)){
+                            FleeMove(creep, -1, 0, LEFT);
                         }
                     }
                     break;
                 case creep.pos.x < closestHostileCreep.pos.x && creep.pos.y === closestHostileCreep.pos.y:
-                    result = creep.move(LEFT);
-                    if(result === ERR_INVALID_ARGS){
-                        result = creep.move(TOP_LEFT);
-                        if(result === ERR_INVALID_ARGS){
-                            result = creep.move(BOTTOM_LEFT);
-                            if(result === ERR_INVALID_ARGS){
-                                result = creep.move(BOTTOM);
-                                if(result === ERR_INVALID_ARGS){
-                                    result = creep.move(TOP);
-                                }
-                            }
+                    if(!FleeMove(creep, -1, 0, LEFT)){
+                        if(!FleeMove(creep, -1, 1, BOTTOM_LEFT)){
+                            FleeMove(creep, -1, -1, TOP_LEFT);
                         }
                     }
                     break;
                 case creep.pos.x > closestHostileCreep.pos.x && creep.pos.y === closestHostileCreep.pos.y:
-                    result = creep.move(RIGHT);
-                    if(result === ERR_INVALID_ARGS){
-                        result = creep.move(TOP_RIGHT);
-                        if(result === ERR_INVALID_ARGS){
-                            result = creep.move(BOTTOM_RIGHT);
-                            if(result === ERR_INVALID_ARGS){
-                                result = creep.move(BOTTOM);
-                                if(result === ERR_INVALID_ARGS){
-                                    result = creep.move(TOP);
-                                }
-                            }
+                    if(!FleeMove(creep, 1, 0, RIGHT)){
+                        if(!FleeMove(creep, 1, 1, BOTTOM_RIGHT)){
+                            FleeMove(creep, 1, -1, TOP_RIGHT);
                         }
                     }
                     break;
                 case creep.pos.x === closestHostileCreep.pos.x && creep.pos.y > closestHostileCreep.pos.y:
-                    result = creep.move(BOTTOM);
-                    if(result === ERR_INVALID_ARGS){
-                        result = creep.move(BOTTOM_LEFT);
-                        if(result === ERR_INVALID_ARGS){
-                            result = creep.move(BOTTOM_RIGHT);
-                            if(result === ERR_INVALID_ARGS){
-                                result = creep.move(RIGHT);
-                                if(result === ERR_INVALID_ARGS){
-                                    result = creep.move(LEFT);
-                                }
-                            }
+                    if(!FleeMove(creep, 0, 1, BOTTOM)){
+                        if(!FleeMove(creep, -1, 1, BOTTOM_LEFT)){
+                            FleeMove(creep, 1, 1, BOTTOM_RIGHT);
                         }
                     }
                     break;
                 case creep.pos.x === closestHostileCreep.pos.x && creep.pos.y < closestHostileCreep.pos.y:
-                    result = creep.move(TOP);
-                    if(result === ERR_INVALID_ARGS){
-                        result = creep.move(TOP_LEFT);
-                        if(result === ERR_INVALID_ARGS){
-                            result = creep.move(TOP_RIGHT);
-                            if(result === ERR_INVALID_ARGS){
-                                result = creep.move(RIGHT);
-                                if(result === ERR_INVALID_ARGS){
-                                    result = creep.move(LEFT);
-                                }
-                            }
+                    if(!FleeMove(creep, 0, -1, TOP)){
+                        if(!FleeMove(creep, -1, -1, TOP_LEFT)){
+                            FleeMove(creep, 1, -1, TOP_RIGHT);
                         }
                     }
                     break;
                 default:
                     Util.ErrorLog('ExecuteJobs', 'Flee', 'flee move error ' + creep.name);
             }
+        }
+
+        /** @return {boolean}*/
+        function FleeMove(creep, xMod, yMod, direction){
+            if(creep.room.Terrain.get(creep.pos.x + xMod, creep.pos.y + yMod)){
+                creep.move(direction);
+                return true;
+            }
+            return false;
         }
 
         /**@return {object} @return {undefined}*/
