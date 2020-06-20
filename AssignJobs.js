@@ -114,7 +114,7 @@ const AssignJobs = {
             // if idle creep not found for vacant job then look if spawn is possible
             if (ShouldSpawnCreep(roomJob.CreepType, memRoomKey)) {
                 const availableName = GetAvailableName(roomJob.CreepType);
-                let bestLinearDistance = 1; // normally creeps should only be spawned in the room they are needed
+                let bestLinearDistance = 0; // normally creeps should only be spawned in the room they are needed
                 let spawnLargeVersion = false;
                 // job in another room
                 if (Game.rooms[memRoomKey]) { // job in invisible room

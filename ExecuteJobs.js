@@ -2438,9 +2438,10 @@ const ExecuteJobs = {
 
         /** @return {boolean}*/
         function FleeMove(creep, xMod, yMod, direction){
-            const pos = new RoomPosition(creep.pos.x + xMod, creep.pos.y + yMod, creep.room.name);
-            // Util.Info('ExecuteJobs', 'FleeMove', pos.lookFor(LOOK_TERRAIN));
-            if(pos.lookFor(LOOK_TERRAIN)[0] === 'plain'){
+            Util.Info('ExecuteJobs', 'FleeMove', 'x ' + (creep.pos.x + xMod) + ' y ' + (creep.pos.y + yMod) + ' ' + creep.pos.roomName);
+            const fleeToPos = new RoomPosition((creep.pos.x + xMod), (creep.pos.y + yMod), creep.pos.roomName);
+            Util.Info('ExecuteJobs', 'FleeMove', fleeToPos.lookFor(LOOK_TERRAIN));
+            if(fleeToPos.lookFor(LOOK_TERRAIN)[0] === 'plain'){
                 creep.move(direction);
                 return true;
             }
