@@ -19,12 +19,12 @@ module.exports.loop = function () {
         if (!Memory.MemRooms) {
             Memory.MemRooms = {};
         }
-        if(Game.time % 5 === 0){
-            if (Game.time % 10 === 0) {
-                if (Game.time % 30 === 0) { // tick burst from https://docs.screeps.com/cpu-limit.html#Bucket
+        if(Game.time % Util.GAME_TIME_MODULO_2 === 0){
+            if (Game.time % Util.GAME_TIME_MODULO_3 === 0) {
+                if (Game.time % Util.GAME_TIME_MODULO_4 === 0) { // tick burst from https://docs.screeps.com/cpu-limit.html#Bucket
                     CreateJobs.run();
                     Links.run();
-                    if (Game.time % 15000 === 0) {
+                    if (Game.time % Util.GAME_TIME_MODULO_5 === 0) {
                         Util.Info('Main', 'Controller', '--------------- main reset of memory ---------------');
 
                         const foundCreeps = {};
@@ -38,7 +38,7 @@ module.exports.loop = function () {
                             MaxCreepsCleanup(memRoomKey, memRoom, foundCreeps);
                             UnusedRoomsCleanup(memRoomKey, memRoom);
                         }
-                        if(Game.time % 240000 === 0){ // approx every 3 days
+                        if(Game.time % Util.GAME_TIME_MODULO_6 === 0){ // approx every 3 days
                             delete Memory.Paths; // remove Paths to make room for new paths
                             delete Memory.InfoLog;
                             Util.InfoLog('Main', 'Controller', 'reset memory logs ' + Game.time);

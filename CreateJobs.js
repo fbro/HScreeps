@@ -427,8 +427,8 @@ const CreateJobs = {
                         }else if(factory.store.getUsedCapacity(RESOURCE_ALLOY) > 0 && factory.level === 3){ // level 3 specific
                             roomJobs = TryAddFillFactoryJob(gameRoom, factory, roomJobs, RESOURCE_FIXTURES);
                             roomJobs = TryAddFillFactoryJob(gameRoom, factory, roomJobs, RESOURCE_TUBE);
+                            roomJobs = TryAddFillFactoryJob(gameRoom, factory, roomJobs, RESOURCE_HYDROGEN);
                             roomJobs = TryAddFillFactoryJob(gameRoom, factory, roomJobs, RESOURCE_REDUCTANT);
-                            roomJobs = TryAddFillFactoryJob(gameRoom, factory, roomJobs, RESOURCE_ZYNTHIUM_BAR);
                         }
                     }
                 }

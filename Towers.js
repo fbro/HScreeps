@@ -2,13 +2,13 @@ let Util = require('Util');
 const Towers = {
     run: function (gameRoom) {
         let anyHostiles = Memory.MemRooms[gameRoom.name].AnyHostiles;
-        if(anyHostiles || Game.time % 2 === 0){
+        if(anyHostiles || Game.time % Util.GAME_TIME_MODULO_1 === 0){
             const towers = FindTowers(gameRoom);
             anyHostiles = HostileCreeps(towers);
             if(!anyHostiles){
                 anyHostiles = DamagedCreeps(towers);
             }
-            if(!anyHostiles && Game.time % 30 === 0){
+            if(!anyHostiles && Game.time % Util.GAME_TIME_MODULO_4 === 0){
                 EmergencyRepair(towers);
             }
             if(anyHostiles !== Memory.MemRooms[gameRoom.name].AnyHostiles){

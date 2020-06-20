@@ -38,6 +38,14 @@ const Util = {
     RAMPART_WALL_HITS_U_LVL8 : 100000,
     RAMPART_WALL_HITS_O_LVL8 : 2000000,
 
+    // Game.time % modulo value below - stack expensive ticks on top of each other
+    GAME_TIME_MODULO_1 : 2,
+    GAME_TIME_MODULO_2 : 6,
+    GAME_TIME_MODULO_3 : 12,
+    GAME_TIME_MODULO_4 : 30,
+    GAME_TIME_MODULO_5 : 18000,
+    GAME_TIME_MODULO_6 : 240000,
+
     ErrorLog: function (functionParentName, functionName, message) {
         const messageId = functionParentName + ' ' + functionName;
         console.log('!!--------------- ' + messageId + ' ---------------!!');

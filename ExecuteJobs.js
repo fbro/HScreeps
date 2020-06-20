@@ -2438,7 +2438,9 @@ const ExecuteJobs = {
 
         /** @return {boolean}*/
         function FleeMove(creep, xMod, yMod, direction){
-            if(creep.room.Terrain.get(creep.pos.x + xMod, creep.pos.y + yMod)){
+            const pos = new RoomPosition(creep.pos.x + xMod, creep.pos.y + yMod, creep.room.name);
+            // Util.Info('ExecuteJobs', 'FleeMove', pos.lookFor(LOOK_TERRAIN));
+            if(pos.lookFor(LOOK_TERRAIN)[0] === 'plain'){
                 creep.move(direction);
                 return true;
             }
