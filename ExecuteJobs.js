@@ -2438,10 +2438,18 @@ const ExecuteJobs = {
 
         /** @return {boolean}*/
         function FleeMove(creep, xMod, yMod, direction){
-            Util.Info('ExecuteJobs', 'FleeMove', 'x ' + (creep.pos.x + xMod) + ' y ' + (creep.pos.y + yMod) + ' ' + creep.pos.roomName);
-            const fleeToPos = new RoomPosition((creep.pos.x + xMod), (creep.pos.y + yMod), creep.pos.roomName);
-            Util.Info('ExecuteJobs', 'FleeMove', fleeToPos.lookFor(LOOK_TERRAIN));
-            if(fleeToPos.lookFor(LOOK_TERRAIN)[0] === 'plain'){
+            let newX = (creep.pos.x + xMod);
+            if(newX <= 0 || newX >= 49){
+                newX = creep.pos.x;
+            }
+            let newY = (creep.pos.y + yMod);
+            if(newY <= 0 || newY >= 49){
+                newY = creep.pos.y;
+            }
+            const fleeToPos = new RoomPosition(newX, newY, creep.pos.roomName);
+            const terrain = fleeToPos.lookFor(LOOK_TERRAIN);
+            Util.Info('ExecuteJobs', 'FleeMove', 'terrain ' + terrain + ' ' + JSON.stringify(fleeToPos) + ' orig ' + JSON.stringify(creep.pos));
+            if(terrain[0] === 'plain'){
                 creep.move(direction);
                 return true;
             }
