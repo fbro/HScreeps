@@ -1,18 +1,22 @@
 let Util = require('Util');
 const Towers = {
     run: function (gameRoom) {
-        let anyHostiles = Memory.MemRooms[gameRoom.name].AnyHostiles;
-        if(anyHostiles || Game.time % Util.GAME_TIME_MODULO_1 === 0){
+        let anyTowerActionLastTick = Memory.MemRooms[gameRoom.name].AnyTowerAction;
+        if(anyTowerActionLastTick || Game.time % Util.GAME_TIME_MODULO_1 === 0){
             const towers = FindTowers(gameRoom);
-            anyHostiles = HostileCreeps(towers);
-            if(!anyHostiles){
-                anyHostiles = DamagedCreeps(towers);
+            let anyTowerAction = HostileCreeps(towers);
+            if(!anyTowerAction){
+                anyTowerAction = DamagedCreeps(towers);
             }
-            if(!anyHostiles && Game.time % Util.GAME_TIME_MODULO_4 === 0){
-                EmergencyRepair(towers);
+            if(!anyTowerAction && (Game.time % Util.GAME_TIME_MODULO_4 === 0 || anyTowerActionLastTick)){
+                anyTowerAction = EmergencyRepair(towers);
             }
-            if(anyHostiles !== Memory.MemRooms[gameRoom.name].AnyHostiles){
-                Memory.MemRooms[gameRoom.name].AnyHostiles = anyHostiles;
+            if(anyTowerActionLastTick !== anyTowerAction) {
+                if (anyTowerAction) {
+                    Memory.MemRooms[gameRoom.name].AnyTowerAction = anyTowerAction;
+                } else {
+                    delete Memory.MemRooms[gameRoom.name].AnyTowerAction;
+                }
             }
         }
 
@@ -37,6 +41,7 @@ const Towers = {
             return towers;
         }
 
+        /**@return {boolean}*/
         function EmergencyRepair(towers){
             const damagedStructures = gameRoom.find(FIND_STRUCTURES, {
                 filter: function (structure) {
@@ -50,14 +55,19 @@ const Towers = {
                 }
             });
 
-            for (let i = 0; i < towers.length; i++) {
-                if (damagedStructures.length > 0 && towers[i].store.getUsedCapacity(RESOURCE_ENERGY) > 700) {
-                    const val = ((i + 1) % damagedStructures.length);
-                    towers[i].repair(damagedStructures[val]);
+            if (damagedStructures.length > 0) {
+                for (let i = 0; i < towers.length; i++) {
+                    if (towers[i].store.getUsedCapacity(RESOURCE_ENERGY) > 700) {
+                        const val = ((i + 1) % damagedStructures.length);
+                        towers[i].repair(damagedStructures[val]);
+                    }
                 }
+                return true;
             }
+            return false;
         }
 
+        /**@return {boolean}*/
         function HostileCreeps(towers){
             const hostileTargets = gameRoom.find(FIND_HOSTILE_CREEPS, {
                 filter: function (hostile) {
@@ -68,10 +78,12 @@ const Towers = {
                 for (let i = 0; i < towers.length; i++) {
                     towers[i].attack(hostileTargets[((i + 1) % hostileTargets.length)]);
                 }
-                return hostileTargets;
+                return true;
             }
+            return false;
         }
 
+        /**@return {boolean}*/
         function DamagedCreeps(towers){
             let damagedCreeps = gameRoom.find(FIND_MY_CREEPS, {
                 filter: function (creep) {
@@ -85,8 +97,9 @@ const Towers = {
                 for (let i = 0; i < towers.length; i++) {
                     towers[i].heal(damagedCreeps[((i + 1) % damagedCreeps.length)]);
                 }
-                return damagedCreeps;
+                return true;
             }
+            return false;
         }
     }
 };
