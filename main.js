@@ -45,7 +45,6 @@ module.exports.loop = function () {
                         }
                     }
                     Terminals.run();
-                    Factories.run();
                 }
                 AssignJobs.run();
             }
@@ -59,6 +58,7 @@ module.exports.loop = function () {
                 if(gameRoom.controller.level === 8){
                     Observers.run(gameRoom, gameRoomKey);
                     PowerSpawns.run(gameRoom);
+                    Factories.run(gameRoom, gameRoomKey);
                 }
             }
         }

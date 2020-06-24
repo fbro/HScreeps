@@ -1,26 +1,25 @@
 let Util = require('Util');
 const Factories = {
-    run: function () {
-        for (const gameRoomKey in Game.rooms) {
-            const gameRoom = Game.rooms[gameRoomKey];
-            const memRoom = Memory.MemRooms[gameRoomKey];
-            if (memRoom && memRoom.FctrId !== '-' && gameRoom.controller && gameRoom.controller.my && gameRoom.controller.level === 8) {
-                let factory;
-                if(memRoom.FctrId){
-                    factory = Game.getObjectById(memRoom.FctrId);
-                }
-                if(!factory){
-                    factory = gameRoom.find(FIND_MY_STRUCTURES, {
-                        filter: function (factory) {
-                            return factory.structureType === STRUCTURE_FACTORY && factory.cooldown === 0 && factory.store.getUsedCapacity(RESOURCE_ENERGY) > 0;
-                        }
-                    })[0];
-                    if(factory) {
-                        memRoom.FctrId = factory.id;
-                        Util.InfoLog('Factories', '', 'add new factory in ' + gameRoomKey + ' FctrId ' + memRoom.FctrId);
+    run: function (gameRoom, gameRoomKey) {
+        const memRoom = Memory.MemRooms[gameRoomKey];
+        if (memRoom && memRoom.FctrId !== '-') {
+            let factory;
+            if(memRoom.FctrId){
+                factory = Game.getObjectById(memRoom.FctrId);
+            }
+            if(!factory){
+                factory = gameRoom.find(FIND_MY_STRUCTURES, {
+                    filter: function (factory) {
+                        return factory.structureType === STRUCTURE_FACTORY;
                     }
+                })[0];
+                if(factory) {
+                    memRoom.FctrId = factory.id;
+                    Util.InfoLog('Factories', '', 'add new factory in ' + gameRoomKey + ' FctrId ' + memRoom.FctrId);
                 }
-                if(factory && factory.cooldown === 0){
+            }
+            if(factory){
+                if(factory.cooldown === 0){
                     let result;
                     const hasOperateFactoryEffect = factory.effects && factory.effects[0] && factory.effects[0].effect === PWR_OPERATE_FACTORY;
                     if(factory.level === 1 && hasOperateFactoryEffect){
@@ -60,10 +59,10 @@ const Factories = {
                             }
                         }
                     }
-                }else if(!factory){ // no factory in this room - set FctrId so that it wont look again
-                    memRoom.FctrId = '-';
-                    Util.InfoLog('Factories', '', 'no factory in ' + gameRoomKey + ' FctrId set to -');
                 }
+            }else{ // no factory in this room - set FctrId so that it wont look again
+                memRoom.FctrId = '-';
+                Util.InfoLog('Factories', '', 'no factory in ' + gameRoomKey + ' FctrId set to -');
             }
         }
 

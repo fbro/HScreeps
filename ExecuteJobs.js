@@ -1014,6 +1014,7 @@ const ExecuteJobs = {
                 creep.memory.resourceType = resourceType;
             }
             const creepCarry = creep.store.getCapacity(); // when a creep withdraws from storage then the amount is diminished - the job might end because of that diminish - it should not
+            let storageResourceAmount = 0;
             let Low = Util.STORAGE_LOW - creepCarry;
             let LowTransfer = Util.STORAGE_LOW_TRANSFER;
             let Medium = Util.STORAGE_MEDIUM - creepCarry;
@@ -1021,27 +1022,28 @@ const ExecuteJobs = {
             let High = Util.STORAGE_HIGH - creepCarry;
             let HighTransfer = Util.STORAGE_HIGH_TRANSFER;
             if (resourceType === RESOURCE_ENERGY) {
-                Low = Util.STORAGE_ENERGY_LOW;
+                Low = Util.STORAGE_ENERGY_LOW - creepCarry;
                 LowTransfer = Util.STORAGE_ENERGY_LOW_TRANSFER;
-                Medium = Util.STORAGE_ENERGY_MEDIUM;
+                Medium = Util.STORAGE_ENERGY_MEDIUM - creepCarry;
                 MediumTransfer = Util.STORAGE_ENERGY_MEDIUM_TRANSFER;
-                High = Util.STORAGE_ENERGY_HIGH;
+                High = Util.STORAGE_ENERGY_HIGH - creepCarry;
                 HighTransfer = Util.STORAGE_ENERGY_HIGH_TRANSFER;
             }
             const result = GenericJobAction(creep, roomJob, {
                 /**@return {int}*/
                 JobStatus: function (terminal) {
                     const storage = terminal.room.storage;
-                    if (!storage ||
-                        storage.store.getUsedCapacity(resourceType) <= Low && resourceType === RESOURCE_ENERGY // low resource in storage abort only if energy
+                    storageResourceAmount = storage.store.getUsedCapacity(resourceType);
 
-                        || storage.store.getUsedCapacity(resourceType) <= Medium
+                    if (storageResourceAmount <= Low && resourceType === RESOURCE_ENERGY // low resource in storage abort only if energy
+
+                        || storageResourceAmount <= Medium
                         && terminal.store.getUsedCapacity(resourceType) >= LowTransfer
 
-                        || storage.store.getUsedCapacity(resourceType) <= High
+                        || storageResourceAmount <= High
                         && terminal.store.getUsedCapacity(resourceType) >= MediumTransfer
 
-                        || storage.store.getUsedCapacity(resourceType) >= High
+                        || storageResourceAmount >= High
                         && terminal.store.getUsedCapacity(resourceType) >= HighTransfer
                     ) {
                         return JOB_IS_DONE;
@@ -1057,18 +1059,17 @@ const ExecuteJobs = {
                 },
                 /**@return {int}*/
                 IsJobDone: function (terminal) {
-                    const storage = terminal.room.storage;
                     const newAmountInTerminal = creep.store.getUsedCapacity(resourceType) + terminal.store.getUsedCapacity(resourceType);
                     if (
-                        storage.store.getUsedCapacity(resourceType) <= Low && resourceType === RESOURCE_ENERGY // low resource in storage abort only if energy
+                        storageResourceAmount <= Low && resourceType === RESOURCE_ENERGY // low resource in storage abort only if energy
 
-                        || storage.store.getUsedCapacity(resourceType) <= Medium
+                        || storageResourceAmount <= Medium
                         && newAmountInTerminal >= LowTransfer
 
-                        || storage.store.getUsedCapacity(resourceType) <= High
+                        || storageResourceAmount <= High
                         && newAmountInTerminal >= MediumTransfer
 
-                        || storage.store.getUsedCapacity(resourceType) >= High
+                        || storageResourceAmount >= High
                         && newAmountInTerminal >= HighTransfer
                     ) {
                         return JOB_IS_DONE;

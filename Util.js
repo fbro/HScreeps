@@ -1,6 +1,7 @@
 const Util = {
-    // if over target - terminal should send to another owned room that has under the target
-    TERMINAL_TARGET_RESOURCE: 3000,
+
+    TERMINAL_TARGET_RESOURCE: 3000, // if over target - terminal should send to another owned room that has under the target
+    TERMINAL_EMPTY_RESOURCE: 20000, // if terminal has over TERMINAL_EMPTY_RESOURCE then it must try and empty it to storage
     TERMINAL_TARGET_ENERGY: 30000,
     // if over max - then try and sell
     TERMINAL_MAX_RESOURCE: 6000,

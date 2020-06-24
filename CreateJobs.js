@@ -501,8 +501,20 @@ const CreateJobs = {
             }
 
             // terminal
-            if (gameRoom.terminal && (gameRoom.terminal.store.getUsedCapacity(RESOURCE_ENERGY) >= 120000 || (gameRoom.storage.store.getUsedCapacity(RESOURCE_ENERGY) < 5000 || !gameRoom.storage.store.getUsedCapacity(RESOURCE_ENERGY)) && gameRoom.terminal.store.getUsedCapacity(RESOURCE_ENERGY) >= Util.TERMINAL_TARGET_ENERGY)) {
-                AddJob(roomJobs, 'FillStrg-' + gameRoom.terminal.structureType + '(' + gameRoom.terminal.pos.x + ',' + gameRoom.terminal.pos.y + ',' + RESOURCE_ENERGY + ')' + gameRoom.name, gameRoom.terminal.id, Util.OBJECT_JOB, 'T');
+            if (gameRoom.terminal) {
+                for (const resourceType in gameRoom.terminal.store) {
+                    const amount = gameRoom.terminal.store.getUsedCapacity(resourceType);
+                    if(
+                        resourceType === RESOURCE_ENERGY && (
+                            amount >= 120000
+                            || (gameRoom.storage.store.getUsedCapacity(resourceType) < 5000 || !gameRoom.storage.store.getUsedCapacity(resourceType))
+                            && amount >= Util.TERMINAL_TARGET_ENERGY
+                        )
+                        || amount !== RESOURCE_ENERGY && amount > Util.TERMINAL_EMPTY_RESOURCE
+                    ){
+                        AddJob(roomJobs, 'FillStrg-' + gameRoom.terminal.structureType + '(' + gameRoom.terminal.pos.x + ',' + gameRoom.terminal.pos.y + ',' + resourceType + ')' + gameRoom.name, gameRoom.terminal.id, Util.OBJECT_JOB, 'T');
+                    }
+                }
             }
 
             // factory
@@ -511,15 +523,38 @@ const CreateJobs = {
                 if (factory) {
                     for (const resourceType in factory.store) {
                         const amount = factory.store.getUsedCapacity(resourceType);
-                        if (   resourceType === RESOURCE_PHLEGM    && amount >=  100 && factory.level === 1
-                            || resourceType === RESOURCE_TUBE      && amount >=  100 && factory.level === 1
-                            || resourceType === RESOURCE_COMPOSITE && amount >=  100 && factory.level === 1
-                            || resourceType === RESOURCE_TISSUE    && amount >=   50 && factory.level === 2
-                            || resourceType === RESOURCE_FIXTURES  && amount >=   50 && factory.level === 2
+                        if (   resourceType === RESOURCE_COMPOSITE && amount >=  500 && factory.level === 1
+                            || resourceType === RESOURCE_CRYSTAL   && amount >=  500 && factory.level === 2
+                            || resourceType === RESOURCE_LIQUID    && amount >=  500 && factory.level === 3
 
-                            || resourceType === RESOURCE_MUSCLE    && amount >= 1000 && factory.level === 3
-                            || resourceType === RESOURCE_ORGANOID  && amount >= 1000 && factory.level === 4
-                            || resourceType === RESOURCE_ORGANISM  && amount >= 1000 && factory.level === 5) {
+                            // Mechanical chain
+                            || resourceType === RESOURCE_TUBE       && amount >= 400 && factory.level === 1
+                            || resourceType === RESOURCE_FIXTURES   && amount >= 200 && factory.level === 2
+                            || resourceType === RESOURCE_FRAME      && amount >= 100 && factory.level === 3
+                            || resourceType === RESOURCE_HYDRAULICS && amount >=  10 && factory.level === 4
+                            || resourceType === RESOURCE_MACHINE    && amount >=   1 && factory.level === 5
+
+                            // Biological chain
+                            || resourceType === RESOURCE_PHLEGM   && amount >= 400 && factory.level === 1
+                            || resourceType === RESOURCE_TISSUE   && amount >= 200 && factory.level === 2
+                            || resourceType === RESOURCE_MUSCLE   && amount >= 100 && factory.level === 3
+                            || resourceType === RESOURCE_ORGANOID && amount >=  10 && factory.level === 4
+                            || resourceType === RESOURCE_ORGANISM && amount >=   1 && factory.level === 5
+
+                            // Electronical chain
+                            || resourceType === RESOURCE_SWITCH     && amount >= 400 && factory.level === 1
+                            || resourceType === RESOURCE_TRANSISTOR && amount >= 200 && factory.level === 2
+                            || resourceType === RESOURCE_MICROCHIP  && amount >= 100 && factory.level === 3
+                            || resourceType === RESOURCE_CIRCUIT    && amount >=  10 && factory.level === 4
+                            || resourceType === RESOURCE_DEVICE     && amount >=   1 && factory.level === 5
+
+                            // Mystical chain
+                            || resourceType === RESOURCE_CONCENTRATE && amount >= 400 && factory.level === 1
+                            || resourceType === RESOURCE_EXTRACT     && amount >= 200 && factory.level === 2
+                            || resourceType === RESOURCE_SPIRIT      && amount >= 100 && factory.level === 3
+                            || resourceType === RESOURCE_EMANATION   && amount >=  10 && factory.level === 4
+                            || resourceType === RESOURCE_ESSENCE     && amount >=   1 && factory.level === 5
+                        ) {
                             new RoomVisual(gameRoom.name).text('🏭', factory.pos.x, factory.pos.y);
                             AddJob(roomJobs, 'FillStrg-' + factory.structureType + '(' + factory.pos.x + ',' + factory.pos.y + ',' + resourceType + ')' + gameRoom.name, factory.id, Util.OBJECT_JOB, 'T');
                         }
