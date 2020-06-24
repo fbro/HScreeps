@@ -889,6 +889,15 @@ const ExecuteJobs = {
                 /**@return {int}*/
                 JobStatus: function (jobObject) {
                     let creepSum = creep.store.getUsedCapacity();
+                    if(jobObject.structureType === STRUCTURE_TERMINAL){ // TODO remake JobFillStorage to handle resourceType
+                        let resourceType = creep.memory.resourceType;
+                        if (!resourceType) {
+                            resourceType = creep.memory.JobName.split(/[,()]+/).filter(function (e) {
+                                return e;
+                            })[3];
+                            creep.memory.resourceType = resourceType;
+                        }
+                    }
                     if (!jobObject && creepSum === 0 // if the target is a dropped resource it may just disappear because it was picked up
                         || jobObject.structureType === STRUCTURE_TERMINAL && (jobObject.store.getUsedCapacity(RESOURCE_ENERGY) < Util.STORAGE_ENERGY_MEDIUM_TRANSFER && jobObject.room.storage.store.getUsedCapacity(RESOURCE_ENERGY) >= Util.STORAGE_ENERGY_LOW)) {
                         return JOB_IS_DONE;
