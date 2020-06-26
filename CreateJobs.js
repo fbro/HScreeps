@@ -506,8 +506,8 @@ const CreateJobs = {
                     const amount = gameRoom.terminal.store.getUsedCapacity(resourceType);
                     if(
                         resourceType === RESOURCE_ENERGY && (
-                            amount >= 120000
-                            || (gameRoom.storage.store.getUsedCapacity(resourceType) < 5000 || !gameRoom.storage.store.getUsedCapacity(resourceType))
+                            amount >= Util.TERMINAL_EMPTY_ENERGY
+                            || (gameRoom.storage.store.getUsedCapacity(resourceType) < Util.STORAGE_ENERGY_LOW || !gameRoom.storage.store.getUsedCapacity(resourceType))
                             && amount >= Util.TERMINAL_TARGET_ENERGY
                         )
                         || amount !== RESOURCE_ENERGY && amount > Util.TERMINAL_EMPTY_RESOURCE

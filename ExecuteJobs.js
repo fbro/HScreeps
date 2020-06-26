@@ -885,70 +885,39 @@ const ExecuteJobs = {
 
         /**@return {int}*/
         function JobFillStorage(creep, roomJob) {
+            let resourceType = creep.memory.resourceType;
+            if (!resourceType) {
+                resourceType = creep.memory.JobName.split(/[(,)]+/).filter(function (e) {
+                    return e;
+                })[3];
+                creep.memory.resourceType = resourceType;
+            }
             const result = GenericJobAction(creep, roomJob, {
                 /**@return {int}*/
                 JobStatus: function (jobObject) {
-                    let creepSum = creep.store.getUsedCapacity();
-                    if(jobObject.structureType === STRUCTURE_TERMINAL){ // TODO remake JobFillStorage to handle resourceType
-                        let resourceType = creep.memory.resourceType;
-                        if (!resourceType) {
-                            resourceType = creep.memory.JobName.split(/[,()]+/).filter(function (e) {
-                                return e;
-                            })[3];
-                            creep.memory.resourceType = resourceType;
+                    if(creep.store.getUsedCapacity() === 0) { // if creep is not carrying anything
+                        if(!jobObject // if the target is a dropped resource it may just disappear because it was picked up
+                            || jobObject.store.getUsedCapacity(resourceType) <= GetDesiredLeftoverResource(jobObject.structureType, resourceType, jobObject.room.storage) // check if target is "empty"
+                        ){
+                            return JOB_IS_DONE;
+                        }else{
+                            return SHOULD_ACT; // get resources from target
                         }
-                    }
-                    if (!jobObject && creepSum === 0 // if the target is a dropped resource it may just disappear because it was picked up
-                        || jobObject.structureType === STRUCTURE_TERMINAL && (jobObject.store.getUsedCapacity(RESOURCE_ENERGY) < Util.STORAGE_ENERGY_MEDIUM_TRANSFER && jobObject.room.storage.store.getUsedCapacity(RESOURCE_ENERGY) >= Util.STORAGE_ENERGY_LOW)) {
-                        return JOB_IS_DONE;
-                    } else if (jobObject && (creepSum === 0 || !creep.memory.Depositing && creepSum < creep.store.getCapacity() && creep.pos.getRangeTo(jobObject) <= 1
-                        && (jobObject.resourceType || (jobObject.store.getUsedCapacity() > 0
-                            || jobObject.structureType === STRUCTURE_TERMINAL && (jobObject.store.getUsedCapacity(RESOURCE_ENERGY) >= Util.STORAGE_ENERGY_HIGH_TRANSFER || jobObject.room.storage.store.getUsedCapacity(RESOURCE_ENERGY) < Util.STORAGE_ENERGY_LOW && jobObject.store.getUsedCapacity(RESOURCE_ENERGY) > 0))))
-                    ) {
-                        creep.memory.Depositing = undefined;
-                        return SHOULD_ACT; // get resources from target
                     } else {
-                        creep.memory.Depositing = true;
                         return SHOULD_FETCH; // place in storage
                     }
                 },
                 /**@return {int}*/
-                Act: function (jobObject) {
-                    if (jobObject.structure/*ruin*/ || jobObject.structureType === STRUCTURE_CONTAINER || jobObject.creep/*tombstone*/) {
-                        for (const resourceType in jobObject.store) {
-                            if (jobObject.store.getUsedCapacity(resourceType) > 0) {
-                                return creep.withdraw(jobObject, resourceType);
-                            }
-                        }
-                        return ERR_NOT_ENOUGH_RESOURCES;
-                    } else if (jobObject.structureType === STRUCTURE_FACTORY) {
-                        let resourceType = creep.memory.resourceType;
-                        if (!resourceType) {
-                            resourceType = creep.memory.JobName.split(/[(,)]+/).filter(function (e) {
-                                return e;
-                            })[3];
-                            creep.memory.resourceType = resourceType;
-                        }
-                        if (resourceType && jobObject.store.getUsedCapacity(resourceType) > 0) {
-                            let amountToWithdraw = jobObject.store.getUsedCapacity(resourceType);
-                            if (amountToWithdraw > creep.store.getFreeCapacity()) {
-                                amountToWithdraw = creep.store.getFreeCapacity();
-                            }
-                            return creep.withdraw(jobObject, resourceType, amountToWithdraw);
-                        } else {
-                            return JOB_IS_DONE;
-                        }
-                    } else if (jobObject.structureType === STRUCTURE_LINK || jobObject.structureType === STRUCTURE_TERMINAL) {
-                        return creep.withdraw(jobObject, RESOURCE_ENERGY);
-                    } else if (jobObject.resourceType) { // drop
+                Act: function (jobObject) { // get the resource
+                    if (jobObject.resourceType) { // drop
                         return creep.pickup(jobObject);
-                    } else {
-                        return ERR_NO_RESULT_FOUND;
+                    }else{
+                        return creep.withdraw(jobObject, resourceType);
                     }
                 },
                 /**@return {int}*/
                 IsJobDone: function (jobObject) {
-                    return this.JobStatus(jobObject);
+                    return OK;
                 },
                 /**@return {object}
                  * @return {undefined}*/
@@ -962,11 +931,28 @@ const ExecuteJobs = {
                     }
                 },
                 /**@return {int}*/
-                Fetch: function (fetchObject, jobObject) {
+                Fetch: function (fetchObject, jobObject) { // deposit the resource
                     return DepositCreepStore(creep, fetchObject, jobObject);
                 },
             });
             return result;
+        }
+
+        /**@return {number}*/
+        function GetDesiredLeftoverResource(structureType, resourceType, storage){
+            if(structureType === STRUCTURE_TERMINAL){
+                if(resourceType === RESOURCE_ENERGY){
+                    if(storage.store.getUsedCapacity(RESOURCE_ENERGY) < Util.STORAGE_ENERGY_LOW){
+                        return 0;
+                    }else{
+                        return Util.TERMINAL_EMPTY_ENERGY;
+                    }
+                }else{
+                    return Util.TERMINAL_EMPTY_RESOURCE;
+                }
+            }else{
+                return 0;
+            }
         }
 
         /**@return {int}*/
