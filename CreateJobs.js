@@ -512,7 +512,6 @@ const CreateJobs = {
                         )
                         || amount !== RESOURCE_ENERGY && amount > Util.TERMINAL_EMPTY_RESOURCE
                     ){
-                        Util.Info('test', 'test', 'FillStrg created room ' + gameRoom.name + ' resourceType ' + resourceType);
                         AddJob(roomJobs, 'FillStrg-' + gameRoom.terminal.structureType + '(' + gameRoom.terminal.pos.x + ',' + gameRoom.terminal.pos.y + ',' + resourceType + ')' + gameRoom.name, gameRoom.terminal.id, Util.OBJECT_JOB, 'T');
                     }
                 }

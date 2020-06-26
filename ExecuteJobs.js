@@ -897,7 +897,8 @@ const ExecuteJobs = {
                 JobStatus: function (jobObject) {
                     if(creep.store.getUsedCapacity() === 0) { // if creep is not carrying anything
                         // if the target is a dropped resource it may just disappear because it was picked up
-                        if(!jobObject || !jobObject.resourceType/*drop*/ && jobObject.store.getUsedCapacity(resourceType) <= GetDesiredLeftoverResource(jobObject.structureType, resourceType, jobObject.room.storage) // check if target is "empty"
+                        if(!jobObject ||
+                            !jobObject.resourceType/*drop*/ && jobObject.store.getUsedCapacity(resourceType) <= GetDesiredLeftoverResource(jobObject.structureType, resourceType, jobObject.room.storage) // check if target is "empty"
                         ){
                             return JOB_IS_DONE;
                         }else{
