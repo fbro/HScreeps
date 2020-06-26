@@ -31,7 +31,7 @@ const Terminals = {
             }
         }
 
-        // distribute ALL available resources to all terminals 2k each and only to 5k - except with energy 50k each and only to 100k
+        // distribute ALL available resources to all terminals
         function DistributeResources(fromTerminal, terminals) {
             for (const resourceType in fromTerminal.store) { // for each resource type
                 let fromAmount = fromTerminal.store[resourceType];
@@ -56,7 +56,7 @@ const Terminals = {
                             && toTerminal.id !== fromTerminal.id
                         ) { // is allowed to send this resource to another terminal
                             let sendAmount = fromAmount - target; // possible send amount
-                            const resourcesNeeded = (toAmount - target) * -1;
+                            const resourcesNeeded = target - toAmount;
                             if (sendAmount > resourcesNeeded) {
                                 sendAmount = resourcesNeeded; // does not need more resources than this
                             }
