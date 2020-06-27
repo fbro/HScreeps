@@ -261,31 +261,31 @@ const ExecuteJobs = {
         /**@return {number}*/
         function ConstantCreepActions(creepMemory, gameCreep){
             let result = ERR_NO_RESULT_FOUND;
+            const energyUsers = gameCreep.pos.findInRange(FIND_MY_STRUCTURES, 1, {
+                filter: (structure) => {
+                    return structure.structureType === STRUCTURE_TOWER
+                        || structure.structureType === STRUCTURE_EXTENSION
+                        || structure.structureType === STRUCTURE_SPAWN;
+                }
+            });
             if (gameCreep.store.getUsedCapacity(RESOURCE_ENERGY) > 0) { // fill adjacent spawns, extensions and towers or repair or construct on the road
-                result = TryFillOrRepairOrBuild(creepMemory, gameCreep, result);
+                result = TryFillOrRepairOrBuild(creepMemory, gameCreep, energyUsers, result);
+            }
+            if (result === ERR_NO_RESULT_FOUND && !creepMemory.Boost/*do not renew if creep is boosted*/ && (600 / gameCreep.body.length + gameCreep.ticksToLive) <= 1500) { // spawn renew functionality
+                result = TryRenewCreepAdjacentToSpawn(creepMemory, gameCreep, energyUsers, result);
             }
             if (result === ERR_NO_RESULT_FOUND && gameCreep.store.getUsedCapacity() < gameCreep.store.getCapacity()) { // pickup adjacent resources
                 result = TryPickupDropOrTombstone(creepMemory, gameCreep, result);
-
-            }
-            if (!creepMemory.Boost/*do not renew if creep is boosted*/ && (600 / gameCreep.body.length + gameCreep.ticksToLive) <= 1500) { // spawn renew functionality
-                TryRenewCreepAdjacentToSpawn(creepMemory, gameCreep, result);
             }
             return result;
         }
 
         /**@return {number}*/
-        function TryFillOrRepairOrBuild(creepMemory, gameCreep, result){
-            const toFill = gameCreep.pos.findInRange(FIND_MY_STRUCTURES, 1, {
-                filter: (structure) => {
-                    return (structure.structureType === STRUCTURE_SPAWN
-                        || structure.structureType === STRUCTURE_EXTENSION
-                        || structure.structureType === STRUCTURE_TOWER) && structure.store.getUsedCapacity(RESOURCE_ENERGY) < structure.store.getCapacity(RESOURCE_ENERGY);
-                }
-            })[0];
-            if (toFill) { // fill adjacent spawns, extensions
-                result = gameCreep.transfer(toFill, RESOURCE_ENERGY); // it may do that 'double' but it really does not matter
-                //Util.Info('ExecuteJobs', 'ExecuteRoomJobs', creep.name + ' transferred energy to adjacent spawn tower or extension (' + toFill.pos.x + ',' + toFill.pos.y + ',' + toFill.pos.roomName + ')');
+        function TryFillOrRepairOrBuild(creepMemory, gameCreep, energyUsers, result){
+            const energyUsersNeedsEnergy = energyUsers.filter(structure => structure.store.getFreeCapacity(RESOURCE_ENERGY) > 0);
+            if (energyUsersNeedsEnergy[0]) { // fill adjacent spawns, extensions
+                result = gameCreep.transfer(energyUsersNeedsEnergy[0], RESOURCE_ENERGY); // it may do that 'double' but it really does not matter
+                //Util.Info('ExecuteJobs', 'ExecuteRoomJobs', creep.name + ' transferred energy to adjacent spawn tower or extension (' + energyUsers.pos.x + ',' + energyUsers.pos.y + ',' + energyUsers.pos.roomName + ')');
             } else if (gameCreep.name.startsWith('H') || gameCreep.name.startsWith('B') || gameCreep.name.startsWith('D')) { // repair on the road
                 const toRepair = gameCreep.pos.findInRange(FIND_STRUCTURES, 2, {
                     filter: (structure) => {
@@ -329,14 +329,10 @@ const ExecuteJobs = {
         }
 
         /**@return {number}*/
-        function TryRenewCreepAdjacentToSpawn(creepMemory, gameCreep, result){
-            const spawn = gameCreep.pos.findInRange(FIND_MY_STRUCTURES, 1, {
-                filter: (s) => {
-                    return s.structureType === STRUCTURE_SPAWN && !s.spawning;
-                }
-            })[0];
-            if (spawn) {
-                result = spawn.renewCreep(gameCreep);
+        function TryRenewCreepAdjacentToSpawn(creepMemory, gameCreep, energyUsers, result){
+            const spawns = energyUsers.filter(structure => structure.structureType === STRUCTURE_SPAWN && !structure.spawning);
+            if (spawns[0]) {
+                result = spawns[0].renewCreep(gameCreep);
             }
             return result;
         }

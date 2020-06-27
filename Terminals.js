@@ -163,7 +163,7 @@ const Terminals = {
                         if(result === OK) {
                             marketDealSendCount++;
                         }
-                        if(resourceType === RESOURCE_TISSUE || resourceType === RESOURCE_FIXTURES){
+                        if(resourceType === RESOURCE_TISSUE || resourceType === RESOURCE_FRAME){
                             Util.InfoLog('Terminals', 'SellExcessResource', sendAmount + ' ' + resourceType + ' from ' + fromTerminal.pos.roomName + ' to ' + order.roomName + ' result ' + result + ' marketDealSendCount ' + marketDealSendCount + ' order.remainingAmount ' + order.remainingAmount + ' price ' + order.price + ' total price ' + order.price * sendAmount + ' fromAmount ' + fromAmount);
                         }else{
                             Util.Info('Terminals', 'SellExcessResource', sendAmount + ' ' + resourceType + ' from ' + fromTerminal.pos.roomName + ' to ' + order.roomName + ' result ' + result + ' marketDealSendCount ' + marketDealSendCount + ' order.remainingAmount ' + order.remainingAmount + ' price ' + order.price + ' total price ' + order.price * sendAmount + ' fromAmount ' + fromAmount);
