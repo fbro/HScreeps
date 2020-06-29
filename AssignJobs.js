@@ -67,7 +67,7 @@ const AssignJobs = {
                     // idle creep is in memory room with vacant job and matching job type
                     idleCreep.memory.JobName = roomJobKey;
                     for (const memoryElementKey in idleCreep.memory) {
-                        if (memoryElementKey !== 'JobName' && memoryElementKey !== 'Boost' ) { // creep.memory that should not be deleted
+                        if (memoryElementKey !== 'JobName' && memoryElementKey !== 'Boost') { // creep.memory that should not be deleted
                             idleCreep.memory[memoryElementKey] = undefined;
                         }
                     }
@@ -126,7 +126,7 @@ const AssignJobs = {
                             if (availableSpawnsInRoom.length === 0) { // no spawn in my room
                                 Util.Info('AssignJobs', 'SpawnCreep', 'job in room has no spawns ' + roomJobKey);
                                 bestLinearDistance = Number.MAX_SAFE_INTEGER;
-                            }else{
+                            } else {
                                 spawnLargeVersion = ShouldSpawnLargeVersion(gameRoom, roomJob, roomJobKey, memRoomKey);
                             }
                         } else {
@@ -212,7 +212,7 @@ const AssignJobs = {
                     default:
                         Util.ErrorLog('AssignJobs', 'ShouldSpawnCreep', 'creep type not found ' + creepType);
                 }
-                if(!memRoom.MaxCreeps[creepType]){
+                if (!memRoom.MaxCreeps[creepType]) {
                     memRoom.MaxCreeps[creepType] = {};
                 }
                 memRoom.MaxCreeps[creepType]['M'] = maxCreepsInRoom;
@@ -221,7 +221,7 @@ const AssignJobs = {
         }
 
         /**@return {boolean}*/
-        function ShouldSpawnLargeVersion(gameRoom, roomJob, roomJobKey, memRoomKey){
+        function ShouldSpawnLargeVersion(gameRoom, roomJob, roomJobKey, memRoomKey) {
             let spawnLargeVersion = false;
             if (roomJob.CreepType === 'H' && gameRoom.storage) { // logic only relevant for harvester
                 const source = gameRoom.find(FIND_SOURCES)[0];
@@ -238,20 +238,20 @@ const AssignJobs = {
             return spawnLargeVersion;
         }
 
-        function FindBestSpawn(availableSpawns, availableSpawnsInRoom, bestLinearDistance, roomJob, memRoomKey){
+        function FindBestSpawn(availableSpawns, availableSpawnsInRoom, bestLinearDistance, roomJob, memRoomKey) {
             let bestAvailableSpawn;
             let bestAvailableSpawnCounter;
             for (const availableSpawnCounter in availableSpawns) { // find closest spawn
                 const availableSpawn = availableSpawns[availableSpawnCounter];
 
                 if (availableSpawnsInRoom.length > 0) { // spawn in room if possible
-                    if(availableSpawn.id === availableSpawnsInRoom[0].id){
+                    if (availableSpawn.id === availableSpawnsInRoom[0].id) {
                         bestAvailableSpawn = availableSpawnsInRoom[0];
                         bestAvailableSpawnCounter = availableSpawnCounter;
                         delete availableSpawnsInRoom[0];
                         break;
                     }
-                }else{
+                } else {
                     const linearDistance = Game.map.getRoomLinearDistance(availableSpawn.pos.roomName, memRoomKey);
                     let energyAvailableModifier = 0;
                     if (roomJob.JobType === Util.FLAG_JOB) { // on flag jobs one wants to share the load between rooms with more energy
@@ -309,7 +309,7 @@ const AssignJobs = {
         }
 
         /**@return {boolean}*/
-        function SpawningCreep(bestAvailableSpawn, spawnLargeVersion, roomJob, roomJobKey, memRoomKey){
+        function SpawningCreep(bestAvailableSpawn, spawnLargeVersion, roomJob, roomJobKey, memRoomKey) {
             if (bestAvailableSpawn) { // the closest spawn is found
                 const availableName = GetAvailableName(roomJob.CreepType);
                 const spawnResult = bestAvailableSpawn.spawnCreep(GetCreepBody(roomJob.CreepType, Game.rooms[bestAvailableSpawn.pos.roomName].energyAvailable, spawnLargeVersion), availableName);

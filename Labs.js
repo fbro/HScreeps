@@ -17,7 +17,7 @@ const Labs = {
             }
         }
 
-        function TryPossibleReactionLab(lab, flag){
+        function TryPossibleReactionLab(lab, flag) {
             if (!lab.cooldown) {
                 const mineral = flag.name.split('-')[1];
                 if ((!lab.store || lab.store.getFreeCapacity(mineral) >= 5)) {
@@ -45,7 +45,7 @@ const Labs = {
                             result = Reaction(lab, RESOURCE_CATALYST, RESOURCE_GHODIUM_ACID);
                             break;
                     }
-                    if(result){
+                    if (result) {
                         Util.ErrorLog('Labs', 'Labs', 'result ' + result + ' mineral ' + mineral + ' lab.store ' + lab.store);
                     }
                 }
@@ -53,10 +53,18 @@ const Labs = {
         }
 
         function Reaction(lab, resource1, resource2) {
-            const lab1 = lab.pos.findInRange(FIND_MY_STRUCTURES, 2, {filter: function (l) {return l.store && l.store[resource1] >= 5;}})[0];
-            if(lab1){
-                const lab2 = lab.pos.findInRange(FIND_MY_STRUCTURES, 2, {filter: function (l) {return l.store && l.store[resource2] >= 5;}})[0];
-                if(lab2){
+            const lab1 = lab.pos.findInRange(FIND_MY_STRUCTURES, 2, {
+                filter: function (l) {
+                    return l.store && l.store[resource1] >= 5;
+                }
+            })[0];
+            if (lab1) {
+                const lab2 = lab.pos.findInRange(FIND_MY_STRUCTURES, 2, {
+                    filter: function (l) {
+                        return l.store && l.store[resource2] >= 5;
+                    }
+                })[0];
+                if (lab2) {
                     return lab.runReaction(lab1, lab2);
                 }
             }

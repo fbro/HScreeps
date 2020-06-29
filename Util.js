@@ -23,30 +23,30 @@ const Util = {
     STORAGE_LOW_TRANSFER: 6000,
 
     // job type int enum
-    OBJECT_JOB : 1,
-    FLAG_JOB : 2,
+    OBJECT_JOB: 1,
+    FLAG_JOB: 2,
 
-    MINIMUM_ENERGY_REQUIRED : 200,  // the smallest creep that a spawn can create
+    MINIMUM_ENERGY_REQUIRED: 200,  // the smallest creep that a spawn can create
 
-    OBSERVER_SCAN_RADIUS_POWER_DEPOSIT : 5, // the radius around the flagged observer when scanning for power banks or deposits
-    DEPOSIT_MAX_LAST_COOLDOWN : 80, // if the deposit is over this value then ignore it and end the deposit job
+    OBSERVER_SCAN_RADIUS_POWER_DEPOSIT: 5, // the radius around the flagged observer when scanning for power banks or deposits
+    DEPOSIT_MAX_LAST_COOLDOWN: 80, // if the deposit is over this value then ignore it and end the deposit job
 
-    TRANSPORTER_MAX_CARRY : 1000, // used in JobAttackPowerBank to generate JobTransportPowerBank
-    GENERATE_TRANSPORTER_WHEN_POWERBANK_HITS_UNDER : 200000, // used in JobAttackPowerBank to determine when powerbank hit is low when to generate transporter jobs
+    TRANSPORTER_MAX_CARRY: 1000, // used in JobAttackPowerBank to generate JobTransportPowerBank
+    GENERATE_TRANSPORTER_WHEN_POWERBANK_HITS_UNDER: 200000, // used in JobAttackPowerBank to determine when powerbank hit is low when to generate transporter jobs
 
-    DO_EXTRACTING_WHEN_STORAGE_UNDER_MINERAL : 200000, // stop extracting mineral when one has more than this
-    RAMPART_WALL_MAX_HITS_WHEN_STORAGE_ENERGY : 600000, // when storage energy is over this value then go crazy with upgrading ramparts and walls
-    RAMPART_WALL_HITS_U_LVL5 : 1000,
-    RAMPART_WALL_HITS_U_LVL8 : 100000,
-    RAMPART_WALL_HITS_O_LVL8 : 2000000,
+    DO_EXTRACTING_WHEN_STORAGE_UNDER_MINERAL: 200000, // stop extracting mineral when one has more than this
+    RAMPART_WALL_MAX_HITS_WHEN_STORAGE_ENERGY: 600000, // when storage energy is over this value then go crazy with upgrading ramparts and walls
+    RAMPART_WALL_HITS_U_LVL5: 1000,
+    RAMPART_WALL_HITS_U_LVL8: 100000,
+    RAMPART_WALL_HITS_O_LVL8: 2000000,
 
     // Game.time % modulo value below - stack expensive ticks on top of each other
-    GAME_TIME_MODULO_1 : 2,
-    GAME_TIME_MODULO_2 : 6,
-    GAME_TIME_MODULO_3 : 12,
-    GAME_TIME_MODULO_4 : 30,
-    GAME_TIME_MODULO_5 : 18000,
-    GAME_TIME_MODULO_6 : 240000,
+    GAME_TIME_MODULO_1: 2,
+    GAME_TIME_MODULO_2: 6,
+    GAME_TIME_MODULO_3: 12,
+    GAME_TIME_MODULO_4: 30,
+    GAME_TIME_MODULO_5: 18000,
+    GAME_TIME_MODULO_6: 240000,
 
     ErrorLog: function (functionParentName, functionName, message) {
         const messageId = functionParentName + ' ' + functionName;
@@ -102,19 +102,19 @@ const Util = {
     },
 
     /**@return {boolean}*/
-    IsHighway: function(roomName){
+    IsHighway: function (roomName) {
         const parsed = /^[WE]([0-9]+)[NS]([0-9]+)$/.exec(roomName);
         return (parsed[1] % 10 === 0) || (parsed[2] % 10 === 0);
     },
 
-    DeleteJob: function(job, jobKey, roomName){
+    DeleteJob: function (job, jobKey, roomName) {
         // this.Info('Util', 'DeleteJob', 'job deleted ' + jobKey);
-        if(Memory.MemRooms[roomName] && job.JobType === this.FLAG_JOB && job.CreepType !== 'T' && job.CreepType !== 'B') {
+        if (Memory.MemRooms[roomName] && job.JobType === this.FLAG_JOB && job.CreepType !== 'T' && job.CreepType !== 'B') {
             // if job is a flag job then remember to decrease the number og allowed creeps in the room creeptype T and B should never be changed
-            if(Memory.MemRooms[roomName].MaxCreeps
+            if (Memory.MemRooms[roomName].MaxCreeps
                 && Memory.MemRooms[roomName].MaxCreeps[job.CreepType]
                 && Memory.MemRooms[roomName].MaxCreeps[job.CreepType].M
-                && Memory.MemRooms[roomName].MaxCreeps[job.CreepType].M > 0){
+                && Memory.MemRooms[roomName].MaxCreeps[job.CreepType].M > 0) {
                 Memory.MemRooms[roomName].MaxCreeps[job.CreepType].M -= 1;
             }
         }

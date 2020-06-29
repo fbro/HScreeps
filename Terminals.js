@@ -16,12 +16,12 @@ const Terminals = {
             return terminals;
         }
 
-        function TerminalActions(terminals){
+        function TerminalActions(terminals) {
             let marketDealSendCount = 0;
             for (const terminalKey in terminals) {
                 const terminal = terminals[terminalKey];
                 if (terminal.cooldown === 0) {
-                    if(terminal.store.getUsedCapacity(RESOURCE_ENERGY) >= Util.STORAGE_ENERGY_LOW){
+                    if (terminal.store.getUsedCapacity(RESOURCE_ENERGY) >= Util.STORAGE_ENERGY_LOW) {
                         DistributeResources(terminal, terminals);
                         marketDealSendCount = SellExcessResource(terminal, marketDealSendCount);
                         marketDealSendCount = BuyResources(terminal, marketDealSendCount);
@@ -36,13 +36,13 @@ const Terminals = {
             for (const resourceType in fromTerminal.store) { // for each resource type
                 let fromAmount = fromTerminal.store[resourceType];
                 let target;
-                if(resourceType === RESOURCE_FIXTURES || resourceType === RESOURCE_TUBE){
+                if (resourceType === RESOURCE_FIXTURES || resourceType === RESOURCE_TUBE) {
                     DistributeFactoryCommodities(fromTerminal, resourceType, fromAmount, 3); // only send to factories that are of lvl 3
-                } else if(resourceType === RESOURCE_SWITCH || resourceType === RESOURCE_PHLEGM || resourceType === RESOURCE_COMPOSITE || resourceType === RESOURCE_CONCENTRATE) { // SWITCH, PHLEGM, COMPOSITE or CONCENTRATE should only be sent to a terminal that has a factory of level 2
+                } else if (resourceType === RESOURCE_SWITCH || resourceType === RESOURCE_PHLEGM || resourceType === RESOURCE_COMPOSITE || resourceType === RESOURCE_CONCENTRATE) { // SWITCH, PHLEGM, COMPOSITE or CONCENTRATE should only be sent to a terminal that has a factory of level 2
                     DistributeFactoryCommodities(fromTerminal, resourceType, fromAmount, 2); // only send to factories that are of lvl 2
-                } else if(resourceType === RESOURCE_SILICON || resourceType === RESOURCE_BIOMASS || resourceType === RESOURCE_METAL || resourceType === RESOURCE_MIST) { // SILICON, BIOMASS, METAL or MIST should only be sent to a terminal that has a factory that uses SILICON, BIOMASS, METAL or MIST
+                } else if (resourceType === RESOURCE_SILICON || resourceType === RESOURCE_BIOMASS || resourceType === RESOURCE_METAL || resourceType === RESOURCE_MIST) { // SILICON, BIOMASS, METAL or MIST should only be sent to a terminal that has a factory that uses SILICON, BIOMASS, METAL or MIST
                     DistributeFactoryCommodities(fromTerminal, resourceType, fromAmount); // send to any level factory
-                } else{
+                } else {
                     if (resourceType === RESOURCE_ENERGY) {
                         target = Util.TERMINAL_TARGET_ENERGY;
                     } else {
@@ -80,16 +80,16 @@ const Terminals = {
                     return s.structureType === STRUCTURE_FACTORY && (sendToFactoryLevel === s.level || sendToFactoryLevel === 0);
                 }
             })[0];
-            if(!fromFactory || fromTerminal.room.storage.store.getUsedCapacity(resourceType) > Util.STORAGE_HIGH) { // only send the resource if the factory lvl in sender room is not the same as sendToFactoryLevel unless there is a surplus
+            if (!fromFactory || fromTerminal.room.storage.store.getUsedCapacity(resourceType) > Util.STORAGE_HIGH) { // only send the resource if the factory lvl in sender room is not the same as sendToFactoryLevel unless there is a surplus
                 for (const toTerminalKey in terminals) {
                     const toTerminal = terminals[toTerminalKey];
                     if (toTerminal.id !== fromTerminal.id
                         && toTerminal.store.getUsedCapacity(resourceType) < Util.TERMINAL_TARGET_RESOURCE // do not transfer anymore commodities if toTerminal already has more than STORAGE_HIGH_TRANSFER
                         && toTerminal.room.find(FIND_MY_STRUCTURES, {
-                        filter: function (s) {
-                            return s.structureType === STRUCTURE_FACTORY && (sendToFactoryLevel === s.level || sendToFactoryLevel === 0);
-                        }
-                    })[0]) {
+                            filter: function (s) {
+                                return s.structureType === STRUCTURE_FACTORY && (sendToFactoryLevel === s.level || sendToFactoryLevel === 0);
+                            }
+                        })[0]) {
                         const result = fromTerminal.send(resourceType, fromAmount, toTerminal.pos.roomName);
                         Util.Info('Terminals', 'DistributeResources', fromAmount + ' ' + resourceType + ' from ' + fromTerminal.pos.roomName + ' to ' + toTerminal.pos.roomName + ' result ' + result);
                         break;
@@ -106,7 +106,7 @@ const Terminals = {
                 let lowestSellingValue = 0.1; // if the mineral has a lower selling value than this then it is not worth the computational value to mine and sell
                 if (resourceType === RESOURCE_ENERGY) {
                     max = Util.TERMINAL_MAX_ENERGY;
-                } else if(resourceType === RESOURCE_TISSUE || resourceType === RESOURCE_FRAME){
+                } else if (resourceType === RESOURCE_TISSUE || resourceType === RESOURCE_FRAME) {
                     max = 0; // right now i am selling out on tissue and frame
                 } else if (resourceType === RESOURCE_POWER
                     || resourceType === RESOURCE_SILICON // deposit
@@ -160,12 +160,12 @@ const Terminals = {
                             sendAmount = order.remainingAmount; // does not need more resources than this
                         }
                         const result = Game.market.deal(order.id, sendAmount, fromTerminal.pos.roomName);
-                        if(result === OK) {
+                        if (result === OK) {
                             marketDealSendCount++;
                         }
-                        if(resourceType === RESOURCE_TISSUE || resourceType === RESOURCE_FRAME){
+                        if (resourceType === RESOURCE_TISSUE || resourceType === RESOURCE_FRAME) {
                             Util.InfoLog('Terminals', 'SellExcessResource', sendAmount + ' ' + resourceType + ' from ' + fromTerminal.pos.roomName + ' to ' + order.roomName + ' result ' + result + ' marketDealSendCount ' + marketDealSendCount + ' order.remainingAmount ' + order.remainingAmount + ' price ' + order.price + ' total price ' + order.price * sendAmount + ' fromAmount ' + fromAmount);
-                        }else{
+                        } else {
                             Util.Info('Terminals', 'SellExcessResource', sendAmount + ' ' + resourceType + ' from ' + fromTerminal.pos.roomName + ' to ' + order.roomName + ' result ' + result + ' marketDealSendCount ' + marketDealSendCount + ' order.remainingAmount ' + order.remainingAmount + ' price ' + order.price + ' total price ' + order.price * sendAmount + ' fromAmount ' + fromAmount);
                         }
                     }
@@ -175,9 +175,9 @@ const Terminals = {
         }
 
         /**@return {boolean}*/
-        function IsOutdated(date1, date2 = Date.now(), millisecondsToWait = 86400000/*24h*/){
+        function IsOutdated(date1, date2 = Date.now(), millisecondsToWait = 86400000/*24h*/) {
             const elapsed = date2 - Date.parse(date1); // date1 format: "2019-06-24"
-            if(elapsed > millisecondsToWait){
+            if (elapsed > millisecondsToWait) {
                 //Util.Info('Terminals', 'IsOutdated', 'date ' + date1 + ' elapsed ' + elapsed + ' parsed date ' + Date.parse(date1) + ' now ' + date2);
                 return true;
             }
@@ -203,10 +203,14 @@ const Terminals = {
             return marketDealSendCount;
         }
 
-        function BuyLabResources(terminal, marketDealSendCount){
+        function BuyLabResources(terminal, marketDealSendCount) {
             // find FillLabMineralJobs flags
-            const labFlags = terminal.room.find(FIND_FLAGS, {filter : function (flag){return flag.color === COLOR_PURPLE && flag.secondaryColor === COLOR_PURPLE && flag.name.split('-') === 'BUY'}});
-            for(const labFlagKey in labFlags){
+            const labFlags = terminal.room.find(FIND_FLAGS, {
+                filter: function (flag) {
+                    return flag.color === COLOR_PURPLE && flag.secondaryColor === COLOR_PURPLE && flag.name.split('-') === 'BUY'
+                }
+            });
+            for (const labFlagKey in labFlags) {
                 const labFlag = labFlags[labFlagKey];
                 const mineral = labFlag.name.split(/[-]+/).filter(function (e) {
                     return e;
@@ -235,11 +239,11 @@ const Terminals = {
                 orders.sort(comparePriceCheapestFirst);
                 Util.Info('Terminals', 'BuyResource', 'WTB ' + amount + ' ' + resourceType + ' from ' + terminal + ' ' + JSON.stringify(orders) + ' avg price ' + resourceHistory[0].avgPrice);
                 const order = orders[0];
-                if(order.remainingAmount < amount){
+                if (order.remainingAmount < amount) {
                     amount = order.remainingAmount;
                 }
                 const result = Game.market.deal(order.id, amount, terminal.pos.roomName);
-                if(result === OK) {
+                if (result === OK) {
                     marketDealSendCount++;
                 }
                 Util.InfoLog('Terminals', 'BuyResource', amount + ' ' + resourceType + ' from ' + terminal.pos.roomName + ' to ' + order.roomName + ' result ' + result + ' marketDealSendCount ' + marketDealSendCount + ' order.remainingAmount ' + order.remainingAmount + ' price ' + order.price + ' total price ' + (order.price * amount));

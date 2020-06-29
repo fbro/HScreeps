@@ -109,7 +109,7 @@ const CreateJobs = {
                     }
                 }
                 if (gameRoom.controller && gameRoom.controller.my) { // create all the jobs in this room
-                    if(!gameRoom.controller.pos.lookFor(LOOK_FLAGS)[0] && (!gameRoom.controller.sign || gameRoom.controller.sign.text !== 'Homebrewed code @ github.com/fbro/HScreeps ' + gameRoom.name)){
+                    if (!gameRoom.controller.pos.lookFor(LOOK_FLAGS)[0] && (!gameRoom.controller.sign || gameRoom.controller.sign.text !== 'Homebrewed code @ github.com/fbro/HScreeps ' + gameRoom.name)) {
                         const result = gameRoom.createFlag(gameRoom.controller.pos, 'Homebrewed code @ github.com/fbro/HScreeps ' + gameRoom.name, COLOR_ORANGE, COLOR_ORANGE);
                         Util.InfoLog('CreateJobs', 'CreateObjJobs', 'createFlag sign flag ' + gameRoom.controller.pos + ' ' + result);
                     }
@@ -128,7 +128,7 @@ const CreateJobs = {
                     }
                     // Controller
                     new RoomVisual(gameRoom.name).text('🧠', gameRoom.controller.pos.x, gameRoom.controller.pos.y);
-                    if(!gameRoom.storage || gameRoom.storage.store.getUsedCapacity(RESOURCE_ENERGY) >= Util.STORAGE_ENERGY_LOW || gameRoom.controller.ticksToDowngrade < 20000){
+                    if (!gameRoom.storage || gameRoom.storage.store.getUsedCapacity(RESOURCE_ENERGY) >= Util.STORAGE_ENERGY_LOW || gameRoom.controller.ticksToDowngrade < 20000) {
                         AddJob(jobs, 'Ctrl(' + gameRoom.controller.pos.x + ',' + gameRoom.controller.pos.y + ')' + gameRoom.name, gameRoom.controller.id, Util.OBJECT_JOB, 'B');
                     }
                     if (!gameRoom.storage || gameRoom.storage && gameRoom.storage.store.getUsedCapacity(RESOURCE_ENERGY) > Util.STORAGE_ENERGY_MEDIUM && gameRoom.controller.level < 8) {
@@ -191,7 +191,7 @@ const CreateJobs = {
                     if (gameRoom.controller && Memory.MemRooms[gameRoom.name].RoomLevel !== gameRoom.controller.level) { // room level change
                         Memory.MemRooms[gameRoom.name].RoomLevel = gameRoom.controller.level;
                         Memory.MemRooms[gameRoom.name].SourceNumber = gameRoom.find(FIND_SOURCES).length;
-                        for(const maxCreepKey in Memory.MemRooms[gameRoom.name].MaxCreeps){
+                        for (const maxCreepKey in Memory.MemRooms[gameRoom.name].MaxCreeps) {
                             Memory.MemRooms[gameRoom.name].MaxCreeps[maxCreepKey].M = undefined; // reset - maybe the MaxCreepsInRoom changes with room level
                         }
                     }
@@ -215,20 +215,20 @@ const CreateJobs = {
             }
         }
 
-        function IncrementMaxCreepsMForFlagJob(job, roomName){
+        function IncrementMaxCreepsMForFlagJob(job, roomName) {
             // increase MaxCreeps.M for when flag jobs are created
-            if(Memory.MemRooms[roomName] && job.JobType === Util.FLAG_JOB && job.CreepType !== 'T' && job.CreepType !== 'B') {
-                if(Memory.MemRooms[roomName].MaxCreeps){
-                    if(Memory.MemRooms[roomName].MaxCreeps[job.CreepType]){
-                        if(!Memory.MemRooms[roomName].MaxCreeps[job.CreepType].M){
+            if (Memory.MemRooms[roomName] && job.JobType === Util.FLAG_JOB && job.CreepType !== 'T' && job.CreepType !== 'B') {
+                if (Memory.MemRooms[roomName].MaxCreeps) {
+                    if (Memory.MemRooms[roomName].MaxCreeps[job.CreepType]) {
+                        if (!Memory.MemRooms[roomName].MaxCreeps[job.CreepType].M) {
                             Memory.MemRooms[roomName].MaxCreeps[job.CreepType]['M'] = 0;
                         }
-                    }else{
-                        Memory.MemRooms[roomName].MaxCreeps[job.CreepType] = {'M' : 0};
+                    } else {
+                        Memory.MemRooms[roomName].MaxCreeps[job.CreepType] = {'M': 0};
                     }
-                }else{
+                } else {
                     Memory.MemRooms[roomName].MaxCreeps = {};
-                    Memory.MemRooms[roomName].MaxCreeps[job.CreepType] = {'M' : 0};
+                    Memory.MemRooms[roomName].MaxCreeps[job.CreepType] = {'M': 0};
                 }
                 Memory.MemRooms[roomName].MaxCreeps[job.CreepType].M += 1;
             }
@@ -250,13 +250,17 @@ const CreateJobs = {
             const mineral = gameFlagKey.split(/[-]+/).filter(function (e) {
                 return e;
             })[1];
-            const lab = gameFlag.pos.findInRange(FIND_MY_STRUCTURES, 0, {filter: function (s) {return s.structureType === STRUCTURE_LAB;}})[0];
+            const lab = gameFlag.pos.findInRange(FIND_MY_STRUCTURES, 0, {
+                filter: function (s) {
+                    return s.structureType === STRUCTURE_LAB;
+                }
+            })[0];
             if (lab && (!lab.mineralType || lab.mineralType === mineral)) {
                 // flagname rules: GET-L-roomname = get lemergium from all rooms, BUY-L-roomname = get lemergium from all rooms or then buy it from the terminal
-                if(lab.store.getFreeCapacity(mineral) >= Util.TRANSPORTER_MAX_CARRY && (lab.room.storage.store.getUsedCapacity(mineral) > 0 || lab.room.terminal.store.getUsedCapacity(mineral) > 0)){
+                if (lab.store.getFreeCapacity(mineral) >= Util.TRANSPORTER_MAX_CARRY && (lab.room.storage.store.getUsedCapacity(mineral) > 0 || lab.room.terminal.store.getUsedCapacity(mineral) > 0)) {
                     jobs = CreateFlagJob(jobs, 'FillLabMin', gameFlagKey, gameFlag, 'T');
                 }
-            }else{ // flag must be on top of an existing lab!
+            } else { // flag must be on top of an existing lab!
                 Util.ErrorLog('CreateJobs', 'CreateFlagJobs', 'lab not found! ' + gameFlagKey);
                 gameFlag.remove();
             }
@@ -267,14 +271,18 @@ const CreateJobs = {
             const mineral = gameFlagKey.split(/[-]+/).filter(function (e) {
                 return e;
             })[1];
-            const lab = gameFlag.pos.findInRange(FIND_MY_STRUCTURES, 0, {filter: function (s) {return s.structureType === STRUCTURE_LAB;}})[0];
-            if(lab && (!lab.mineralType || lab.mineralType === mineral)){
+            const lab = gameFlag.pos.findInRange(FIND_MY_STRUCTURES, 0, {
+                filter: function (s) {
+                    return s.structureType === STRUCTURE_LAB;
+                }
+            })[0];
+            if (lab && (!lab.mineralType || lab.mineralType === mineral)) {
                 // flagname rules: EMPTY-GH-roomname = create the mineral and allows it to be emptied from the nearby lab to this lab
                 //Util.Info('CreateJobs', 'CreateFlagJobs', 'mineral ' + mineral + ' lab ' + lab.store.getUsedCapacity(mineral) + ' terminal ' + lab.room.terminal.store.getUsedCapacity(mineral));
                 if (lab.store.getUsedCapacity(mineral) >= Util.TRANSPORTER_MAX_CARRY && lab.room.terminal.store.getUsedCapacity(mineral) < Util.TERMINAL_MAX_RESOURCE) {
                     CreateFlagJob(jobs, 'EmptyLabMin', gameFlagKey, gameFlag, 'T');
                 }
-            }else{ // flag must be on top of an existing lab!
+            } else { // flag must be on top of an existing lab!
                 Util.ErrorLog('CreateJobs', 'CreateFlagJobs', 'lab not found! ' + gameFlagKey);
                 gameFlag.remove();
             }
@@ -390,6 +398,7 @@ const CreateJobs = {
                     if (factory.store.getUsedCapacity(RESOURCE_ENERGY) < 10000) {
                         AddJob(roomJobs, 'FillFctr(' + RESOURCE_ENERGY + ')' + gameRoom.name, factory.id, Util.OBJECT_JOB, 'T');
                     }
+
                     // Biological chain
                     if (gameRoom.storage.store.getUsedCapacity(RESOURCE_BIOMASS) > 0
                         || gameRoom.terminal.store.getUsedCapacity(RESOURCE_BIOMASS) > 0
@@ -402,7 +411,7 @@ const CreateJobs = {
                         if (factory.store.getUsedCapacity(RESOURCE_CELL) > 0 && factory.level === 1) { // level 1 specific
                             roomJobs = TryAddFillFactoryJob(gameRoom, factory, roomJobs, RESOURCE_OXYGEN);
                             roomJobs = TryAddFillFactoryJob(gameRoom, factory, roomJobs, RESOURCE_OXIDANT);
-                        }else if(factory.store.getUsedCapacity(RESOURCE_CELL) > 0 && factory.level === 2){ // level 2 specific
+                        } else if (factory.store.getUsedCapacity(RESOURCE_CELL) > 0 && factory.level === 2) { // level 2 specific
                             roomJobs = TryAddFillFactoryJob(gameRoom, factory, roomJobs, RESOURCE_HYDROGEN);
                             roomJobs = TryAddFillFactoryJob(gameRoom, factory, roomJobs, RESOURCE_REDUCTANT);
                             roomJobs = TryAddFillFactoryJob(gameRoom, factory, roomJobs, RESOURCE_PHLEGM);
@@ -420,11 +429,11 @@ const CreateJobs = {
                         if (factory.store.getUsedCapacity(RESOURCE_ALLOY) > 0 && factory.level === 1) { // level 1 specific
                             roomJobs = TryAddFillFactoryJob(gameRoom, factory, roomJobs, RESOURCE_UTRIUM);
                             roomJobs = TryAddFillFactoryJob(gameRoom, factory, roomJobs, RESOURCE_UTRIUM_BAR);
-                        }else if(factory.store.getUsedCapacity(RESOURCE_ALLOY) > 0 && factory.level === 2){ // level 2 specific
+                        } else if (factory.store.getUsedCapacity(RESOURCE_ALLOY) > 0 && factory.level === 2) { // level 2 specific
                             roomJobs = TryAddFillFactoryJob(gameRoom, factory, roomJobs, RESOURCE_OXYGEN);
                             roomJobs = TryAddFillFactoryJob(gameRoom, factory, roomJobs, RESOURCE_OXIDANT);
                             roomJobs = TryAddFillFactoryJob(gameRoom, factory, roomJobs, RESOURCE_COMPOSITE); // used for lvl 2 FIXTURES
-                        }else if(factory.store.getUsedCapacity(RESOURCE_ALLOY) > 0 && factory.level === 3){ // level 3 specific
+                        } else if (factory.store.getUsedCapacity(RESOURCE_ALLOY) > 0 && factory.level === 3) { // level 3 specific
                             roomJobs = TryAddFillFactoryJob(gameRoom, factory, roomJobs, RESOURCE_FIXTURES);
                             roomJobs = TryAddFillFactoryJob(gameRoom, factory, roomJobs, RESOURCE_TUBE);
                             roomJobs = TryAddFillFactoryJob(gameRoom, factory, roomJobs, RESOURCE_HYDROGEN);
@@ -504,56 +513,67 @@ const CreateJobs = {
             if (gameRoom.terminal) {
                 for (const resourceType in gameRoom.terminal.store) {
                     const amount = gameRoom.terminal.store.getUsedCapacity(resourceType);
-                    if(
+                    if (
                         resourceType === RESOURCE_ENERGY && (
                             amount >= Util.TERMINAL_EMPTY_ENERGY
                             || (gameRoom.storage.store.getUsedCapacity(resourceType) < Util.STORAGE_ENERGY_LOW || !gameRoom.storage.store.getUsedCapacity(resourceType))
                             && amount >= Util.TERMINAL_TARGET_ENERGY
                         )
                         || amount !== RESOURCE_ENERGY && amount > Util.TERMINAL_EMPTY_RESOURCE
-                    ){
+                    ) {
                         AddJob(roomJobs, 'FillStrg-' + gameRoom.terminal.structureType + '(' + gameRoom.terminal.pos.x + ',' + gameRoom.terminal.pos.y + ',' + resourceType + ')' + gameRoom.name, gameRoom.terminal.id, Util.OBJECT_JOB, 'T');
                     }
                 }
             }
 
             // factory
-            if(Memory.MemRooms[gameRoom.name].FctrId && Memory.MemRooms[gameRoom.name].FctrId !== '-'){
+            if (Memory.MemRooms[gameRoom.name].FctrId && Memory.MemRooms[gameRoom.name].FctrId !== '-') {
                 const factory = Game.getObjectById(Memory.MemRooms[gameRoom.name].FctrId);
                 if (factory) {
                     for (const resourceType in factory.store) {
                         const amount = factory.store.getUsedCapacity(resourceType);
-                        if (   resourceType === RESOURCE_COMPOSITE && amount >=  500 && factory.level === 1
-                            || resourceType === RESOURCE_CRYSTAL   && amount >=  500 && factory.level === 2
-                            || resourceType === RESOURCE_LIQUID    && amount >=  500 && factory.level === 3
+                        if ((resourceType === RESOURCE_LEMERGIUM_BAR
+                                || resourceType === RESOURCE_ZYNTHIUM_BAR
+                                || resourceType === RESOURCE_UTRIUM_BAR
+                                || resourceType === RESOURCE_OXIDANT
+                                || resourceType === RESOURCE_REDUCTANT
+                            ) && amount >= 1000 && !factory.level && gameRoom.terminal.store.getUsedCapacity(resourceType) <= Util.TERMINAL_TARGET_RESOURCE && gameRoom.storage.store.getUsedCapacity(resourceType) <= Util.STORAGE_LOW
+
+                            || resourceType === RESOURCE_COMPOSITE && amount >= 500 && factory.level === 1
+                            || resourceType === RESOURCE_CRYSTAL && amount >= 500 && factory.level === 2
+                            || resourceType === RESOURCE_LIQUID && amount >= 500 && factory.level === 3
 
                             // Mechanical chain
-                            || resourceType === RESOURCE_TUBE       && amount >= 400 && factory.level === 1
-                            || resourceType === RESOURCE_FIXTURES   && amount >= 200 && factory.level === 2
-                            || resourceType === RESOURCE_FRAME      && amount >= 100 && factory.level === 3
-                            || resourceType === RESOURCE_HYDRAULICS && amount >=  10 && factory.level === 4
-                            || resourceType === RESOURCE_MACHINE    && amount >=   1 && factory.level === 5
+                            || resourceType === RESOURCE_ALLOY && amount >= 1000 && !factory.level
+                            || resourceType === RESOURCE_TUBE && amount >= 400 && factory.level === 1
+                            || resourceType === RESOURCE_FIXTURES && amount >= 200 && factory.level === 2
+                            || resourceType === RESOURCE_FRAME && amount >= 100 && factory.level === 3
+                            || resourceType === RESOURCE_HYDRAULICS && amount >= 10 && factory.level === 4
+                            || resourceType === RESOURCE_MACHINE && amount >= 1 && factory.level === 5
 
                             // Biological chain
-                            || resourceType === RESOURCE_PHLEGM   && amount >= 400 && factory.level === 1
-                            || resourceType === RESOURCE_TISSUE   && amount >= 200 && factory.level === 2
-                            || resourceType === RESOURCE_MUSCLE   && amount >= 100 && factory.level === 3
-                            || resourceType === RESOURCE_ORGANOID && amount >=  10 && factory.level === 4
-                            || resourceType === RESOURCE_ORGANISM && amount >=   1 && factory.level === 5
+                            || resourceType === RESOURCE_CELL && amount >= 1000 && !factory.level
+                            || resourceType === RESOURCE_PHLEGM && amount >= 400 && factory.level === 1
+                            || resourceType === RESOURCE_TISSUE && amount >= 200 && factory.level === 2
+                            || resourceType === RESOURCE_MUSCLE && amount >= 100 && factory.level === 3
+                            || resourceType === RESOURCE_ORGANOID && amount >= 10 && factory.level === 4
+                            || resourceType === RESOURCE_ORGANISM && amount >= 1 && factory.level === 5
 
                             // Electronical chain
-                            || resourceType === RESOURCE_SWITCH     && amount >= 400 && factory.level === 1
+                            || resourceType === RESOURCE_WIRE && amount >= 1000 && !factory.level
+                            || resourceType === RESOURCE_SWITCH && amount >= 400 && factory.level === 1
                             || resourceType === RESOURCE_TRANSISTOR && amount >= 200 && factory.level === 2
-                            || resourceType === RESOURCE_MICROCHIP  && amount >= 100 && factory.level === 3
-                            || resourceType === RESOURCE_CIRCUIT    && amount >=  10 && factory.level === 4
-                            || resourceType === RESOURCE_DEVICE     && amount >=   1 && factory.level === 5
+                            || resourceType === RESOURCE_MICROCHIP && amount >= 100 && factory.level === 3
+                            || resourceType === RESOURCE_CIRCUIT && amount >= 10 && factory.level === 4
+                            || resourceType === RESOURCE_DEVICE && amount >= 1 && factory.level === 5
 
                             // Mystical chain
+                            || resourceType === RESOURCE_CONDENSATE && amount >= 1000 && !factory.level
                             || resourceType === RESOURCE_CONCENTRATE && amount >= 400 && factory.level === 1
-                            || resourceType === RESOURCE_EXTRACT     && amount >= 200 && factory.level === 2
-                            || resourceType === RESOURCE_SPIRIT      && amount >= 100 && factory.level === 3
-                            || resourceType === RESOURCE_EMANATION   && amount >=  10 && factory.level === 4
-                            || resourceType === RESOURCE_ESSENCE     && amount >=   1 && factory.level === 5
+                            || resourceType === RESOURCE_EXTRACT && amount >= 200 && factory.level === 2
+                            || resourceType === RESOURCE_SPIRIT && amount >= 100 && factory.level === 3
+                            || resourceType === RESOURCE_EMANATION && amount >= 10 && factory.level === 4
+                            || resourceType === RESOURCE_ESSENCE && amount >= 1 && factory.level === 5
                         ) {
                             new RoomVisual(gameRoom.name).text('🏭', factory.pos.x, factory.pos.y);
                             AddJob(roomJobs, 'FillStrg-' + factory.structureType + '(' + factory.pos.x + ',' + factory.pos.y + ',' + resourceType + ')' + gameRoom.name, factory.id, Util.OBJECT_JOB, 'T');
@@ -674,7 +694,7 @@ const CreateJobs = {
                     Util.InfoLog('CreateJobs', 'FillControllerContainerJobs', 'removed container id from mem' + gameRoom.name);
                     Memory.MemRooms[gameRoom.name].CtrlConId = undefined;
                 }
-            }else if (!controllerContainer && Memory.MemRooms[gameRoom.name]) {
+            } else if (!controllerContainer && Memory.MemRooms[gameRoom.name]) {
                 controllerContainer = gameRoom.controller.pos.findInRange(FIND_STRUCTURES, 3, {
                     filter: (s) => {
                         return s.structureType === STRUCTURE_CONTAINER;

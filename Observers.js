@@ -5,9 +5,9 @@ const Observers = {
 
         function ObserversActions(gameRoom, observerRoomKey) {
             let observer;
-            if(Memory.MemRooms[observerRoomKey].ObserverId){
+            if (Memory.MemRooms[observerRoomKey].ObserverId) {
                 observer = Game.getObjectById(Memory.MemRooms[observerRoomKey].ObserverId);
-            }else{
+            } else {
                 observer = gameRoom.find(FIND_MY_STRUCTURES, {
                     filter: function (observer) {
                         return observer.structureType === STRUCTURE_OBSERVER;
@@ -93,16 +93,18 @@ const Observers = {
                             return s.structureType === STRUCTURE_WALL;
                         }
                     });
-                    const hostileCreeps = Game.rooms[roomKey].find(FIND_HOSTILE_CREEPS, {filter:function(h){
-                        return h.getActiveBodyparts(ATTACK) || h.getActiveBodyparts(RANGED_ATTACK) || h.getActiveBodyparts(HEAL)
-                        }}); // if 4 or more hostile creeps - better to just ignore the room!
+                    const hostileCreeps = Game.rooms[roomKey].find(FIND_HOSTILE_CREEPS, {
+                        filter: function (h) {
+                            return h.getActiveBodyparts(ATTACK) || h.getActiveBodyparts(RANGED_ATTACK) || h.getActiveBodyparts(HEAL)
+                        }
+                    }); // if 4 or more hostile creeps - better to just ignore the room!
                     let shouldVacateHallway = false;
                     if (walls[0] || hostileCreeps.length >= 4) { // other factors could be added here like hostile creeps
                         shouldVacateHallway = true;
                     }
-                    if(shouldVacateHallway) {
+                    if (shouldVacateHallway) {
                         clearRoomOfFlags(roomKey, observerRoom);
-                    }else{
+                    } else {
                         AddPowerBankFlag(observerRoom, roomKey, observer);
                         AddDepositFlag(observerRoom, roomKey);
                     }
@@ -116,16 +118,16 @@ const Observers = {
             }
         }
 
-        function clearRoomOfFlags(roomKey, observerRoom){
+        function clearRoomOfFlags(roomKey, observerRoom) {
             // make sure that there are no flags in the room that should be vacated
             const flags = Game.rooms[roomKey].find(FIND_FLAGS, {
                 filter: function (flag) {
                     return flag.color === COLOR_ORANGE && flag.secondaryColor === COLOR_CYAN || flag.color === COLOR_ORANGE && flag.secondaryColor === COLOR_PURPLE;
                 }
             });
-            for (const flagKey in flags){
+            for (const flagKey in flags) {
                 const flag = flags[flagKey];
-                if(flag.color === COLOR_ORANGE && flag.secondaryColor === COLOR_PURPLE && observerRoom.PowerBankFlag.pos.roomName === roomKey){
+                if (flag.color === COLOR_ORANGE && flag.secondaryColor === COLOR_PURPLE && observerRoom.PowerBankFlag.pos.roomName === roomKey) {
                     Util.Info('Observers', 'ScanPowerBanksAndDeposits', 'delete ' + JSON.stringify(observerRoom.PowerBankFlag));
                     delete observerRoom.PowerBankFlag;
                 }
@@ -134,7 +136,7 @@ const Observers = {
             }
         }
 
-        function AddPowerBankFlag(observerRoom, roomKey, observer){
+        function AddPowerBankFlag(observerRoom, roomKey, observer) {
             if (!observerRoom.PowerBankFlag) {
                 const powerBank = LookForPowerBank(roomKey, observer, observerRoomKey);
                 if (powerBank && (powerBank.Deadline - 4000) > Game.time && powerBank.FreeSpaces >= 2) {
@@ -153,7 +155,7 @@ const Observers = {
             }
         }
 
-        function AddDepositFlag(observerRoom, roomKey){
+        function AddDepositFlag(observerRoom, roomKey) {
             const deposits = Game.rooms[roomKey].find(FIND_DEPOSITS, {
                 filter: function (deposit) {
                     return deposit.lastCooldown < Util.DEPOSIT_MAX_LAST_COOLDOWN;

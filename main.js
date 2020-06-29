@@ -15,11 +15,11 @@ module.exports.loop = function () {
 
     Controller();
 
-    function Controller(){
+    function Controller() {
         if (!Memory.MemRooms) {
             Memory.MemRooms = {};
         }
-        if(Game.time % Util.GAME_TIME_MODULO_2 === 0){
+        if (Game.time % Util.GAME_TIME_MODULO_2 === 0) {
             if (Game.time % Util.GAME_TIME_MODULO_3 === 0) {
                 if (Game.time % Util.GAME_TIME_MODULO_4 === 0) { // tick burst from https://docs.screeps.com/cpu-limit.html#Bucket
                     CreateJobs.run();
@@ -38,7 +38,7 @@ module.exports.loop = function () {
                             MaxCreepsCleanup(memRoomKey, memRoom, foundCreeps);
                             UnusedRoomsCleanup(memRoomKey, memRoom);
                         }
-                        if(Game.time % Util.GAME_TIME_MODULO_6 === 0){ // approx every 3 days
+                        if (Game.time % Util.GAME_TIME_MODULO_6 === 0) { // approx every 3 days
                             delete Memory.Paths; // remove Paths to make room for new paths
                             delete Memory.InfoLog;
                             Util.InfoLog('Main', 'Controller', 'reset memory logs ' + Game.time);
@@ -53,9 +53,9 @@ module.exports.loop = function () {
         ExecuteJobs.run();
         for (const gameRoomKey in Game.rooms) {
             const gameRoom = Game.rooms[gameRoomKey];
-            if(gameRoom.controller && gameRoom.controller.my && Memory.MemRooms[gameRoom.name]){
+            if (gameRoom.controller && gameRoom.controller.my && Memory.MemRooms[gameRoom.name]) {
                 Towers.run(gameRoom);
-                if(gameRoom.controller.level === 8){
+                if (gameRoom.controller.level === 8) {
                     Observers.run(gameRoom, gameRoomKey);
                     PowerSpawns.run(gameRoom);
                     Factories.run(gameRoom, gameRoomKey);
@@ -63,13 +63,13 @@ module.exports.loop = function () {
             }
         }
         PowerCreeps.run();
-        if (Game.cpu.bucket >= 9000){
+        if (Game.cpu.bucket >= 9000) {
             //Util.Info('Main', 'Controller', 'Game.cpu.bucket ' + Game.cpu.bucket);
             Game.cpu.generatePixel();
         }
     }
 
-    function MaxCreepsCleanup(memRoomKey, memRoom, foundCreeps){
+    function MaxCreepsCleanup(memRoomKey, memRoom, foundCreeps) {
         // search through MaxCreeps to see if they all have an alive creep and that there are only one of each creep names in MaxCreeps
         for (const creepTypesKey in memRoom.MaxCreeps) {
             let creepOfTypeFound = false;
@@ -93,21 +93,21 @@ module.exports.loop = function () {
                         Util.ErrorLog('Main', 'Main', 'Lingering MaxCreeps found and removed ' + creepKey + ' in ' + memRoomKey);
                         // this bug might happen when there are an error somewhere in the code that prevents the normal creep memory cleanup
                         memRoom.MaxCreeps[creepTypesKey][creepKey] = undefined;
-                    }else{
+                    } else {
                         creepOfTypeFound = true;
                     }
-                }else{
+                } else {
                     memRoom.MaxCreeps[creepTypesKey][creepKey] = undefined; // reset - remove M
                 }
             }
-            if(!creepOfTypeFound){
+            if (!creepOfTypeFound) {
                 memRoom.MaxCreeps[creepTypesKey] = undefined; // remove creep type altogether
             }
         }
         return foundCreeps;
     }
 
-    function UnusedRoomsCleanup(memRoomKey, memRoom){
+    function UnusedRoomsCleanup(memRoomKey, memRoom) {
         if (memRoom.RoomLevel <= 0 && Object.keys(memRoom.RoomJobs).length === 0) {
             let foundCreep = false;
             for (const creepType in memRoom.MaxCreeps) {
@@ -128,7 +128,7 @@ module.exports.loop = function () {
 
 // TODOs:
 // TODO FillStrg-container can be very expensive!
-// TODO possible optimization: when a creep is looking for spawnOrExtensions nearby it might as well do the spawn replenish at that point and remove the dedicated spawn look for creeps to replenish
+// TODO make logic that favors getting resources from own rooms than buying on the market
 
 // attack NPC strongholds
 // harvest middle rooms

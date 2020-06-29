@@ -9,7 +9,7 @@ const PowerCreeps = {
             });
             for (const powerCreepKey in Game.powerCreeps) {
                 const powerCreep = Game.powerCreeps[powerCreepKey];
-                if(!powerCreep.shard || powerCreep.shard === Game.shard.name){ // if the creep is in another shard then just skip
+                if (!powerCreep.shard || powerCreep.shard === Game.shard.name) { // if the creep is in another shard then just skip
                     let result;
                     const flagWithCreepName = _.filter(powerCreepSpawnFlags, function (flag) {
                         return flag.name === powerCreep.name;
@@ -130,18 +130,18 @@ const PowerCreeps = {
 
         function OperateSpawn(powerCreep) {
             let result;
-            if(!powerCreep.memory.spawns){
+            if (!powerCreep.memory.spawns) {
                 const spawns = powerCreep.room.find(FIND_MY_SPAWNS);
                 const spawnIDs = {};
-                for(const spawnKey in spawns){
+                for (const spawnKey in spawns) {
                     const spawn = spawns[spawnKey];
                     spawnIDs[spawn.id] = 1;
                 }
                 powerCreep.memory.spawns = spawnIDs;
             }
-            for(const spawnId in powerCreep.memory.spawns){
+            for (const spawnId in powerCreep.memory.spawns) {
                 const spawn = Game.getObjectById(spawnId);
-                if(spawn){
+                if (spawn) {
                     let spawnHasBuff = false;
                     for (const effectKey in spawn.effects) {
                         const effect = spawn.effects[effectKey];
@@ -150,7 +150,7 @@ const PowerCreeps = {
                             break;
                         }
                     }
-                    if(!spawnHasBuff){
+                    if (!spawnHasBuff) {
                         result = powerCreep.usePower(PWR_OPERATE_SPAWN, spawn);
                         Util.Info('PowerCreeps', 'OperateSpawn', powerCreep.name + ' on (' + spawn.pos.x + ',' + spawn.pos.y + ',' + spawn.pos.roomName + ')');
                         if (result === ERR_NOT_IN_RANGE) {
@@ -302,19 +302,23 @@ const PowerCreeps = {
                         return s.structureType === STRUCTURE_POWER_SPAWN || s.structureType === STRUCTURE_POWER_BANK;
                     }
                 })[0];
-                if(!powerSpawnOrBank) { // look in other visible rooms for a renew source
+                if (!powerSpawnOrBank) { // look in other visible rooms for a renew source
                     let bestRange = Number.MAX_SAFE_INTEGER;
                     for (const gameRoomKey in Game.rooms) {
                         const room = Game.rooms[gameRoomKey];
-                        let s = room.find(FIND_STRUCTURES, {filter: (s) => {return s.structureType === STRUCTURE_POWER_SPAWN && room.controller && room.controller.my || s.structureType === STRUCTURE_POWER_BANK;}})[0];
+                        let s = room.find(FIND_STRUCTURES, {
+                            filter: (s) => {
+                                return s.structureType === STRUCTURE_POWER_SPAWN && room.controller && room.controller.my || s.structureType === STRUCTURE_POWER_BANK;
+                            }
+                        })[0];
                         const range = Game.map.getRoomLinearDistance(powerCreep.pos.roomName, powerSpawnOrBank.pos.roomName);
-                        if(range < bestRange){
+                        if (range < bestRange) {
                             powerSpawnOrBank = s;
                             bestRange = range;
                         }
                     }
                 }
-                if(powerSpawnOrBank){
+                if (powerSpawnOrBank) {
                     Util.Info('PowerCreeps', 'RenewPowerCreep', powerCreep.name + ' in ' + powerCreep.pos.roomName + ' trying to renew at ' + JSON.stringify(powerSpawnOrBank.pos));
                     powerCreep.memory.PowerSpawnOrBankId = powerSpawnOrBank.id;
                 }
