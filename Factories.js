@@ -39,19 +39,19 @@ const Factories = {
                         result = Produce(factory, RESOURCE_FRAME, 2000, RESOURCE_FIXTURES, 2, RESOURCE_TUBE, 4, RESOURCE_REDUCTANT, 330, RESOURCE_ZYNTHIUM_BAR, 31, RESOURCE_ENERGY, 16);
                     }
                     if (result !== OK) {
-                        result = Produce(factory, RESOURCE_LEMERGIUM_BAR, 1000, RESOURCE_LEMERGIUM, 500, RESOURCE_ENERGY, 200);
+                        result = Produce(factory, RESOURCE_LEMERGIUM_BAR, 10000, RESOURCE_LEMERGIUM, 500, RESOURCE_ENERGY, 200);
                         if (result !== OK) {
-                            result = Produce(factory, RESOURCE_ZYNTHIUM_BAR, 1000, RESOURCE_ZYNTHIUM, 500, RESOURCE_ENERGY, 200);
+                            result = Produce(factory, RESOURCE_ZYNTHIUM_BAR, 10000, RESOURCE_ZYNTHIUM, 500, RESOURCE_ENERGY, 200);
                             if (result !== OK) {
-                                result = Produce(factory, RESOURCE_UTRIUM_BAR, 1000, RESOURCE_UTRIUM, 500, RESOURCE_ENERGY, 200);
+                                result = Produce(factory, RESOURCE_UTRIUM_BAR, 10000, RESOURCE_UTRIUM, 500, RESOURCE_ENERGY, 200);
                                 if (result !== OK) {
-                                    result = Produce(factory, RESOURCE_OXIDANT, 1000, RESOURCE_OXYGEN, 500, RESOURCE_ENERGY, 200);
+                                    result = Produce(factory, RESOURCE_OXIDANT, 10000, RESOURCE_OXYGEN, 500, RESOURCE_ENERGY, 200);
                                     if (result !== OK) {
-                                        result = Produce(factory, RESOURCE_REDUCTANT, 1000, RESOURCE_HYDROGEN, 500, RESOURCE_ENERGY, 200);
+                                        result = Produce(factory, RESOURCE_REDUCTANT, 10000, RESOURCE_HYDROGEN, 500, RESOURCE_ENERGY, 200);
                                         if (result !== OK) {
-                                            result = Produce(factory, RESOURCE_CELL, 1000, RESOURCE_BIOMASS, 100, RESOURCE_LEMERGIUM_BAR, 20, RESOURCE_ENERGY, 40);
+                                            result = Produce(factory, RESOURCE_CELL, 10000, RESOURCE_BIOMASS, 100, RESOURCE_LEMERGIUM_BAR, 20, RESOURCE_ENERGY, 40);
                                             if (result !== OK) {
-                                                result = Produce(factory, RESOURCE_ALLOY, 1000, RESOURCE_METAL, 100, RESOURCE_ZYNTHIUM_BAR, 20, RESOURCE_ENERGY, 40);
+                                                result = Produce(factory, RESOURCE_ALLOY, 10000, RESOURCE_METAL, 100, RESOURCE_ZYNTHIUM_BAR, 20, RESOURCE_ENERGY, 40);
                                             }
                                         }
                                     }

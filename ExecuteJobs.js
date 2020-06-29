@@ -1027,21 +1027,22 @@ const ExecuteJobs = {
                 JobStatus: function (terminal) {
                     const storage = terminal.room.storage;
                     storageResourceAmount = storage.store.getUsedCapacity(resourceType);
-                    // TODO if getting last resource then job clears
-                    if (storageResourceAmount <= Low && resourceType === RESOURCE_ENERGY // low resource in storage abort only if energy
+                    if (creep.store.getUsedCapacity(resourceType) === 0) {
+                        if (storageResourceAmount <= Low && resourceType === RESOURCE_ENERGY // low resource in storage abort only if energy
 
-                        || storageResourceAmount <= Medium
-                        && terminal.store.getUsedCapacity(resourceType) >= LowTransfer
+                            || storageResourceAmount <= Medium
+                            && terminal.store.getUsedCapacity(resourceType) >= LowTransfer
 
-                        || storageResourceAmount <= High
-                        && terminal.store.getUsedCapacity(resourceType) >= MediumTransfer
+                            || storageResourceAmount <= High
+                            && terminal.store.getUsedCapacity(resourceType) >= MediumTransfer
 
-                        || storageResourceAmount >= High
-                        && terminal.store.getUsedCapacity(resourceType) >= HighTransfer
-                    ) {
-                        return JOB_IS_DONE;
-                    } else if (creep.store.getUsedCapacity(resourceType) === 0) { // fetch
-                        return SHOULD_FETCH;
+                            || storageResourceAmount >= High
+                            && terminal.store.getUsedCapacity(resourceType) >= HighTransfer
+                        ) {
+                            return JOB_IS_DONE;
+                        } else if (creep.store.getUsedCapacity(resourceType) === 0) { // fetch
+                            return SHOULD_FETCH;
+                        }
                     } else { // action not done yet
                         return SHOULD_ACT;
                     }

@@ -129,6 +129,7 @@ module.exports.loop = function () {
 // TODOs:
 // TODO FillStrg-container can be very expensive!
 // TODO make logic that favors getting resources from own rooms than buying on the market
+// TODO make terminal logic that sends extra factory resources to terminals with factory.level > 0
 
 // attack NPC strongholds
 // harvest middle rooms
