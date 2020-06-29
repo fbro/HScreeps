@@ -131,6 +131,8 @@ module.exports.loop = function () {
 // TODO make logic that favors getting resources from own rooms than buying on the market
 // TODO make terminal logic that sends extra factory resources to terminals with factory.level > 0
 
+// TODO rewrite terminal code. it looks like it has grown to a proportion that needs more management
+
 // attack NPC strongholds
 // harvest middle rooms
 // harvest neutral rooms
