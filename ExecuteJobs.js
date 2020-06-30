@@ -150,7 +150,7 @@ const ExecuteJobs = {
             if (hostileCreeps[0]) {
                 const hostileCreep = hostileCreeps[0];
                 Util.Info('ExecuteJobs', 'ExecuteRoomJobs', 'idle ' + gameCreep.name + ' found ' + hostileCreeps.length + ' hostile creeps! targeting ' + hostileCreep + ' attack');
-                gameCreep.say('ATK ' + hostileCreep);
+                gameCreep.say('ATK ' + hostileCreep.pos.x + ',' + hostileCreep.pos.y);
                 result = gameCreep.attack(hostileCreep);
                 if (result === ERR_NOT_IN_RANGE) {
                     result = Move(gameCreep, hostileCreep);
@@ -166,7 +166,7 @@ const ExecuteJobs = {
             if (hostileCreeps[0]) {
                 const hostileCreep = hostileCreeps[0];
                 Util.Info('ExecuteJobs', 'ExecuteRoomJobs', 'idle ' + gameCreep.name + ' found ' + hostileCreeps.length + ' hostile creeps! targeting ' + hostileCreep + ' ranged attack');
-                gameCreep.say('RATK ' + hostileCreep);
+                gameCreep.say('RATK ' + hostileCreep.pos.x + ',' + hostileCreep.pos.y);
                 result = gameCreep.rangedAttack(hostileCreep);
                 if (result === ERR_NOT_IN_RANGE) {
                     result = Move(gameCreep, hostileCreep);
@@ -186,7 +186,7 @@ const ExecuteJobs = {
             if (damagedCreeps[0]) {
                 const damagedCreep = damagedCreeps[0];
                 Util.Info('ExecuteJobs', 'ExecuteRoomJobs', 'idle ' + gameCreep.name + ' found ' + damagedCreeps.length + ' damaged creeps! targeting ' + damagedCreep + ' heal');
-                gameCreep.say('HEAL ' + damagedCreep);
+                gameCreep.say('HEAL ' + damagedCreep.pos.x + ',' + damagedCreep.pos.y);
                 result = gameCreep.heal(damagedCreep);
                 if (result === ERR_NOT_IN_RANGE) {
                     result = Move(gameCreep, damagedCreep);

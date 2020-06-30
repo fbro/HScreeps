@@ -38,7 +38,7 @@ const Terminals = {
                 if(memRoom && memRoom.FctrId && memRoom.FctrId !== '-'){
                     const factory = Game.getObjectById(memRoom.FctrId);
                     if(factory){
-                        GetFactoryResources(terminal, terminals, factory);
+                        GetFactoryResources(terminal, terminals, factory); // first try and get from other terminals then try and buy from the market
                     }
                 }
 
@@ -48,7 +48,7 @@ const Terminals = {
                     }
                 });
                 if(flags.length > 0){
-                    GetLabResources(terminal, terminals, flags);
+                    GetLabResources(terminal, terminals, flags); // first try and get from other terminals then try and buy from the market
                 }
 
                 DistributeEnergy(terminal, terminals);

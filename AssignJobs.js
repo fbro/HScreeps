@@ -124,8 +124,13 @@ const AssignJobs = {
                     if (gameRoom.controller) { // flag in controller-less room
                         if (gameRoom.controller.my) { // only use my room
                             if (availableSpawnsInRoom.length === 0) { // no spawn in my room
-                                Util.Info('AssignJobs', 'SpawnCreep', 'job in room has no spawns ' + roomJobKey);
-                                bestLinearDistance = Number.MAX_SAFE_INTEGER;
+                                Util.Info('AssignJobs', 'SpawnCreep', 'job in room has no available spawns ' + roomJobKey);
+                                if(!_.find(Game.spawns, function (spawn) {
+                                    return spawn.pos.roomName === gameRoom;
+                                })){
+                                    Util.Info('AssignJobs', 'SpawnCreep', 'and no spawns at all' + roomJobKey);
+                                    bestLinearDistance = Number.MAX_SAFE_INTEGER;
+                                }
                             } else {
                                 spawnLargeVersion = ShouldSpawnLargeVersion(gameRoom, roomJob, roomJobKey, memRoomKey);
                             }
