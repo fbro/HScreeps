@@ -44,8 +44,8 @@ module.exports.loop = function () {
                             Util.InfoLog('Main', 'Controller', 'reset memory logs ' + Game.time);
                         }
                     }
-                    Terminals.run();
                 }
+                Terminals.run();
                 AssignJobs.run();
             }
             Labs.run();
@@ -128,9 +128,10 @@ module.exports.loop = function () {
 
 // TODOs:
 // TODO FillStrg-container can be very expensive!
+
+
 // TODO make logic that favors getting resources from own rooms than buying on the market
 // TODO make terminal logic that sends extra factory resources to terminals with factory.level > 0
-
 // TODO rewrite terminal code. it looks like it has grown to a proportion that needs more management
 
 // attack NPC strongholds

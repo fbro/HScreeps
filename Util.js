@@ -44,9 +44,9 @@ const Util = {
     GAME_TIME_MODULO_1: 2,
     GAME_TIME_MODULO_2: 6,
     GAME_TIME_MODULO_3: 12,
-    GAME_TIME_MODULO_4: 30,
-    GAME_TIME_MODULO_5: 18000,
-    GAME_TIME_MODULO_6: 240000,
+    GAME_TIME_MODULO_4: 24,
+    GAME_TIME_MODULO_5: 10800,
+    GAME_TIME_MODULO_6: 216000,
 
     ErrorLog: function (functionParentName, functionName, message) {
         const messageId = functionParentName + ' ' + functionName;

@@ -1,7 +1,6 @@
 let Util = require('Util');
 const Terminals = {
     run: function () {
-
         const terminals = LoadMyTerminals();
         TerminalActions(terminals);
 
