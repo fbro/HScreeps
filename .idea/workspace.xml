@@ -588,11 +588,11 @@
     </state>
     <state x="721" y="325" key="#com.intellij.openapi.updateSettings.impl.PluginUpdateInfoDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1586630081891" />
     <state x="961" y="438" key="#com.intellij.openapi.updateSettings.impl.PluginUpdateInfoDialog/3840.1065.1920.1020/0.0.2560.1400@0.0.2560.1400" timestamp="1586383746639" />
-    <state x="526" y="23" width="1888" height="1014" key="CommitChangelistDialog2" timestamp="1593531299609">
+    <state x="526" y="23" width="1888" height="1014" key="CommitChangelistDialog2" timestamp="1593553663797">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
     <state x="26" y="14" width="1888" height="1014" key="CommitChangelistDialog2/0.0.1920.1040@0.0.1920.1040" timestamp="1591220164553" />
-    <state x="526" y="23" width="959" height="921" key="CommitChangelistDialog2/0.0.1920.1080@0.0.1920.1080" timestamp="1593531299609" />
+    <state x="526" y="23" width="959" height="921" key="CommitChangelistDialog2/0.0.1920.1080@0.0.1920.1080" timestamp="1593553663797" />
     <state x="92" y="92" width="1536" height="891" key="DiffContextDialog" timestamp="1593208597346">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
@@ -608,11 +608,11 @@
     </state>
     <state x="672" y="236" key="MultipleFileMergeDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1590578491830" />
     <state x="672" y="245" key="MultipleFileMergeDialog/0.0.1920.1080@0.0.1920.1080" timestamp="1593531280327" />
-    <state x="552" y="274" key="Vcs.Push.Dialog.v2" timestamp="1593531302244">
+    <state x="552" y="274" key="Vcs.Push.Dialog.v2" timestamp="1593553604559">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
     <state x="552" y="264" key="Vcs.Push.Dialog.v2/0.0.1920.1040@0.0.1920.1040" timestamp="1591220166620" />
-    <state x="552" y="274" key="Vcs.Push.Dialog.v2/0.0.1920.1080@0.0.1920.1080" timestamp="1593531302244" />
+    <state x="552" y="274" key="Vcs.Push.Dialog.v2/0.0.1920.1080@0.0.1920.1080" timestamp="1593553604559" />
     <state x="92" y="96" width="1736" height="889" maximized="true" key="com.intellij.history.integration.ui.views.FileHistoryDialog" timestamp="1593552206255">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
