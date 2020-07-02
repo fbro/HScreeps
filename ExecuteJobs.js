@@ -1102,8 +1102,8 @@ const ExecuteJobs = {
             const result = GenericJobAction(creep, roomJob, {
                 /**@return {int}*/
                 JobStatus: function (jobObject) { // terminal
-                    if (resourceType === RESOURCE_ENERGY && jobObject.store.getUsedCapacity(resourceType) >= 10000
-                        || resourceType !== RESOURCE_ENERGY && jobObject.store.getUsedCapacity(resourceType) >= 2000
+                    if (resourceType === RESOURCE_ENERGY && jobObject.store.getUsedCapacity(resourceType) >= Util.FACTORY_TARGET_ENERGY
+                        || resourceType !== RESOURCE_ENERGY && jobObject.store.getUsedCapacity(resourceType) >= Util.FACTORY_TARGET_RESOURCE
                     ) {
                         return JOB_IS_DONE;
                     } else if (creep.store.getUsedCapacity(resourceType) === 0) { // fetch
@@ -1118,8 +1118,8 @@ const ExecuteJobs = {
                 },
                 /**@return {int}*/
                 IsJobDone: function (jobObject) {
-                    if (resourceType === RESOURCE_ENERGY && (creep.store.getUsedCapacity(resourceType) + jobObject.store.getUsedCapacity(resourceType)) >= 10000
-                        || resourceType !== RESOURCE_ENERGY && (creep.store.getUsedCapacity(resourceType) + jobObject.store.getUsedCapacity(resourceType)) >= 2000) {
+                    if (resourceType === RESOURCE_ENERGY && (creep.store.getUsedCapacity(resourceType) + jobObject.store.getUsedCapacity(resourceType)) >= Util.FACTORY_TARGET_ENERGY
+                        || resourceType !== RESOURCE_ENERGY && (creep.store.getUsedCapacity(resourceType) + jobObject.store.getUsedCapacity(resourceType)) >= Util.FACTORY_TARGET_RESOURCE) {
                         return JOB_IS_DONE;
                     } else {
                         return this.JobStatus(jobObject);
@@ -1142,9 +1142,9 @@ const ExecuteJobs = {
                 Fetch: function (fetchObject, jobObject) {
                     let max = -1;
                     if (resourceType === RESOURCE_ENERGY) {
-                        max = 10000;
+                        max = Util.FACTORY_TARGET_ENERGY;
                     } else {
-                        max = 2000;
+                        max = Util.FACTORY_TARGET_RESOURCE;
                     }
                     return FetchResource(creep, fetchObject, resourceType, max - jobObject.store.getUsedCapacity(resourceType));
                 },

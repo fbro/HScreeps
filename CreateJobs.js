@@ -395,7 +395,7 @@ const CreateJobs = {
                     }
                 })[0];
                 if (factory) {
-                    if (factory.store.getUsedCapacity(RESOURCE_ENERGY) < 10000) {
+                    if (factory.store.getUsedCapacity(RESOURCE_ENERGY) < Util.FACTORY_TARGET_ENERGY) {
                         AddJob(roomJobs, 'FillFctr(' + RESOURCE_ENERGY + ')' + gameRoom.name, factory.id, Util.OBJECT_JOB, 'T');
                     }
 
@@ -446,7 +446,7 @@ const CreateJobs = {
         }
 
         function TryAddFillFactoryJob(gameRoom, factory, roomJobs, resource) {
-            if (factory.store.getUsedCapacity(resource) < 2000 && (gameRoom.storage.store.getUsedCapacity(resource) > 0 || gameRoom.terminal.store.getUsedCapacity(resource) > 0)) {
+            if (factory.store.getUsedCapacity(resource) < Util.FACTORY_TARGET_RESOURCE && (gameRoom.storage.store.getUsedCapacity(resource) > 0 || gameRoom.terminal.store.getUsedCapacity(resource) > 0)) {
                 roomJobs = AddJob(roomJobs, 'FillFctr(' + resource + ')' + gameRoom.name, factory.id, Util.OBJECT_JOB, 'T');
             }
             return roomJobs;
@@ -532,48 +532,52 @@ const CreateJobs = {
                 if (factory) {
                     for (const resourceType in factory.store) {
                         const amount = factory.store.getUsedCapacity(resourceType);
-                        if ((resourceType === RESOURCE_LEMERGIUM_BAR
-                                || resourceType === RESOURCE_ZYNTHIUM_BAR
-                                || resourceType === RESOURCE_UTRIUM_BAR
-                                || resourceType === RESOURCE_OXIDANT
-                                || resourceType === RESOURCE_REDUCTANT
-                            ) && amount >= 1000 && !factory.level && gameRoom.terminal.store.getUsedCapacity(resourceType) <= Util.TERMINAL_TARGET_RESOURCE && gameRoom.storage.store.getUsedCapacity(resourceType) <= Util.STORAGE_LOW
+                        if (gameRoom.storage.store.getUsedCapacity(resourceType) < Util.STORAGE_MEDIUM
+                            && gameRoom.terminal.store.getUsedCapacity(resourceType) < Util.STORAGE_MEDIUM_TRANSFER
+                            && (
+                                (resourceType === RESOURCE_LEMERGIUM_BAR
+                                    || resourceType === RESOURCE_ZYNTHIUM_BAR
+                                    || resourceType === RESOURCE_UTRIUM_BAR
+                                    || resourceType === RESOURCE_OXIDANT
+                                    || resourceType === RESOURCE_REDUCTANT
+                                ) && amount >= 1000 && !factory.level && gameRoom.terminal.store.getUsedCapacity(resourceType) <= Util.TERMINAL_TARGET_RESOURCE && gameRoom.storage.store.getUsedCapacity(resourceType) <= Util.STORAGE_LOW
 
-                            || resourceType === RESOURCE_COMPOSITE && amount >= 500 && factory.level === 1
-                            || resourceType === RESOURCE_CRYSTAL && amount >= 500 && factory.level === 2
-                            || resourceType === RESOURCE_LIQUID && amount >= 500 && factory.level === 3
+                                || resourceType === RESOURCE_COMPOSITE && amount >= 500 && factory.level === 1
+                                || resourceType === RESOURCE_CRYSTAL && amount >= 500 && factory.level === 2
+                                || resourceType === RESOURCE_LIQUID && amount >= 500 && factory.level === 3
 
-                            // Mechanical chain
-                            || resourceType === RESOURCE_ALLOY && amount >= 1000 && !factory.level
-                            || resourceType === RESOURCE_TUBE && amount >= 400 && factory.level === 1
-                            || resourceType === RESOURCE_FIXTURES && amount >= 200 && factory.level === 2
-                            || resourceType === RESOURCE_FRAME && amount >= 100 && factory.level === 3
-                            || resourceType === RESOURCE_HYDRAULICS && amount >= 10 && factory.level === 4
-                            || resourceType === RESOURCE_MACHINE && amount >= 1 && factory.level === 5
+                                // Mechanical chain
+                                || resourceType === RESOURCE_ALLOY && amount >= 1000 && !factory.level
+                                || resourceType === RESOURCE_TUBE && amount >= 400 && factory.level === 1
+                                || resourceType === RESOURCE_FIXTURES && amount >= 200 && factory.level === 2
+                                || resourceType === RESOURCE_FRAME && amount >= 100 && factory.level === 3
+                                || resourceType === RESOURCE_HYDRAULICS && amount >= 10 && factory.level === 4
+                                || resourceType === RESOURCE_MACHINE && amount >= 1 && factory.level === 5
 
-                            // Biological chain
-                            || resourceType === RESOURCE_CELL && amount >= 1000 && !factory.level
-                            || resourceType === RESOURCE_PHLEGM && amount >= 400 && factory.level === 1
-                            || resourceType === RESOURCE_TISSUE && amount >= 200 && factory.level === 2
-                            || resourceType === RESOURCE_MUSCLE && amount >= 100 && factory.level === 3
-                            || resourceType === RESOURCE_ORGANOID && amount >= 10 && factory.level === 4
-                            || resourceType === RESOURCE_ORGANISM && amount >= 1 && factory.level === 5
+                                // Biological chain
+                                || resourceType === RESOURCE_CELL && amount >= 1000 && !factory.level
+                                || resourceType === RESOURCE_PHLEGM && amount >= 400 && factory.level === 1
+                                || resourceType === RESOURCE_TISSUE && amount >= 200 && factory.level === 2
+                                || resourceType === RESOURCE_MUSCLE && amount >= 100 && factory.level === 3
+                                || resourceType === RESOURCE_ORGANOID && amount >= 10 && factory.level === 4
+                                || resourceType === RESOURCE_ORGANISM && amount >= 1 && factory.level === 5
 
-                            // Electronical chain
-                            || resourceType === RESOURCE_WIRE && amount >= 1000 && !factory.level
-                            || resourceType === RESOURCE_SWITCH && amount >= 400 && factory.level === 1
-                            || resourceType === RESOURCE_TRANSISTOR && amount >= 200 && factory.level === 2
-                            || resourceType === RESOURCE_MICROCHIP && amount >= 100 && factory.level === 3
-                            || resourceType === RESOURCE_CIRCUIT && amount >= 10 && factory.level === 4
-                            || resourceType === RESOURCE_DEVICE && amount >= 1 && factory.level === 5
+                                // Electronical chain
+                                || resourceType === RESOURCE_WIRE && amount >= 1000 && !factory.level
+                                || resourceType === RESOURCE_SWITCH && amount >= 400 && factory.level === 1
+                                || resourceType === RESOURCE_TRANSISTOR && amount >= 200 && factory.level === 2
+                                || resourceType === RESOURCE_MICROCHIP && amount >= 100 && factory.level === 3
+                                || resourceType === RESOURCE_CIRCUIT && amount >= 10 && factory.level === 4
+                                || resourceType === RESOURCE_DEVICE && amount >= 1 && factory.level === 5
 
-                            // Mystical chain
-                            || resourceType === RESOURCE_CONDENSATE && amount >= 1000 && !factory.level
-                            || resourceType === RESOURCE_CONCENTRATE && amount >= 400 && factory.level === 1
-                            || resourceType === RESOURCE_EXTRACT && amount >= 200 && factory.level === 2
-                            || resourceType === RESOURCE_SPIRIT && amount >= 100 && factory.level === 3
-                            || resourceType === RESOURCE_EMANATION && amount >= 10 && factory.level === 4
-                            || resourceType === RESOURCE_ESSENCE && amount >= 1 && factory.level === 5
+                                // Mystical chain
+                                || resourceType === RESOURCE_CONDENSATE && amount >= 1000 && !factory.level
+                                || resourceType === RESOURCE_CONCENTRATE && amount >= 400 && factory.level === 1
+                                || resourceType === RESOURCE_EXTRACT && amount >= 200 && factory.level === 2
+                                || resourceType === RESOURCE_SPIRIT && amount >= 100 && factory.level === 3
+                                || resourceType === RESOURCE_EMANATION && amount >= 10 && factory.level === 4
+                                || resourceType === RESOURCE_ESSENCE && amount >= 1 && factory.level === 5
+                            )
                         ) {
                             new RoomVisual(gameRoom.name).text('🏭', factory.pos.x, factory.pos.y);
                             AddJob(roomJobs, 'FillStrg-' + factory.structureType + '(' + factory.pos.x + ',' + factory.pos.y + ',' + resourceType + ')' + gameRoom.name, factory.id, Util.OBJECT_JOB, 'T');

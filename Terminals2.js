@@ -35,21 +35,10 @@ const Terminals = {
             for (const terminalKey in terminals) {
                 const terminal = terminals[terminalKey];
                 const memRoom = Memory.MemRooms[terminal.pos.roomName];
-                if(memRoom && memRoom.FctrId && memRoom.FctrId !== '-'){
-                    const factory = Game.getObjectById(memRoom.FctrId);
-                    if(factory){
-                        GetFactoryResources(terminal, terminals, factory); // first try and get from other terminals then try and buy from the market
-                    }
-                }
 
-                const flags = terminal.room.find(FIND_FLAGS, {
-                    filter: function (flag) {
-                        return flag.color === COLOR_PURPLE && flag.secondaryColor === COLOR_PURPLE;
-                    }
-                });
-                if(flags.length > 0){
-                    GetLabResources(terminal, terminals, flags); // first try and get from other terminals then try and buy from the market
-                }
+                GetFactoryResources(terminal, terminals, memRoom); // first try and get from other terminals then try and buy from the market
+
+                GetLabResources(terminal, terminals); // first try and get from other terminals then try and buy from the market
 
                 DistributeEnergy(terminal, terminals);
 
@@ -57,41 +46,70 @@ const Terminals = {
             }
         }
 
-        /**@return {boolean}*/
-        function GetFactoryResources(terminal, terminals, factory){
+        function GetFactoryResources(terminal, terminals, memRoom){
 
-            for (const resourceType in terminal.store) {
-                let fromAmount = terminal.store[resourceType];
+            if(memRoom && memRoom.FctrId && memRoom.FctrId !== '-'){
+                const factory = Game.getObjectById(memRoom.FctrId);
+                if(factory && factory.level){
+                    for (const resourceType in terminal.store) {
+                        let fromAmount = terminal.store[resourceType];
+
+                    }
+                }
+            }
+            // TODO set cooldown if sending
+            // TODO set new amount both places if sending
+            // TODO set cooldown if buying
+            // TODO set new amount if buying
+        }
+
+        function GetLabResources(terminal, terminals){
+
+            const flags = terminal.room.find(FIND_FLAGS, {
+                filter: function (flag) {
+                    return flag.color === COLOR_PURPLE && flag.secondaryColor === COLOR_PURPLE;
+                }
+            });
+            if(flags.length > 0){
+                // look at
+                // TODO
             }
 
             // TODO set cooldown if sending
             // TODO set new amount both places if sending
             // TODO set cooldown if buying
             // TODO set new amount if buying
-            return true;
         }
 
-        /**@return {boolean}*/
-        function GetLabResources(terminal, terminals, flags){
-            // TODO set cooldown if sending
-            // TODO set new amount both places if sending
-            // TODO set cooldown if buying
-            // TODO set new amount if buying
-            return true;
-        }
-
-        /**@return {boolean}*/
         function DistributeEnergy(terminal, terminals){
             // TODO set cooldown if sending
             // TODO set new amount both places if sending
-            return true;
+
+            if(terminal.store.getUsedCapacity(RESOURCE_ENERGY) === 0 && terminal.room.storage.store.getUsedCapacity(RESOURCE_ENERGY) === 0){
+                for(const tKey in terminals){
+                    const t = terminals[tKey];
+                    if(t.store.getUsedCapacity(RESOURCE_ENERGY) >= Util.STORAGE_ENERGY_MEDIUM){
+                        trySendResource(Util.STORAGE_ENERGY_LOW, RESOURCE_ENERGY, t, terminal);
+                    }
+                }
+            }
         }
 
-        /**@return {boolean}*/
         function SellExcess(terminal, terminals){
             // TODO set cooldown if selling
             // TODO set new amount if selling
-            return true;
+        }
+
+        function trySendResource(amount, resourceType, fromTerminal, toTerminal){
+            if(!fromTerminal.cooldown && fromTerminal.id !== toTerminal.id){ // && fromTerminal.store.getUsedCapacity(resourceType) >= Util.STORAGE_ENERGY_MEDIUM
+                const result = fromTerminal.send(resourceType, amount, toTerminal.pos.roomName);
+                Util.Info('Terminals', 'trySendResource', amount + ' ' + resourceType + ' from ' + fromTerminal.pos.roomName + ' to ' + toTerminal.pos.roomName + ' result ' + result);
+                if(result === OK){
+                    fromTerminal.cooldown = 10;
+                    fromTerminal.store[resourceType] = fromTerminal.store[resourceType] - amount;
+                    toTerminal.store[resourceType] = toTerminal.store[resourceType] + amount;
+                }
+            }
         }
 
         function comparePriceCheapestFirst(a, b) {

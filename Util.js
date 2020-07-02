@@ -4,6 +4,10 @@ const Util = {
     TERMINAL_TARGET_ENERGY: 30000,
     TERMINAL_EMPTY_RESOURCE: 20000, // if terminal has over TERMINAL_EMPTY_RESOURCE then it must try and empty it to storage
     TERMINAL_EMPTY_ENERGY: 200000,
+
+    FACTORY_TARGET_RESOURCE: 2000,
+    FACTORY_TARGET_ENERGY: 10000,
+
     // if over max - then try and sell
     TERMINAL_MAX_RESOURCE: 6000,
     TERMINAL_MAX_ENERGY: 90000,
