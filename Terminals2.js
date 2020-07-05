@@ -34,10 +34,10 @@ const Terminals = {
             }
         }
 
-        function GetFactoryResources(toTerminal, terminals, memRoom, marketDealCount){
-            if(memRoom && memRoom.FctrId && memRoom.FctrId !== '-'){
+        function GetFactoryResources(toTerminal, terminals, memRoom, marketDealCount) {
+            if (memRoom && memRoom.FctrId && memRoom.FctrId !== '-') {
                 const factory = Game.getObjectById(memRoom.FctrId);
-                if(factory && factory.level){
+                if (factory && factory.level) {
                     for (const resourceType in toTerminal.store) {
                         let fromAmount = toTerminal.store[resourceType];
 
@@ -51,33 +51,35 @@ const Terminals = {
             return marketDealCount;
         }
 
-        function GetLabResources(toTerminal, terminals, marketDealCount){
+        function GetLabResources(toTerminal, terminals, marketDealCount) {
             const flags = toTerminal.room.find(FIND_FLAGS, {
                 filter: function (flag) {
                     return flag.color === COLOR_PURPLE && flag.secondaryColor === COLOR_PURPLE;
                 }
             });
-            if(flags.length > 0){
-                for(const flagKey in flags){
-                    const flagNameArray = flagKey.split(/[-]+/).filter(function (e) {return e;});
+            if (flags.length > 0) {
+                for (const flagKey in flags) {
+                    const flagNameArray = flagKey.split(/[-]+/).filter(function (e) {
+                        return e;
+                    });
                     const resourceType = flagNameArray[1];
                     const amount = Util.TERMINAL_TARGET_RESOURCE - toTerminal.store.getUsedCapacity(resourceType);
-                    if(amount > 0){
+                    if (amount > 0) {
                         let didSend = false;
-                        for(const fromTerminalKey in terminals) {
+                        for (const fromTerminalKey in terminals) {
                             const fromTerminal = terminals[fromTerminalKey];
                             didSend = TrySendResource(amount, resourceType, fromTerminal, toTerminal);
-                            if(didSend){
+                            if (didSend) {
                                 break;
                             }
                         }
-                        if(!didSend){
+                        if (!didSend) {
                             const shouldBuy = flagNameArray[0].equals("BUY"); // if "GET" then shouldBuy = false
-                            if(marketDealCount >= 10 || toTerminal.cooldown || !shouldBuy){
+                            if (marketDealCount >= 10 || toTerminal.cooldown || !shouldBuy) {
                                 return marketDealCount;
                             }
                             const didBuy = TryBuyResource(toTerminal, resourceType, amount);
-                            if(didBuy){
+                            if (didBuy) {
                                 marketDealCount++;
                                 break; // when buying on the market one can only buy once per terminal
                             }
@@ -88,13 +90,13 @@ const Terminals = {
             return marketDealCount;
         }
 
-        function GetEnergy(toTerminal, terminals){
-            if(toTerminal.store.getUsedCapacity(RESOURCE_ENERGY) === 0 && toTerminal.room.storage.store.getUsedCapacity(RESOURCE_ENERGY) === 0){
-                for(const fromTerminalKey in terminals){
+        function GetEnergy(toTerminal, terminals) {
+            if (toTerminal.store.getUsedCapacity(RESOURCE_ENERGY) === 0 && toTerminal.room.storage.store.getUsedCapacity(RESOURCE_ENERGY) === 0) {
+                for (const fromTerminalKey in terminals) {
                     const fromTerminal = terminals[fromTerminalKey];
-                    if(fromTerminal.store.getUsedCapacity(RESOURCE_ENERGY) >= Util.STORAGE_ENERGY_MEDIUM){
+                    if (fromTerminal.store.getUsedCapacity(RESOURCE_ENERGY) >= Util.STORAGE_ENERGY_MEDIUM) {
                         const didSend = TrySendResource(Util.STORAGE_ENERGY_LOW, RESOURCE_ENERGY, fromTerminal, toTerminal);
-                        if(didSend){
+                        if (didSend) {
                             return;
                         }
                     }
@@ -102,16 +104,16 @@ const Terminals = {
             }
         }
 
-        function SellExcess(terminal, marketDealCount){
-            if(marketDealCount >= 10 || terminal.cooldown){
+        function SellExcess(terminal, marketDealCount) {
+            if (marketDealCount >= 10 || terminal.cooldown) {
                 return marketDealCount;
             }
-            for(const resourceType in terminal.store){
+            for (const resourceType in terminal.store) {
                 const max = (resourceType === RESOURCE_ENERGY ? Util.TERMINAL_MAX_ENERGY : Util.TERMINAL_MAX_RESOURCE);
-                if(terminal.store.getUsedCapacity(resourceType) > max){
+                if (terminal.store.getUsedCapacity(resourceType) > max) {
                     const amount = terminal.store.getUsedCapacity(resourceType) - max;
                     const didSell = TrySellResource(terminal, resourceType, amount);
-                    if(didSell){
+                    if (didSell) {
                         marketDealCount++;
                         break; // when selling on the market one can only sell once per terminal
                     }
@@ -125,7 +127,7 @@ const Terminals = {
         //region helper functions
 
         /**@return {boolean}*/
-        function TryBuyResource(terminal, resourceType, amount){
+        function TryBuyResource(terminal, resourceType, amount) {
             const highestBuyingValue = 50; // a hard cap to protect against very expensive purchases
             const resourceHistory = Game.market.getHistory(resourceType);
             const orders = Game.market.getAllOrders(order => order.resourceType === resourceType
@@ -133,7 +135,7 @@ const Terminals = {
                 && (!resourceHistory[0]
                     || IsOutdated(resourceHistory[resourceHistory.length - 1].date)
                     || (resourceHistory[resourceHistory.length - 1].avgPrice * 1.5) >= order.price
-                )  && highestBuyingValue > order.price
+                ) && highestBuyingValue > order.price
                 && order.remainingAmount > 0
             );
             if (orders.length > 0) {
@@ -155,14 +157,14 @@ const Terminals = {
         }
 
         /**@return {boolean}*/
-        function TrySellResource(terminal, resourceType, amount){
+        function TrySellResource(terminal, resourceType, amount) {
             let lowestSellingValue = 0.1; // if the mineral has a lower selling value than this then it is not worth the computational value to mine and sell
             const resourceHistory = Game.market.getHistory(resourceType);
             const orders = Game.market.getAllOrders(order => order.resourceType === resourceType
                 && order.type === ORDER_BUY
                 && (!resourceHistory[0]
-                        || IsOutdated(resourceHistory[resourceHistory.length - 1].date)
-                        || (resourceHistory[resourceHistory.length - 1].avgPrice / 1.5/*medium price fall is okay*/) <= order.price)
+                    || IsOutdated(resourceHistory[resourceHistory.length - 1].date)
+                    || (resourceHistory[resourceHistory.length - 1].avgPrice / 1.5/*medium price fall is okay*/) <= order.price)
                 && lowestSellingValue <= order.price
                 && order.remainingAmount > 0
             );
@@ -184,11 +186,11 @@ const Terminals = {
         }
 
         /**@return {boolean}*/
-        function TrySendResource(amount, resourceType, fromTerminal, toTerminal){
-            if(!fromTerminal.cooldown && fromTerminal.id !== toTerminal.id) { // && fromTerminal.store.getUsedCapacity(resourceType) >= Util.STORAGE_ENERGY_MEDIUM
+        function TrySendResource(amount, resourceType, fromTerminal, toTerminal) {
+            if (!fromTerminal.cooldown && fromTerminal.id !== toTerminal.id) {
                 const result = fromTerminal.send(resourceType, amount, toTerminal.pos.roomName);
                 Util.Info('Terminals', 'TrySendResource', amount + ' ' + resourceType + ' from ' + fromTerminal.pos.roomName + ' to ' + toTerminal.pos.roomName + ' result ' + result);
-                if(result === OK){
+                if (result === OK) {
                     fromTerminal.cooldown = 10;
                     fromTerminal.store[resourceType] = fromTerminal.store[resourceType] - amount;
                     toTerminal.store[resourceType] = toTerminal.store[resourceType] + amount;
