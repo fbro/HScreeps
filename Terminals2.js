@@ -38,8 +38,13 @@ const Terminals = {
             if (memRoom && memRoom.FctrId && memRoom.FctrId !== '-') {
                 const factory = Game.getObjectById(memRoom.FctrId);
                 if (factory && factory.level) {
-                    for (const resourceType in toTerminal.store) {
-                        let fromAmount = toTerminal.store[resourceType];
+                    if(IsProductionChain(factory, RESOURCE_METAL)){
+
+                    }else if(IsProductionChain(factory, RESOURCE_BIOMASS)){
+
+                    }else if(IsProductionChain(factory, RESOURCE_SILICON)){
+
+                    }else if(IsProductionChain(factory, RESOURCE_MIST)){
 
                     }
                 }
@@ -125,6 +130,16 @@ const Terminals = {
         //endregion
 
         //region helper functions
+
+        /**@return {boolean}*/
+        function IsProductionChain(factory, resourceType){
+            if (factory.room.storage.store.getUsedCapacity(resourceType) > 0
+                || factory.room.terminal.store.getUsedCapacity(resourceType) > 0
+                || factory.store.getUsedCapacity(resourceType) > 0) {
+                return true;
+            }
+            return false;
+        }
 
         /**@return {number}*/
         function SetMaxResource(resourceType) {
