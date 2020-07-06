@@ -108,26 +108,26 @@ const Terminals = {
                 } else if (resourceType === RESOURCE_TISSUE || resourceType === RESOURCE_FRAME) {
                     max = 0; // right now i am selling out on tissue and frame
                 } else if (resourceType === RESOURCE_POWER
-                    || resourceType === RESOURCE_SILICON // deposit
-                    || resourceType === RESOURCE_WIRE // factory lvl 0
-                    || resourceType === RESOURCE_SWITCH // factory lvl 1
+                    || resourceType     === RESOURCE_SILICON // deposit
+                    || resourceType     === RESOURCE_WIRE // factory lvl 0
+                    || resourceType     === RESOURCE_SWITCH // factory lvl 1
 
-                    || resourceType === RESOURCE_BIOMASS // deposit
-                    || resourceType === RESOURCE_CELL // factory lvl 0
-                    || resourceType === RESOURCE_PHLEGM // factory lvl 1
+                    || resourceType     === RESOURCE_BIOMASS // deposit
+                    || resourceType     === RESOURCE_CELL // factory lvl 0
+                    || resourceType     === RESOURCE_PHLEGM // factory lvl 1
 
-                    || resourceType === RESOURCE_METAL // deposit
-                    || resourceType === RESOURCE_ALLOY // factory lvl 0
-                    || resourceType === RESOURCE_TUBE // factory lvl 1
-                    || resourceType === RESOURCE_FIXTURES // factory lvl 2
+                    || resourceType     === RESOURCE_METAL // deposit
+                    || resourceType     === RESOURCE_ALLOY // factory lvl 0
+                    || resourceType     === RESOURCE_TUBE // factory lvl 1
+                    || resourceType     === RESOURCE_FIXTURES // factory lvl 2
 
-                    || resourceType === RESOURCE_MIST // deposit
-                    || resourceType === RESOURCE_CONDENSATE // factory lvl 0
-                    || resourceType === RESOURCE_CONCENTRATE // factory lvl 1
+                    || resourceType     === RESOURCE_MIST // deposit
+                    || resourceType     === RESOURCE_CONDENSATE // factory lvl 0
+                    || resourceType     === RESOURCE_CONCENTRATE // factory lvl 1
 
-                    || resourceType === RESOURCE_COMPOSITE // factory lvl 1
-                    || resourceType === RESOURCE_CRYSTAL // factory lvl 2
-                    || resourceType === RESOURCE_LIQUID // factory lvl 3
+                    || resourceType     === RESOURCE_COMPOSITE // factory lvl 1
+                    || resourceType     === RESOURCE_CRYSTAL // factory lvl 2
+                    || resourceType     === RESOURCE_LIQUID // factory lvl 3
                 ) { // will never sell out on these resources
                     max = Number.MAX_SAFE_INTEGER;
                 } else {

@@ -66,14 +66,14 @@ const Terminals = {
                     const amount = Util.TERMINAL_TARGET_RESOURCE - toTerminal.store.getUsedCapacity(resourceType);
                     if (amount > 0) {
                         let didSend = false;
-                        for (const fromTerminalKey in terminals) {
+                        for (const fromTerminalKey in terminals) { // get resource from other terminal ?
                             const fromTerminal = terminals[fromTerminalKey];
                             didSend = TrySendResource(amount, resourceType, fromTerminal, toTerminal);
                             if (didSend) {
                                 break;
                             }
                         }
-                        if (!didSend) {
+                        if (!didSend) { // buy resource ?
                             const shouldBuy = flagNameArray[0].equals("BUY"); // if "GET" then shouldBuy = false
                             if (marketDealCount >= 10 || toTerminal.cooldown || !shouldBuy) {
                                 return marketDealCount;
@@ -109,7 +109,7 @@ const Terminals = {
                 return marketDealCount;
             }
             for (const resourceType in terminal.store) {
-                const max = (resourceType === RESOURCE_ENERGY ? Util.TERMINAL_MAX_ENERGY : Util.TERMINAL_MAX_RESOURCE);
+                const max = SetMaxResource(resourceType);
                 if (terminal.store.getUsedCapacity(resourceType) > max) {
                     const amount = terminal.store.getUsedCapacity(resourceType) - max;
                     const didSell = TrySellResource(terminal, resourceType, amount);
@@ -125,6 +125,61 @@ const Terminals = {
         //endregion
 
         //region helper functions
+
+        /**@return {number}*/
+        function SetMaxResource(resourceType) {
+            switch (resourceType) {
+                case RESOURCE_ENERGY :
+                    return Util.TERMINAL_MAX_ENERGY;
+
+                case RESOURCE_POWER       : // power
+
+                // Electronical
+                case RESOURCE_SILICON     : // deposit
+                case RESOURCE_WIRE        : // factory lvl 0
+                case RESOURCE_SWITCH      : // factory lvl 1
+                case RESOURCE_TRANSISTOR  : // factory lvl 2
+                case RESOURCE_MICROCHIP   : // factory lvl 3
+                case RESOURCE_CIRCUIT     : // factory lvl 4
+
+                // Biological
+                case RESOURCE_BIOMASS     : // deposit
+                case RESOURCE_CELL        : // factory lvl 0
+                case RESOURCE_PHLEGM      : // factory lvl 1
+                // sell RESOURCE_TISSUE        factory lvl 2
+                case RESOURCE_MUSCLE      : // factory lvl 3
+                case RESOURCE_ORGANOID    : // factory lvl 4
+
+                // Mechanical
+                case RESOURCE_METAL       : // deposit
+                case RESOURCE_ALLOY       : // factory lvl 0
+                case RESOURCE_TUBE        : // factory lvl 1
+                case RESOURCE_FIXTURES    : // factory lvl 2
+                // sell RESOURCE_FRAME         factory lvl 3
+                case RESOURCE_HYDRAULICS  : // factory lvl 4
+
+                // Mystical
+                case RESOURCE_MIST        : // deposit
+                case RESOURCE_CONDENSATE  : // factory lvl 0
+                case RESOURCE_CONCENTRATE : // factory lvl 1
+                case RESOURCE_EXTRACT     : // factory lvl 2
+                case RESOURCE_SPIRIT      : // factory lvl 3
+                case RESOURCE_EMANATION   : // factory lvl 4
+
+                // Common higher commodities
+                case RESOURCE_COMPOSITE   : // factory lvl 1
+                case RESOURCE_CRYSTAL     : // factory lvl 2
+                case RESOURCE_LIQUID      : // factory lvl 3
+                    return Number.MAX_SAFE_INTEGER;
+
+                case RESOURCE_TISSUE : // factory lvl 2
+                case RESOURCE_FRAME  : // factory lvl 3
+                    return 0;
+
+                default :
+                    return Util.TERMINAL_MAX_RESOURCE;
+            }
+        }
 
         /**@return {boolean}*/
         function TryBuyResource(terminal, resourceType, amount) {
