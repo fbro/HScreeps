@@ -1,8 +1,11 @@
 let Util = require('Util');
 const Terminals = {
     run: function () {
+
         const terminals = LoadMyTerminals();
         TerminalActions(terminals);
+
+        //region terminal actions
 
         function LoadMyTerminals() {
             let terminals = [];
@@ -16,161 +19,424 @@ const Terminals = {
         }
 
         function TerminalActions(terminals) {
-            let marketDealSendCount = 0;
+            let marketDealCount = 0;
             for (const terminalKey in terminals) {
                 const terminal = terminals[terminalKey];
-                if (terminal.cooldown === 0) {
-                    if (terminal.store.getUsedCapacity(RESOURCE_ENERGY) >= Util.STORAGE_ENERGY_LOW) {
-                        DistributeResources(terminal, terminals);
-                        marketDealSendCount = SellExcessResource(terminal, marketDealSendCount);
-                        marketDealSendCount = BuyResources(terminal, marketDealSendCount);
-                        marketDealSendCount = BuyLabResources(terminal, marketDealSendCount);
-                    }
-                }
+                const memRoom = Memory.MemRooms[terminal.pos.roomName];
+
+                GetFactoryResources(terminal, terminals, memRoom); // try and get from other terminals
+
+                marketDealCount = GetLabResources(terminal, terminals, marketDealCount); // first try and get from other terminals then try and buy from the market
+
+                GetEnergy(terminal, terminals);
+
+                marketDealCount = SellExcess(terminal, marketDealCount);
             }
         }
 
-        // distribute ALL available resources to all terminals
-        function DistributeResources(fromTerminal, terminals) {
-            for (const resourceType in fromTerminal.store) { // for each resource type
-                let fromAmount = fromTerminal.store[resourceType];
-                let target;
-                if (resourceType === RESOURCE_FIXTURES || resourceType === RESOURCE_TUBE) {
-                    DistributeFactoryCommodities(fromTerminal, resourceType, fromAmount, 3); // only send to factories that are of lvl 3
-                } else if (resourceType === RESOURCE_SWITCH || resourceType === RESOURCE_PHLEGM || resourceType === RESOURCE_COMPOSITE || resourceType === RESOURCE_CONCENTRATE) { // SWITCH, PHLEGM, COMPOSITE or CONCENTRATE should only be sent to a terminal that has a factory of level 2
-                    DistributeFactoryCommodities(fromTerminal, resourceType, fromAmount, 2); // only send to factories that are of lvl 2
-                } else if (resourceType === RESOURCE_SILICON || resourceType === RESOURCE_BIOMASS || resourceType === RESOURCE_METAL || resourceType === RESOURCE_MIST) { // SILICON, BIOMASS, METAL or MIST should only be sent to a terminal that has a factory that uses SILICON, BIOMASS, METAL or MIST
-                    DistributeFactoryCommodities(fromTerminal, resourceType, fromAmount); // send to any level factory
-                } else {
-                    if (resourceType === RESOURCE_ENERGY) {
-                        target = Util.TERMINAL_TARGET_ENERGY;
-                    } else {
-                        target = Util.TERMINAL_TARGET_RESOURCE;
-                    }
-                    for (const toTerminalKey in terminals) {
-                        const toTerminal = terminals[toTerminalKey];
-                        const toAmount = toTerminal.store[resourceType];
-                        if (fromAmount > (target + 500/*buffer to prevent many small send*/)
-                            && toAmount < target
-                            && toTerminal.id !== fromTerminal.id
-                        ) { // is allowed to send this resource to another terminal
-                            let sendAmount = fromAmount - target; // possible send amount
-                            const resourcesNeeded = target - toAmount;
-                            if (sendAmount > resourcesNeeded) {
-                                sendAmount = resourcesNeeded; // does not need more resources than this
+        function GetFactoryResources(toTerminal, terminals, memRoom) {
+            if (memRoom && memRoom.FctrId && memRoom.FctrId !== '-') {
+                const factory = Game.getObjectById(memRoom.FctrId);
+                if (factory) {
+                    const resourcesNeeded = [RESOURCE_ENERGY];
+                    switch (factory.level) { // factory level
+                        case(0):
+                            switch (true) { // production chain
+                                case(IsProductionChain(factory, RESOURCE_METAL, RESOURCE_ALLOY, RESOURCE_METAL)): // Mechanical chain
+                                    resourcesNeeded.push(RESOURCE_ZYNTHIUM);
+                                    resourcesNeeded.push(RESOURCE_METAL);
+                                    resourcesNeeded.push(RESOURCE_UTRIUM);
+                                    resourcesNeeded.push(RESOURCE_OXYGEN);
+                                    resourcesNeeded.push(RESOURCE_HYDROGEN);
+                                    break;
+                                case(IsProductionChain(factory, RESOURCE_BIOMASS, RESOURCE_CELL, RESOURCE_BIOMASS)): // Biological chain
+                                    resourcesNeeded.push(RESOURCE_LEMERGIUM);
+                                    resourcesNeeded.push(RESOURCE_BIOMASS);
+                                    resourcesNeeded.push(RESOURCE_OXYGEN);
+                                    resourcesNeeded.push(RESOURCE_HYDROGEN);
+                                    resourcesNeeded.push(RESOURCE_ZYNTHIUM);
+                                    break;
+                                case(IsProductionChain(factory, RESOURCE_SILICON, RESOURCE_WIRE, RESOURCE_SILICON)): // Electronical chain
+                                    resourcesNeeded.push(RESOURCE_UTRIUM);
+                                    resourcesNeeded.push(RESOURCE_SILICON);
+                                    resourcesNeeded.push(RESOURCE_OXYGEN);
+                                    resourcesNeeded.push(RESOURCE_HYDROGEN);
+                                    break;
+                                case(IsProductionChain(factory, RESOURCE_MIST, RESOURCE_CONDENSATE, RESOURCE_MIST)): // Mystical chain
+                                    resourcesNeeded.push(RESOURCE_KEANIUM);
+                                    resourcesNeeded.push(RESOURCE_MIST);
+                                    resourcesNeeded.push(RESOURCE_HYDROGEN);
+                                    resourcesNeeded.push(RESOURCE_OXYGEN);
+                                    break;
                             }
-                            const result = fromTerminal.send(resourceType, sendAmount, toTerminal.pos.roomName);
-                            Util.Info('Terminals', 'DistributeResources', sendAmount + ' ' + resourceType + ' from ' + fromTerminal.pos.roomName + ' to ' + toTerminal.pos.roomName + ' result ' + result + ' resourcesNeeded ' + resourcesNeeded);
-                            toTerminal.store[resourceType] += sendAmount;
-                            fromTerminal.store[resourceType] -= sendAmount;
-                            fromAmount -= sendAmount;
                             break;
-                        }
-                    }
-                }
-            }
-        }
-
-        // factory commodities are not distributed like the other resources should be
-        /**@return {number}*/
-        function DistributeFactoryCommodities(fromTerminal, resourceType, fromAmount, sendToFactoryLevel = 0) {
-            const fromFactory = fromTerminal.room.find(FIND_MY_STRUCTURES, {
-                filter: function (s) {
-                    return s.structureType === STRUCTURE_FACTORY && (sendToFactoryLevel === s.level || sendToFactoryLevel === 0);
-                }
-            })[0];
-            if (!fromFactory || fromTerminal.room.storage.store.getUsedCapacity(resourceType) > Util.STORAGE_HIGH) { // only send the resource if the factory lvl in sender room is not the same as sendToFactoryLevel unless there is a surplus
-                for (const toTerminalKey in terminals) {
-                    const toTerminal = terminals[toTerminalKey];
-                    if (toTerminal.id !== fromTerminal.id
-                        && toTerminal.store.getUsedCapacity(resourceType) < Util.TERMINAL_TARGET_RESOURCE // do not transfer anymore commodities if toTerminal already has more than STORAGE_HIGH_TRANSFER
-                        && toTerminal.room.find(FIND_MY_STRUCTURES, {
-                            filter: function (s) {
-                                return s.structureType === STRUCTURE_FACTORY && (sendToFactoryLevel === s.level || sendToFactoryLevel === 0);
+                        case(1):
+                            switch (true) { // production chain
+                                case(IsProductionChain(factory, RESOURCE_ALLOY, RESOURCE_TUBE, RESOURCE_METAL)): // Mechanical chain
+                                    resourcesNeeded.push(RESOURCE_ALLOY);
+                                    resourcesNeeded.push(RESOURCE_ZYNTHIUM_BAR);
+                                    break;
+                                case(IsProductionChain(factory, RESOURCE_CELL, RESOURCE_PHLEGM, RESOURCE_BIOMASS)): // Biological chain
+                                    resourcesNeeded.push(RESOURCE_CELL);
+                                    resourcesNeeded.push(RESOURCE_OXIDANT);
+                                    resourcesNeeded.push(RESOURCE_LEMERGIUM_BAR);
+                                    break;
+                                case(IsProductionChain(factory, RESOURCE_WIRE, RESOURCE_SWITCH, RESOURCE_SILICON)): // Electronical chain
+                                    resourcesNeeded.push(RESOURCE_WIRE);
+                                    resourcesNeeded.push(RESOURCE_OXIDANT);
+                                    resourcesNeeded.push(RESOURCE_UTRIUM_BAR);
+                                    break;
+                                case(IsProductionChain(factory, RESOURCE_CONDENSATE, RESOURCE_CONCENTRATE, RESOURCE_MIST)): // Mystical chain
+                                    resourcesNeeded.push(RESOURCE_CONDENSATE);
+                                    resourcesNeeded.push(RESOURCE_KEANIUM_BAR);
+                                    resourcesNeeded.push(RESOURCE_REDUCTANT);
+                                    break;
                             }
-                        })[0]) {
-                        const result = fromTerminal.send(resourceType, fromAmount, toTerminal.pos.roomName);
-                        Util.Info('Terminals', 'DistributeResources', fromAmount + ' ' + resourceType + ' from ' + fromTerminal.pos.roomName + ' to ' + toTerminal.pos.roomName + ' result ' + result);
-                        break;
+                            break;
+                        case(2):
+                            switch (true) { // production chain
+                                case(IsProductionChain(factory, RESOURCE_ALLOY, RESOURCE_FIXTURES, RESOURCE_METAL)): // Mechanical chain
+                                    resourcesNeeded.push(RESOURCE_COMPOSITE);
+                                    resourcesNeeded.push(RESOURCE_ALLOY);
+                                    resourcesNeeded.push(RESOURCE_OXIDANT);
+                                    break;
+                                case(IsProductionChain(factory, RESOURCE_PHLEGM, RESOURCE_TISSUE, RESOURCE_BIOMASS)): // Biological chain
+                                    resourcesNeeded.push(RESOURCE_PHLEGM);
+                                    resourcesNeeded.push(RESOURCE_CELL);
+                                    resourcesNeeded.push(RESOURCE_REDUCTANT);
+                                    break;
+                                case(IsProductionChain(factory, RESOURCE_SWITCH, RESOURCE_TRANSISTOR, RESOURCE_SILICON)): // Electronical chain
+                                    resourcesNeeded.push(RESOURCE_SWITCH);
+                                    resourcesNeeded.push(RESOURCE_WIRE);
+                                    resourcesNeeded.push(RESOURCE_REDUCTANT);
+                                    break;
+                                case(IsProductionChain(factory, RESOURCE_CONCENTRATE, RESOURCE_EXTRACT, RESOURCE_MIST)): // Mystical chain
+                                    resourcesNeeded.push(RESOURCE_CONCENTRATE);
+                                    resourcesNeeded.push(RESOURCE_CONDENSATE);
+                                    resourcesNeeded.push(RESOURCE_OXIDANT);
+                                    break;
+                            }
+                            break;
+                        case(3):
+                            switch (true) { // production chain
+                                case(IsProductionChain(factory, RESOURCE_FIXTURES, RESOURCE_FRAME, RESOURCE_METAL)): // Mechanical chain
+                                    resourcesNeeded.push(RESOURCE_FIXTURES);
+                                    resourcesNeeded.push(RESOURCE_TUBE);
+                                    resourcesNeeded.push(RESOURCE_REDUCTANT);
+                                    resourcesNeeded.push(RESOURCE_ZYNTHIUM_BAR);
+                                    break;
+                                case(IsProductionChain(factory, RESOURCE_TISSUE, RESOURCE_MUSCLE, RESOURCE_BIOMASS)): // Biological chain
+                                    resourcesNeeded.push(RESOURCE_TISSUE);
+                                    resourcesNeeded.push(RESOURCE_PHLEGM);
+                                    resourcesNeeded.push(RESOURCE_ZYNTHIUM_BAR);
+                                    resourcesNeeded.push(RESOURCE_REDUCTANT);
+                                    break;
+                                case(IsProductionChain(factory, RESOURCE_TRANSISTOR, RESOURCE_MICROCHIP, RESOURCE_SILICON)): // Electronical chain
+                                    resourcesNeeded.push(RESOURCE_TRANSISTOR);
+                                    resourcesNeeded.push(RESOURCE_COMPOSITE); // not added in lower factory yet!
+                                    resourcesNeeded.push(RESOURCE_WIRE);
+                                    resourcesNeeded.push(RESOURCE_PURIFIER); // not added in lower factory yet!
+                                    break;
+                                case(IsProductionChain(factory, RESOURCE_EXTRACT, RESOURCE_SPIRIT, RESOURCE_MIST)): // Mystical chain
+                                    resourcesNeeded.push(RESOURCE_EXTRACT);
+                                    resourcesNeeded.push(RESOURCE_CONCENTRATE);
+                                    resourcesNeeded.push(RESOURCE_REDUCTANT);
+                                    resourcesNeeded.push(RESOURCE_PURIFIER); // not added in lower factory yet!
+                                    break;
+                            }
+                            break;
+                        case(4):
+                            switch (true) { // production chain
+                                case(IsProductionChain(factory, RESOURCE_FIXTURES, RESOURCE_HYDRAULICS, RESOURCE_METAL)): // Mechanical chain
+                                    resourcesNeeded.push(RESOURCE_LIQUID); // not added in lower factory yet!
+                                    resourcesNeeded.push(RESOURCE_FIXTURES);
+                                    resourcesNeeded.push(RESOURCE_TUBE);
+                                    resourcesNeeded.push(RESOURCE_PURIFIER); // not added in lower factory yet!
+                                    break;
+                                case(IsProductionChain(factory, RESOURCE_MUSCLE, RESOURCE_ORGANOID, RESOURCE_BIOMASS)): // Biological chain
+                                    resourcesNeeded.push(RESOURCE_MUSCLE);
+                                    resourcesNeeded.push(RESOURCE_TISSUE);
+                                    resourcesNeeded.push(RESOURCE_PURIFIER); // not added in lower factory yet!
+                                    resourcesNeeded.push(RESOURCE_OXIDANT);
+                                    break;
+                                case(IsProductionChain(factory, RESOURCE_MICROCHIP, RESOURCE_CIRCUIT, RESOURCE_SILICON)): // Electronical chain
+                                    resourcesNeeded.push(RESOURCE_MICROCHIP);
+                                    resourcesNeeded.push(RESOURCE_TRANSISTOR);
+                                    resourcesNeeded.push(RESOURCE_SWITCH);
+                                    resourcesNeeded.push(RESOURCE_OXIDANT);
+                                    break;
+                                case(IsProductionChain(factory, RESOURCE_SPIRIT, RESOURCE_EMANATION, RESOURCE_MIST)): // Mystical chain
+                                    resourcesNeeded.push(RESOURCE_SPIRIT);
+                                    resourcesNeeded.push(RESOURCE_EXTRACT);
+                                    resourcesNeeded.push(RESOURCE_CONCENTRATE);
+                                    resourcesNeeded.push(RESOURCE_KEANIUM_BAR);
+                                    break;
+                            }
+                            break;
+                        case(5):
+                            switch (true) { // production chain
+                                case(IsProductionChain(factory, RESOURCE_HYDRAULICS, RESOURCE_MACHINE, RESOURCE_METAL)): // Mechanical chain
+                                    resourcesNeeded.push(RESOURCE_HYDRAULICS);
+                                    resourcesNeeded.push(RESOURCE_FRAME);
+                                    resourcesNeeded.push(RESOURCE_FIXTURES);
+                                    resourcesNeeded.push(RESOURCE_TUBE);
+                                    break;
+                                case(IsProductionChain(factory, RESOURCE_ORGANOID, RESOURCE_ORGANISM, RESOURCE_BIOMASS)): // Biological chain
+                                    resourcesNeeded.push(RESOURCE_ORGANOID);
+                                    resourcesNeeded.push(RESOURCE_LIQUID); // not added in lower factory yet!
+                                    resourcesNeeded.push(RESOURCE_TISSUE);
+                                    resourcesNeeded.push(RESOURCE_CELL);
+                                    break;
+                                case(IsProductionChain(factory, RESOURCE_CIRCUIT, RESOURCE_DEVICE, RESOURCE_SILICON)): // Electronical chain
+                                    resourcesNeeded.push(RESOURCE_CIRCUIT);
+                                    resourcesNeeded.push(RESOURCE_MICROCHIP);
+                                    resourcesNeeded.push(RESOURCE_CRYSTAL); // not added in lower factory yet!
+                                    resourcesNeeded.push(RESOURCE_GHODIUM_MELT); // not added in lower factory yet!
+                                    break;
+                                case(IsProductionChain(factory, RESOURCE_EMANATION, RESOURCE_ESSENCE, RESOURCE_MIST)): // Mystical chain
+                                    resourcesNeeded.push(RESOURCE_EMANATION);
+                                    resourcesNeeded.push(RESOURCE_SPIRIT);
+                                    resourcesNeeded.push(RESOURCE_CRYSTAL); // not added in lower factory yet!
+                                    resourcesNeeded.push(RESOURCE_GHODIUM_MELT); // not added in lower factory yet!
+                                    break;
+                            }
+                            break;
+                    }
+                    for(const resourceNeedKey in resourcesNeeded){
+                        const resourceNeed = resourcesNeeded[resourceNeedKey];
+                        const amount = Util.TERMINAL_MAX_RESOURCE - toTerminal.store.getUsedCapacity(resourceNeed);
+                        if (amount > 0) {
+                            for (const fromTerminalKey in terminals) {
+                                let didSend = false;
+                                const fromTerminal = terminals[fromTerminalKey];
+                                didSend = TrySendResource(amount, resourceNeed, fromTerminal, toTerminal);
+                                if (didSend) {
+                                    break;
+                                }
+                            }
+                        }
                     }
                 }
             }
         }
 
-        /**@return {number}*/
-        function SellExcessResource(fromTerminal, marketDealSendCount) {
-            for (const resourceType in fromTerminal.store) { // for each resource type
-                let fromAmount = fromTerminal.store.getUsedCapacity(resourceType);
-                let max;
-                let lowestSellingValue = 0.1; // if the mineral has a lower selling value than this then it is not worth the computational value to mine and sell
-                if (resourceType === RESOURCE_ENERGY) {
-                    max = Util.TERMINAL_MAX_ENERGY;
-                } else if (resourceType === RESOURCE_TISSUE || resourceType === RESOURCE_FRAME) {
-                    max = 0; // right now i am selling out on tissue and frame
-                } else if (resourceType === RESOURCE_POWER
-                    || resourceType     === RESOURCE_SILICON // deposit
-                    || resourceType     === RESOURCE_WIRE // factory lvl 0
-                    || resourceType     === RESOURCE_SWITCH // factory lvl 1
-
-                    || resourceType     === RESOURCE_BIOMASS // deposit
-                    || resourceType     === RESOURCE_CELL // factory lvl 0
-                    || resourceType     === RESOURCE_PHLEGM // factory lvl 1
-
-                    || resourceType     === RESOURCE_METAL // deposit
-                    || resourceType     === RESOURCE_ALLOY // factory lvl 0
-                    || resourceType     === RESOURCE_TUBE // factory lvl 1
-                    || resourceType     === RESOURCE_FIXTURES // factory lvl 2
-
-                    || resourceType     === RESOURCE_MIST // deposit
-                    || resourceType     === RESOURCE_CONDENSATE // factory lvl 0
-                    || resourceType     === RESOURCE_CONCENTRATE // factory lvl 1
-
-                    || resourceType     === RESOURCE_COMPOSITE // factory lvl 1
-                    || resourceType     === RESOURCE_CRYSTAL // factory lvl 2
-                    || resourceType     === RESOURCE_LIQUID // factory lvl 3
-                ) { // will never sell out on these resources
-                    max = Number.MAX_SAFE_INTEGER;
-                } else {
-                    max = Util.TERMINAL_MAX_RESOURCE;
+        function GetLabResources(toTerminal, terminals, marketDealCount) {
+            const flags = toTerminal.room.find(FIND_FLAGS, {
+                filter: function (flag) {
+                    return flag.color === COLOR_PURPLE && flag.secondaryColor === COLOR_PURPLE;
                 }
-                if (marketDealSendCount <= 10 && fromAmount > max) { // is allowed to sell this resource
-                    const resourceHistory = Game.market.getHistory(resourceType);
-                    const orders = Game.market.getAllOrders(order => order.resourceType === resourceType
-                        && order.type === ORDER_BUY
-                        /*&& Game.market.calcTransactionCost(500, fromTerminal.pos.roomName, order.roomName) <= 500*/
-                        &&
-                        (
-                            (!resourceHistory[0]
-                                || IsOutdated(resourceHistory[resourceHistory.length - 1].date)
-                                || (resourceHistory[resourceHistory.length - 1].avgPrice / 1.5/*medium price fall is okay*/) <= order.price
-                            ) && lowestSellingValue <= order.price
-                            ||
-                            resourceType === RESOURCE_ENERGY
-                            && fromTerminal.room.storage
-                            && fromTerminal.room.storage.store[RESOURCE_ENERGY] > Util.STORAGE_ENERGY_HIGH // hard sellout because storage is full with energy
-                        )
-                        && order.remainingAmount > 0
-                    );
-                    if (orders.length > 0) {
-                        orders.sort(comparePriceExpensiveFirst);
-                        const order = orders[0];
-                        let sendAmount = fromAmount - max; // possible send amount
-                        if (sendAmount > order.remainingAmount) {
-                            sendAmount = order.remainingAmount; // does not need more resources than this
+            });
+            if (flags.length > 0) {
+                for (const flagKey in flags) {
+                    const flagNameArray = flagKey.split(/[-]+/).filter(function (e) {
+                        return e;
+                    });
+                    const resourceType = flagNameArray[1];
+                    const amount = Util.TERMINAL_TARGET_RESOURCE - toTerminal.store.getUsedCapacity(resourceType);
+                    if (amount > 0) {
+                        let didSend = false;
+                        for (const fromTerminalKey in terminals) { // try to get resource from other terminal
+                            const fromTerminal = terminals[fromTerminalKey];
+                            didSend = TrySendResource(amount, resourceType, fromTerminal, toTerminal);
+                            if (didSend) {
+                                break;
+                            }
                         }
-                        const result = Game.market.deal(order.id, sendAmount, fromTerminal.pos.roomName);
-                        if (result === OK) {
-                            marketDealSendCount++;
-                        }
-                        if (resourceType === RESOURCE_TISSUE || resourceType === RESOURCE_FRAME) {
-                            Util.InfoLog('Terminals', 'SellExcessResource', sendAmount + ' ' + resourceType + ' from ' + fromTerminal.pos.roomName + ' to ' + order.roomName + ' result ' + result + ' marketDealSendCount ' + marketDealSendCount + ' order.remainingAmount ' + order.remainingAmount + ' price ' + order.price + ' total price ' + order.price * sendAmount + ' fromAmount ' + fromAmount);
-                        } else {
-                            Util.Info('Terminals', 'SellExcessResource', sendAmount + ' ' + resourceType + ' from ' + fromTerminal.pos.roomName + ' to ' + order.roomName + ' result ' + result + ' marketDealSendCount ' + marketDealSendCount + ' order.remainingAmount ' + order.remainingAmount + ' price ' + order.price + ' total price ' + order.price * sendAmount + ' fromAmount ' + fromAmount);
+                        if (!didSend && flagNameArray[0].equals("BUY")) { // try to buy resource
+                            if (marketDealCount >= 10 || toTerminal.cooldown) {
+                                return marketDealCount;
+                            }
+                            const didBuy = TryBuyResource(toTerminal, resourceType, amount);
+                            if (didBuy) {
+                                marketDealCount++;
+                                break; // when buying on the market one can only buy once per terminal
+                            }
                         }
                     }
                 }
             }
-            return marketDealSendCount;
+            return marketDealCount;
+        }
+
+        function GetEnergy(toTerminal, terminals) {
+            if (toTerminal.store.getUsedCapacity(RESOURCE_ENERGY) === 0 && toTerminal.room.storage.store.getUsedCapacity(RESOURCE_ENERGY) === 0) {
+                for (const fromTerminalKey in terminals) {
+                    const fromTerminal = terminals[fromTerminalKey];
+                    if (fromTerminal.store.getUsedCapacity(RESOURCE_ENERGY) >= Util.STORAGE_ENERGY_MEDIUM) {
+                        const didSend = TrySendResource(Util.STORAGE_ENERGY_LOW, RESOURCE_ENERGY, fromTerminal, toTerminal);
+                        if (didSend) {
+                            return;
+                        }
+                    }
+                }
+            }
+        }
+
+        function SellExcess(terminal, marketDealCount) {
+            if (marketDealCount >= 10 || terminal.cooldown) {
+                return marketDealCount;
+            }
+            for (const resourceType in terminal.store) {
+                const max = SetMaxResource(resourceType);
+                if (terminal.store.getUsedCapacity(resourceType) > max) {
+                    const amount = terminal.store.getUsedCapacity(resourceType) - max;
+                    const didSell = TrySellResource(terminal, resourceType, amount);
+                    if (didSell) {
+                        marketDealCount++;
+                        break; // when selling on the market one can only sell once per terminal
+                    }
+                }
+            }
+            return marketDealCount;
+        }
+
+        //endregion
+
+        //region helper functions
+
+        /**@return {boolean}*/
+        function IsProductionChain(factory, resourceTypeNeeded, resourceTypeProduced, resourceBasic) {
+            if (factory.room.storage.store.getUsedCapacity(resourceTypeNeeded) > 0
+                || factory.room.storage.store.getUsedCapacity(resourceTypeProduced) > 0
+                || factory.room.storage.store.getUsedCapacity(resourceBasic) > 0
+                || factory.room.terminal.store.getUsedCapacity(resourceTypeNeeded) > 0
+                || factory.room.terminal.store.getUsedCapacity(resourceTypeProduced) > 0
+                || factory.room.terminal.store.getUsedCapacity(resourceBasic) > 0
+                || factory.store.getUsedCapacity(resourceTypeNeeded) > 0
+                || factory.store.getUsedCapacity(resourceTypeProduced) > 0
+                || factory.store.getUsedCapacity(resourceBasic) > 0) {
+                return true;
+            }
+            return false;
+        }
+
+        /**@return {number}*/
+        function SetMaxResource(resourceType) {
+            switch (resourceType) {
+                case RESOURCE_ENERGY :
+                    return Util.TERMINAL_MAX_ENERGY;
+
+                case RESOURCE_POWER       : // power
+
+                // Electronical
+                case RESOURCE_SILICON     : // deposit
+                case RESOURCE_WIRE        : // factory lvl 0
+                case RESOURCE_SWITCH      : // factory lvl 1
+                case RESOURCE_TRANSISTOR  : // factory lvl 2
+                case RESOURCE_MICROCHIP   : // factory lvl 3
+                case RESOURCE_CIRCUIT     : // factory lvl 4
+
+                // Biological
+                case RESOURCE_BIOMASS     : // deposit
+                case RESOURCE_CELL        : // factory lvl 0
+                case RESOURCE_PHLEGM      : // factory lvl 1
+                // sell RESOURCE_TISSUE        factory lvl 2
+                case RESOURCE_MUSCLE      : // factory lvl 3
+                case RESOURCE_ORGANOID    : // factory lvl 4
+
+                // Mechanical
+                case RESOURCE_METAL       : // deposit
+                case RESOURCE_ALLOY       : // factory lvl 0
+                case RESOURCE_TUBE        : // factory lvl 1
+                case RESOURCE_FIXTURES    : // factory lvl 2
+                // sell RESOURCE_FRAME         factory lvl 3
+                case RESOURCE_HYDRAULICS  : // factory lvl 4
+
+                // Mystical
+                case RESOURCE_MIST        : // deposit
+                case RESOURCE_CONDENSATE  : // factory lvl 0
+                case RESOURCE_CONCENTRATE : // factory lvl 1
+                case RESOURCE_EXTRACT     : // factory lvl 2
+                case RESOURCE_SPIRIT      : // factory lvl 3
+                case RESOURCE_EMANATION   : // factory lvl 4
+
+                // Common higher commodities
+                case RESOURCE_COMPOSITE   : // factory lvl 1
+                case RESOURCE_CRYSTAL     : // factory lvl 2
+                case RESOURCE_LIQUID      : // factory lvl 3
+                    return Number.MAX_SAFE_INTEGER;
+
+                case RESOURCE_TISSUE : // factory lvl 2
+                case RESOURCE_FRAME  : // factory lvl 3
+                    return 0;
+
+                default :
+                    return Util.TERMINAL_MAX_RESOURCE;
+            }
+        }
+
+        /**@return {boolean}*/
+        function TryBuyResource(terminal, resourceType, amount) {
+            const highestBuyingValue = 50; // a hard cap to protect against very expensive purchases
+            const resourceHistory = Game.market.getHistory(resourceType);
+            const orders = Game.market.getAllOrders(order => order.resourceType === resourceType
+                && order.type === ORDER_SELL
+                && (!resourceHistory[0]
+                    || IsOutdated(resourceHistory[resourceHistory.length - 1].date)
+                    || (resourceHistory[resourceHistory.length - 1].avgPrice * 1.5) >= order.price
+                ) && highestBuyingValue > order.price
+                && order.remainingAmount > 0
+            );
+            if (orders.length > 0) {
+                orders.sort(comparePriceCheapestFirst);
+                const order = orders[0];
+                Util.Info('Terminals', 'TryBuyResource', 'WTB ' + amount + ' ' + resourceType + ' from ' + terminal + ' ' + JSON.stringify(order) + ' avg price ' + resourceHistory[0].avgPrice);
+                if (amount > order.remainingAmount) {
+                    amount = order.remainingAmount;  // cannot buy more resources than this
+                }
+                const result = Game.market.deal(order.id, amount, terminal.pos.roomName);
+                Util.Info('Terminals', 'TryBuyResource', amount + ' ' + resourceType + ' from ' + terminal.pos.roomName + ' to ' + order.roomName + ' result ' + result + ' order.remainingAmount ' + order.remainingAmount + ' price ' + order.price + ' total price ' + order.price * amount + ' terminal Amount ' + terminal.store.getUsedCapacity(resourceType));
+                if (result === OK) {
+                    terminal.cooldown = 10;
+                    terminal.store[resourceType] = terminal.store[resourceType] + amount;
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        /**@return {boolean}*/
+        function TrySellResource(terminal, resourceType, amount) {
+            let lowestSellingValue = 0.1; // if the mineral has a lower selling value than this then it is not worth the computational value to mine and sell
+            const resourceHistory = Game.market.getHistory(resourceType);
+            const orders = Game.market.getAllOrders(order => order.resourceType === resourceType
+                && order.type === ORDER_BUY
+                && (!resourceHistory[0]
+                    || IsOutdated(resourceHistory[resourceHistory.length - 1].date)
+                    || (resourceHistory[resourceHistory.length - 1].avgPrice / 1.5/*medium price fall is okay*/) <= order.price)
+                && lowestSellingValue <= order.price
+                && order.remainingAmount > 0
+            );
+            if (orders.length > 0) {
+                orders.sort(comparePriceExpensiveFirst);
+                const order = orders[0];
+                if (amount > order.remainingAmount) {
+                    amount = order.remainingAmount; // cannot sell more resources than this
+                }
+                const result = Game.market.deal(order.id, amount, terminal.pos.roomName);
+                Util.Info('Terminals', 'TrySellResource', amount + ' ' + resourceType + ' from ' + terminal.pos.roomName + ' to ' + order.roomName + ' result ' + result + ' order.remainingAmount ' + order.remainingAmount + ' price ' + order.price + ' total price ' + order.price * amount + ' terminal Amount ' + terminal.store.getUsedCapacity(resourceType));
+                if (result === OK) {
+                    terminal.cooldown = 10;
+                    terminal.store[resourceType] = terminal.store[resourceType] - amount;
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        /**@return {boolean}*/
+        function TrySendResource(amount, resourceType, fromTerminal, toTerminal) {
+            if (!fromTerminal.cooldown && fromTerminal.id !== toTerminal.id) {
+                const result = fromTerminal.send(resourceType, amount, toTerminal.pos.roomName);
+                Util.Info('Terminals', 'TrySendResource', amount + ' ' + resourceType + ' from ' + fromTerminal.pos.roomName + ' to ' + toTerminal.pos.roomName + ' result ' + result);
+                if (result === OK) {
+                    fromTerminal.cooldown = 10;
+                    fromTerminal.store[resourceType] = fromTerminal.store[resourceType] - amount;
+                    toTerminal.store[resourceType] = toTerminal.store[resourceType] + amount;
+                    return true;
+                }
+            }
+            return false;
         }
 
         /**@return {boolean}*/
@@ -181,73 +447,6 @@ const Terminals = {
                 return true;
             }
             return false;
-        }
-
-        /**@return {number}*/
-        function BuyResources(terminal, marketDealSendCount) {
-            // buy resources to make sure that there are at least 500 Hydrogen, Oxygen, Utrium, Keanium, Lemergium, Zynthium and Catalyst in each terminal
-            const basicResourceList = [RESOURCE_HYDROGEN, RESOURCE_OXYGEN, RESOURCE_UTRIUM, RESOURCE_KEANIUM, RESOURCE_LEMERGIUM, RESOURCE_ZYNTHIUM, RESOURCE_CATALYST];
-            for (const basicResourceKey in basicResourceList) {
-                const basicResource = basicResourceList[basicResourceKey];
-                const usedCapacity = terminal.store.getUsedCapacity(basicResource);
-                if (usedCapacity === 0 && marketDealSendCount <= 10 && terminal.room.storage.store.getUsedCapacity(basicResource) === 0) {
-                    marketDealSendCount = BuyResource(terminal, basicResource, 500, marketDealSendCount);
-                }
-            }
-            // buy power
-            const usedPowerCapacity = terminal.store.getUsedCapacity(RESOURCE_POWER);
-            if (usedPowerCapacity === 0 && marketDealSendCount <= 10 && terminal.room.storage.store.getUsedCapacity(RESOURCE_ENERGY) > Util.STORAGE_ENERGY_LOW_TRANSFER) {
-                marketDealSendCount = BuyResource(terminal, RESOURCE_POWER, 1000, marketDealSendCount, 1, 2);
-            }
-            return marketDealSendCount;
-        }
-
-        function BuyLabResources(terminal, marketDealSendCount) {
-            // find FillLabMineralJobs flags
-            const labFlags = terminal.room.find(FIND_FLAGS, {
-                filter: function (flag) {
-                    return flag.color === COLOR_PURPLE && flag.secondaryColor === COLOR_PURPLE && flag.name.split('-') === 'BUY'
-                }
-            });
-            for (const labFlagKey in labFlags) {
-                const labFlag = labFlags[labFlagKey];
-                const mineral = labFlag.name.split(/[-]+/).filter(function (e) {
-                    return e;
-                })[1];
-                const usedMineralCapacity = terminal.store.getUsedCapacity(mineral);
-                if (usedMineralCapacity < 500 && marketDealSendCount <= 10 && terminal.room.storage.store.getUsedCapacity(mineral) === 0) {
-                    marketDealSendCount = BuyResource(terminal, mineral, 500 - usedMineralCapacity, marketDealSendCount, 2, 2);
-                }
-            }
-            return marketDealSendCount;
-        }
-
-        /**@return {number}*/
-        function BuyResource(terminal, resourceType, amount, marketDealSendCount,
-                             avgPrice = 1.5, // set if one wants a another acceptable average price
-                             maxPrice = undefined // set if one should use a fixed price to buy under
-        ) {
-            const resourceHistory = Game.market.getHistory(resourceType);
-            const orders = Game.market.getAllOrders(order => order.resourceType === resourceType
-                && order.type === ORDER_SELL
-                && Game.market.calcTransactionCost(500, terminal.pos.roomName, order.roomName) <= 500
-                && (!resourceHistory[0] || (resourceHistory[0].avgPrice * avgPrice) >= order.price && (maxPrice && maxPrice >= order.price || !maxPrice))
-                && order.remainingAmount > 0
-            );
-            if (orders.length > 0) {
-                orders.sort(comparePriceCheapestFirst);
-                Util.Info('Terminals', 'BuyResource', 'WTB ' + amount + ' ' + resourceType + ' from ' + terminal + ' ' + JSON.stringify(orders) + ' avg price ' + resourceHistory[0].avgPrice);
-                const order = orders[0];
-                if (order.remainingAmount < amount) {
-                    amount = order.remainingAmount;
-                }
-                const result = Game.market.deal(order.id, amount, terminal.pos.roomName);
-                if (result === OK) {
-                    marketDealSendCount++;
-                }
-                Util.InfoLog('Terminals', 'BuyResource', amount + ' ' + resourceType + ' from ' + terminal.pos.roomName + ' to ' + order.roomName + ' result ' + result + ' marketDealSendCount ' + marketDealSendCount + ' order.remainingAmount ' + order.remainingAmount + ' price ' + order.price + ' total price ' + (order.price * amount));
-            }
-            return marketDealSendCount;
         }
 
         function comparePriceCheapestFirst(a, b) {
@@ -269,6 +468,8 @@ const Terminals = {
             }
             return 0;
         }
+
+        //endregion
     }
 };
 module.exports = Terminals;
