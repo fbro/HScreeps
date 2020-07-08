@@ -38,180 +38,182 @@ const Terminals = {
             if (memRoom && memRoom.FctrId && memRoom.FctrId !== '-') {
                 const factory = Game.getObjectById(memRoom.FctrId);
                 if (factory) {
-                    const resourcesNeeded = [RESOURCE_ENERGY];
+                    const resourceTypesNeeded = [RESOURCE_ENERGY];
                     switch (factory.level) { // factory level
                         case(0):
                             switch (true) { // production chain
                                 case(IsProductionChain(factory, RESOURCE_METAL, RESOURCE_ALLOY, RESOURCE_METAL)): // Mechanical chain
-                                    resourcesNeeded.push(RESOURCE_ZYNTHIUM);
-                                    resourcesNeeded.push(RESOURCE_METAL);
-                                    resourcesNeeded.push(RESOURCE_UTRIUM);
-                                    resourcesNeeded.push(RESOURCE_OXYGEN);
-                                    resourcesNeeded.push(RESOURCE_HYDROGEN);
+                                    resourceTypesNeeded.push(RESOURCE_ZYNTHIUM);
+                                    resourceTypesNeeded.push(RESOURCE_METAL);
+                                    resourceTypesNeeded.push(RESOURCE_UTRIUM);
+                                    resourceTypesNeeded.push(RESOURCE_OXYGEN);
+                                    resourceTypesNeeded.push(RESOURCE_HYDROGEN);
                                     break;
                                 case(IsProductionChain(factory, RESOURCE_BIOMASS, RESOURCE_CELL, RESOURCE_BIOMASS)): // Biological chain
-                                    resourcesNeeded.push(RESOURCE_LEMERGIUM);
-                                    resourcesNeeded.push(RESOURCE_BIOMASS);
-                                    resourcesNeeded.push(RESOURCE_OXYGEN);
-                                    resourcesNeeded.push(RESOURCE_HYDROGEN);
-                                    resourcesNeeded.push(RESOURCE_ZYNTHIUM);
+                                    resourceTypesNeeded.push(RESOURCE_LEMERGIUM);
+                                    resourceTypesNeeded.push(RESOURCE_BIOMASS);
+                                    resourceTypesNeeded.push(RESOURCE_OXYGEN);
+                                    resourceTypesNeeded.push(RESOURCE_HYDROGEN);
+                                    resourceTypesNeeded.push(RESOURCE_ZYNTHIUM);
                                     break;
                                 case(IsProductionChain(factory, RESOURCE_SILICON, RESOURCE_WIRE, RESOURCE_SILICON)): // Electronical chain
-                                    resourcesNeeded.push(RESOURCE_UTRIUM);
-                                    resourcesNeeded.push(RESOURCE_SILICON);
-                                    resourcesNeeded.push(RESOURCE_OXYGEN);
-                                    resourcesNeeded.push(RESOURCE_HYDROGEN);
+                                    resourceTypesNeeded.push(RESOURCE_UTRIUM);
+                                    resourceTypesNeeded.push(RESOURCE_SILICON);
+                                    resourceTypesNeeded.push(RESOURCE_OXYGEN);
+                                    resourceTypesNeeded.push(RESOURCE_HYDROGEN);
                                     break;
                                 case(IsProductionChain(factory, RESOURCE_MIST, RESOURCE_CONDENSATE, RESOURCE_MIST)): // Mystical chain
-                                    resourcesNeeded.push(RESOURCE_KEANIUM);
-                                    resourcesNeeded.push(RESOURCE_MIST);
-                                    resourcesNeeded.push(RESOURCE_HYDROGEN);
-                                    resourcesNeeded.push(RESOURCE_OXYGEN);
+                                    resourceTypesNeeded.push(RESOURCE_KEANIUM);
+                                    resourceTypesNeeded.push(RESOURCE_MIST);
+                                    resourceTypesNeeded.push(RESOURCE_HYDROGEN);
+                                    resourceTypesNeeded.push(RESOURCE_OXYGEN);
                                     break;
                             }
                             break;
                         case(1):
                             switch (true) { // production chain
                                 case(IsProductionChain(factory, RESOURCE_ALLOY, RESOURCE_TUBE, RESOURCE_METAL)): // Mechanical chain
-                                    resourcesNeeded.push(RESOURCE_ALLOY);
-                                    resourcesNeeded.push(RESOURCE_ZYNTHIUM_BAR);
+                                    resourceTypesNeeded.push(RESOURCE_ALLOY);
+                                    resourceTypesNeeded.push(RESOURCE_ZYNTHIUM_BAR);
                                     break;
                                 case(IsProductionChain(factory, RESOURCE_CELL, RESOURCE_PHLEGM, RESOURCE_BIOMASS)): // Biological chain
-                                    resourcesNeeded.push(RESOURCE_CELL);
-                                    resourcesNeeded.push(RESOURCE_OXIDANT);
-                                    resourcesNeeded.push(RESOURCE_LEMERGIUM_BAR);
+                                    resourceTypesNeeded.push(RESOURCE_CELL);
+                                    resourceTypesNeeded.push(RESOURCE_OXIDANT);
+                                    resourceTypesNeeded.push(RESOURCE_LEMERGIUM_BAR);
                                     break;
                                 case(IsProductionChain(factory, RESOURCE_WIRE, RESOURCE_SWITCH, RESOURCE_SILICON)): // Electronical chain
-                                    resourcesNeeded.push(RESOURCE_WIRE);
-                                    resourcesNeeded.push(RESOURCE_OXIDANT);
-                                    resourcesNeeded.push(RESOURCE_UTRIUM_BAR);
+                                    resourceTypesNeeded.push(RESOURCE_WIRE);
+                                    resourceTypesNeeded.push(RESOURCE_OXIDANT);
+                                    resourceTypesNeeded.push(RESOURCE_UTRIUM_BAR);
                                     break;
                                 case(IsProductionChain(factory, RESOURCE_CONDENSATE, RESOURCE_CONCENTRATE, RESOURCE_MIST)): // Mystical chain
-                                    resourcesNeeded.push(RESOURCE_CONDENSATE);
-                                    resourcesNeeded.push(RESOURCE_KEANIUM_BAR);
-                                    resourcesNeeded.push(RESOURCE_REDUCTANT);
+                                    resourceTypesNeeded.push(RESOURCE_CONDENSATE);
+                                    resourceTypesNeeded.push(RESOURCE_KEANIUM_BAR);
+                                    resourceTypesNeeded.push(RESOURCE_REDUCTANT);
                                     break;
                             }
                             break;
                         case(2):
                             switch (true) { // production chain
                                 case(IsProductionChain(factory, RESOURCE_ALLOY, RESOURCE_FIXTURES, RESOURCE_METAL)): // Mechanical chain
-                                    resourcesNeeded.push(RESOURCE_COMPOSITE);
-                                    resourcesNeeded.push(RESOURCE_ALLOY);
-                                    resourcesNeeded.push(RESOURCE_OXIDANT);
+                                    resourceTypesNeeded.push(RESOURCE_COMPOSITE);
+                                    resourceTypesNeeded.push(RESOURCE_ALLOY);
+                                    resourceTypesNeeded.push(RESOURCE_OXIDANT);
                                     break;
                                 case(IsProductionChain(factory, RESOURCE_PHLEGM, RESOURCE_TISSUE, RESOURCE_BIOMASS)): // Biological chain
-                                    resourcesNeeded.push(RESOURCE_PHLEGM);
-                                    resourcesNeeded.push(RESOURCE_CELL);
-                                    resourcesNeeded.push(RESOURCE_REDUCTANT);
+                                    resourceTypesNeeded.push(RESOURCE_PHLEGM);
+                                    resourceTypesNeeded.push(RESOURCE_CELL);
+                                    resourceTypesNeeded.push(RESOURCE_REDUCTANT);
                                     break;
                                 case(IsProductionChain(factory, RESOURCE_SWITCH, RESOURCE_TRANSISTOR, RESOURCE_SILICON)): // Electronical chain
-                                    resourcesNeeded.push(RESOURCE_SWITCH);
-                                    resourcesNeeded.push(RESOURCE_WIRE);
-                                    resourcesNeeded.push(RESOURCE_REDUCTANT);
+                                    resourceTypesNeeded.push(RESOURCE_SWITCH);
+                                    resourceTypesNeeded.push(RESOURCE_WIRE);
+                                    resourceTypesNeeded.push(RESOURCE_REDUCTANT);
                                     break;
                                 case(IsProductionChain(factory, RESOURCE_CONCENTRATE, RESOURCE_EXTRACT, RESOURCE_MIST)): // Mystical chain
-                                    resourcesNeeded.push(RESOURCE_CONCENTRATE);
-                                    resourcesNeeded.push(RESOURCE_CONDENSATE);
-                                    resourcesNeeded.push(RESOURCE_OXIDANT);
+                                    resourceTypesNeeded.push(RESOURCE_CONCENTRATE);
+                                    resourceTypesNeeded.push(RESOURCE_CONDENSATE);
+                                    resourceTypesNeeded.push(RESOURCE_OXIDANT);
                                     break;
                             }
                             break;
                         case(3):
                             switch (true) { // production chain
                                 case(IsProductionChain(factory, RESOURCE_FIXTURES, RESOURCE_FRAME, RESOURCE_METAL)): // Mechanical chain
-                                    resourcesNeeded.push(RESOURCE_FIXTURES);
-                                    resourcesNeeded.push(RESOURCE_TUBE);
-                                    resourcesNeeded.push(RESOURCE_REDUCTANT);
-                                    resourcesNeeded.push(RESOURCE_ZYNTHIUM_BAR);
+                                    resourceTypesNeeded.push(RESOURCE_FIXTURES);
+                                    resourceTypesNeeded.push(RESOURCE_TUBE);
+                                    resourceTypesNeeded.push(RESOURCE_REDUCTANT);
+                                    resourceTypesNeeded.push(RESOURCE_ZYNTHIUM_BAR);
                                     break;
                                 case(IsProductionChain(factory, RESOURCE_TISSUE, RESOURCE_MUSCLE, RESOURCE_BIOMASS)): // Biological chain
-                                    resourcesNeeded.push(RESOURCE_TISSUE);
-                                    resourcesNeeded.push(RESOURCE_PHLEGM);
-                                    resourcesNeeded.push(RESOURCE_ZYNTHIUM_BAR);
-                                    resourcesNeeded.push(RESOURCE_REDUCTANT);
+                                    resourceTypesNeeded.push(RESOURCE_TISSUE);
+                                    resourceTypesNeeded.push(RESOURCE_PHLEGM);
+                                    resourceTypesNeeded.push(RESOURCE_ZYNTHIUM_BAR);
+                                    resourceTypesNeeded.push(RESOURCE_REDUCTANT);
                                     break;
                                 case(IsProductionChain(factory, RESOURCE_TRANSISTOR, RESOURCE_MICROCHIP, RESOURCE_SILICON)): // Electronical chain
-                                    resourcesNeeded.push(RESOURCE_TRANSISTOR);
-                                    resourcesNeeded.push(RESOURCE_COMPOSITE); // not added in lower factory yet!
-                                    resourcesNeeded.push(RESOURCE_WIRE);
-                                    resourcesNeeded.push(RESOURCE_PURIFIER); // not added in lower factory yet!
+                                    resourceTypesNeeded.push(RESOURCE_TRANSISTOR);
+                                    resourceTypesNeeded.push(RESOURCE_COMPOSITE); // not added in lower factory yet!
+                                    resourceTypesNeeded.push(RESOURCE_WIRE);
+                                    resourceTypesNeeded.push(RESOURCE_PURIFIER); // not added in lower factory yet!
                                     break;
                                 case(IsProductionChain(factory, RESOURCE_EXTRACT, RESOURCE_SPIRIT, RESOURCE_MIST)): // Mystical chain
-                                    resourcesNeeded.push(RESOURCE_EXTRACT);
-                                    resourcesNeeded.push(RESOURCE_CONCENTRATE);
-                                    resourcesNeeded.push(RESOURCE_REDUCTANT);
-                                    resourcesNeeded.push(RESOURCE_PURIFIER); // not added in lower factory yet!
+                                    resourceTypesNeeded.push(RESOURCE_EXTRACT);
+                                    resourceTypesNeeded.push(RESOURCE_CONCENTRATE);
+                                    resourceTypesNeeded.push(RESOURCE_REDUCTANT);
+                                    resourceTypesNeeded.push(RESOURCE_PURIFIER); // not added in lower factory yet!
                                     break;
                             }
                             break;
                         case(4):
                             switch (true) { // production chain
                                 case(IsProductionChain(factory, RESOURCE_FIXTURES, RESOURCE_HYDRAULICS, RESOURCE_METAL)): // Mechanical chain
-                                    resourcesNeeded.push(RESOURCE_LIQUID); // not added in lower factory yet!
-                                    resourcesNeeded.push(RESOURCE_FIXTURES);
-                                    resourcesNeeded.push(RESOURCE_TUBE);
-                                    resourcesNeeded.push(RESOURCE_PURIFIER); // not added in lower factory yet!
+                                    resourceTypesNeeded.push(RESOURCE_LIQUID); // not added in lower factory yet!
+                                    resourceTypesNeeded.push(RESOURCE_FIXTURES);
+                                    resourceTypesNeeded.push(RESOURCE_TUBE);
+                                    resourceTypesNeeded.push(RESOURCE_PURIFIER); // not added in lower factory yet!
                                     break;
                                 case(IsProductionChain(factory, RESOURCE_MUSCLE, RESOURCE_ORGANOID, RESOURCE_BIOMASS)): // Biological chain
-                                    resourcesNeeded.push(RESOURCE_MUSCLE);
-                                    resourcesNeeded.push(RESOURCE_TISSUE);
-                                    resourcesNeeded.push(RESOURCE_PURIFIER); // not added in lower factory yet!
-                                    resourcesNeeded.push(RESOURCE_OXIDANT);
+                                    resourceTypesNeeded.push(RESOURCE_MUSCLE);
+                                    resourceTypesNeeded.push(RESOURCE_TISSUE);
+                                    resourceTypesNeeded.push(RESOURCE_PURIFIER); // not added in lower factory yet!
+                                    resourceTypesNeeded.push(RESOURCE_OXIDANT);
                                     break;
                                 case(IsProductionChain(factory, RESOURCE_MICROCHIP, RESOURCE_CIRCUIT, RESOURCE_SILICON)): // Electronical chain
-                                    resourcesNeeded.push(RESOURCE_MICROCHIP);
-                                    resourcesNeeded.push(RESOURCE_TRANSISTOR);
-                                    resourcesNeeded.push(RESOURCE_SWITCH);
-                                    resourcesNeeded.push(RESOURCE_OXIDANT);
+                                    resourceTypesNeeded.push(RESOURCE_MICROCHIP);
+                                    resourceTypesNeeded.push(RESOURCE_TRANSISTOR);
+                                    resourceTypesNeeded.push(RESOURCE_SWITCH);
+                                    resourceTypesNeeded.push(RESOURCE_OXIDANT);
                                     break;
                                 case(IsProductionChain(factory, RESOURCE_SPIRIT, RESOURCE_EMANATION, RESOURCE_MIST)): // Mystical chain
-                                    resourcesNeeded.push(RESOURCE_SPIRIT);
-                                    resourcesNeeded.push(RESOURCE_EXTRACT);
-                                    resourcesNeeded.push(RESOURCE_CONCENTRATE);
-                                    resourcesNeeded.push(RESOURCE_KEANIUM_BAR);
+                                    resourceTypesNeeded.push(RESOURCE_SPIRIT);
+                                    resourceTypesNeeded.push(RESOURCE_EXTRACT);
+                                    resourceTypesNeeded.push(RESOURCE_CONCENTRATE);
+                                    resourceTypesNeeded.push(RESOURCE_KEANIUM_BAR);
                                     break;
                             }
                             break;
                         case(5):
                             switch (true) { // production chain
                                 case(IsProductionChain(factory, RESOURCE_HYDRAULICS, RESOURCE_MACHINE, RESOURCE_METAL)): // Mechanical chain
-                                    resourcesNeeded.push(RESOURCE_HYDRAULICS);
-                                    resourcesNeeded.push(RESOURCE_FRAME);
-                                    resourcesNeeded.push(RESOURCE_FIXTURES);
-                                    resourcesNeeded.push(RESOURCE_TUBE);
+                                    resourceTypesNeeded.push(RESOURCE_HYDRAULICS);
+                                    resourceTypesNeeded.push(RESOURCE_FRAME);
+                                    resourceTypesNeeded.push(RESOURCE_FIXTURES);
+                                    resourceTypesNeeded.push(RESOURCE_TUBE);
                                     break;
                                 case(IsProductionChain(factory, RESOURCE_ORGANOID, RESOURCE_ORGANISM, RESOURCE_BIOMASS)): // Biological chain
-                                    resourcesNeeded.push(RESOURCE_ORGANOID);
-                                    resourcesNeeded.push(RESOURCE_LIQUID); // not added in lower factory yet!
-                                    resourcesNeeded.push(RESOURCE_TISSUE);
-                                    resourcesNeeded.push(RESOURCE_CELL);
+                                    resourceTypesNeeded.push(RESOURCE_ORGANOID);
+                                    resourceTypesNeeded.push(RESOURCE_LIQUID); // not added in lower factory yet!
+                                    resourceTypesNeeded.push(RESOURCE_TISSUE);
+                                    resourceTypesNeeded.push(RESOURCE_CELL);
                                     break;
                                 case(IsProductionChain(factory, RESOURCE_CIRCUIT, RESOURCE_DEVICE, RESOURCE_SILICON)): // Electronical chain
-                                    resourcesNeeded.push(RESOURCE_CIRCUIT);
-                                    resourcesNeeded.push(RESOURCE_MICROCHIP);
-                                    resourcesNeeded.push(RESOURCE_CRYSTAL); // not added in lower factory yet!
-                                    resourcesNeeded.push(RESOURCE_GHODIUM_MELT); // not added in lower factory yet!
+                                    resourceTypesNeeded.push(RESOURCE_CIRCUIT);
+                                    resourceTypesNeeded.push(RESOURCE_MICROCHIP);
+                                    resourceTypesNeeded.push(RESOURCE_CRYSTAL); // not added in lower factory yet!
+                                    resourceTypesNeeded.push(RESOURCE_GHODIUM_MELT); // not added in lower factory yet!
                                     break;
                                 case(IsProductionChain(factory, RESOURCE_EMANATION, RESOURCE_ESSENCE, RESOURCE_MIST)): // Mystical chain
-                                    resourcesNeeded.push(RESOURCE_EMANATION);
-                                    resourcesNeeded.push(RESOURCE_SPIRIT);
-                                    resourcesNeeded.push(RESOURCE_CRYSTAL); // not added in lower factory yet!
-                                    resourcesNeeded.push(RESOURCE_GHODIUM_MELT); // not added in lower factory yet!
+                                    resourceTypesNeeded.push(RESOURCE_EMANATION);
+                                    resourceTypesNeeded.push(RESOURCE_SPIRIT);
+                                    resourceTypesNeeded.push(RESOURCE_CRYSTAL); // not added in lower factory yet!
+                                    resourceTypesNeeded.push(RESOURCE_GHODIUM_MELT); // not added in lower factory yet!
                                     break;
                             }
                             break;
                     }
-                    for(const resourceNeedKey in resourcesNeeded){
-                        const resourceNeed = resourcesNeeded[resourceNeedKey];
-                        const amount = Util.TERMINAL_MAX_RESOURCE - toTerminal.store.getUsedCapacity(resourceNeed);
-                        if (amount > 0) {
+                    for(const resourceNeedKey in resourceTypesNeeded){
+                        const resourceTypeNeeded = resourceTypesNeeded[resourceNeedKey];
+                        const amountNeeded = Util.TERMINAL_TARGET_RESOURCE - toTerminal.store.getUsedCapacity(resourceTypeNeeded);
+                        if (amountNeeded > 0) {
                             for (const fromTerminalKey in terminals) {
                                 let didSend = false;
                                 const fromTerminal = terminals[fromTerminalKey];
-                                didSend = TrySendResource(amount, resourceNeed, fromTerminal, toTerminal);
-                                if (didSend) {
-                                    break;
+                                if(fromTerminal.store.getUsedCapacity(resourceTypeNeeded) > Util.TERMINAL_TARGET_RESOURCE){
+                                    didSend = TrySendResource(amountNeeded, resourceTypeNeeded, fromTerminal, toTerminal);
+                                    if (didSend) {
+                                        break;
+                                    }
                                 }
                             }
                         }
@@ -231,22 +233,24 @@ const Terminals = {
                     const flagNameArray = flagKey.split(/[-]+/).filter(function (e) {
                         return e;
                     });
-                    const resourceType = flagNameArray[1];
-                    const amount = Util.TERMINAL_TARGET_RESOURCE - toTerminal.store.getUsedCapacity(resourceType);
-                    if (amount > 0) {
+                    const resourceTypeNeeded = flagNameArray[1];
+                    const amountNeeded = Util.TERMINAL_TARGET_RESOURCE - toTerminal.store.getUsedCapacity(resourceTypeNeeded);
+                    if (amountNeeded > 0) {
                         let didSend = false;
                         for (const fromTerminalKey in terminals) { // try to get resource from other terminal
                             const fromTerminal = terminals[fromTerminalKey];
-                            didSend = TrySendResource(amount, resourceType, fromTerminal, toTerminal);
-                            if (didSend) {
-                                break;
+                            if(fromTerminal.store.getUsedCapacity(resourceTypeNeeded) > Util.TERMINAL_TARGET_RESOURCE){
+                                didSend = TrySendResource(amountNeeded, resourceTypeNeeded, fromTerminal, toTerminal);
+                                if (didSend) {
+                                    break;
+                                }
                             }
                         }
                         if (!didSend && flagNameArray[0].equals("BUY")) { // try to buy resource
                             if (marketDealCount >= 10 || toTerminal.cooldown) {
                                 return marketDealCount;
                             }
-                            const didBuy = TryBuyResource(toTerminal, resourceType, amount);
+                            const didBuy = TryBuyResource(toTerminal, resourceTypeNeeded, amountNeeded);
                             if (didBuy) {
                                 marketDealCount++;
                                 break; // when buying on the market one can only buy once per terminal
@@ -354,6 +358,16 @@ const Terminals = {
                 case RESOURCE_COMPOSITE   : // factory lvl 1
                 case RESOURCE_CRYSTAL     : // factory lvl 2
                 case RESOURCE_LIQUID      : // factory lvl 3
+
+                // lab resources
+                //case RESOURCE_CATALYST:
+                //case RESOURCE_ZYNTHIUM_KEANITE:
+                //case RESOURCE_UTRIUM_LEMERGITE:
+                //case RESOURCE_GHODIUM:
+                //case RESOURCE_GHODIUM_HYDRIDE:
+                //case RESOURCE_HYDROXIDE:
+                //case RESOURCE_GHODIUM_ACID:
+                //case RESOURCE_CATALYZED_GHODIUM_ACID:
                     return Number.MAX_SAFE_INTEGER;
 
                 case RESOURCE_TISSUE : // factory lvl 2
@@ -426,7 +440,10 @@ const Terminals = {
 
         /**@return {boolean}*/
         function TrySendResource(amount, resourceType, fromTerminal, toTerminal) {
-            if (!fromTerminal.cooldown && fromTerminal.id !== toTerminal.id) {
+            if (!fromTerminal.cooldown && fromTerminal.id !== toTerminal.id && fromTerminal.store.getUsedCapacity(resourceType)) {
+                if (amount > fromTerminal.store.getUsedCapacity(resourceType)) {
+                    amount = fromTerminal.store.getUsedCapacity(resourceType);  // cannot send more resources than this
+                }
                 const result = fromTerminal.send(resourceType, amount, toTerminal.pos.roomName);
                 Util.Info('Terminals', 'TrySendResource', amount + ' ' + resourceType + ' from ' + fromTerminal.pos.roomName + ' to ' + toTerminal.pos.roomName + ' result ' + result);
                 if (result === OK) {

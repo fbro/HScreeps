@@ -33,7 +33,7 @@ const PowerCreeps = {
                     } else if (powerCreep.shard) { // flag is found and the creep is spawned - do something
                         if (powerCreep.ticksToLive < 500) { // power creep needs to be renewed
                             result = RenewPowerCreep(powerCreep);
-                            Util.Info('PowerCreeps', 'PowerCreepsActions', 'trying to renew ' + powerCreep.name + ' result ' + result + ' ticksToLive ' + powerCreep.ticksToLive);
+                            //Util.Info('PowerCreeps', 'PowerCreepsActions', 'trying to renew ' + powerCreep.name + ' result ' + result + ' ticksToLive ' + powerCreep.ticksToLive);
                         } else if (powerCreep.room.controller && powerCreep.room.controller.my && !powerCreep.room.controller.isPowerEnabled) { // my room is not power enabled
                             result = EnablePowerInRoom(powerCreep);
                             Util.Info('PowerCreeps', 'PowerCreepsActions', 'trying to EnablePowerInRoom ' + powerCreep.name + ' ' + powerCreep.pos.roomName);
