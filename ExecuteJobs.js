@@ -251,7 +251,7 @@ const ExecuteJobs = {
                     if (result === ERR_NOT_IN_RANGE) {
                         result = Move(gameCreep, closestSpawn);
                     } else {
-                        Util.Info('ExecuteJobs', 'ExecuteRoomJobs', 'idle ' + gameCreep.name + ' recycled. MaxCreeps ' + maxCreeps[creepType]['M'] + ' current ' + (Object.keys(maxCreeps[creepType]).length - 1) + ' in ' + gameCreep.pos.roomName);
+                        Util.Info('ExecuteJobs', 'RecycleIdleCreep', 'idle ' + gameCreep.name + ' recycled. MaxCreeps ' + maxCreeps[creepType]['M'] + ' current ' + (Object.keys(maxCreeps[creepType]).length - 1) + ' in ' + gameCreep.pos.roomName);
                     }
                 }
             }
@@ -442,7 +442,7 @@ const ExecuteJobs = {
             }
 
             if (result === OK) {
-                creep.say('OK'); // job is done everyone is happy, nothing to do.
+                //creep.say('OK'); // job is done everyone is happy, nothing to do.
             } else if (result === ERR_TIRED) {
                 creep.say('😫 ' + creep.fatigue); // creep has fatigue and is limited in movement
             } else if (result === ERR_BUSY) {
