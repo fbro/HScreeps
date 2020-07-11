@@ -2810,7 +2810,12 @@ const ExecuteJobs = {
                     result = creep.moveByPath(creep.memory._move.path);
                     if (result !== OK && result !== ERR_TIRED) {
                         Util.Warning('ExecuteJobs', 'Move', 'using old path failed ' + creep.name + ' ' + creep.pos.roomName + ' ' + result);
-                        result = ERR_NO_RESULT_FOUND;
+                        if(result === ERR_NOT_FOUND){
+                            result = creep.moveTo(obj, opts);
+                            Util.ErrorLog('ExecuteJobs', 'Move', 'ERR_NOT_FOUND fallback logic - moveto obj ' + obj + ' for ' + creep.name + ' ' + creep.pos.roomName + ' ' + result);
+                        }else {
+                            result = ERR_NO_RESULT_FOUND;
+                        }
                     }
                 }
                 if (result === ERR_NO_RESULT_FOUND) { // calculate path

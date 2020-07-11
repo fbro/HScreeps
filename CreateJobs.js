@@ -376,7 +376,7 @@ const CreateJobs = {
                         maxResources = HighTransfer;
                     } else if (storageResourceAmount >= Medium) {
                         maxResources = MediumTransfer;
-                    } else if (storageResourceAmount >= Low) {
+                    } else if (storageResourceAmount > Low) {
                         maxResources = LowTransfer;
                     }
                     if (gameRoom.terminal.store.getUsedCapacity(resourceType) < maxResources) {

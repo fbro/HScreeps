@@ -399,7 +399,7 @@ const Terminals = {
                     amount = order.remainingAmount;  // cannot buy more resources than this
                 }
                 const result = Game.market.deal(order.id, amount, terminal.pos.roomName);
-                Util.Info('Terminals', 'TryBuyResource', amount + ' ' + resourceType + ' from ' + terminal.pos.roomName + ' to ' + order.roomName + ' result ' + result + ' order.remainingAmount ' + order.remainingAmount + ' price ' + order.price + ' total price ' + order.price * amount + ' terminal Amount ' + terminal.store.getUsedCapacity(resourceType));
+                Util.Info('Terminals', 'TryBuyResource', amount + ' ' + resourceType + ' from ' + terminal.pos.roomName + ' to ' + order.roomName + ' result ' + result + ' remaining ' + order.remainingAmount + ' price ' + order.price + ' sum ' + order.price * amount + ' terminal ' + terminal.store.getUsedCapacity(resourceType));
                 if (result === OK) {
                     terminal.cooldown = 10;
                     terminal.store[resourceType] = terminal.store[resourceType] + amount;
@@ -428,7 +428,7 @@ const Terminals = {
                     amount = order.remainingAmount; // cannot sell more resources than this
                 }
                 const result = Game.market.deal(order.id, amount, terminal.pos.roomName);
-                Util.Info('Terminals', 'TrySellResource', amount + ' ' + resourceType + ' from ' + terminal.pos.roomName + ' to ' + order.roomName + ' result ' + result + ' order.remainingAmount ' + order.remainingAmount + ' price ' + order.price + ' total price ' + order.price * amount + ' terminal Amount ' + terminal.store.getUsedCapacity(resourceType));
+                Util.Info('Terminals', 'TrySellResource', amount + ' ' + resourceType + ' from ' + terminal.pos.roomName + ' to ' + order.roomName + ' result ' + result + ' remaining ' + order.remainingAmount + ' price ' + order.price + ' sum ' + order.price * amount + ' terminal ' + terminal.store.getUsedCapacity(resourceType));
                 if (result === OK) {
                     terminal.cooldown = 10;
                     terminal.store[resourceType] = terminal.store[resourceType] - amount;
