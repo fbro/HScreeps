@@ -282,7 +282,7 @@ const Terminals = {
             }
             for (const resourceType in terminal.store) {
                 const max = SetMaxResource(resourceType);
-                if (terminal.store.getUsedCapacity(resourceType) > max) {
+                if (terminal.store.getUsedCapacity(resourceType) > max + 500/*buffer to avoid small sales*/) {
                     const amount = terminal.store.getUsedCapacity(resourceType) - max;
                     const didSell = TrySellResource(terminal, resourceType, amount);
                     if (didSell) {

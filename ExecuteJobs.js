@@ -1030,6 +1030,8 @@ const ExecuteJobs = {
                     if (creep.store.getUsedCapacity(resourceType) === 0) {
                         if (storageResourceAmount <= Low && resourceType === RESOURCE_ENERGY // low resource in storage abort only if energy
 
+                            || storageResourceAmount === 0
+
                             || storageResourceAmount <= Medium
                             && terminal.store.getUsedCapacity(resourceType) >= LowTransfer
 
@@ -1102,8 +1104,10 @@ const ExecuteJobs = {
             const result = GenericJobAction(creep, roomJob, {
                 /**@return {int}*/
                 JobStatus: function (jobObject) { // terminal
-                    if (resourceType === RESOURCE_ENERGY && jobObject.store.getUsedCapacity(resourceType) >= Util.FACTORY_TARGET_ENERGY
-                        || resourceType !== RESOURCE_ENERGY && jobObject.store.getUsedCapacity(resourceType) >= Util.FACTORY_TARGET_RESOURCE
+                    const usedCapacity = jobObject.store.getUsedCapacity(resourceType);
+                    if (resourceType === RESOURCE_ENERGY && usedCapacity >= Util.FACTORY_TARGET_ENERGY
+                        || resourceType !== RESOURCE_ENERGY && usedCapacity >= Util.FACTORY_TARGET_RESOURCE
+                        || usedCapacity === 0
                     ) {
                         return JOB_IS_DONE;
                     } else if (creep.store.getUsedCapacity(resourceType) === 0) { // fetch

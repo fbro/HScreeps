@@ -128,8 +128,6 @@ module.exports.loop = function () {
 
 // TODOs:
 // TODO FillStrg-container can be very expensive!
-// TODO WARNING! ExecuteJobs JobAction | no fetch object found
-// the above error happens too much!
 
 // attack NPC strongholds
 // harvest middle rooms

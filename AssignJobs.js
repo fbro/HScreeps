@@ -237,7 +237,7 @@ const AssignJobs = {
                         break;
                     }
                 }
-            } else if (roomJob.CreepType === 'B' && roomJobKey.startsWith('Ctrl') && gameRoom.storage && gameRoom.storage.store.getUsedCapacity(RESOURCE_ENERGY) > Util.STORAGE_ENERGY_MEDIUM/*large builders are only allowed when the room has the required energy - the drawback is that upgrade controller takes alot of energy*/) {
+            } else if (roomJob.CreepType === 'B' && gameRoom.storage && gameRoom.storage.store.getUsedCapacity(RESOURCE_ENERGY) > Util.STORAGE_ENERGY_MEDIUM/*large builders are only allowed when the room has the required energy - the drawback is that upgrade controller takes alot of energy*/) {
                 spawnLargeVersion = true;
             }
             return spawnLargeVersion;
