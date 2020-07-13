@@ -309,7 +309,7 @@ const ExecuteJobs = {
         /**@return {number}*/
         function TryPickupDropOrTombstone(creepMemory, gameCreep, result) {
             const drop = gameCreep.pos.findInRange(FIND_DROPPED_RESOURCES, 1)[0];
-            if (drop) {
+            if (drop && (!gameCreep.name.startsWith('D') || drop.resourceType === RESOURCE_SILICON || drop.resourceType === RESOURCE_BIOMASS || drop.resourceType === RESOURCE_METAL || drop.resourceType === RESOURCE_MIST)) {
                 result = gameCreep.pickup(drop); // it may do that 'double' but it really does not matter
                 //Util.Info('ExecuteJobs', 'ExecuteRoomJobs', creep.name + ' picked up adjacent resource (' + drop.pos.x + ',' + drop.pos.y + ',' + drop.pos.roomName + ',' + drop.amount + ',' + drop.resourceType + ')');
             } else {
