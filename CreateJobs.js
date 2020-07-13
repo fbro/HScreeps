@@ -305,7 +305,8 @@ const CreateJobs = {
         //region room jobs
 
         function FillPowerSpawnEnergyJobs(gameRoom, roomJobs) {
-            if (gameRoom.storage && gameRoom.storage.store.getUsedCapacity(RESOURCE_ENERGY) > Util.STORAGE_ENERGY_LOW) {
+            if (gameRoom.storage && gameRoom.storage.store.getUsedCapacity(RESOURCE_ENERGY) > Util.STORAGE_ENERGY_LOW
+                || gameRoom.terminal && gameRoom.terminal.store.getUsedCapacity(RESOURCE_ENERGY) > Util.STORAGE_ENERGY_LOW) {
                 const powerSpawns = gameRoom.find(FIND_MY_STRUCTURES, {
                     filter: (s) => {
                         return s.structureType === STRUCTURE_POWER_SPAWN;

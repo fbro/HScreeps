@@ -30,7 +30,7 @@ const Terminals = {
 
                 GetEnergy(terminal, terminals);
 
-                marketDealCount = SellExcess(terminal, marketDealCount);
+                marketDealCount = SendExcess(terminal, marketDealCount);
             }
         }
 
@@ -276,7 +276,7 @@ const Terminals = {
             }
         }
 
-        function SellExcess(terminal, marketDealCount) {
+        function SendExcess(terminal, marketDealCount) {
             if (marketDealCount >= 10 || terminal.cooldown) {
                 return marketDealCount;
             }
@@ -284,8 +284,22 @@ const Terminals = {
                 const max = SetMaxResource(resourceType);
                 if (terminal.store.getUsedCapacity(resourceType) > max + 500/*buffer to avoid small sales*/) {
                     const amount = terminal.store.getUsedCapacity(resourceType) - max;
-                    const didSell = TrySellResource(terminal, resourceType, amount);
-                    if (didSell) {
+                    let didSend = false;
+                    if(resourceType === RESOURCE_ENERGY){
+                        for (const toTerminalKey in terminals) { // try to send energy to other terminal that needs it
+                            const toTerminal = terminals[toTerminalKey];
+                            if(toTerminal.store.getUsedCapacity(resourceType) < Util.TERMINAL_TARGET_ENERGY){
+                                didSend = TrySendResource(amount, resourceType, terminal, toTerminal);
+                                if (didSend) {
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    if (!didSend) {
+                        didSend = TrySellResource(terminal, resourceType, amount);
+                    }
+                    if (didSend) {
                         marketDealCount++;
                         break; // when selling on the market one can only sell once per terminal
                     }
