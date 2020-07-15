@@ -1103,11 +1103,11 @@ const ExecuteJobs = {
             }
             const result = GenericJobAction(creep, roomJob, {
                 /**@return {int}*/
-                JobStatus: function (jobObject) { // terminal
+                JobStatus: function (jobObject) {
                     const usedCapacity = jobObject.store.getUsedCapacity(resourceType);
                     if (resourceType === RESOURCE_ENERGY && usedCapacity >= Util.FACTORY_TARGET_ENERGY
                         || resourceType !== RESOURCE_ENERGY && usedCapacity >= Util.FACTORY_TARGET_RESOURCE
-                        || usedCapacity === 0
+                        || creep.store.getUsedCapacity(resourceType) === 0 && creep.room.storage.store.getUsedCapacity(resourceType) === 0 && creep.room.terminal.store.getUsedCapacity(resourceType) === 0
                     ) {
                         return JOB_IS_DONE;
                     } else if (creep.store.getUsedCapacity(resourceType) === 0) { // fetch

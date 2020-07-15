@@ -209,7 +209,7 @@ const Terminals = {
                             for (const fromTerminalKey in terminals) {
                                 let didSend = false;
                                 const fromTerminal = terminals[fromTerminalKey];
-                                if(fromTerminal.store.getUsedCapacity(resourceTypeNeeded) > Util.TERMINAL_TARGET_RESOURCE){
+                                if(fromTerminal.store.getUsedCapacity(resourceTypeNeeded) > (Util.TERMINAL_TARGET_RESOURCE + 500)/*buffer to avoid small sends*/){
                                     didSend = TrySendResource(amountNeeded, resourceTypeNeeded, fromTerminal, toTerminal);
                                     if (didSend) {
                                         break;
@@ -230,7 +230,8 @@ const Terminals = {
             });
             if (flags.length > 0) {
                 for (const flagKey in flags) {
-                    const flagNameArray = flagKey.split(/[-]+/).filter(function (e) {
+                    const flag = flags[flagKey];
+                    const flagNameArray = flag.name.split(/[-]+/).filter(function (e) {
                         return e;
                     });
                     const resourceTypeNeeded = flagNameArray[1];
@@ -246,7 +247,8 @@ const Terminals = {
                                 }
                             }
                         }
-                        if (!didSend && flagNameArray[0].equals("BUY")) { // try to buy resource
+                        if (!didSend && flagNameArray[0] === 'BUY') { // try to buy resource
+                            Util.Info('Terminal', 'GetLabResources', 'flagNameArray ' + flagNameArray);
                             if (marketDealCount >= 10 || toTerminal.cooldown) {
                                 return marketDealCount;
                             }
@@ -282,7 +284,7 @@ const Terminals = {
             }
             for (const resourceType in terminal.store) {
                 const max = SetMaxResource(resourceType);
-                if (terminal.store.getUsedCapacity(resourceType) > max + 500/*buffer to avoid small sales*/) {
+                if (terminal.store.getUsedCapacity(resourceType) > (max + 500)/*buffer to avoid small sales*/) {
                     const amount = terminal.store.getUsedCapacity(resourceType) - max;
                     let didSend = false;
                     if(resourceType === RESOURCE_ENERGY){
@@ -408,7 +410,7 @@ const Terminals = {
             if (orders.length > 0) {
                 orders.sort(comparePriceCheapestFirst);
                 const order = orders[0];
-                Util.Info('Terminals', 'TryBuyResource', 'WTB ' + amount + ' ' + resourceType + ' from ' + terminal + ' ' + JSON.stringify(order) + ' avg price ' + resourceHistory[0].avgPrice);
+                Util.Info('Terminals', 'TryBuyResource', 'WTB ' + amount + ' ' + resourceType + ' from ' + terminal.pos.roomName + ' ' + JSON.stringify(order) + ' avg price ' + resourceHistory[0].avgPrice);
                 if (amount > order.remainingAmount) {
                     amount = order.remainingAmount;  // cannot buy more resources than this
                 }

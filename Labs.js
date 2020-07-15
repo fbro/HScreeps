@@ -65,7 +65,9 @@ const Labs = {
                     }
                 })[0];
                 if (lab2) {
-                    return lab.runReaction(lab1, lab2);
+                    const result = lab.runReaction(lab1, lab2);
+                    //Util.Info('Labs', 'Reaction', lab.pos.roomName + ' merge ' + resource1 + ' and ' + resource2);
+                    return result;
                 }
             }
         }

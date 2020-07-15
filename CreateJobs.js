@@ -408,36 +408,38 @@ const CreateJobs = {
                         roomJobs = TryAddFillFactoryJob(gameRoom, factory, roomJobs, RESOURCE_BIOMASS);
                         roomJobs = TryAddFillFactoryJob(gameRoom, factory, roomJobs, RESOURCE_LEMERGIUM);
                         roomJobs = TryAddFillFactoryJob(gameRoom, factory, roomJobs, RESOURCE_LEMERGIUM_BAR);
-                        roomJobs = TryAddFillFactoryJob(gameRoom, factory, roomJobs, RESOURCE_CELL);
-                        if (factory.store.getUsedCapacity(RESOURCE_CELL) > 0 && factory.level === 1) { // level 1 specific
-                            roomJobs = TryAddFillFactoryJob(gameRoom, factory, roomJobs, RESOURCE_OXYGEN);
+                        roomJobs = TryAddFillFactoryJob(gameRoom, factory, roomJobs, RESOURCE_OXYGEN);
+                        roomJobs = TryAddFillFactoryJob(gameRoom, factory, roomJobs, RESOURCE_HYDROGEN);
+                        if (factory.level === 1) { // level 1 specific
+                            roomJobs = TryAddFillFactoryJob(gameRoom, factory, roomJobs, RESOURCE_CELL);
                             roomJobs = TryAddFillFactoryJob(gameRoom, factory, roomJobs, RESOURCE_OXIDANT);
-                        } else if (factory.store.getUsedCapacity(RESOURCE_CELL) > 0 && factory.level === 2) { // level 2 specific
-                            roomJobs = TryAddFillFactoryJob(gameRoom, factory, roomJobs, RESOURCE_HYDROGEN);
-                            roomJobs = TryAddFillFactoryJob(gameRoom, factory, roomJobs, RESOURCE_REDUCTANT);
+                        } else if (factory.level === 2) { // level 2 specific
                             roomJobs = TryAddFillFactoryJob(gameRoom, factory, roomJobs, RESOURCE_PHLEGM);
+                            roomJobs = TryAddFillFactoryJob(gameRoom, factory, roomJobs, RESOURCE_CELL);
+                            roomJobs = TryAddFillFactoryJob(gameRoom, factory, roomJobs, RESOURCE_REDUCTANT);
                         }
                     }
                     // Mechanical chain
-                    if (gameRoom.storage.store.getUsedCapacity(RESOURCE_METAL) > 0
+                    else if (gameRoom.storage.store.getUsedCapacity(RESOURCE_METAL) > 0
                         || gameRoom.terminal.store.getUsedCapacity(RESOURCE_METAL) > 0
                         || factory.store.getUsedCapacity(RESOURCE_METAL) > 0
                         || factory.store.getUsedCapacity(RESOURCE_ALLOY) > 0) {
                         roomJobs = TryAddFillFactoryJob(gameRoom, factory, roomJobs, RESOURCE_METAL);
                         roomJobs = TryAddFillFactoryJob(gameRoom, factory, roomJobs, RESOURCE_ZYNTHIUM);
                         roomJobs = TryAddFillFactoryJob(gameRoom, factory, roomJobs, RESOURCE_ZYNTHIUM_BAR);
-                        roomJobs = TryAddFillFactoryJob(gameRoom, factory, roomJobs, RESOURCE_ALLOY);
-                        if (factory.store.getUsedCapacity(RESOURCE_ALLOY) > 0 && factory.level === 1) { // level 1 specific
-                            roomJobs = TryAddFillFactoryJob(gameRoom, factory, roomJobs, RESOURCE_UTRIUM);
+                        roomJobs = TryAddFillFactoryJob(gameRoom, factory, roomJobs, RESOURCE_OXYGEN);
+                        roomJobs = TryAddFillFactoryJob(gameRoom, factory, roomJobs, RESOURCE_UTRIUM);
+                        roomJobs = TryAddFillFactoryJob(gameRoom, factory, roomJobs, RESOURCE_HYDROGEN);
+                        if (factory.level === 1) { // level 1 specific
+                            roomJobs = TryAddFillFactoryJob(gameRoom, factory, roomJobs, RESOURCE_ALLOY);
                             roomJobs = TryAddFillFactoryJob(gameRoom, factory, roomJobs, RESOURCE_UTRIUM_BAR);
-                        } else if (factory.store.getUsedCapacity(RESOURCE_ALLOY) > 0 && factory.level === 2) { // level 2 specific
-                            roomJobs = TryAddFillFactoryJob(gameRoom, factory, roomJobs, RESOURCE_OXYGEN);
+                        } else if (factory.level === 2) { // level 2 specific
+                            roomJobs = TryAddFillFactoryJob(gameRoom, factory, roomJobs, RESOURCE_ALLOY);
                             roomJobs = TryAddFillFactoryJob(gameRoom, factory, roomJobs, RESOURCE_OXIDANT);
                             roomJobs = TryAddFillFactoryJob(gameRoom, factory, roomJobs, RESOURCE_COMPOSITE); // used for lvl 2 FIXTURES
-                        } else if (factory.store.getUsedCapacity(RESOURCE_ALLOY) > 0 && factory.level === 3) { // level 3 specific
+                        } else if (factory.level === 3) { // level 3 specific
                             roomJobs = TryAddFillFactoryJob(gameRoom, factory, roomJobs, RESOURCE_FIXTURES);
                             roomJobs = TryAddFillFactoryJob(gameRoom, factory, roomJobs, RESOURCE_TUBE);
-                            roomJobs = TryAddFillFactoryJob(gameRoom, factory, roomJobs, RESOURCE_HYDROGEN);
                             roomJobs = TryAddFillFactoryJob(gameRoom, factory, roomJobs, RESOURCE_REDUCTANT);
                         }
                     }
@@ -536,12 +538,15 @@ const CreateJobs = {
                         if (gameRoom.storage.store.getUsedCapacity(resourceType) < Util.STORAGE_MEDIUM
                             && gameRoom.terminal.store.getUsedCapacity(resourceType) < Util.STORAGE_MEDIUM_TRANSFER
                             && (
-                                (resourceType === RESOURCE_LEMERGIUM_BAR
+                                (      resourceType === RESOURCE_LEMERGIUM_BAR
                                     || resourceType === RESOURCE_ZYNTHIUM_BAR
                                     || resourceType === RESOURCE_UTRIUM_BAR
+                                    || resourceType === RESOURCE_KEANIUM_BAR
+                                    || resourceType === RESOURCE_PURIFIER
+                                    || resourceType === RESOURCE_GHODIUM_MELT
                                     || resourceType === RESOURCE_OXIDANT
                                     || resourceType === RESOURCE_REDUCTANT
-                                ) && amount >= 1000 && !factory.level && gameRoom.terminal.store.getUsedCapacity(resourceType) <= Util.TERMINAL_TARGET_RESOURCE && gameRoom.storage.store.getUsedCapacity(resourceType) <= Util.STORAGE_LOW
+                                ) && amount >= 1000 && !factory.level
 
                                 || resourceType === RESOURCE_COMPOSITE && amount >= 500 && factory.level === 1
                                 || resourceType === RESOURCE_CRYSTAL && amount >= 500 && factory.level === 2

@@ -24,41 +24,34 @@ const Factories = {
                     const hasOperateFactoryEffect = factory.effects && factory.effects[0] && factory.effects[0].effect === PWR_OPERATE_FACTORY;
                     if (factory.level === 1 && hasOperateFactoryEffect) {
                         result = Produce(factory, RESOURCE_PHLEGM, Util.FACTORY_TARGET_RESOURCE, RESOURCE_OXIDANT, 36, RESOURCE_CELL, 20, RESOURCE_LEMERGIUM_BAR, 16, RESOURCE_ENERGY, 8);
-                        if (result !== OK) {
-                            result = Produce(factory, RESOURCE_COMPOSITE, Util.FACTORY_TARGET_RESOURCE, RESOURCE_UTRIUM_BAR, 20, RESOURCE_ZYNTHIUM_BAR, 20, RESOURCE_ENERGY, 20);
-                            if (result !== OK) {
-                                result = Produce(factory, RESOURCE_TUBE, Util.FACTORY_TARGET_RESOURCE, RESOURCE_ALLOY, 40, RESOURCE_ZYNTHIUM_BAR, 16, RESOURCE_ENERGY, 8);
-                            }
-                        }
+                        if (result === OK) return;
+                        result = Produce(factory, RESOURCE_COMPOSITE, Util.FACTORY_TARGET_RESOURCE, RESOURCE_UTRIUM_BAR, 20, RESOURCE_ZYNTHIUM_BAR, 20, RESOURCE_ENERGY, 20);
+                        if (result === OK) return;
+                        result = Produce(factory, RESOURCE_TUBE, Util.FACTORY_TARGET_RESOURCE, RESOURCE_ALLOY, 40, RESOURCE_ZYNTHIUM_BAR, 16, RESOURCE_ENERGY, 8);
+                        if (result === OK) return;
                     } else if (factory.level === 2 && hasOperateFactoryEffect) {
                         result = Produce(factory, RESOURCE_TISSUE, Util.FACTORY_TARGET_RESOURCE, RESOURCE_REDUCTANT, 110, RESOURCE_CELL, 10, RESOURCE_PHLEGM, 10, RESOURCE_ENERGY, 16);
-                        if (result !== OK) {
-                            result = Produce(factory, RESOURCE_FIXTURES, Util.FACTORY_TARGET_RESOURCE, RESOURCE_COMPOSITE, 20, RESOURCE_ALLOY, 41, RESOURCE_OXIDANT, 161, RESOURCE_ENERGY, 8);
-                        }
+                        if (result === OK) return;
+                        result = Produce(factory, RESOURCE_FIXTURES, Util.FACTORY_TARGET_RESOURCE, RESOURCE_COMPOSITE, 20, RESOURCE_ALLOY, 41, RESOURCE_OXIDANT, 161, RESOURCE_ENERGY, 8);
+                        if (result === OK) return;
                     } else if (factory.level === 3 && hasOperateFactoryEffect) {
                         result = Produce(factory, RESOURCE_FRAME, Util.FACTORY_TARGET_RESOURCE, RESOURCE_FIXTURES, 2, RESOURCE_TUBE, 4, RESOURCE_REDUCTANT, 330, RESOURCE_ZYNTHIUM_BAR, 31, RESOURCE_ENERGY, 16);
+                        if (result === OK) return;
                     }
-                    if (result !== OK) {
-                        result = Produce(factory, RESOURCE_LEMERGIUM_BAR, Util.FACTORY_TARGET_RESOURCE, RESOURCE_LEMERGIUM, 500, RESOURCE_ENERGY, 200);
-                        if (result !== OK) {
-                            result = Produce(factory, RESOURCE_ZYNTHIUM_BAR, Util.FACTORY_TARGET_RESOURCE, RESOURCE_ZYNTHIUM, 500, RESOURCE_ENERGY, 200);
-                            if (result !== OK) {
-                                result = Produce(factory, RESOURCE_UTRIUM_BAR, Util.FACTORY_TARGET_RESOURCE, RESOURCE_UTRIUM, 500, RESOURCE_ENERGY, 200);
-                                if (result !== OK) {
-                                    result = Produce(factory, RESOURCE_OXIDANT, Util.FACTORY_TARGET_RESOURCE, RESOURCE_OXYGEN, 500, RESOURCE_ENERGY, 200);
-                                    if (result !== OK) {
-                                        result = Produce(factory, RESOURCE_REDUCTANT, Util.FACTORY_TARGET_RESOURCE, RESOURCE_HYDROGEN, 500, RESOURCE_ENERGY, 200);
-                                        if (result !== OK) {
-                                            result = Produce(factory, RESOURCE_CELL, Util.FACTORY_TARGET_RESOURCE, RESOURCE_BIOMASS, 100, RESOURCE_LEMERGIUM_BAR, 20, RESOURCE_ENERGY, 40);
-                                            if (result !== OK) {
-                                                result = Produce(factory, RESOURCE_ALLOY, Util.FACTORY_TARGET_RESOURCE, RESOURCE_METAL, 100, RESOURCE_ZYNTHIUM_BAR, 20, RESOURCE_ENERGY, 40);
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
+                    result = Produce(factory, RESOURCE_LEMERGIUM_BAR, Util.FACTORY_TARGET_RESOURCE, RESOURCE_LEMERGIUM, 500, RESOURCE_ENERGY, 200);
+                    if (result === OK) return;
+                    result = Produce(factory, RESOURCE_ZYNTHIUM_BAR, Util.FACTORY_TARGET_RESOURCE, RESOURCE_ZYNTHIUM, 500, RESOURCE_ENERGY, 200);
+                    if (result === OK) return;
+                    result = Produce(factory, RESOURCE_UTRIUM_BAR, Util.FACTORY_TARGET_RESOURCE, RESOURCE_UTRIUM, 500, RESOURCE_ENERGY, 200);
+                    if (result === OK) return;
+                    result = Produce(factory, RESOURCE_OXIDANT, Util.FACTORY_TARGET_RESOURCE, RESOURCE_OXYGEN, 500, RESOURCE_ENERGY, 200);
+                    if (result === OK) return;
+                    result = Produce(factory, RESOURCE_REDUCTANT, Util.FACTORY_TARGET_RESOURCE, RESOURCE_HYDROGEN, 500, RESOURCE_ENERGY, 200);
+                    if (result === OK) return;
+                    result = Produce(factory, RESOURCE_CELL, Util.FACTORY_TARGET_RESOURCE, RESOURCE_BIOMASS, 100, RESOURCE_LEMERGIUM_BAR, 20, RESOURCE_ENERGY, 40);
+                    if (result === OK) return;
+                    result = Produce(factory, RESOURCE_ALLOY, Util.FACTORY_TARGET_RESOURCE, RESOURCE_METAL, 100, RESOURCE_ZYNTHIUM_BAR, 20, RESOURCE_ENERGY, 40);
+                    if (result === OK) return;
                 }
             } else { // no factory in this room - set FctrId so that it wont look again
                 memRoom.FctrId = '-';
