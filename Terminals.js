@@ -216,8 +216,7 @@ const Terminals = {
                                     }
                                 }
                             }
-                            if (!didSend && false) { // try to buy resource
-                                Util.Info('Terminal', 'GetFactoryResources', ' ');
+                            if (!didSend && resourceTypeNeeded.length === 1) { // try to buy resource
                                 if (marketDealCount >= 10 || toTerminal.cooldown) {
                                     return marketDealCount;
                                 }
