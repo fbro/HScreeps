@@ -24,7 +24,7 @@ const Terminals = {
                 const terminal = terminals[terminalKey];
                 const memRoom = Memory.MemRooms[terminal.pos.roomName];
 
-                GetFactoryResources(terminal, terminals, memRoom); // try and get from other terminals
+                marketDealCount = GetFactoryResources(terminal, terminals, memRoom, marketDealCount); // try and get from other terminals
 
                 marketDealCount = GetLabResources(terminal, terminals, marketDealCount); // first try and get from other terminals then try and buy from the market
 
@@ -34,13 +34,13 @@ const Terminals = {
             }
         }
 
-        function GetFactoryResources(toTerminal, terminals, memRoom) {
+        function GetFactoryResources(toTerminal, terminals, memRoom, marketDealCount) {
             if (memRoom && memRoom.FctrId && memRoom.FctrId !== '-') {
                 const factory = Game.getObjectById(memRoom.FctrId);
                 if (factory) {
-                    const resourceTypesNeeded = [RESOURCE_ENERGY];
+                    const resourceTypesNeeded = [];
                     switch (factory.level) { // factory level
-                        case(0):
+                        case undefined:
                             switch (true) { // production chain
                                 case(IsProductionChain(factory, RESOURCE_METAL, RESOURCE_ALLOY, RESOURCE_METAL)): // Mechanical chain
                                     resourceTypesNeeded.push(RESOURCE_ZYNTHIUM);
@@ -205,21 +205,33 @@ const Terminals = {
                     for(const resourceNeedKey in resourceTypesNeeded){
                         const resourceTypeNeeded = resourceTypesNeeded[resourceNeedKey];
                         const amountNeeded = Util.TERMINAL_TARGET_RESOURCE - toTerminal.store.getUsedCapacity(resourceTypeNeeded);
-                        if (amountNeeded > 0) {
+                        if (amountNeeded > 500/*buffer to avoid small sends*/) {
+                            let didSend = false;
                             for (const fromTerminalKey in terminals) {
-                                let didSend = false;
                                 const fromTerminal = terminals[fromTerminalKey];
-                                if(fromTerminal.store.getUsedCapacity(resourceTypeNeeded) > (Util.TERMINAL_TARGET_RESOURCE + 500)/*buffer to avoid small sends*/){
+                                if(fromTerminal.store.getUsedCapacity(resourceTypeNeeded) > Util.TERMINAL_TARGET_RESOURCE){
                                     didSend = TrySendResource(amountNeeded, resourceTypeNeeded, fromTerminal, toTerminal);
                                     if (didSend) {
                                         break;
                                     }
                                 }
                             }
+                            if (!didSend && false) { // try to buy resource
+                                Util.Info('Terminal', 'GetFactoryResources', ' ');
+                                if (marketDealCount >= 10 || toTerminal.cooldown) {
+                                    return marketDealCount;
+                                }
+                                const didBuy = TryBuyResource(toTerminal, resourceTypeNeeded, amountNeeded);
+                                if (didBuy) {
+                                    marketDealCount++;
+                                    break; // when buying on the market one can only buy once per terminal
+                                }
+                            }
                         }
                     }
                 }
             }
+            return marketDealCount;
         }
 
         function GetLabResources(toTerminal, terminals, marketDealCount) {
@@ -236,7 +248,7 @@ const Terminals = {
                     });
                     const resourceTypeNeeded = flagNameArray[1];
                     const amountNeeded = Util.TERMINAL_TARGET_RESOURCE - toTerminal.store.getUsedCapacity(resourceTypeNeeded);
-                    if (amountNeeded > 0) {
+                    if (amountNeeded > 500/*buffer to avoid small sends*/) {
                         let didSend = false;
                         for (const fromTerminalKey in terminals) { // try to get resource from other terminal
                             const fromTerminal = terminals[fromTerminalKey];
@@ -247,8 +259,8 @@ const Terminals = {
                                 }
                             }
                         }
-                        if (!didSend && flagNameArray[0] === 'BUY') { // try to buy resource
-                            Util.Info('Terminal', 'GetLabResources', 'flagNameArray ' + flagNameArray);
+                        if (!didSend && flagNameArray[0] === 'BUY') { // try to buy the resource
+                            Util.Info('Terminal', 'GetLabResources', 'buy flagNameArray ' + flagNameArray);
                             if (marketDealCount >= 10 || toTerminal.cooldown) {
                                 return marketDealCount;
                             }
