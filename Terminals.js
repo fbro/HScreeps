@@ -216,7 +216,7 @@ const Terminals = {
                                     }
                                 }
                             }
-                            if (!didSend && resourceTypeNeeded.length === 1) { // try to buy resource
+                            if (!didSend && toTerminal.store.getUsedCapacity(RESOURCE_ENERGY) >= Util.TERMINAL_TARGET_ENERGY && resourceTypeNeeded.length === 1) { // try to buy resource
                                 if (marketDealCount >= 10 || toTerminal.cooldown) {
                                     return marketDealCount;
                                 }
@@ -258,7 +258,7 @@ const Terminals = {
                                 }
                             }
                         }
-                        if (!didSend && flagNameArray[0] === 'BUY') { // try to buy the resource
+                        if (!didSend && toTerminal.store.getUsedCapacity(RESOURCE_ENERGY) >= Util.TERMINAL_TARGET_ENERGY && flagNameArray[0] === 'BUY') { // try to buy the resource
                             Util.Info('Terminal', 'GetLabResources', 'buy flagNameArray ' + flagNameArray);
                             if (marketDealCount >= 10 || toTerminal.cooldown) {
                                 return marketDealCount;
