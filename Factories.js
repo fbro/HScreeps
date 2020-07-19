@@ -75,7 +75,7 @@ const Factories = {
                 && factory.store.getUsedCapacity(resToProduceName) < resToProduceMaxAmount
             ) { // res 1 and 2 is always required but 3 - 5 may be undefined
                 const result = factory.produce(resToProduceName);
-                /*
+                /**/
                 Util.Info('Factories', 'Produce',
                     factory.pos.roomName + ' producing ' + resToProduceName + ' ' + factory.store.getUsedCapacity(resToProduceName) + ' result ' + result
                     + ' ' + res1Name + ' ' + factory.store.getUsedCapacity(res1Name)
@@ -83,7 +83,7 @@ const Factories = {
                     + (res3Name ? ' ' + res3Name + ' ' + factory.store.getUsedCapacity(res3Name) : '')
                     + (res4Name ? ' ' + res4Name + ' ' + factory.store.getUsedCapacity(res4Name) : '')
                     + (res5Name ? ' ' + res5Name + ' ' + factory.store.getUsedCapacity(res5Name) : ''));
-                */
+
                 return result;
             }
         }
