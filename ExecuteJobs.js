@@ -733,7 +733,7 @@ const ExecuteJobs = {
                         || ((jobObject.structureType === STRUCTURE_WALL || jobObject.structureType === STRUCTURE_RAMPART)
                             && (newHits >= Util.RAMPART_WALL_HITS_U_LVL5 && jobObject.room.controller.level < 5
                                 || newHits >= Util.RAMPART_WALL_HITS_U_LVL8 && jobObject.room.controller.level >= 5 && jobObject.room.controller.level < 8
-                                || newHits >= Util.RAMPART_WALL_HITS_O_LVL8 && jobObject.room.controller.level === 8 && (!jobObject.room.storage || jobObject.room.storage && jobObject.room.storage.store.getUsedCapacity(RESOURCE_ENERGY) < Util.RAMPART_WALL_MAX_HITS_WHEN_STORAGE_ENERGY)))) {
+                                || newHits >= Util.RAMPART_WALL_HITS_LVL8 && jobObject.room.controller.level === 8 && (!jobObject.room.storage || jobObject.room.storage && jobObject.room.storage.store.getUsedCapacity(RESOURCE_ENERGY) < Util.RAMPART_WALL_MAX_HITS_WHEN_STORAGE_ENERGY)))) {
                         // predict that the creep will be done
                         return JOB_IS_DONE;
                     } else {

@@ -11,6 +11,7 @@ const Util = {
     // if over max - then try and sell
     TERMINAL_MAX_RESOURCE: 6000,
     TERMINAL_MAX_ENERGY: 90000,
+    TERMINAL_BUFFER: 500, // buffer to avoid small sends/sales
     // if storage contains more or equal of high then creep should transfer to terminal until high_transfer is in terminal
     STORAGE_ENERGY_HIGH: 300000,
     STORAGE_ENERGY_HIGH_TRANSFER: 100000,
@@ -42,7 +43,7 @@ const Util = {
     RAMPART_WALL_MAX_HITS_WHEN_STORAGE_ENERGY: 600000, // when storage energy is over this value then go crazy with upgrading ramparts and walls
     RAMPART_WALL_HITS_U_LVL5: 1000,
     RAMPART_WALL_HITS_U_LVL8: 100000,
-    RAMPART_WALL_HITS_O_LVL8: 2000000,
+    RAMPART_WALL_HITS_LVL8: 2000000,
 
     // Game.time % modulo value below - stack expensive ticks on top of each other
     GAME_TIME_MODULO_1: 2,

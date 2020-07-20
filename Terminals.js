@@ -28,9 +28,9 @@ const Terminals = {
 
                 marketDealCount = GetLabResources(terminal, terminals, marketDealCount); // first try and get from other terminals then try and buy from the market
 
-                GetEnergy(terminal, terminals);
+                GetEnergy(terminal, terminals); // get energy from other terminals
 
-                marketDealCount = SendExcess(terminal, marketDealCount);
+                marketDealCount = SendExcess(terminal, marketDealCount); // selected terminal will actively send/sell resources out
             }
         }
 
@@ -42,18 +42,9 @@ const Terminals = {
                     for(const resourceNeedKey in resourceTypesNeeded){
                         const resourceTypeNeeded = resourceTypesNeeded[resourceNeedKey];
                         const amountNeeded = Util.TERMINAL_TARGET_RESOURCE - toTerminal.store.getUsedCapacity(resourceTypeNeeded);
-                        if (amountNeeded > 500/*buffer to avoid small sends*/) {
-                            let didSend = false;
-                            for (const fromTerminalKey in terminals) {
-                                const fromTerminal = terminals[fromTerminalKey];
-                                if(fromTerminal.store.getUsedCapacity(resourceTypeNeeded) > Util.TERMINAL_TARGET_RESOURCE){
-                                    didSend = TrySendResource(amountNeeded, resourceTypeNeeded, fromTerminal, toTerminal);
-                                    if (didSend) {
-                                        break;
-                                    }
-                                }
-                            }
-                            if (!didSend && toTerminal.store.getUsedCapacity(RESOURCE_ENERGY) >= Util.TERMINAL_TARGET_ENERGY && resourceTypeNeeded.length === 1) { // try to buy resource
+                        if (amountNeeded > Util.TERMINAL_BUFFER) {
+                            const didSend = GetFromTerminal(amountNeeded, resourceTypeNeeded, toTerminal, terminals, Util.TERMINAL_TARGET_RESOURCE);
+                            if (!didSend && toTerminal.store.getUsedCapacity(RESOURCE_ENERGY) >= Util.TERMINAL_TARGET_ENERGY && resourceTypeNeeded.length === 1/*only buy H, O, L, U, K, Z, X*/) { // try to buy resource
                                 if (marketDealCount >= 10 || toTerminal.cooldown) {
                                     return marketDealCount;
                                 }
@@ -84,17 +75,8 @@ const Terminals = {
                     });
                     const resourceTypeNeeded = flagNameArray[1];
                     const amountNeeded = Util.TERMINAL_TARGET_RESOURCE - toTerminal.store.getUsedCapacity(resourceTypeNeeded);
-                    if (amountNeeded > 500/*buffer to avoid small sends*/) {
-                        let didSend = false;
-                        for (const fromTerminalKey in terminals) { // try to get resource from other terminal
-                            const fromTerminal = terminals[fromTerminalKey];
-                            if(fromTerminal.store.getUsedCapacity(resourceTypeNeeded) > Util.TERMINAL_TARGET_RESOURCE){
-                                didSend = TrySendResource(amountNeeded, resourceTypeNeeded, fromTerminal, toTerminal);
-                                if (didSend) {
-                                    break;
-                                }
-                            }
-                        }
+                    if (amountNeeded > Util.TERMINAL_BUFFER) {
+                        const didSend = GetFromTerminal(amountNeeded, resourceTypeNeeded, toTerminal, terminals, Util.TERMINAL_TARGET_RESOURCE);
                         if (!didSend && toTerminal.store.getUsedCapacity(RESOURCE_ENERGY) >= Util.TERMINAL_TARGET_ENERGY && flagNameArray[0] === 'BUY') { // try to buy the resource
                             Util.Info('Terminal', 'GetLabResources', 'buy flagNameArray ' + flagNameArray);
                             if (marketDealCount >= 10 || toTerminal.cooldown) {
@@ -114,42 +96,27 @@ const Terminals = {
 
         function GetEnergy(toTerminal, terminals) {
             if (toTerminal.store.getUsedCapacity(RESOURCE_ENERGY) === 0 && toTerminal.room.storage.store.getUsedCapacity(RESOURCE_ENERGY) === 0) {
-                for (const fromTerminalKey in terminals) {
-                    const fromTerminal = terminals[fromTerminalKey];
-                    if (fromTerminal.store.getUsedCapacity(RESOURCE_ENERGY) >= Util.STORAGE_ENERGY_MEDIUM) {
-                        const didSend = TrySendResource(Util.STORAGE_ENERGY_LOW, RESOURCE_ENERGY, fromTerminal, toTerminal);
-                        if (didSend) {
-                            return;
-                        }
-                    }
-                }
+                const didSend = GetFromTerminal(Util.STORAGE_ENERGY_LOW, RESOURCE_ENERGY, toTerminal, terminals, Util.STORAGE_ENERGY_MEDIUM);
             }
         }
 
-        function SendExcess(terminal, marketDealCount) {
-            if (marketDealCount >= 10 || terminal.cooldown) {
-                return marketDealCount;
-            }
-            for (const resourceType in terminal.store) {
-                const max = SetMaxResourceToSell(resourceType);
-                if (terminal.store.getUsedCapacity(resourceType) > (max + 500)/*buffer to avoid small sales*/) {
-                    const amount = terminal.store.getUsedCapacity(resourceType) - max;
-                    let didSend = false;
-                    if(resourceType === RESOURCE_ENERGY){
-                        for (const toTerminalKey in terminals) { // try to send energy to other terminal that needs it
-                            const toTerminal = terminals[toTerminalKey];
-                            if(toTerminal.store.getUsedCapacity(resourceType) < Util.TERMINAL_TARGET_ENERGY){
-                                didSend = TrySendResource(amount, resourceType, terminal, toTerminal);
-                                if (didSend) {
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                    if (!didSend) {
-                        didSend = TrySellResource(terminal, resourceType, amount);
-                    }
-                    if (didSend) {
+        function SendExcess(fromTerminal, marketDealCount) { // selected terminal will actively send/sell resources out
+            for (const resourceType in fromTerminal.store) {
+                if (marketDealCount >= 10 || fromTerminal.cooldown) {
+                    return marketDealCount;
+                }
+                let didSend = false;
+                if(resourceType === RESOURCE_ENERGY){ // try to send energy to other terminal that needs it
+                    didSend = SendToTerminal(Util.TERMINAL_MAX_ENERGY, resourceType, fromTerminal, terminals, Util.TERMINAL_TARGET_ENERGY);
+                }else if(resourceType === RESOURCE_POWER){
+                    didSend = SendToTerminal(Util.TERMINAL_TARGET_RESOURCE, resourceType, fromTerminal, terminals, Util.TERMINAL_TARGET_RESOURCE);
+                }
+
+                const max = GetMaxResourceToSell(resourceType);
+                if (!didSend && fromTerminal.store.getUsedCapacity(resourceType) > (max + Util.TERMINAL_BUFFER)) {
+                    const amount = fromTerminal.store.getUsedCapacity(resourceType) - max;
+                    const didSell = TrySellResource(fromTerminal, resourceType, amount);
+                    if (didSell) {
                         marketDealCount++;
                         break; // when selling on the market one can only sell once per terminal
                     }
@@ -161,6 +128,45 @@ const Terminals = {
         //endregion
 
         //region helper functions
+
+        /**@return {boolean}*/
+        function GetFromTerminal(amountNeeded, resourceTypeNeeded, toTerminal, terminals, minFromTerminalAmount){
+            let didSend = false;
+            for (const fromTerminalKey in terminals) { // try to get resource from other terminal
+                const fromTerminal = terminals[fromTerminalKey];
+                if(fromTerminal.store.getUsedCapacity(resourceTypeNeeded) > minFromTerminalAmount){
+                    didSend = TrySendResource(amountNeeded, resourceTypeNeeded, fromTerminal, toTerminal);
+                    if (didSend) {
+                        break;
+                    }
+                }
+            }
+            return didSend;
+        }
+
+        /**@return {boolean}*/
+        function SendToTerminal(amountToKeep, resourceTypeToSend, fromTerminal, terminals, maxToTerminalAmount){
+            let didSend = false;
+            if (fromTerminal.store.getUsedCapacity(resourceTypeToSend) > (amountToKeep + Util.TERMINAL_BUFFER)) {
+                let amountToSend = fromTerminal.store.getUsedCapacity(resourceTypeToSend) - amountToKeep;
+                for (const toTerminalKey in terminals) { // try to get resource from other terminal
+                    const toTerminal = terminals[toTerminalKey];
+                    if(toTerminal.store.getUsedCapacity(resourceTypeToSend) < maxToTerminalAmount){
+                        if(amountToSend > maxToTerminalAmount - toTerminal.store.getUsedCapacity(resourceTypeToSend)){
+                            amountToSend = maxToTerminalAmount - toTerminal.store.getUsedCapacity(resourceTypeToSend);
+                            if(amountToSend < Util.TERMINAL_BUFFER){
+                                break;
+                            }
+                        }
+                        didSend = TrySendResource(amountToSend, resourceTypeToSend, fromTerminal, toTerminal);
+                        if (didSend) {
+                            break;
+                        }
+                    }
+                }
+            }
+            return didSend;
+        }
 
         function GetListOfFactoryResources(factory){
             const resourceTypesNeeded = [];
@@ -345,7 +351,7 @@ const Terminals = {
         }
 
         /**@return {number}*/
-        function SetMaxResourceToSell(resourceType) {
+        function GetMaxResourceToSell(resourceType) {
             switch (resourceType) {
                 case RESOURCE_ENERGY :
                     return Util.TERMINAL_MAX_ENERGY;
