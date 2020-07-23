@@ -1441,7 +1441,7 @@ const ExecuteJobs = {
                 },
                 /**@return {int}*/
                 Fetch: function (fetchObject, jobObject) {
-                    if (jobObject !== fetchObject) { // hostileCreep
+                    if (jobObject !== fetchObject) { // hostileCreep or hostileStructure
                         return creep.attack(fetchObject);
                     } else if (creep.pos.isEqualTo(jobObject)) {
                         return OK; // when OK is returned FindFetchObject is checking each tick for new hostileCreeps
