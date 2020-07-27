@@ -77,7 +77,7 @@ const Factories = {
                 const result = factory.produce(resToProduceName);
                 /**/
                 Util.Info('Factories', 'Produce',
-                    factory.level + ' ' + factory.pos.roomName + ' producing ' + resToProduceName + ' ' + factory.store.getUsedCapacity(resToProduceName) + ' result ' + result
+                    'lvl ' + (!factory.level ? 0 : factory.level) + ' ' + factory.pos.roomName + ' producing ' + resToProduceName + ' ' + factory.store.getUsedCapacity(resToProduceName) + ' result ' + result
                     + ' ' + res1Name + ' ' + factory.store.getUsedCapacity(res1Name)
                     + ' ' + res2Name + ' ' + factory.store.getUsedCapacity(res2Name)
                     + (res3Name ? ' ' + res3Name + ' ' + factory.store.getUsedCapacity(res3Name) : '')

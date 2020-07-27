@@ -124,6 +124,25 @@ const Util = {
             }
         }
         Memory.MemRooms[roomName].RoomJobs[jobKey] = undefined;
+    },
+
+    CreateRoom: function(roomName, jobs) {
+        const gameRoom = Game.rooms[roomName];
+        let level = -1;
+        let sourceNumber = 0;
+        if (gameRoom) {
+            if (gameRoom.controller) {
+                level = gameRoom.controller.level;
+            }
+            sourceNumber = gameRoom.find(FIND_SOURCES).length;
+        }
+        Memory.MemRooms[roomName] = {
+            'RoomLevel': level, // 0 to 8 or if there are NO controller then -1
+            'RoomJobs': jobs, // JobName - [JobName(x,y)] - user friendly, unique per room, name
+            'MaxCreeps': {}, // object that gives information on how many of each type of creep may be in the room and what creeps of that type is in the room
+            'SourceNumber': sourceNumber, // number of sources in room
+        };
+        Util.Info('CreateJobs', 'CreateRoom', 'add new room ' + roomName + ' level ' + level + ' sourceNumber ' + sourceNumber + ' jobs ' + JSON.stringify(jobs))
     }
 };
 module.exports = Util;

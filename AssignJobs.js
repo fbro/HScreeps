@@ -232,7 +232,7 @@ const AssignJobs = {
                 const source = gameRoom.find(FIND_SOURCES)[0];
                 for (const effectKey in source.effects) {
                     if (source.effects[effectKey].effect === PWR_REGEN_SOURCE) {
-                        Util.Info('AssignJobs', 'SpawnCreep', 'Harvester spawning uses large version because of PWR_REGEN_SOURCE ' + source.effects[effectKey].effect + ' ' + memRoomKey);
+                        //Util.Info('AssignJobs', 'SpawnCreep', 'Harvester spawning uses large version because of PWR_REGEN_SOURCE ' + source.effects[effectKey].effect + ' ' + memRoomKey);
                         spawnLargeVersion = true;
                         break;
                     }

@@ -169,7 +169,7 @@ const CreateJobs = {
                     }
                 }
                 if (!Memory.MemRooms[gameRoom.name] && Object.keys(jobs).length > 0) { // room not found and there are jobs in it - create it
-                    CreateRoom(gameRoom.name, jobs);
+                    Util.CreateRoom(gameRoom.name, jobs);
                 } else if (Memory.MemRooms[gameRoom.name]) { // update jobs in memRoom
                     let addedNewJob = false;
                     // add new jobs
@@ -210,7 +210,7 @@ const CreateJobs = {
                 } else {
                     const jobs = {};
                     jobs[flagJobKey] = flagJob;
-                    CreateRoom(roomName, jobs);
+                    Util.CreateRoom(roomName, jobs);
                 }
             }
         }
@@ -530,7 +530,7 @@ const CreateJobs = {
             }
 
             // factory
-            if (Memory.MemRooms[gameRoom.name].FctrId && Memory.MemRooms[gameRoom.name].FctrId !== '-') {
+            if (Memory.MemRooms[gameRoom.name] && Memory.MemRooms[gameRoom.name].FctrId && Memory.MemRooms[gameRoom.name].FctrId !== '-') {
                 const factory = Game.getObjectById(Memory.MemRooms[gameRoom.name].FctrId);
                 if (factory) {
                     for (const resourceType in factory.store) {
@@ -725,24 +725,7 @@ const CreateJobs = {
 
         //region helper functions
 
-        function CreateRoom(roomName, jobs) {
-            const gameRoom = Game.rooms[roomName];
-            let level = -1;
-            let sourceNumber = 0;
-            if (gameRoom) {
-                if (gameRoom.controller) {
-                    level = gameRoom.controller.level;
-                }
-                sourceNumber = gameRoom.find(FIND_SOURCES).length;
-            }
-            Memory.MemRooms[roomName] = {
-                'RoomLevel': level, // 0 to 8 or if there are NO controller then -1
-                'RoomJobs': jobs, // JobName - [JobName(x,y)] - user friendly, unique per room, name
-                'MaxCreeps': {}, // object that gives information on how many of each type of creep may be in the room and what creeps of that type is in the room
-                'SourceNumber': sourceNumber, // number of sources in room
-            };
-            Util.Info('CreateJobs', 'CreateRoom', 'add new room ' + roomName + ' level ' + level + ' sourceNumber ' + sourceNumber + ' jobs ' + JSON.stringify(jobs))
-        }
+
 
         function AddJob(roomJobs, jobName, jobId, jobType, creepType) {
             roomJobs[jobName] = { // create job - RoomJobs - JobName - [JobName(x,y)] - user friendly, unique per room, name

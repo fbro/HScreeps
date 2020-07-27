@@ -132,11 +132,12 @@ const ExecuteJobs = {
                 if (result === ERR_NO_RESULT_FOUND && (!gameCreep.room.controller
                     || !gameCreep.room.controller.my
                     || gameCreep.memory.MoveHome
-                    || Memory.MemRooms[gameCreep.pos.roomName].MaxCreeps[creepName.substring(0, 1)]
+                    || Memory.MemRooms[gameCreep.pos.roomName]
+                    && Memory.MemRooms[gameCreep.pos.roomName].MaxCreeps[creepName.substring(0, 1)]
                     && !Memory.MemRooms[gameCreep.pos.roomName].MaxCreeps[creepName.substring(0, 1)][creepName])) { // I do not own the room the idle creep is in - move it to an owned room!
                     result = IdleCreepMoveHome(creepName, gameCreep, jobRoomName);
                 }
-                if (result === ERR_NO_RESULT_FOUND) {
+                if (result === ERR_NO_RESULT_FOUND && Memory.MemRooms[gameCreep.pos.roomName]) {
                     result = RecycleIdleCreep(creepName, gameCreep)
                 }
             }
@@ -2036,7 +2037,7 @@ const ExecuteJobs = {
                 /**@return {int}*/
                 JobStatus: function (jobObject) {
                     if (creep.store.getUsedCapacity() === 0 && creep.ticksToLive < 400) {
-                        Util.Info('ExecuteJobs', 'JobHarvestDeposit', creep.name + ' committed suicide creep.ticksToLive ' + creep.ticksToLive + ' JOB_IS_DONE');
+                        //Util.Info('ExecuteJobs', 'JobHarvestDeposit', creep.name + ' committed suicide creep.ticksToLive ' + creep.ticksToLive + ' JOB_IS_DONE');
                         creep.suicide();
                         return JOB_IS_DONE;
                     } else if (creep.store.getFreeCapacity() === 0 || creep.memory.FetchObjectId && creep.store.getUsedCapacity() > 0 || creep.ticksToLive < 400) {
@@ -2792,40 +2793,36 @@ const ExecuteJobs = {
 
         /**@return {int}*/
         function Move(creep, obj, fill = 'transparent', stroke = '#fff', lineStyle = 'dashed', strokeWidth = .15, opacity = .3) {
-            const opts = {
-                reusePath: 5, // default
-                serializeMemory: true,  // default
-                noPathFinding: false,  // default
-                visualizePathStyle: {
-                    fill: fill,
-                    stroke: stroke,
-                    lineStyle: lineStyle,
-                    strokeWidth: strokeWidth,
-                    opacity: opacity
-                }
-            };
             let result = ERR_NO_RESULT_FOUND;
             let from = creep.pos;
             let to = obj.pos;
             if (from.roomName === to.roomName) {
+                const opts = {
+                    reusePath: 5, // default
+                    serializeMemory: true,  // default
+                    noPathFinding: false,  // default
+                    visualizePathStyle: {
+                        fill: fill,
+                        stroke: stroke,
+                        lineStyle: lineStyle,
+                        strokeWidth: strokeWidth,
+                        opacity: opacity
+                    }
+                };
                 result = creep.moveTo(to, opts);
             } else { // not in the same room - make a map in mem
-                if (creep.memory._move && creep.pos.roomName === creep.memory._move.room && Game.time < creep.memory._move.time + 50 && creep.memory._move.path) { // movement between rooms should reuse path more
-                    result = creep.moveByPath(creep.memory._move.path);
+                if (creep.memory.ExitPosition && creep.memory.ExitPosition.roomName === creep.pos.roomName) { // movement between rooms should reuse path more
+                    result = creep.moveByPath(Memory.MemRooms[creep.pos.roomName].CachedPaths[creep.memory.ExitPosition.x + ',' + creep.memory.ExitPosition.y]);
                     if (result !== OK && result !== ERR_TIRED) {
-                        Util.Warning('ExecuteJobs', 'Move', 'using old path failed ' + creep.name + ' ' + creep.pos.roomName + ' ' + result);
-                        if(result === ERR_NOT_FOUND){
-                            result = creep.moveTo(obj, opts);
-                            Util.ErrorLog('ExecuteJobs', 'Move', 'ERR_NOT_FOUND fallback logic - moveto obj ' + obj + ' for ' + creep.name + ' ' + creep.pos.roomName + ' ' + result);
-                        }else {
-                            result = ERR_NO_RESULT_FOUND;
-                        }
+                        Util.Warning('ExecuteJobs', 'Move', 'using cached path failed ' + creep.name + ' ' + creep.pos.roomName + ' ' + result + " cached Path: " + JSON.stringify(Memory.MemRooms[creep.pos.roomName].CachedPaths[creep.memory.ExitPosition.x + ',' + creep.memory.ExitPosition.y]));
+                        result = ERR_NO_RESULT_FOUND;
                     }
                 }
                 if (result === ERR_NO_RESULT_FOUND) { // calculate path
                     generateOuterRoomPath(to, from, creep); // saves result in Memory.Paths
-                    const exitPosition = generateInnerRoomPath(to, creep);
-                    result = creep.moveTo(exitPosition, opts);
+                    const exitPosition = getInnerRoomPath(to, creep);
+                    result = creep.moveByPath(Memory.MemRooms[creep.pos.roomName].CachedPaths[exitPosition.x + ',' + exitPosition.y]);
+                    creep.memory.ExitPosition = exitPosition;
                 }
             }
             result = MoveAnalysis(to, from, creep, result, obj);
@@ -2871,10 +2868,20 @@ const ExecuteJobs = {
             }
         }
 
-        function generateInnerRoomPath(to, creep) {
+        function getInnerRoomPath(to, creep) {
             const nextRoom = Memory.Paths[to.roomName][creep.pos.roomName];
             const exitDirection = Game.map.findExit(creep.room, nextRoom);
             const exitPosition = creep.pos.findClosestByPath(exitDirection);
+            // cache path in the room
+            if(!Memory.MemRooms[creep.pos.roomName]){
+                Util.CreateRoom(creep.pos.roomName, {});
+            }
+            if(!Memory.MemRooms[creep.pos.roomName].CachedPaths){
+                Memory.MemRooms[creep.pos.roomName].CachedPaths = {};
+            }
+            if(!Memory.MemRooms[creep.pos.roomName].CachedPaths[exitPosition.x + ',' + exitPosition.y]){
+                Memory.MemRooms[creep.pos.roomName].CachedPaths[exitPosition.x + ',' + exitPosition.y] = creep.room.findPath(creep.pos, exitPosition);
+            }
             return exitPosition;
         }
 
@@ -2885,40 +2892,55 @@ const ExecuteJobs = {
                 result = JOB_MOVING;
             } else if (result !== ERR_BUSY && result !== ERR_TIRED) {
                 if (creep.pos.x === 0) { // get away from room exits asap
-                    creep.move(RIGHT);
+                    result = TryMoveInDirection(creep, BOTTOM_RIGHT, RIGHT, TOP_RIGHT);
                 } else if (creep.pos.x === 49) {
-                    creep.move(LEFT);
+                    result = TryMoveInDirection(creep, BOTTOM_LEFT, LEFT, TOP_LEFT);
                 } else if (creep.pos.y === 0) {
-                    creep.move(BOTTOM);
+                    result = TryMoveInDirection(creep, BOTTOM_LEFT, BOTTOM, BOTTOM_RIGHT);
                 } else if (creep.pos.y === 49) {
-                    creep.move(TOP);
-                }
-                if (!creep.memory.MoveErrWait) { // maybe wait a couple of ticks to see if the obstacle has disappeared
-                    creep.memory.MoveErrWait = 1;
-                    creep.memory.MoveErrLastWait = Game.time;
-                    result = JOB_MOVING;
-                } else if (creep.memory.MoveErrWait < 10) {
-                    const ticksSinceWaitingStart = Game.time - creep.memory.MoveErrLastWait;
-                    if (creep.memory.MoveErrLastWait && ticksSinceWaitingStart > 30) { // if the start of the wait time is more than 30 ticks away then reset it
-                        Util.Info('ExecuteJobs', 'Move', 'move error reset time MoveErrWait ' + creep.memory.MoveErrWait + ' waited ' + ticksSinceWaitingStart + ' ticks ' + result + ' ' + creep.name + ' (' + from.x + ',' + from.y + ',' + from.roomName + ') to ' + obj + '(' + to.x + ',' + to.y + ',' + to.roomName + ')');
+                    result = TryMoveInDirection(creep, TOP_LEFT, TOP, TOP_RIGHT);
+                }else { // not on room edges
+                    if (!creep.memory.MoveErrWait) { // maybe wait a couple of ticks to see if the obstacle has disappeared
+                        creep.memory.MoveErrWait = 1;
                         creep.memory.MoveErrLastWait = Game.time;
-                        creep.memory.MoveErrWait = 0;
-                    }
-                    creep.memory.MoveErrWait++;
-                    result = JOB_MOVING;
-                } else {
-                    if (from.roomName === to.roomName) {
-                        Util.Warning('ExecuteJobs', 'Move', 'move error MoveErrWait ' + creep.memory.MoveErrWait + ' ' + result + ' ' + creep.name + ' (' + from.x + ',' + from.y + ',' + from.roomName + ') to ' + obj + '(' + to.x + ',' + to.y + ',' + to.roomName + ') ending move!');
+                        result = JOB_MOVING;
+                    } else if (creep.memory.MoveErrWait < 10) {
+                        const ticksSinceWaitingStart = Game.time - creep.memory.MoveErrLastWait;
+                        if (creep.memory.MoveErrLastWait && ticksSinceWaitingStart > 30) { // if the start of the wait time is more than 30 ticks away then reset it
+                            Util.Info('ExecuteJobs', 'Move', 'move error reset time MoveErrWait ' + creep.memory.MoveErrWait + ' waited ' + ticksSinceWaitingStart + ' ticks ' + result + ' ' + creep.name + ' (' + from.x + ',' + from.y + ',' + from.roomName + ') to ' + obj + '(' + to.x + ',' + to.y + ',' + to.roomName + ')');
+                            creep.memory.MoveErrLastWait = Game.time;
+                            creep.memory.MoveErrWait = 0;
+                        }
+                        creep.memory.MoveErrWait++;
+                        result = JOB_MOVING;
                     } else {
-                        Util.Warning('ExecuteJobs', 'Move', 'move error multiple room MoveErrWait ' + creep.memory.MoveErrWait + ' ' + result + ' ' + creep.name + ' (' + from.x + ',' + from.y + ',' + from.roomName + ') to ' + obj + '(' + to.x + ',' + to.y + ',' + to.roomName + ') ending move!');
+                        if (from.roomName === to.roomName) {
+                            Util.Warning('ExecuteJobs', 'Move', 'move error MoveErrWait ' + creep.memory.MoveErrWait + ' ' + result + ' ' + creep.name + ' (' + from.x + ',' + from.y + ',' + from.roomName + ') to ' + obj + '(' + to.x + ',' + to.y + ',' + to.roomName + ') ending move!');
+                        } else {
+                            Util.Warning('ExecuteJobs', 'Move', 'move error multiple room MoveErrWait ' + creep.memory.MoveErrWait + ' ' + result + ' ' + creep.name + ' (' + from.x + ',' + from.y + ',' + from.roomName + ') to ' + obj + '(' + to.x + ',' + to.y + ',' + to.roomName + ') ending move!');
+                        }
+                        if (result === ERR_NO_BODYPART) { // no MOVE bodypart
+                            Util.InfoLog('ExecuteJobs', 'Move', creep.name + ' ERR_NO_BODYPART ' + creep.pos.roomName + ' committing suicide');
+                            creep.suicide();
+                        }
+                        creep.memory.MoveErrWait = undefined;
+                        result = JOB_IS_DONE;
                     }
-                    if (result === ERR_NO_BODYPART) { // no MOVE bodypart
-                        Util.InfoLog('ExecuteJobs', 'Move', creep.name + ' ERR_NO_BODYPART ' + creep.pos.roomName + ' committing suicide');
-                        creep.suicide();
-                    }
-                    result = JOB_IS_DONE;
-                    creep.memory.MoveErrWait = undefined;
                 }
+            }
+            return result;
+        }
+
+        function TryMoveInDirection(creep, option1, option2, option3){
+            let result = creep.move(option2);
+            if(result !== OK){
+                result = creep.move(option1);
+                if(result !== OK){
+                    result = creep.move(option3);
+                }
+            }
+            if(result === OK){
+                result = JOB_MOVING;
             }
             return result;
         }
