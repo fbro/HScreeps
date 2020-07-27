@@ -2871,6 +2871,10 @@ const ExecuteJobs = {
             const nextRoom = Memory.Paths[to.roomName][creep.pos.roomName];
             const exitDirection = Game.map.findExit(creep.room, nextRoom);
             const exitPosition = creep.pos.findClosestByPath(exitDirection);
+            if(!exitPosition){
+                Util.ErrorLog('ExecuteJobs', 'getInnerRoomPath', 'exitPosition not found ' + creep.pos.roomName + ' exitDirection ' + exitDirection + ' nextRoom ' + nextRoom);
+                return;
+            }
             // cache path in the room
             if(!Memory.MemRooms[creep.pos.roomName]){
                 Util.CreateRoom(creep.pos.roomName, {});
