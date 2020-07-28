@@ -553,34 +553,34 @@ const CreateJobs = {
                                 || resourceType === RESOURCE_LIQUID && amount >= 500 && factory.level === 3
 
                                 // Mechanical chain
-                                || resourceType === RESOURCE_ALLOY && amount >= 1000 && !factory.level
+                                || resourceType === RESOURCE_ALLOY && amount >= 900 && !factory.level
                                 || resourceType === RESOURCE_TUBE && amount >= 400 && factory.level === 1
-                                || resourceType === RESOURCE_FIXTURES && amount >= 200 && factory.level === 2
-                                || resourceType === RESOURCE_FRAME && amount >= 100 && factory.level === 3
+                                || resourceType === RESOURCE_FIXTURES && amount >= 100 && factory.level === 2
+                                || resourceType === RESOURCE_FRAME && amount >= 50 && factory.level === 3
                                 || resourceType === RESOURCE_HYDRAULICS && amount >= 10 && factory.level === 4
                                 || resourceType === RESOURCE_MACHINE && amount >= 1 && factory.level === 5
 
                                 // Biological chain
-                                || resourceType === RESOURCE_CELL && amount >= 1000 && !factory.level
+                                || resourceType === RESOURCE_CELL && amount >= 900 && !factory.level
                                 || resourceType === RESOURCE_PHLEGM && amount >= 400 && factory.level === 1
-                                || resourceType === RESOURCE_TISSUE && amount >= 200 && factory.level === 2
-                                || resourceType === RESOURCE_MUSCLE && amount >= 100 && factory.level === 3
+                                || resourceType === RESOURCE_TISSUE && amount >= 100 && factory.level === 2
+                                || resourceType === RESOURCE_MUSCLE && amount >= 50 && factory.level === 3
                                 || resourceType === RESOURCE_ORGANOID && amount >= 10 && factory.level === 4
                                 || resourceType === RESOURCE_ORGANISM && amount >= 1 && factory.level === 5
 
                                 // Electronical chain
-                                || resourceType === RESOURCE_WIRE && amount >= 1000 && !factory.level
+                                || resourceType === RESOURCE_WIRE && amount >= 900 && !factory.level
                                 || resourceType === RESOURCE_SWITCH && amount >= 400 && factory.level === 1
-                                || resourceType === RESOURCE_TRANSISTOR && amount >= 200 && factory.level === 2
-                                || resourceType === RESOURCE_MICROCHIP && amount >= 100 && factory.level === 3
+                                || resourceType === RESOURCE_TRANSISTOR && amount >= 100 && factory.level === 2
+                                || resourceType === RESOURCE_MICROCHIP && amount >= 50 && factory.level === 3
                                 || resourceType === RESOURCE_CIRCUIT && amount >= 10 && factory.level === 4
                                 || resourceType === RESOURCE_DEVICE && amount >= 1 && factory.level === 5
 
                                 // Mystical chain
-                                || resourceType === RESOURCE_CONDENSATE && amount >= 1000 && !factory.level
+                                || resourceType === RESOURCE_CONDENSATE && amount >= 900 && !factory.level
                                 || resourceType === RESOURCE_CONCENTRATE && amount >= 400 && factory.level === 1
-                                || resourceType === RESOURCE_EXTRACT && amount >= 200 && factory.level === 2
-                                || resourceType === RESOURCE_SPIRIT && amount >= 100 && factory.level === 3
+                                || resourceType === RESOURCE_EXTRACT && amount >= 100 && factory.level === 2
+                                || resourceType === RESOURCE_SPIRIT && amount >= 50 && factory.level === 3
                                 || resourceType === RESOURCE_EMANATION && amount >= 10 && factory.level === 4
                                 || resourceType === RESOURCE_ESSENCE && amount >= 1 && factory.level === 5
                             )

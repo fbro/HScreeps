@@ -129,6 +129,7 @@ module.exports.loop = function () {
 
 // TODOs:
 // TODO FillStrg-container can be very expensive!
+// TODO setting terminal cooldown and store value manually does not work. maybe create your own values to avoid many sends from the same terminal?
 
 // attack NPC strongholds
 // harvest middle rooms

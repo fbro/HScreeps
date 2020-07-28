@@ -43,7 +43,7 @@ const Terminals = {
                         const resourceTypeNeeded = resourceTypesNeeded[resourceNeedKey];
                         const amountNeeded = Util.TERMINAL_TARGET_RESOURCE - toTerminal.store.getUsedCapacity(resourceTypeNeeded);
                         if (amountNeeded > Util.TERMINAL_BUFFER) {
-                            const didSend = GetFromTerminal(amountNeeded, resourceTypeNeeded, toTerminal, terminals, Util.TERMINAL_TARGET_RESOURCE);
+                            const didSend = GetFromTerminal(amountNeeded, resourceTypeNeeded, toTerminal, terminals, 0);
                             if (!didSend && toTerminal.store.getUsedCapacity(RESOURCE_ENERGY) >= Util.TERMINAL_TARGET_ENERGY && resourceTypeNeeded.length === 1/*only buy H, O, L, U, K, Z, X*/) { // try to buy resource
                                 if (marketDealCount >= 10 || toTerminal.cooldown) {
                                     return marketDealCount;
