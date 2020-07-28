@@ -130,6 +130,8 @@ module.exports.loop = function () {
 // TODOs:
 // TODO FillStrg-container can be very expensive!
 // TODO setting terminal cooldown and store value manually does not work. maybe create your own values to avoid many sends from the same terminal?
+// TODO create a store energy into battery solution - this can then be used to send resources to defending rooms that needs alot of energy
+// TODO external room movement caching - create a solution that hooks onto a known cached route in the "next" room
 
 // attack NPC strongholds
 // harvest middle rooms

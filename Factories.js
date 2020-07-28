@@ -44,6 +44,8 @@ const Factories = {
                     if (result === OK) return;
                     result = Produce(factory, RESOURCE_UTRIUM_BAR, Util.FACTORY_TARGET_RESOURCE, RESOURCE_UTRIUM, 500, RESOURCE_ENERGY, 200);
                     if (result === OK) return;
+                    result = Produce(factory, RESOURCE_KEANIUM_BAR, Util.FACTORY_TARGET_RESOURCE, RESOURCE_KEANIUM, 500, RESOURCE_ENERGY, 200);
+                    if (result === OK) return;
                     result = Produce(factory, RESOURCE_OXIDANT, Util.FACTORY_TARGET_RESOURCE, RESOURCE_OXYGEN, 500, RESOURCE_ENERGY, 200);
                     if (result === OK) return;
                     result = Produce(factory, RESOURCE_REDUCTANT, Util.FACTORY_TARGET_RESOURCE, RESOURCE_HYDROGEN, 500, RESOURCE_ENERGY, 200);

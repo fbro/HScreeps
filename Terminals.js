@@ -43,7 +43,7 @@ const Terminals = {
                         const resourceTypeNeeded = resourceTypesNeeded[resourceNeedKey];
                         const amountNeeded = Util.TERMINAL_TARGET_RESOURCE - toTerminal.store.getUsedCapacity(resourceTypeNeeded);
                         if (amountNeeded > Util.TERMINAL_BUFFER) {
-                            const didSend = GetFromTerminal(amountNeeded, resourceTypeNeeded, toTerminal, terminals, 0);
+                            const didSend = GetFromTerminal(amountNeeded, resourceTypeNeeded, toTerminal, terminals, GetNeededFactoryLeftoverResource(resourceTypeNeeded));
                             if (!didSend && toTerminal.store.getUsedCapacity(RESOURCE_ENERGY) >= Util.TERMINAL_TARGET_ENERGY && resourceTypeNeeded.length === 1/*only buy H, O, L, U, K, Z, X*/) { // try to buy resource
                                 if (marketDealCount >= 10 || toTerminal.cooldown) {
                                     return marketDealCount;
@@ -348,6 +348,51 @@ const Terminals = {
                 || factory.store.getUsedCapacity(resourceTypeProduced) > 0
                 || factory.store.getUsedCapacity(resourceBasic) > 0;
 
+        }
+
+        /**@return {number}*/
+        function GetNeededFactoryLeftoverResource(resourceType){
+            switch (resourceType) {
+                // Electronical
+                case RESOURCE_SWITCH      : // factory lvl 1
+                case RESOURCE_TRANSISTOR  : // factory lvl 2
+                case RESOURCE_MICROCHIP   : // factory lvl 3
+                case RESOURCE_CIRCUIT     : // factory lvl 4
+
+                // Biological
+                case RESOURCE_PHLEGM      : // factory lvl 1
+                case RESOURCE_TISSUE      : // factory lvl 2
+                case RESOURCE_MUSCLE      : // factory lvl 3
+                case RESOURCE_ORGANOID    : // factory lvl 4
+
+                // Mechanical
+                case RESOURCE_TUBE        : // factory lvl 1
+                case RESOURCE_FIXTURES    : // factory lvl 2
+                case RESOURCE_FRAME       : // factory lvl 3
+                case RESOURCE_HYDRAULICS  : // factory lvl 4
+
+                // Mystical
+                case RESOURCE_CONCENTRATE : // factory lvl 1
+                case RESOURCE_EXTRACT     : // factory lvl 2
+                case RESOURCE_SPIRIT      : // factory lvl 3
+                case RESOURCE_EMANATION   : // factory lvl 4
+
+                // Common higher commodities
+                case RESOURCE_COMPOSITE   : // factory lvl 1
+                case RESOURCE_CRYSTAL     : // factory lvl 2
+                case RESOURCE_LIQUID      : // factory lvl 3
+
+                // Compressed commodities
+                case RESOURCE_ZYNTHIUM_BAR  : // factory lvl 0
+                case RESOURCE_LEMERGIUM_BAR : // factory lvl 0
+                case RESOURCE_UTRIUM_BAR    : // factory lvl 0
+                case RESOURCE_KEANIUM_BAR   : // factory lvl 0
+                case RESOURCE_REDUCTANT     : // factory lvl 0
+                case RESOURCE_OXIDANT       : // factory lvl 0
+                    return 0;
+                default :
+                    return Util.TERMINAL_TARGET_RESOURCE;
+            }
         }
 
         /**@return {number}*/
