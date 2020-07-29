@@ -4,7 +4,6 @@
     <list default="true" id="7b6f36cb-4298-4902-b6a2-ea3816b3b82c" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ExecuteJobs.js" beforeDir="false" afterPath="$PROJECT_DIR$/ExecuteJobs.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.js" beforeDir="false" afterPath="$PROJECT_DIR$/main.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -172,14 +171,7 @@
       <workItem from="1594498433521" duration="16535000" />
       <workItem from="1594836318508" duration="25111000" />
       <workItem from="1595255325195" duration="23808000" />
-      <workItem from="1596014863512" duration="1112000" />
-    </task>
-    <task id="LOCAL-00187" summary="small changes">
-      <created>1587156777369</created>
-      <option name="number" value="00187" />
-      <option name="presentableId" value="LOCAL-00187" />
-      <option name="project" value="LOCAL" />
-      <updated>1587156777369</updated>
+      <workItem from="1596014863512" duration="2121000" />
     </task>
     <task id="LOCAL-00188" summary="small changes">
       <created>1587502653613</created>
@@ -517,7 +509,14 @@
       <option name="project" value="LOCAL" />
       <updated>1595876883910</updated>
     </task>
-    <option name="localTasksCounter" value="236" />
+    <task id="LOCAL-00236" summary="small changes">
+      <created>1596018956659</created>
+      <option name="number" value="00236" />
+      <option name="presentableId" value="LOCAL-00236" />
+      <option name="project" value="LOCAL" />
+      <updated>1596018956659</updated>
+    </task>
+    <option name="localTasksCounter" value="237" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -594,11 +593,11 @@
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
     <state x="721" y="338" key="#com.intellij.openapi.updateSettings.impl.PluginUpdateInfoDialog/0.0.1920.1080@0.0.1920.1080" timestamp="1594498337678" />
-    <state x="526" y="23" width="1888" height="1014" key="CommitChangelistDialog2" timestamp="1595876883157">
+    <state x="526" y="23" width="1888" height="1014" key="CommitChangelistDialog2" timestamp="1596018956098">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
     <state x="26" y="14" width="1888" height="1014" key="CommitChangelistDialog2/0.0.1920.1040@0.0.1920.1040" timestamp="1591220164553" />
-    <state x="526" y="23" width="959" height="921" key="CommitChangelistDialog2/0.0.1920.1080@0.0.1920.1080" timestamp="1595876883157" />
+    <state x="526" y="23" width="959" height="921" key="CommitChangelistDialog2/0.0.1920.1080@0.0.1920.1080" timestamp="1596018956098" />
     <state x="92" y="92" width="1536" height="891" key="DiffContextDialog" timestamp="1595113593542">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
@@ -614,11 +613,11 @@
     </state>
     <state x="672" y="236" key="MultipleFileMergeDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1590578491830" />
     <state x="672" y="245" key="MultipleFileMergeDialog/0.0.1920.1080@0.0.1920.1080" timestamp="1593531280327" />
-    <state x="552" y="274" key="Vcs.Push.Dialog.v2" timestamp="1595876885262">
+    <state x="552" y="274" key="Vcs.Push.Dialog.v2" timestamp="1596018958326">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
     <state x="552" y="264" key="Vcs.Push.Dialog.v2/0.0.1920.1040@0.0.1920.1040" timestamp="1591220166620" />
-    <state x="552" y="274" key="Vcs.Push.Dialog.v2/0.0.1920.1080@0.0.1920.1080" timestamp="1595876885262" />
+    <state x="552" y="274" key="Vcs.Push.Dialog.v2/0.0.1920.1080@0.0.1920.1080" timestamp="1596018958326" />
     <state x="92" y="96" width="1736" height="889" maximized="true" key="com.intellij.history.integration.ui.views.FileHistoryDialog" timestamp="1594069873751">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>

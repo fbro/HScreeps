@@ -2825,7 +2825,7 @@ const ExecuteJobs = {
                 };
                 result = creep.moveTo(to, opts);
             } else { // not in the same room - make a map in mem
-                if (creep.memory.ExitPosition && creep.memory.ExitPosition.roomName === creep.pos.roomName) { // movement between rooms should reuse path more
+                if (creep.memory.ExitPosition && creep.memory.ExitPosition.roomName === creep.pos.roomName && Memory.MemRooms[creep.pos.roomName]) { // movement between rooms should reuse path more
                     result = creep.moveByPath(Memory.MemRooms[creep.pos.roomName].CachedPaths[creep.memory.StartPosition.x + ',' + creep.memory.StartPosition.y + ' ' + creep.memory.ExitPosition.x + ',' + creep.memory.ExitPosition.y]);
                     if (result !== OK && result !== ERR_TIRED) {
                         Util.Warning('ExecuteJobs', 'Move', 'using cached path failed ' + creep.name + ' ' + creep.pos.roomName + ' ' + result + " cached Path: " + JSON.stringify(Memory.MemRooms[creep.pos.roomName].CachedPaths[creep.memory.StartPosition.x + ',' + creep.memory.StartPosition.y + ' ' + creep.memory.ExitPosition.x + ',' + creep.memory.ExitPosition.y]));
