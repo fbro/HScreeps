@@ -2825,12 +2825,11 @@ const ExecuteJobs = {
                 };
                 result = creep.moveTo(to, opts);
             } else { // not in the same room - make a map in mem
-                if (creep.memory.ExitPosition && creep.memory.ExitPosition.roomName === creep.pos.roomName && Memory.MemRooms[creep.pos.roomName]) { // movement between rooms should reuse path more
-                    result = creep.moveByPath(Memory.MemRooms[creep.pos.roomName].CachedPaths[creep.memory.StartPosition.x + ',' + creep.memory.StartPosition.y + ' ' + creep.memory.ExitPosition.x + ',' + creep.memory.ExitPosition.y]);
+                if (creep.memory.ExitPosition && creep.memory.ExitPosition.roomName === creep.pos.roomName) { // movement between rooms should reuse path more
+                    result = creep.moveByPath(creep.memory.CachedPath);
                     if (result !== OK && result !== ERR_TIRED) {
-                        Util.Warning('ExecuteJobs', 'Move', 'using cached path failed ' + creep.name + ' ' + creep.pos.roomName + ' ' + result + " cached Path: " + JSON.stringify(Memory.MemRooms[creep.pos.roomName].CachedPaths[creep.memory.StartPosition.x + ',' + creep.memory.StartPosition.y + ' ' + creep.memory.ExitPosition.x + ',' + creep.memory.ExitPosition.y]));
-                        delete Memory.MemRooms[creep.pos.roomName].CachedPaths[creep.memory.StartPosition.x + ',' + creep.memory.StartPosition.y + ' ' + creep.memory.ExitPosition.x + ',' + creep.memory.ExitPosition.y];
-                        delete creep.memory.StartPosition;
+                        Util.Warning('ExecuteJobs', 'Move', 'using cached path failed ' + creep.name + ' ' + creep.pos.roomName + ' ' + result + " cached Path: " + JSON.stringify(creep.memory.CachedPath));
+                        delete creep.memory.CachedPath;
                         delete creep.memory.ExitPosition;
                         result = ERR_NO_RESULT_FOUND;
                     }
@@ -2838,7 +2837,7 @@ const ExecuteJobs = {
                 if (result === ERR_NO_RESULT_FOUND) { // calculate path
                     generateOuterRoomPath(to, from, creep); // saves result in Memory.Paths
                     getInnerRoomPath(to, creep);
-                    result = creep.moveByPath(Memory.MemRooms[creep.pos.roomName].CachedPaths[creep.memory.StartPosition.x + ',' + creep.memory.StartPosition.y + ' ' + creep.memory.ExitPosition.x + ',' + creep.memory.ExitPosition.y]);
+                    result = creep.moveByPath(creep.memory.CachedPath);
                 }
             }
             result = MoveAnalysis(to, from, creep, result, obj);
@@ -2892,17 +2891,7 @@ const ExecuteJobs = {
                 Util.ErrorLog('ExecuteJobs', 'getInnerRoomPath', 'exitPosition not found ' + creep.pos.roomName + ' exitDirection ' + exitDirection + ' nextRoom ' + nextRoom);
                 return;
             }
-            // cache path in the room
-            if(!Memory.MemRooms[creep.pos.roomName]){
-                Util.CreateRoom(creep.pos.roomName, {});
-            }
-            if(!Memory.MemRooms[creep.pos.roomName].CachedPaths){
-                Memory.MemRooms[creep.pos.roomName].CachedPaths = {};
-            }
-            if(!Memory.MemRooms[creep.pos.roomName].CachedPaths[creep.pos.x + ',' + creep.pos.y + ' ' + exitPosition.x + ',' + exitPosition.y]){
-                Memory.MemRooms[creep.pos.roomName].CachedPaths[creep.pos.x + ',' + creep.pos.y + ' ' + exitPosition.x + ',' + exitPosition.y] = creep.room.findPath(creep.pos, exitPosition);
-            }
-            creep.memory.StartPosition = creep.pos;
+            creep.memory.CachedPath = creep.room.findPath(creep.pos, exitPosition);
             creep.memory.ExitPosition = exitPosition;
         }
 

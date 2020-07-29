@@ -4,6 +4,8 @@
     <list default="true" id="7b6f36cb-4298-4902-b6a2-ea3816b3b82c" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ExecuteJobs.js" beforeDir="false" afterPath="$PROJECT_DIR$/ExecuteJobs.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Terminals.js" beforeDir="false" afterPath="$PROJECT_DIR$/Terminals.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.js" beforeDir="false" afterPath="$PROJECT_DIR$/main.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -71,7 +73,7 @@
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
     <property name="nodejs_package_manager_path" value="npm" />
-    <property name="settings.editor.selected.configurable" value="editor.preferences.jsOptions" />
+    <property name="settings.editor.selected.configurable" value="preferences.customizations" />
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
@@ -171,14 +173,8 @@
       <workItem from="1594498433521" duration="16535000" />
       <workItem from="1594836318508" duration="25111000" />
       <workItem from="1595255325195" duration="23808000" />
-      <workItem from="1596014863512" duration="2121000" />
-    </task>
-    <task id="LOCAL-00188" summary="small changes">
-      <created>1587502653613</created>
-      <option name="number" value="00188" />
-      <option name="presentableId" value="LOCAL-00188" />
-      <option name="project" value="LOCAL" />
-      <updated>1587502653614</updated>
+      <workItem from="1596014863512" duration="3317000" />
+      <workItem from="1596051347576" duration="4826000" />
     </task>
     <task id="LOCAL-00189" summary="small changes">
       <created>1587562339495</created>
@@ -516,7 +512,14 @@
       <option name="project" value="LOCAL" />
       <updated>1596018956659</updated>
     </task>
-    <option name="localTasksCounter" value="237" />
+    <task id="LOCAL-00237" summary="small changes">
+      <created>1596027531474</created>
+      <option name="number" value="00237" />
+      <option name="presentableId" value="LOCAL-00237" />
+      <option name="project" value="LOCAL" />
+      <updated>1596027531474</updated>
+    </task>
+    <option name="localTasksCounter" value="238" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -589,15 +592,19 @@
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
     <state x="552" y="198" key="#Notifications/0.0.1920.1080@0.0.1920.1080" timestamp="1593553702363" />
+    <state x="788" y="255" key="#com.intellij.ide.ui.customization.CustomizableActionsPanel.FindAvailableActionsDialog" timestamp="1596027606669">
+      <screen x="0" y="0" width="1920" height="1080" />
+    </state>
+    <state x="788" y="255" key="#com.intellij.ide.ui.customization.CustomizableActionsPanel.FindAvailableActionsDialog/0.0.1920.1080@0.0.1920.1080" timestamp="1596027606669" />
     <state x="721" y="338" key="#com.intellij.openapi.updateSettings.impl.PluginUpdateInfoDialog" timestamp="1594498337678">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
     <state x="721" y="338" key="#com.intellij.openapi.updateSettings.impl.PluginUpdateInfoDialog/0.0.1920.1080@0.0.1920.1080" timestamp="1594498337678" />
-    <state x="526" y="23" width="1888" height="1014" key="CommitChangelistDialog2" timestamp="1596018956098">
+    <state x="526" y="23" width="1888" height="1014" key="CommitChangelistDialog2" timestamp="1596027530665">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
     <state x="26" y="14" width="1888" height="1014" key="CommitChangelistDialog2/0.0.1920.1040@0.0.1920.1040" timestamp="1591220164553" />
-    <state x="526" y="23" width="959" height="921" key="CommitChangelistDialog2/0.0.1920.1080@0.0.1920.1080" timestamp="1596018956098" />
+    <state x="526" y="23" width="959" height="921" key="CommitChangelistDialog2/0.0.1920.1080@0.0.1920.1080" timestamp="1596027530665" />
     <state x="92" y="92" width="1536" height="891" key="DiffContextDialog" timestamp="1595113593542">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
@@ -613,21 +620,26 @@
     </state>
     <state x="672" y="236" key="MultipleFileMergeDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1590578491830" />
     <state x="672" y="245" key="MultipleFileMergeDialog/0.0.1920.1080@0.0.1920.1080" timestamp="1593531280327" />
-    <state x="552" y="274" key="Vcs.Push.Dialog.v2" timestamp="1596018958326">
+    <state x="461" y="182" key="SettingsEditor" timestamp="1596027607847">
+      <screen x="0" y="0" width="1920" height="1080" />
+    </state>
+    <state x="461" y="182" key="SettingsEditor/0.0.1920.1080@0.0.1920.1080" timestamp="1596027607847" />
+    <state x="552" y="274" key="Vcs.Push.Dialog.v2" timestamp="1596027533391">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
     <state x="552" y="264" key="Vcs.Push.Dialog.v2/0.0.1920.1040@0.0.1920.1040" timestamp="1591220166620" />
-    <state x="552" y="274" key="Vcs.Push.Dialog.v2/0.0.1920.1080@0.0.1920.1080" timestamp="1596018958326" />
+    <state x="552" y="274" key="Vcs.Push.Dialog.v2/0.0.1920.1080@0.0.1920.1080" timestamp="1596027533391" />
     <state x="92" y="96" width="1736" height="889" maximized="true" key="com.intellij.history.integration.ui.views.FileHistoryDialog" timestamp="1594069873751">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
     <state x="92" y="92" width="1736" height="856" key="com.intellij.history.integration.ui.views.FileHistoryDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1589132193920" />
     <state x="92" y="96" width="1736" height="889" maximized="true" key="com.intellij.history.integration.ui.views.FileHistoryDialog/0.0.1920.1080@0.0.1920.1080" timestamp="1594069873751" />
-    <state x="656" y="366" width="911" height="528" key="com.intellij.ide.util.TipDialog" timestamp="1596014990909">
-      <screen x="0" y="0" width="1920" height="1080" />
+    <state x="875" y="488" width="911" height="528" key="com.intellij.ide.util.TipDialog" timestamp="1596051347985">
+      <screen x="0" y="0" width="2560" height="1440" />
     </state>
     <state x="656" y="352" width="911" height="528" key="com.intellij.ide.util.TipDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1591217196786" />
     <state x="656" y="366" key="com.intellij.ide.util.TipDialog/0.0.1920.1080@0.0.1920.1080" timestamp="1596014990909" />
+    <state x="875" y="488" key="com.intellij.ide.util.TipDialog/3840.1080.1920.1080/0.0.2560.1440@0.0.2560.1440" timestamp="1596051347985" />
     <state x="769" y="458" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2" timestamp="1595957989641">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>

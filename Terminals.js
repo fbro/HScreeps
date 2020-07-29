@@ -45,7 +45,7 @@ const Terminals = {
                         if (amountNeeded > Util.TERMINAL_BUFFER) {
                             const didSend = GetFromTerminal(amountNeeded, resourceTypeNeeded, toTerminal, terminals, GetNeededFactoryLeftoverResource(resourceTypeNeeded));
                             if (!didSend && toTerminal.store.getUsedCapacity(RESOURCE_ENERGY) >= Util.TERMINAL_TARGET_ENERGY && resourceTypeNeeded.length === 1/*only buy H, O, L, U, K, Z, X*/) { // try to buy resource
-                                if (marketDealCount >= 10 || toTerminal.cooldown) {
+                                if (marketDealCount >= 10 || toTerminal.cooldown || toTerminal.used) {
                                     return marketDealCount;
                                 }
                                 const didBuy = TryBuyResource(toTerminal, resourceTypeNeeded, amountNeeded);
@@ -79,7 +79,7 @@ const Terminals = {
                         const didSend = GetFromTerminal(amountNeeded, resourceTypeNeeded, toTerminal, terminals, Util.TERMINAL_TARGET_RESOURCE);
                         if (!didSend && toTerminal.store.getUsedCapacity(RESOURCE_ENERGY) >= Util.TERMINAL_TARGET_ENERGY && flagNameArray[0] === 'BUY') { // try to buy the resource
                             Util.Info('Terminal', 'GetLabResources', 'buy flagNameArray ' + flagNameArray);
-                            if (marketDealCount >= 10 || toTerminal.cooldown) {
+                            if (marketDealCount >= 10 || toTerminal.cooldown || toTerminal.used) {
                                 return marketDealCount;
                             }
                             const didBuy = TryBuyResource(toTerminal, resourceTypeNeeded, amountNeeded);
@@ -102,18 +102,19 @@ const Terminals = {
 
         function SendExcess(fromTerminal, marketDealCount) { // selected terminal will actively send/sell resources out
             for (const resourceType in fromTerminal.store) {
-                if (marketDealCount >= 10 || fromTerminal.cooldown) {
+                if (marketDealCount >= 10 || fromTerminal.cooldown || fromTerminal.used) {
                     return marketDealCount;
                 }
                 let didSend = false;
-                if(resourceType === RESOURCE_ENERGY){ // try to send energy to other terminal that needs it
+                // try to send energy or power to other owned terminals that needs it
+                if(resourceType === RESOURCE_ENERGY){
                     didSend = SendToTerminal(Util.TERMINAL_MAX_ENERGY, resourceType, fromTerminal, terminals, Util.TERMINAL_TARGET_ENERGY);
                 }else if(resourceType === RESOURCE_POWER){
                     didSend = SendToTerminal(Util.TERMINAL_TARGET_RESOURCE, resourceType, fromTerminal, terminals, Util.TERMINAL_TARGET_RESOURCE);
                 }
 
                 const max = GetMaxResourceToSell(resourceType);
-                if (!didSend && fromTerminal.store.getUsedCapacity(resourceType) > (max + Util.TERMINAL_BUFFER)) {
+                if (!didSend && fromTerminal.store.getUsedCapacity(resourceType) > (max === 0 ? 0 : (max + Util.TERMINAL_BUFFER))) {
                     const amount = fromTerminal.store.getUsedCapacity(resourceType) - max;
                     const didSell = TrySellResource(fromTerminal, resourceType, amount);
                     if (didSell) {
@@ -482,7 +483,7 @@ const Terminals = {
                 const result = Game.market.deal(order.id, amount, terminal.pos.roomName);
                 Util.Info('Terminals', 'TryBuyResource', amount + ' ' + resourceType + ' from ' + terminal.pos.roomName + ' to ' + order.roomName + ' result ' + result + ' remaining ' + order.remainingAmount + ' price ' + order.price + ' sum ' + order.price * amount + ' terminal ' + terminal.store.getUsedCapacity(resourceType));
                 if (result === OK) {
-                    terminal.cooldown = 10;
+                    terminal.used = true;
                     terminal.store[resourceType] = terminal.store[resourceType] + amount;
                     return true;
                 }
@@ -498,7 +499,7 @@ const Terminals = {
                 && order.type === ORDER_BUY
                 && (!resourceHistory[0]
                     || IsOutdated(resourceHistory[resourceHistory.length - 1].date)
-                    || (resourceHistory[resourceHistory.length - 1].avgPrice / 1.5/*medium price fall is okay*/) <= order.price)
+                    || (resourceHistory[resourceHistory.length - 1].avgPrice / 1.1/*small price fall is okay*/) <= order.price)
                 && lowestSellingValue <= order.price
                 && order.remainingAmount > 0
             );
@@ -511,7 +512,7 @@ const Terminals = {
                 const result = Game.market.deal(order.id, amount, terminal.pos.roomName);
                 Util.Info('Terminals', 'TrySellResource', amount + ' ' + resourceType + ' from ' + terminal.pos.roomName + ' to ' + order.roomName + ' result ' + result + ' remaining ' + order.remainingAmount + ' price ' + order.price + ' sum ' + order.price * amount + ' terminal ' + terminal.store.getUsedCapacity(resourceType));
                 if (result === OK) {
-                    terminal.cooldown = 10;
+                    terminal.used = true;
                     terminal.store[resourceType] = terminal.store[resourceType] - amount;
                     return true;
                 }
@@ -521,14 +522,14 @@ const Terminals = {
 
         /**@return {boolean}*/
         function TrySendResource(amount, resourceType, fromTerminal, toTerminal) {
-            if (!fromTerminal.cooldown && fromTerminal.id !== toTerminal.id && fromTerminal.store.getUsedCapacity(resourceType)) {
+            if (!fromTerminal.cooldown && !fromTerminal.used && fromTerminal.id !== toTerminal.id && fromTerminal.store.getUsedCapacity(resourceType)) {
                 if (amount > fromTerminal.store.getUsedCapacity(resourceType)) {
                     amount = fromTerminal.store.getUsedCapacity(resourceType);  // cannot send more resources than this
                 }
                 const result = fromTerminal.send(resourceType, amount, toTerminal.pos.roomName);
                 Util.Info('Terminals', 'TrySendResource', amount + ' ' + resourceType + ' from ' + fromTerminal.pos.roomName + ' to ' + toTerminal.pos.roomName + ' result ' + result);
                 if (result === OK) {
-                    fromTerminal.cooldown = 10;
+                    fromTerminal.used = true;
                     fromTerminal.store[resourceType] = fromTerminal.store[resourceType] - amount;
                     toTerminal.store[resourceType] = toTerminal.store[resourceType] + amount;
                     return true;
