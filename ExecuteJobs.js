@@ -2551,7 +2551,7 @@ const ExecuteJobs = {
                     const hostileCreep = hostileCreeps[hostileCreepKey];
                     if(hostileCreep.pos.getRangeTo(creep.pos) <= 3 && creep.getActiveBodyparts(RANGED_ATTACK) || hostileCreep.pos.getRangeTo(creep.pos) === 1 && creep.getActiveBodyparts(ATTACK)){
                         AttackHostileCreep(creep, null, null, hostileCreeps);
-                        Util.Info('ExecuteJobs', 'CreepHostileAction', 'harmless hostile - attack ' + creep.name + ' ' + creep.pos.roomName + ' hostile: ' + hostileCreep.name + ' ' + hostileCreep.owner);
+                        Util.Info('ExecuteJobs', 'CreepHostileAction', 'harmless hostile - attack ' + creep.name + ' ' + creep.pos.roomName + ' hostile: ' + hostileCreep.name + ' ' + hostileCreep.owner.username);
                         break;
                     }
                 }

@@ -132,6 +132,7 @@ module.exports.loop = function () {
 // TODO setting terminal cooldown and store value manually does not work. maybe create your own values to avoid many sends from the same terminal?
 // TODO create a store energy into battery solution - this can then be used to send resources to defending rooms that needs alot of energy
 // TODO external room movement caching - create a solution that hooks onto a known cached route in the "next" room
+// TODO an unbalance in healing when attacking powerbank
 
 // attack NPC strongholds
 // harvest middle rooms
