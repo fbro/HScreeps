@@ -19,11 +19,11 @@ const CreateJobs = {
         // this method is not just run in the Game.rooms loop because flags may be in 'invisible' rooms
         function CreateFlagJobs() {
             let jobs = {};
-            let notFound = false;
             for (const gameFlagKey in Game.flags) {
                 const gameFlag = Game.flags[gameFlagKey];
                 const color = gameFlag.color;
                 const secColor = gameFlag.secondaryColor;
+                let notFound = false;
                 if (color === COLOR_ORANGE) { // scout and pos actions and hallway action
                     if (secColor === COLOR_ORANGE) { // scout tag
                         jobs = CreateFlagJob(jobs, 'TagCtrl', gameFlagKey, gameFlag, 'S');

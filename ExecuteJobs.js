@@ -2552,13 +2552,13 @@ const ExecuteJobs = {
                     if(hostileCreep.pos.getRangeTo(creep.pos) <= 3 && creep.getActiveBodyparts(RANGED_ATTACK) || hostileCreep.pos.getRangeTo(creep.pos) === 1 && creep.getActiveBodyparts(ATTACK)){
                         AttackHostileCreep(creep, null, null, hostileCreeps);
                         Util.Info('ExecuteJobs', 'CreepHostileAction', 'harmless hostile - attack ' + creep.name + ' ' + creep.pos.roomName + ' hostile: ' + hostileCreep.name + ' ' + hostileCreep.owner.username);
-                        break;
+                        return CREEP_ATTACKED_HOSTILE; // no threat but can attack it - just do it
                     }
                 }
-                return CREEP_ATTACKED_HOSTILE; // no threat but can attack it - just do it
+                return CREEP_IGNORED_HOSTILE;
             } else if (hostileCreepsWithAttack.length === 0) {
                 //Util.Info('ExecuteJobs', 'CreepHostileAction', 'no hostiles with ATK - ' + creep.name + ' will ignore it in ' + creep.pos.roomName);
-                return CREEP_IGNORED_HOSTILE; // no threat
+                return CREEP_IGNORED_HOSTILE;
             }
 
             const hostileCreepsWithHeal = _.filter(hostileCreeps, function (hostileCreep) {
