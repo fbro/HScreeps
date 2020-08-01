@@ -1411,7 +1411,7 @@ const ExecuteJobs = {
             const result = GenericFlagAction(creep, roomJob, {
                 /**@return {int}*/
                 JobStatus: function (jobObject) {
-                    if (!jobObject.room) {
+                    if (!jobObject.room || jobObject.room.name !== creep.pos.roomName) {
                         return SHOULD_ACT;
                     } else {
                         return SHOULD_FETCH
@@ -1428,7 +1428,7 @@ const ExecuteJobs = {
                 /**@return {object} @return {undefined}*/
                 FindFetchObject: function (jobObject) {
                     const hostileCreep = creep.pos.findClosestByPath(FIND_HOSTILE_CREEPS);
-                    if (hostileCreep) {
+                    if (hostileCreep && hostileCreep.pos.getRangeTo(creep.pos) < 6) {
                         return hostileCreep;
                     } else {
                         if (jobObject) {
@@ -1476,7 +1476,7 @@ const ExecuteJobs = {
                 /**@return {object} @return {undefined}*/
                 FindFetchObject: function (jobObject) {
                     const hostileCreep = creep.pos.findClosestByPath(FIND_HOSTILE_CREEPS);
-                    if (hostileCreep) {
+                    if (hostileCreep && hostileCreep.pos.getRangeTo(creep.pos) < 6) {
                         return hostileCreep;
                     } else {
                         if (jobObject) {
@@ -1492,7 +1492,7 @@ const ExecuteJobs = {
                 Fetch: function (fetchObject, jobObject) {
                     if (jobObject !== fetchObject) { // hostileCreep
                         let result = creep.rangedAttack(fetchObject);
-                        if (result === OK && creep.pos.getRangeTo(fetchObject) <= 2) { // creep could do a ranged attack - maybe it should move away?
+                        if (result === OK && !fetchObject.structureType && creep.pos.getRangeTo(fetchObject) <= 2) { // creep could do a ranged attack - maybe it should move away?
                             const nearestRampart = creep.pos.findClosestByPath(FIND_MY_STRUCTURES, {
                                 filter: function (s) {
                                     return (s.structureType === STRUCTURE_RAMPART);
@@ -1529,6 +1529,8 @@ const ExecuteJobs = {
                                 default:
                                     Util.ErrorLog('ExecuteJobs', 'JobGuardGunnerPosition', 'gunner move error ' + creep.name);
                             }
+                        }else if(result === OK && fetchObject.structureType && creep.pos.getRangeTo(fetchObject) > 2){
+                            return ERR_NOT_IN_RANGE; // always try and move closer to the structure it is attacking
                         }
                         return result;
                     } else if (creep.pos.isEqualTo(jobObject)) {

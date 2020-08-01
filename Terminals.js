@@ -442,14 +442,14 @@ const Terminals = {
                 case RESOURCE_LIQUID      : // factory lvl 3
 
                 // lab resources
-                //case RESOURCE_CATALYST:
-                //case RESOURCE_ZYNTHIUM_KEANITE:
-                //case RESOURCE_UTRIUM_LEMERGITE:
-                //case RESOURCE_GHODIUM:
-                //case RESOURCE_GHODIUM_HYDRIDE:
-                //case RESOURCE_HYDROXIDE:
-                //case RESOURCE_GHODIUM_ACID:
-                //case RESOURCE_CATALYZED_GHODIUM_ACID:
+                case RESOURCE_CATALYST:
+                case RESOURCE_ZYNTHIUM_KEANITE:
+                case RESOURCE_UTRIUM_LEMERGITE:
+                case RESOURCE_GHODIUM:
+                case RESOURCE_GHODIUM_HYDRIDE:
+                case RESOURCE_HYDROXIDE:
+                case RESOURCE_GHODIUM_ACID:
+                case RESOURCE_CATALYZED_GHODIUM_ACID:
                     return Number.MAX_SAFE_INTEGER;
 
                 case RESOURCE_TISSUE : // factory lvl 2

@@ -59,10 +59,12 @@ module.exports.loop = function () {
             const gameRoom = Game.rooms[gameRoomKey];
             if (gameRoom.controller && gameRoom.controller.my && Memory.MemRooms[gameRoom.name]) {
                 Towers.run(gameRoom);
-                if (gameRoom.controller.level === 8) {
-                    Observers.run(gameRoom, gameRoomKey);
-                    PowerSpawns.run(gameRoom);
+                if(gameRoom.controller.level >= 7){
                     Factories.run(gameRoom, gameRoomKey);
+                    if (gameRoom.controller.level >= 8) {
+                        Observers.run(gameRoom, gameRoomKey);
+                        PowerSpawns.run(gameRoom);
+                    }
                 }
             }
         }

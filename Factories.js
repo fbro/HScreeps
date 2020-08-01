@@ -23,9 +23,9 @@ const Factories = {
                     let result;
                     const hasOperateFactoryEffect = factory.effects && factory.effects[0] && factory.effects[0].effect === PWR_OPERATE_FACTORY;
                     if (factory.level === 1 && hasOperateFactoryEffect) {
-                        result = Produce(factory, RESOURCE_PHLEGM, Util.FACTORY_TARGET_RESOURCE, RESOURCE_OXIDANT, 36, RESOURCE_CELL, 20, RESOURCE_LEMERGIUM_BAR, 16, RESOURCE_ENERGY, 8);
-                        if (result === OK) return;
                         result = Produce(factory, RESOURCE_COMPOSITE, Util.FACTORY_TARGET_RESOURCE, RESOURCE_UTRIUM_BAR, 20, RESOURCE_ZYNTHIUM_BAR, 20, RESOURCE_ENERGY, 20);
+                        if (result === OK) return;
+                        result = Produce(factory, RESOURCE_PHLEGM, Util.FACTORY_TARGET_RESOURCE, RESOURCE_OXIDANT, 36, RESOURCE_CELL, 20, RESOURCE_LEMERGIUM_BAR, 16, RESOURCE_ENERGY, 8);
                         if (result === OK) return;
                         result = Produce(factory, RESOURCE_TUBE, Util.FACTORY_TARGET_RESOURCE, RESOURCE_ALLOY, 40, RESOURCE_ZYNTHIUM_BAR, 16, RESOURCE_ENERGY, 8);
                         if (result === OK) return;
@@ -69,8 +69,8 @@ const Factories = {
                          res3Name, res3MinAmount,
                          res4Name, res4MinAmount,
                          res5Name, res5MinAmount) {
-            if (factory.store.getUsedCapacity(res1Name) >= res1MinAmount
-                && factory.store.getUsedCapacity(res2Name) >= res2MinAmount
+            if (                 factory.store.getUsedCapacity(res1Name) >= res1MinAmount
+                &&               factory.store.getUsedCapacity(res2Name) >= res2MinAmount
                 && (!res3Name || factory.store.getUsedCapacity(res3Name) >= res3MinAmount)
                 && (!res4Name || factory.store.getUsedCapacity(res4Name) >= res4MinAmount)
                 && (!res5Name || factory.store.getUsedCapacity(res5Name) >= res5MinAmount)
@@ -88,6 +88,7 @@ const Factories = {
 
                 return result;
             }
+            return -1;
         }
     }
 };
