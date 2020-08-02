@@ -40,7 +40,7 @@ const Util = {
     GENERATE_TRANSPORTER_WHEN_POWERBANK_HITS_UNDER: 200000, // used in JobAttackPowerBank to determine when powerbank hit is low when to generate transporter jobs
 
     DO_EXTRACTING_WHEN_STORAGE_UNDER_MINERAL: 200000, // stop extracting mineral when one has more than this
-    RAMPART_WALL_MAX_HITS_WHEN_STORAGE_ENERGY: 600000, // when storage energy is over this value then go crazy with upgrading ramparts and walls
+    RAMPART_WALL_MAX_HITS_WHEN_STORAGE_ENERGY: 300000, // when storage energy is over this value then go crazy with upgrading ramparts and walls
     RAMPART_WALL_HITS_U_LVL5: 1000,
     RAMPART_WALL_HITS_U_LVL8: 100000,
     RAMPART_WALL_HITS_LVL8: 2000000,
