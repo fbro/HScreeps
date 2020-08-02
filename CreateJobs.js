@@ -548,12 +548,13 @@ const CreateJobs = {
                                     || resourceType === RESOURCE_REDUCTANT
                                 ) && amount >= 1000 && !factory.level
 
-                                || resourceType === RESOURCE_COMPOSITE && amount >= 500 && factory.level === 1
-                                || resourceType === RESOURCE_CRYSTAL && amount >= 500 && factory.level === 2
-                                || resourceType === RESOURCE_LIQUID && amount >= 500 && factory.level === 3
+                                || resourceType === RESOURCE_COMPOSITE && amount >= 200 && factory.level === 1
+                                || resourceType === RESOURCE_CRYSTAL && amount >= 200 && factory.level === 2
+                                || resourceType === RESOURCE_LIQUID && amount >= 200 && factory.level === 3
 
                                 // Mechanical chain
-                                || resourceType === RESOURCE_ALLOY && amount >= 900 && !factory.level
+                                || resourceType === RESOURCE_METAL && amount > 0 && factory.level >= 1
+                                || resourceType === RESOURCE_ALLOY && amount >= 900 && (!factory.level || factory.level > 2)
                                 || resourceType === RESOURCE_TUBE && amount >= 400 && factory.level === 1
                                 || resourceType === RESOURCE_FIXTURES && amount >= 100 && factory.level === 2
                                 || resourceType === RESOURCE_FRAME && amount >= 50 && factory.level === 3
@@ -561,7 +562,7 @@ const CreateJobs = {
                                 || resourceType === RESOURCE_MACHINE && amount >= 1 && factory.level === 5
 
                                 // Biological chain
-                                || resourceType === RESOURCE_CELL && amount >= 900 && !factory.level
+                                || resourceType === RESOURCE_CELL && amount >= 900 && (!factory.level || factory.level > 2 && factory.level < 5)
                                 || resourceType === RESOURCE_PHLEGM && amount >= 400 && factory.level === 1
                                 || resourceType === RESOURCE_TISSUE && amount >= 100 && factory.level === 2
                                 || resourceType === RESOURCE_MUSCLE && amount >= 50 && factory.level === 3
@@ -724,8 +725,6 @@ const CreateJobs = {
         //endregion
 
         //region helper functions
-
-
 
         function AddJob(roomJobs, jobName, jobId, jobType, creepType) {
             roomJobs[jobName] = { // create job - RoomJobs - JobName - [JobName(x,y)] - user friendly, unique per room, name

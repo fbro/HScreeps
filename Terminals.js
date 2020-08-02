@@ -207,6 +207,7 @@ const Terminals = {
                         case(IsProductionChain(factory, RESOURCE_ALLOY, RESOURCE_TUBE, RESOURCE_METAL)): // Mechanical chain
                             resourceTypesNeeded.push(RESOURCE_ALLOY);
                             resourceTypesNeeded.push(RESOURCE_ZYNTHIUM_BAR);
+                            resourceTypesNeeded.push(RESOURCE_UTRIUM_BAR);
                             break;
                         case(IsProductionChain(factory, RESOURCE_CELL, RESOURCE_PHLEGM, RESOURCE_BIOMASS)): // Biological chain
                             resourceTypesNeeded.push(RESOURCE_CELL);
