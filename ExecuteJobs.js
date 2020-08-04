@@ -104,7 +104,7 @@ const ExecuteJobs = {
                 if (job && !gameCreep) { // job exists and creep is dead, remove job
                     Util.DeleteJob(job, creepMemory.JobName, jobRoomName);
                 }
-                const didRemoveMaxCreeps = FindAndRemoveMaxCreeps(jobRoomName, creepName);
+                const removedMaxCreepsInRoom = FindAndRemoveMaxCreeps(jobRoomName, creepName);
                 delete Memory.creeps[creepName];
             }
         }
@@ -112,7 +112,7 @@ const ExecuteJobs = {
         /**@return {number}*/
         function CreepIdle(jobRoomName, gameCreep, creepName, result) {
             if (!gameCreep) { // idle creep is dead
-                const didRemoveMaxCreeps = FindAndRemoveMaxCreeps(jobRoomName, creepName);
+                const removedMaxCreepsInRoom = FindAndRemoveMaxCreeps(jobRoomName, creepName);
                 delete Memory.creeps[creepName];
             } else { // idle creep is alive
                 // if idle creep is carrying something - move it to storage
@@ -212,7 +212,7 @@ const ExecuteJobs = {
                     }
                 }
                 if (closestOwnedRoom) {
-                    const didRemoveMaxCreeps = FindAndRemoveMaxCreeps(jobRoomName, creepName); // remove from the origin room
+                    const removedMaxCreepsInRoom = FindAndRemoveMaxCreeps(jobRoomName, creepName); // remove from the origin room
                     if (!Memory.MemRooms[closestOwnedRoom].MaxCreeps[creepName.substring(0, 1)]) {
                         Memory.MemRooms[closestOwnedRoom].MaxCreeps[creepName.substring(0, 1)] = {};
                     }
@@ -2100,7 +2100,6 @@ const ExecuteJobs = {
 
         //region helper functions
 
-        /**@return {boolean}*/
         function FindAndRemoveMaxCreeps(jobRoomName, creepName) {
             const creepType = creepName.substring(0, 1);
             if (Memory.MemRooms[jobRoomName]
@@ -2108,20 +2107,20 @@ const ExecuteJobs = {
                 && Memory.MemRooms[jobRoomName].MaxCreeps[creepType][creepName]
             ) {
                 Memory.MemRooms[jobRoomName].MaxCreeps[creepType][creepName] = undefined;
-                return true;
+                return jobRoomName;
             } else { // creep was not found in the expected room, now search all rooms for the creepName to remove
-                Util.Info('ExecuteJobs', 'FindAndRemoveMaxCreeps', 'must look in other rooms ' + creepName + ' last job change was in room ' + jobRoomName + ' creepType ' + creepType);
+                //Util.Info('ExecuteJobs', 'FindAndRemoveMaxCreeps', 'must look in other rooms ' + creepName + ' last job change was in room ' + jobRoomName + ' creepType ' + creepType);
                 for (const memRoomKey in Memory.MemRooms) { // search for room with the creep
                     if (Memory.MemRooms[memRoomKey].MaxCreeps[creepType]
                         && Memory.MemRooms[memRoomKey].MaxCreeps[creepType][creepName]
                     ) {
                         Memory.MemRooms[memRoomKey].MaxCreeps[creepType][creepName] = undefined;
-                        Util.Info('ExecuteJobs', 'FindAndRemoveMaxCreeps', 'found in other room ' + memRoomKey + ' ' + creepName + ' last job change was in room ' + jobRoomName + ' creepType ' + creepType);
-                        return true;
+                        //Util.Info('ExecuteJobs', 'FindAndRemoveMaxCreeps', 'found in other room ' + memRoomKey + ' ' + creepName + ' last job change was in room ' + jobRoomName + ' creepType ' + creepType);
+                        return memRoomKey;
                     }
                 }
-                Util.ErrorLog('ExecuteJobs', 'FindAndRemoveMaxCreeps', 'could not find creep ' + creepName + ' last job change was in room ' + jobRoomName + ' creepType ' + creepType);
-                return false;
+                Util.ErrorLog('ExecuteJobs', 'FindAndRemoveMaxCreeps', 'could not find creep ' + creepName + ' in MaxCreeps memory last job change was in room ' + jobRoomName + ' creepType ' + creepType);
+                return undefined;
             }
         }
 
