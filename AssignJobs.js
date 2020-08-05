@@ -317,7 +317,11 @@ const AssignJobs = {
         function SpawningCreep(bestAvailableSpawn, spawnLargeVersion, roomJob, roomJobKey, memRoomKey) {
             if (bestAvailableSpawn) { // the closest spawn is found
                 const availableName = GetAvailableName(roomJob.CreepType);
-                const spawnResult = bestAvailableSpawn.spawnCreep(GetCreepBody(roomJob.CreepType, Game.rooms[bestAvailableSpawn.pos.roomName].energyAvailable, spawnLargeVersion), availableName);
+                let spawnAgileVersion = false;
+                if(memRoomKey !== bestAvailableSpawn.pos.roomName){
+                    spawnAgileVersion = true;
+                }
+                const spawnResult = bestAvailableSpawn.spawnCreep(GetCreepBody(roomJob.CreepType, Game.rooms[bestAvailableSpawn.pos.roomName].energyAvailable, spawnLargeVersion, spawnAgileVersion), availableName);
                 if (spawnResult === OK) {
                     Game.creeps[availableName].memory.JobName = roomJobKey;
                     roomJob.Creep = availableName;
@@ -334,7 +338,7 @@ const AssignJobs = {
         }
 
         /**@return {array}*/
-        function GetCreepBody(creepType, energyAvailable, spawnLargeVersion) {
+        function GetCreepBody(creepType, energyAvailable, spawnLargeVersion, spawnAgileVersion) {
             let body = [];
             switch (creepType) {
                 // harvester
@@ -412,8 +416,18 @@ const AssignJobs = {
                                 MOVE, MOVE, MOVE, MOVE, MOVE,
                                 MOVE, MOVE, MOVE];
                             break;
+                        case (energyAvailable >= 2350 && spawnAgileVersion): // energyCapacityAvailable: 5600
+                            body = [
+                                WORK, WORK, WORK, WORK, WORK, WORK, WORK,
+                                CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY,
+                                MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,
+                                MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];
+                            break;
                         case (energyAvailable >= 2000): // energyCapacityAvailable: 5600
-                            body = [WORK, WORK, WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];
+                            body = [
+                                WORK, WORK, WORK, WORK, WORK, WORK, WORK,
+                                CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY,
+                                MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];
                             break;
                         case (energyAvailable >= 1800): // energyCapacityAvailable: 2300
                             body = [WORK, WORK, WORK, WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];

@@ -97,18 +97,13 @@ const Observers = {
                         filter: function (h) {
                             return h.getActiveBodyparts(ATTACK) || h.getActiveBodyparts(RANGED_ATTACK) || h.getActiveBodyparts(HEAL)
                         }
-                    }); // if 4 or more hostile creeps - better to just ignore the room!
-                    let shouldVacateHallway = false;
-                    if (walls[0] || hostileCreeps.length >= 4) { // other factors could be added here like hostile creeps
-                        shouldVacateHallway = true;
-                    }
-                    if (shouldVacateHallway) {
+                    });
+                    if (walls[0] || hostileCreeps.length >= 4) {
                         clearRoomOfFlags(roomKey, observerRoom);
                     } else {
                         AddPowerBankFlag(observerRoom, roomKey, observer);
                         AddDepositFlag(observerRoom, roomKey);
                     }
-
                     numOfScansLeft++;
                     delete observerRoom.MapScan[roomKey];
                 }
@@ -139,7 +134,7 @@ const Observers = {
         function AddPowerBankFlag(observerRoom, roomKey, observer) {
             if (!observerRoom.PowerBankFlag) {
                 const powerBank = LookForPowerBank(roomKey, observer, observerRoomKey);
-                if (powerBank && (powerBank.Deadline - 4000) > Game.time && powerBank.FreeSpaces >= 2) {
+                if (powerBank && (powerBank.Deadline - 4000) > Game.time && powerBank.FreeSpaces >= 2 && powerBank.power >= 2000) {
                     observerRoom.PowerBankFlag = powerBank;
                     const result = Game.rooms[powerBank.pos.roomName].createFlag(powerBank.pos, CreateFlagName(powerBank.Type, powerBank.pos, observerRoomKey), COLOR_ORANGE, COLOR_PURPLE);
                     Util.Info('Observers', 'AddPowerBankFlag', 'add ' + powerBank.pos.roomName + ' ' + powerBank.Type + ' ' + powerBank.pos + ' ' + powerBank.FreeSpaces + ' result ' + result);

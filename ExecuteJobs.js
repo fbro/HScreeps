@@ -2811,11 +2811,11 @@ const ExecuteJobs = {
             let result = ERR_NO_RESULT_FOUND;
             let from = creep.pos;
             let to = obj.pos;
-            if (from.roomName === to.roomName) {
+            if (from.roomName === to.roomName || creep.memory.onlyMoveTo) {
                 const opts = {
-                    reusePath: 5, // default
-                    serializeMemory: true,  // default
-                    noPathFinding: false,  // default
+                    //reusePath: 5, // default
+                    //serializeMemory: true,  // default
+                    //noPathFinding: false,  // default
                     visualizePathStyle: {
                         fill: fill,
                         stroke: stroke,
@@ -2833,6 +2833,7 @@ const ExecuteJobs = {
                         delete creep.memory.CachedPath;
                         delete creep.memory.ExitPosition;
                         result = ERR_NO_RESULT_FOUND;
+                        creep.memory.onlyMoveTo = true; // if pathing fails then resort to exclusively using the more expensive moveTo function
                     }
                 }
                 if (result === ERR_NO_RESULT_FOUND) { // calculate path
