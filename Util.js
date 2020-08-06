@@ -98,7 +98,7 @@ const Util = {
         for (let x = pos.x - 1; x <= pos.x + 1; x++) {
             for (let y = pos.y - 1; y <= pos.y + 1; y++) {
                 const t = terrain.get(x, y);
-                if (t === 0 && (pos.x !== x || pos.y !== y)) {
+                if (t !== TERRAIN_MASK_WALL && (pos.x !== x || pos.y !== y)) {
                     freeSpaces++;
                 }
             }

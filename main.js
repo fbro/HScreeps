@@ -132,7 +132,11 @@ module.exports.loop = function () {
 // TODO an unbalance in healing when attacking powerbank
 // TODO FillStrg-container can be very expensive!
 
+// TODO make a map with the help of observers and scouts that will help when generating routes in the pathfinding between rooms
+
 // TODO create a store energy into battery solution - this can then be used to send resources to defending rooms that needs alot of energy
+
+// TODO powercreeps could look for dropped resources to pickup
 
 // attack NPC strongholds
 // harvest middle rooms

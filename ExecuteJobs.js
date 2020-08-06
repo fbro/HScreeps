@@ -1782,7 +1782,7 @@ const ExecuteJobs = {
                         }
                     }
                     let result = ERR_NO_RESULT_FOUND;
-                    if (creep.hitsMax - creep.hits > 450) {
+                    if (creep.hitsMax - creep.hits > 600) {
                         result = ERR_TIRED;
                     } else if (powerBank) {
                         result = creep.attack(powerBank);
