@@ -321,7 +321,8 @@ const AssignJobs = {
                 if(memRoomKey !== bestAvailableSpawn.pos.roomName){
                     spawnAgileVersion = true;
                 }
-                const spawnResult = bestAvailableSpawn.spawnCreep(GetCreepBody(roomJob.CreepType, Game.rooms[bestAvailableSpawn.pos.roomName].energyAvailable, spawnLargeVersion, spawnAgileVersion), availableName);
+                const creepBody = GetCreepBody(roomJob.CreepType, Game.rooms[bestAvailableSpawn.pos.roomName].energyAvailable, spawnLargeVersion, spawnAgileVersion);
+                const spawnResult = bestAvailableSpawn.spawnCreep(creepBody, availableName);
                 if (spawnResult === OK) {
                     Game.creeps[availableName].memory.JobName = roomJobKey;
                     roomJob.Creep = availableName;
@@ -331,7 +332,7 @@ const AssignJobs = {
                     Util.Info('AssignJobs', 'SpawnCreep', 'OK ' + availableName + ' assigned to ' + roomJobKey + ' in ' + memRoomKey + ' spawn ' + bestAvailableSpawn.name);
                     return true;
                 } else {
-                    Util.Info('AssignJobs', 'SpawnCreep', 'failed ' + availableName + ' assigned to ' + roomJobKey + ' in ' + memRoomKey + ' spawnResult ' + spawnResult + ' spawn ' + bestAvailableSpawn.name + ' room energy: ' + Game.rooms[bestAvailableSpawn.pos.roomName].energyAvailable);
+                    Util.Warning('AssignJobs', 'SpawnCreep', 'failed ' + availableName + ' assigned to ' + roomJobKey + ' in ' + memRoomKey + ' spawnResult ' + spawnResult + ' spawn ' + bestAvailableSpawn.name + ' room energy: ' + Game.rooms[bestAvailableSpawn.pos.roomName].energyAvailable);
                     return false;
                 }
             }
@@ -547,15 +548,6 @@ const AssignJobs = {
                                 ATTACK, ATTACK, ATTACK
                             ];
                             break;
-                        case (energyAvailable >= 1300): // energyCapacityAvailable: 1300
-                            body = [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK];
-                            break;
-                        case (energyAvailable >= 520): // energyCapacityAvailable: 550
-                            body = [MOVE, MOVE, MOVE, MOVE, ATTACK, ATTACK, ATTACK, ATTACK];
-                            break;
-                        case (energyAvailable >= 260): // energyCapacityAvailable: 300
-                            body = [MOVE, MOVE, ATTACK, ATTACK];
-                            break;
                     }
                     break;
                 // gunner
@@ -577,22 +569,6 @@ const AssignJobs = {
                         case (energyAvailable >= 3000): // energyCapacityAvailable: 5600
                             body = [RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK,
                                 MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, RANGED_ATTACK];
-                            break;
-                        case (energyAvailable >= 2000): // energyCapacityAvailable: 2300
-                            body = [RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK,
-                                MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, RANGED_ATTACK];
-                            break;
-                        case (energyAvailable >= 1400): // energyCapacityAvailable: 1800
-                            body = [RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, RANGED_ATTACK];
-                            break;
-                        case (energyAvailable >= 1000): // energyCapacityAvailable: 1300
-                            body = [RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, MOVE, MOVE, MOVE, MOVE, MOVE, RANGED_ATTACK];
-                            break;
-                        case (energyAvailable >= 400): // energyCapacityAvailable: 550
-                            body = [RANGED_ATTACK, MOVE, MOVE, RANGED_ATTACK];
-                            break;
-                        case (energyAvailable >= 200): // energyCapacityAvailable: 300
-                            body = [MOVE, RANGED_ATTACK];
                             break;
                     }
                     break;
@@ -616,21 +592,6 @@ const AssignJobs = {
                             body = [HEAL, HEAL, HEAL, HEAL, HEAL, HEAL, HEAL, HEAL, HEAL, HEAL, HEAL, HEAL, HEAL, HEAL, HEAL,
                                 MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, HEAL];
                             break;
-                        case (energyAvailable >= 2100): // energyCapacityAvailable: 2300
-                            body = [HEAL, HEAL, HEAL, HEAL, HEAL, HEAL, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, HEAL];
-                            break;
-                        case (energyAvailable >= 1500): // energyCapacityAvailable: 1800
-                            body = [HEAL, HEAL, HEAL, HEAL, MOVE, MOVE, MOVE, MOVE, MOVE, HEAL];
-                            break;
-                        case (energyAvailable >= 1200): // energyCapacityAvailable: 1300
-                            body = [HEAL, HEAL, HEAL, MOVE, MOVE, MOVE, MOVE, HEAL];
-                            break;
-                        case (energyAvailable >= 480): // energyCapacityAvailable: 550
-                            body = [TOUGH, TOUGH, TOUGH, MOVE, MOVE, MOVE, MOVE, HEAL];
-                            break;
-                        case (energyAvailable >= 300): // energyCapacityAvailable: 300
-                            body = [MOVE, HEAL];
-                            break;
                     }
                     break;
                 // distant harvester
@@ -649,24 +610,6 @@ const AssignJobs = {
                                 MOVE, MOVE, MOVE, MOVE, MOVE,
                                 MOVE, MOVE, MOVE, MOVE, MOVE
                             ];
-                            break;
-                        case (energyAvailable >= 1250): // energyCapacityAvailable: 5600
-                            body = [WORK, WORK, WORK, WORK, WORK, WORK, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];
-                            break;
-                        case (energyAvailable >= 1000): // energyCapacityAvailable: 2300
-                            body = [WORK, WORK, WORK, WORK, WORK, WORK, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];
-                            break;
-                        case (energyAvailable >= 750): // energyCapacityAvailable: 1800
-                            body = [WORK, WORK, WORK, CARRY, MOVE, MOVE, MOVE];
-                            break;
-                        case (energyAvailable >= 500): // energyCapacityAvailable: 1300
-                            body = [WORK, WORK, WORK, CARRY, MOVE, MOVE, MOVE];
-                            break;
-                        case (energyAvailable >= 300): // energyCapacityAvailable: 550
-                            body = [WORK, CARRY, MOVE];
-                            break;
-                        case (energyAvailable >= 200): // energyCapacityAvailable: 300
-                            body = [WORK, CARRY, MOVE];
                             break;
                     }
                     break;

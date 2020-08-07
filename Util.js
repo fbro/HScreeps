@@ -55,8 +55,8 @@ const Util = {
 
     ErrorLog: function (functionParentName, functionName, message) {
         const messageId = functionParentName + ' ' + functionName;
-        console.log('!!--------------- ' + messageId + ' ---------------!!');
-        console.log(message);
+        console.log('!!----------------------------------------------------------------------!!');
+        console.log('!!ERROR!! ' + messageId + ' | ' + message);
         if (!Memory.ErrorLog) {
             Memory.ErrorLog = {};
         }
@@ -71,8 +71,8 @@ const Util = {
     },
     InfoLog: function (functionParentName, functionName, message) {
         const messageId = functionParentName + ' ' + functionName;
-        console.log('----------------- ' + messageId + '----------------- ');
-        console.log(message);
+        console.log('--------------------------------------------------------------------------');
+        console.log('--INFO-- ' + messageId + ' | ' + message);
         if (!Memory.InfoLog) {
             Memory.InfoLog = {};
         }
@@ -89,7 +89,7 @@ const Util = {
         console.log(functionParentName + ' ' + functionName + ' | ' + message);
     },
     Warning: function (functionParentName, functionName, message) {
-        console.log('WARNING! ' + functionParentName + ' ' + functionName + ' | ' + message);
+        console.log('--WARNING-- ' + functionParentName + ' ' + functionName + ' | ' + message);
     },
     /**@return {number}*/
     FreeSpaces: function (pos) { // get the number of free spaces around a pos

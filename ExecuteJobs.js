@@ -1529,7 +1529,7 @@ const ExecuteJobs = {
                                 default:
                                     Util.ErrorLog('ExecuteJobs', 'JobGuardGunnerPosition', 'gunner move error ' + creep.name);
                             }
-                        }else if(result === OK && fetchObject.structureType && creep.pos.getRangeTo(fetchObject) > 2){
+                        } else if (result === OK && fetchObject.structureType && creep.pos.getRangeTo(fetchObject) > 2) {
                             return ERR_NOT_IN_RANGE; // always try and move closer to the structure it is attacking
                         }
                         return result;
@@ -2550,7 +2550,7 @@ const ExecuteJobs = {
             if (hostileCreepsWithAttack.length === 0 && (creep.getActiveBodyparts(ATTACK) || creep.getActiveBodyparts(RANGED_ATTACK))) {
                 for (const hostileCreepKey in hostileCreeps) {
                     const hostileCreep = hostileCreeps[hostileCreepKey];
-                    if(hostileCreep.pos.getRangeTo(creep.pos) <= 3 && creep.getActiveBodyparts(RANGED_ATTACK) || hostileCreep.pos.getRangeTo(creep.pos) === 1 && creep.getActiveBodyparts(ATTACK)){
+                    if (hostileCreep.pos.getRangeTo(creep.pos) <= 3 && creep.getActiveBodyparts(RANGED_ATTACK) || hostileCreep.pos.getRangeTo(creep.pos) === 1 && creep.getActiveBodyparts(ATTACK)) {
                         AttackHostileCreep(creep, null, null, hostileCreeps);
                         Util.Info('ExecuteJobs', 'CreepHostileAction', 'harmless hostile - attack ' + creep.name + ' ' + creep.pos.roomName + ' hostile: ' + hostileCreep.name + ' ' + hostileCreep.owner.username);
                         return CREEP_ATTACKED_HOSTILE; // no threat but can attack it - just do it
@@ -2889,7 +2889,7 @@ const ExecuteJobs = {
             const nextRoom = Memory.Paths[to.roomName][creep.pos.roomName];
             const exitDirection = Game.map.findExit(creep.room, nextRoom);
             const exitPosition = creep.pos.findClosestByPath(exitDirection);
-            if(!exitPosition){
+            if (!exitPosition) {
                 Util.ErrorLog('ExecuteJobs', 'getInnerRoomPath', 'exitPosition not found ' + creep.pos.roomName + ' exitDirection ' + exitDirection + ' nextRoom ' + nextRoom);
                 return;
             }
@@ -2911,7 +2911,7 @@ const ExecuteJobs = {
                     result = TryMoveInDirection(creep, BOTTOM_LEFT, BOTTOM, BOTTOM_RIGHT);
                 } else if (creep.pos.y === 49) {
                     result = TryMoveInDirection(creep, TOP_LEFT, TOP, TOP_RIGHT);
-                }else { // not on room edges
+                } else { // not on room edges
                     if (!creep.memory.MoveErrWait) { // maybe wait a couple of ticks to see if the obstacle has disappeared
                         creep.memory.MoveErrWait = 1;
                         creep.memory.MoveErrLastWait = Game.time;
@@ -2943,15 +2943,15 @@ const ExecuteJobs = {
             return result;
         }
 
-        function TryMoveInDirection(creep, option1, option2, option3){
+        function TryMoveInDirection(creep, option1, option2, option3) {
             let result = creep.move(option2);
-            if(result !== OK){
+            if (result !== OK) {
                 result = creep.move(option1);
-                if(result !== OK){
+                if (result !== OK) {
                     result = creep.move(option3);
                 }
             }
-            if(result === OK){
+            if (result === OK) {
                 result = JOB_MOVING;
             }
             return result;

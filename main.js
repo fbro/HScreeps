@@ -19,9 +19,9 @@ module.exports.loop = function () {
         if (!Memory.MemRooms) {
             Memory.MemRooms = {};
         }
-        if (Game.time % Util.GAME_TIME_MODULO_2 === 0) {
+        if (Game.time % Util.GAME_TIME_MODULO_2 === 0) { // tick burst from https://docs.screeps.com/cpu-limit.html#Bucket
             if (Game.time % Util.GAME_TIME_MODULO_3 === 0) {
-                if (Game.time % Util.GAME_TIME_MODULO_4 === 0) { // tick burst from https://docs.screeps.com/cpu-limit.html#Bucket
+                if (Game.time % Util.GAME_TIME_MODULO_4 === 0) {
                     CreateJobs.run();
                     Links.run();
                     if (Game.time % Util.GAME_TIME_MODULO_5 === 0) {
@@ -59,7 +59,7 @@ module.exports.loop = function () {
             const gameRoom = Game.rooms[gameRoomKey];
             if (gameRoom.controller && gameRoom.controller.my && Memory.MemRooms[gameRoom.name]) {
                 Towers.run(gameRoom);
-                if(gameRoom.controller.level >= 7){
+                if (gameRoom.controller.level >= 7) {
                     Factories.run(gameRoom, gameRoomKey);
                     if (gameRoom.controller.level >= 8) {
                         Observers.run(gameRoom, gameRoomKey);
@@ -129,7 +129,6 @@ module.exports.loop = function () {
 };
 
 // TODOs:
-// TODO an unbalance in healing when attacking powerbank
 // TODO FillStrg-container can be very expensive!
 
 // TODO make a map with the help of observers and scouts that will help when generating routes in the pathfinding between rooms
