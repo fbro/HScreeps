@@ -2331,7 +2331,7 @@ const ExecuteJobs = {
                 if (labThatCanBoost) {
                     result = labThatCanBoost.boostCreep(creep);
                     if (result === OK) {
-                        Util.InfoLog('ExecuteJobs', 'BoostCreep', creep.pos.roomName + ' ' + creep.name + ' body ' + bodyTypeToBoost + ' mineral ' + mineral);
+                        Util.Info('ExecuteJobs', 'BoostCreep', creep.pos.roomName + ' ' + creep.name + ' body ' + bodyTypeToBoost + ' mineral ' + mineral);
                         if (!creep.memory.Boost) {
                             creep.memory.Boost = {};
                         }
@@ -2354,7 +2354,7 @@ const ExecuteJobs = {
                         if (creep.getActiveBodyparts(CARRY).length) {
                             creep.pickup(creep.pos.lookFor(LOOK_RESOURCES)[0]);
                         }
-                        Util.InfoLog('ExecuteJobs', 'UnBoostCreep', creep.pos.roomName + ' ' + creep.name + ' body ' + bodyTypeToUnBoost + ' mineral ' + mineral);
+                        Util.Info('ExecuteJobs', 'UnBoostCreep', creep.pos.roomName + ' ' + creep.name + ' body ' + bodyTypeToUnBoost + ' mineral ' + mineral);
                         creep.memory.Boost[bodyTypeToUnBoost] = undefined;
                     }
                 }

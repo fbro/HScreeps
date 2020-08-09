@@ -30,6 +30,8 @@ const Terminals = {
 
                 GetEnergy(terminal, terminals); // get energy from other terminals
 
+                marketDealCount = BuyPower(terminal, marketDealCount);
+
                 marketDealCount = SendExcess(terminal, marketDealCount); // selected terminal will actively send/sell resources out
             }
         }
@@ -98,6 +100,19 @@ const Terminals = {
             if (toTerminal.store.getUsedCapacity(RESOURCE_ENERGY) === 0 && toTerminal.room.storage.store.getUsedCapacity(RESOURCE_ENERGY) === 0) {
                 const didSend = GetFromTerminal(Util.STORAGE_ENERGY_LOW, RESOURCE_ENERGY, toTerminal, terminals, Util.STORAGE_ENERGY_MEDIUM);
             }
+        }
+
+        function BuyPower(toTerminal, marketDealCount) {
+            if (marketDealCount >= 10 || toTerminal.cooldown || toTerminal.used) {
+                return marketDealCount;
+            }
+            if (toTerminal.store.getUsedCapacity(RESOURCE_POWER) === 0 && toTerminal.room.storage.store.getUsedCapacity(RESOURCE_POWER) === 0) {
+                const didBuy = TryBuyResource(toTerminal, RESOURCE_POWER, Util.TERMINAL_TARGET_RESOURCE, 6);
+                if (didBuy) {
+                    marketDealCount++;
+                }
+            }
+            return marketDealCount;
         }
 
         function SendExcess(fromTerminal, marketDealCount) { // selected terminal will actively send/sell resources out
@@ -463,8 +478,7 @@ const Terminals = {
         }
 
         /**@return {boolean}*/
-        function TryBuyResource(terminal, resourceType, amount) {
-            const highestBuyingValue = 50; // a hard cap to protect against very expensive purchases
+        function TryBuyResource(terminal, resourceType, amount, highestBuyingValue = 10 /* a hard cap to protect against very expensive purchases */) {
             const resourceHistory = Game.market.getHistory(resourceType);
             const orders = Game.market.getAllOrders(order => order.resourceType === resourceType
                 && order.type === ORDER_SELL

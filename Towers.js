@@ -22,11 +22,21 @@ const Towers = {
 
         function FindTowers(gameRoom) {
             let towers = [];
+            let towersLoaded = true;
             if (Memory.MemRooms[gameRoom.name].TowerIds) {
                 for (let i = 0; i < Memory.MemRooms[gameRoom.name].TowerIds.length; i++) {
                     towers[i] = Game.getObjectById(Memory.MemRooms[gameRoom.name].TowerIds[i]);
+                    if(!towers[i]){
+                        Util.ErrorLog('Towers', 'FindTowers', 'tower number ' + i + ' not found!');
+                        delete Memory.MemRooms[gameRoom.name].TowerIds;
+                        towersLoaded = false;
+                        break;
+                    }
                 }
-            } else {
+            }else{
+                towersLoaded = false;
+            }
+            if(!towersLoaded) {
                 towers = gameRoom.find(FIND_MY_STRUCTURES, {
                     filter: function (tower) {
                         return tower.structureType === STRUCTURE_TOWER && tower.store.getUsedCapacity(RESOURCE_ENERGY) > 0;

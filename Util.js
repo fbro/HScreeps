@@ -33,7 +33,7 @@ const Util = {
 
     MINIMUM_ENERGY_REQUIRED: 200,  // the smallest creep that a spawn can create
 
-    OBSERVER_SCAN_RADIUS_POWER_DEPOSIT: 5, // the radius around the flagged observer when scanning for power banks or deposits
+    OBSERVER_SCAN_RADIUS_POWER_DEPOSIT: 8, // the radius around the flagged observer when scanning for power banks or deposits
     DEPOSIT_MAX_LAST_COOLDOWN: 80, // if the deposit is over this value then ignore it and end the deposit job
 
     TRANSPORTER_MAX_CARRY: 1000, // used in JobAttackPowerBank to generate JobTransportPowerBank
