@@ -116,7 +116,7 @@ const AssignJobs = {
         function SpawnCreep(roomJob, availableSpawns, availableSpawnsInRoom, roomJobKey, memRoomKey) {
             // if idle creep not found for vacant job then look if spawn is possible
             if (ShouldSpawnCreep(roomJob.CreepType, memRoomKey)) {
-                let bestLinearDistance = 1; // normally creeps should only be spawned in the room they are needed
+                let maxLinearDistance = 1; // normally creeps should only be spawned in the room they are needed
                 let spawnLargeVersion = false;
                 // job in another room
                 if (Game.rooms[memRoomKey]) { // job in invisible room
@@ -129,24 +129,24 @@ const AssignJobs = {
                                     return spawn.pos.roomName === gameRoom;
                                 })){
                                     Util.Info('AssignJobs', 'SpawnCreep', 'and no spawns at all' + roomJobKey);
-                                    bestLinearDistance = Number.MAX_SAFE_INTEGER;
+                                    maxLinearDistance = Number.MAX_SAFE_INTEGER;
                                 }
                             } else {
                                 spawnLargeVersion = ShouldSpawnLargeVersion(gameRoom, roomJob, roomJobKey, memRoomKey);
                             }
                         } else {
                             Util.Info('AssignJobs', 'SpawnCreep', 'job in room, not my room ' + roomJobKey);
-                            bestLinearDistance = Number.MAX_SAFE_INTEGER;
+                            maxLinearDistance = Number.MAX_SAFE_INTEGER;
                         }
                     } else {
                         Util.Info('AssignJobs', 'SpawnCreep', 'job in room, no controller ' + roomJobKey);
-                        bestLinearDistance = Number.MAX_SAFE_INTEGER;
+                        maxLinearDistance = Number.MAX_SAFE_INTEGER;
                     }
                 } else {
                     Util.Info('AssignJobs', 'SpawnCreep', 'job in room, invisible room ' + roomJobKey);
-                    bestLinearDistance = Number.MAX_SAFE_INTEGER;
+                    maxLinearDistance = Number.MAX_SAFE_INTEGER;
                 }
-                const bestAvailableSpawn = FindBestSpawn(availableSpawns, availableSpawnsInRoom, bestLinearDistance, roomJob, memRoomKey);
+                const bestAvailableSpawn = FindBestSpawn(availableSpawns, availableSpawnsInRoom, maxLinearDistance, roomJob, memRoomKey);
 
                 return SpawningCreep(bestAvailableSpawn, spawnLargeVersion, roomJob, roomJobKey, memRoomKey);
             }

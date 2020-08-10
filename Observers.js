@@ -134,7 +134,7 @@ const Observers = {
         function AddPowerBankFlag(observerRoom, roomKey, observer) {
             if (!observerRoom.PowerBankFlag) {
                 const powerBank = LookForPowerBank(roomKey, observer, observerRoomKey);
-                if (powerBank && (powerBank.Deadline - 4000) > Game.time && powerBank.FreeSpaces >= 2 && powerBank.power >= 1000) {
+                if (powerBank && (powerBank.Deadline - 4000) > Game.time && powerBank.FreeSpaces >= 2 && powerBank.Power >= 1000) {
                     observerRoom.PowerBankFlag = powerBank;
                     const result = Game.rooms[powerBank.pos.roomName].createFlag(powerBank.pos, CreateFlagName(powerBank.Type, powerBank.pos, observerRoomKey), COLOR_ORANGE, COLOR_PURPLE);
                     Util.InfoLog('Observers', 'AddPowerBankFlag', 'add ' + powerBank.pos.roomName + ' ' + powerBank.Type + ' ' + powerBank.pos + ' ' + powerBank.FreeSpaces + ' result ' + result);

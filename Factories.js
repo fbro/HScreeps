@@ -54,6 +54,14 @@ const Factories = {
                     if (result === OK) return;
                     result = Produce(factory, RESOURCE_ALLOY, Util.FACTORY_TARGET_RESOURCE, RESOURCE_METAL, 100, RESOURCE_ZYNTHIUM_BAR, 20, RESOURCE_ENERGY, 40);
                     if (result === OK) return;
+                    if(factory.room.storage.store.getUsedCapacity(RESOURCE_ENERGY) >= Util.STORAGE_ENERGY_MEDIUM){
+                        result = Produce(factory, RESOURCE_BATTERY, Util.FACTORY_TARGET_RESOURCE, RESOURCE_ENERGY, 600);
+                        if (result === OK) return;
+                    }else if(factory.room.storage.store.getUsedCapacity(RESOURCE_ENERGY) <= Util.STORAGE_ENERGY_LOW && factory.room.terminal.store.getUsedCapacity(RESOURCE_ENERGY) <= Util.TERMINAL_TARGET_ENERGY){
+                        result = Produce(factory, RESOURCE_ENERGY, Number.MAX_SAFE_INTEGER, RESOURCE_BATTERY, 50);
+                        Util.Warning('Factories', '', 'extracting energy from batteries! energy status: storage ' + factory.room.storage.store.getUsedCapacity(RESOURCE_ENERGY) + ' terminal ' + factory.room.terminal.store.getUsedCapacity(RESOURCE_ENERGY));
+                        if (result === OK) return;
+                    }
                 }
             } else { // no factory in this room - set FctrId so that it wont look again
                 memRoom.FctrId = '-';
@@ -70,7 +78,7 @@ const Factories = {
                          res4Name, res4MinAmount,
                          res5Name, res5MinAmount) {
             if (                 factory.store.getUsedCapacity(res1Name) >= res1MinAmount
-                &&               factory.store.getUsedCapacity(res2Name) >= res2MinAmount
+                && (!res2Name || factory.store.getUsedCapacity(res2Name) >= res2MinAmount)
                 && (!res3Name || factory.store.getUsedCapacity(res3Name) >= res3MinAmount)
                 && (!res4Name || factory.store.getUsedCapacity(res4Name) >= res4MinAmount)
                 && (!res5Name || factory.store.getUsedCapacity(res5Name) >= res5MinAmount)
@@ -81,7 +89,7 @@ const Factories = {
                 Util.Info('Factories', 'Produce',
                     'lvl ' + (!factory.level ? 0 : factory.level) + ' ' + factory.pos.roomName + ' producing ' + resToProduceName + ' ' + factory.store.getUsedCapacity(resToProduceName) + ' result ' + result
                     + ' ' + res1Name + ' ' + factory.store.getUsedCapacity(res1Name)
-                    + ' ' + res2Name + ' ' + factory.store.getUsedCapacity(res2Name)
+                    + (res2Name ? ' ' + res2Name + ' ' + factory.store.getUsedCapacity(res2Name) : '')
                     + (res3Name ? ' ' + res3Name + ' ' + factory.store.getUsedCapacity(res3Name) : '')
                     + (res4Name ? ' ' + res4Name + ' ' + factory.store.getUsedCapacity(res4Name) : '')
                     + (res5Name ? ' ' + res5Name + ' ' + factory.store.getUsedCapacity(res5Name) : ''));

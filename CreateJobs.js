@@ -516,6 +516,9 @@ const CreateJobs = {
                                 || resourceType === RESOURCE_SPIRIT && amount >= 50 && factory.level === 3
                                 || resourceType === RESOURCE_EMANATION && amount >= 10 && factory.level === 4
                                 || resourceType === RESOURCE_ESSENCE && amount >= 1 && factory.level === 5
+
+                                // get Battery to send
+                                || resourceType === RESOURCE_BATTERY && amount >= Util.FACTORY_TARGET_RESOURCE && gameRoom.storage.store.getUsedCapacity(RESOURCE_ENERGY) >= Util.STORAGE_ENERGY_MEDIUM
                             )
                         ) {
                             new RoomVisual(gameRoom.name).text('🏭', factory.pos.x, factory.pos.y);
@@ -599,7 +602,7 @@ const CreateJobs = {
                     let Low = Util.STORAGE_LOW; // 0
                     let LowTransfer = Util.STORAGE_LOW_TRANSFER; // 3000
                     if (resourceType === RESOURCE_ENERGY) {
-                        High = Util.STORAGE_ENERGY_HIGH; // 200000
+                        High = Util.STORAGE_ENERGY_HIGH; // 300000
                         HighTransfer = Util.STORAGE_ENERGY_HIGH_TRANSFER; // 100000
                         Medium = Util.STORAGE_ENERGY_MEDIUM; // 100000
                         MediumTransfer = Util.STORAGE_ENERGY_MEDIUM_TRANSFER; // 80000
