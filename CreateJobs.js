@@ -519,6 +519,8 @@ const CreateJobs = {
 
                                 // get Battery to send
                                 || resourceType === RESOURCE_BATTERY && amount >= Util.FACTORY_TARGET_RESOURCE && gameRoom.storage.store.getUsedCapacity(RESOURCE_ENERGY) >= Util.STORAGE_ENERGY_MEDIUM
+                                // get energy if storage and terminal is low on energy
+                                || resourceType === RESOURCE_ENERGY && amount > 0 && gameRoom.storage.store.getUsedCapacity(RESOURCE_ENERGY) < Util.STORAGE_ENERGY_LOW && gameRoom.terminal.store.getUsedCapacity(RESOURCE_ENERGY) < Util.TERMINAL_TARGET_ENERGY
                             )
                         ) {
                             new RoomVisual(gameRoom.name).text('🏭', factory.pos.x, factory.pos.y);
@@ -626,7 +628,7 @@ const CreateJobs = {
         }
 
         function FillLabEnergyJobs(gameRoom, roomJobs) {
-            if (gameRoom.storage && gameRoom.storage.store.getUsedCapacity(RESOURCE_ENERGY) > 5000) {
+            if (gameRoom.storage && gameRoom.storage.store.getUsedCapacity(RESOURCE_ENERGY) > Util.STORAGE_ENERGY_LOW) {
                 const labs = gameRoom.find(FIND_MY_STRUCTURES, {
                     filter: (s) => {
                         return s.structureType === STRUCTURE_LAB;
@@ -650,8 +652,13 @@ const CreateJobs = {
                     }
                 })[0];
                 if (factory) {
-                    if (factory.store.getUsedCapacity(RESOURCE_ENERGY) < Util.FACTORY_TARGET_ENERGY) {
+                    if (factory.store.getUsedCapacity(RESOURCE_ENERGY) < Util.FACTORY_TARGET_ENERGY && gameRoom.storage.store.getUsedCapacity(RESOURCE_ENERGY) >= Util.STORAGE_ENERGY_MEDIUM) {
                         AddJob(roomJobs, 'FillFctr(' + RESOURCE_ENERGY + ')' + gameRoom.name, factory.id, Util.OBJECT_JOB, 'T');
+                    }
+                    if(gameRoom.storage.store.getUsedCapacity(RESOURCE_ENERGY) <= Util.STORAGE_ENERGY_LOW
+                        && gameRoom.terminal.store.getUsedCapacity(RESOURCE_ENERGY) <= Util.TERMINAL_TARGET_ENERGY
+                        && factory.store.getUsedCapacity(RESOURCE_BATTERY) > 0){ // energy is needed!
+                        AddJob(roomJobs, 'FillFctr(' + RESOURCE_BATTERY + ')' + gameRoom.name, factory.id, Util.OBJECT_JOB, 'T');
                     }
 
                     // Biological chain

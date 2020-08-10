@@ -59,8 +59,10 @@ const Factories = {
                         if (result === OK) return;
                     }else if(factory.room.storage.store.getUsedCapacity(RESOURCE_ENERGY) <= Util.STORAGE_ENERGY_LOW && factory.room.terminal.store.getUsedCapacity(RESOURCE_ENERGY) <= Util.TERMINAL_TARGET_ENERGY){
                         result = Produce(factory, RESOURCE_ENERGY, Number.MAX_SAFE_INTEGER, RESOURCE_BATTERY, 50);
-                        Util.Warning('Factories', '', 'extracting energy from batteries! energy status: storage ' + factory.room.storage.store.getUsedCapacity(RESOURCE_ENERGY) + ' terminal ' + factory.room.terminal.store.getUsedCapacity(RESOURCE_ENERGY));
-                        if (result === OK) return;
+                        if (result === OK) {
+                            Util.Warning('Factories', '', 'extracting energy from batteries in ' + factory.pos.roomName + ' energy status: storage ' + factory.room.storage.store.getUsedCapacity(RESOURCE_ENERGY) + ' terminal ' + factory.room.terminal.store.getUsedCapacity(RESOURCE_ENERGY));
+                            return;
+                        }
                     }
                 }
             } else { // no factory in this room - set FctrId so that it wont look again

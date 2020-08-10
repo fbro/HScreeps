@@ -99,7 +99,7 @@ const Terminals = {
         function GetEnergy(toTerminal, terminals) {
             if (toTerminal.store.getUsedCapacity(RESOURCE_ENERGY) === 0 && toTerminal.room.storage.store.getUsedCapacity(RESOURCE_ENERGY) === 0) {
                 let didSend = false;
-                const memRoom = Memory.MemRooms[toTerminal.pos.roomName]
+                const memRoom = Memory.MemRooms[toTerminal.pos.roomName];
                 if(toTerminal.room.controller.level === 8 || memRoom.FctrId && memRoom.FctrId !== '-'){
                     didSend = GetFromTerminal(Util.TERMINAL_TARGET_RESOURCE, RESOURCE_BATTERY, toTerminal, terminals, Util.TERMINAL_TARGET_RESOURCE);
                 }
