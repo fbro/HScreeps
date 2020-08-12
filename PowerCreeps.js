@@ -2,10 +2,9 @@ let Util = require('Util');
 const PowerCreeps = {
     run: function () {
         const NO_RESULT_FOUND = -20;
+        RunPowerCreeps();
 
-        PowerCreeps();
-
-        function PowerCreeps(){
+        function RunPowerCreeps(){
             const powerCreepSpawnFlags = _.filter(Game.flags, function (flag) {
                 return flag.color === COLOR_BLUE && flag.secondaryColor === COLOR_ORANGE;
             });
@@ -413,13 +412,8 @@ const PowerCreeps = {
                     }
                 }
             }
-
             return result;
         }
-
-
-
-
     }
 };
 module.exports = PowerCreeps;

@@ -133,6 +133,8 @@ module.exports.loop = function () {
 
 // TODO make a map with the help of observers and scouts that will help when generating routes in the pathfinding between rooms
 
+// TODO powercreeps should hook into the job memory and chech if there are any free transporter jobs
+
 // attack NPC strongholds
 // harvest middle rooms
 // harvest neutral rooms
