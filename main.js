@@ -135,6 +135,8 @@ module.exports.loop = function () {
 
 // TODO powercreeps should hook into the job memory and chech if there are any free transporter jobs
 
+// TODO create resource sales
+
 // attack NPC strongholds
 // harvest middle rooms
 // harvest neutral rooms
