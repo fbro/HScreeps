@@ -519,9 +519,9 @@ const CreateJobs = {
 
                                 // get Battery to send
                                 || resourceType === RESOURCE_BATTERY && amount >= Util.FACTORY_TARGET_RESOURCE && gameRoom.storage.store.getUsedCapacity(RESOURCE_ENERGY) >= Util.STORAGE_ENERGY_MEDIUM
-                                // get energy if storage and terminal is low on energy
-                                || resourceType === RESOURCE_ENERGY && amount > 0 && gameRoom.storage.store.getUsedCapacity(RESOURCE_ENERGY) < Util.STORAGE_ENERGY_LOW && gameRoom.terminal.store.getUsedCapacity(RESOURCE_ENERGY) < Util.TERMINAL_TARGET_ENERGY
                             )
+                            // get energy if storage and terminal is low on energy
+                            || resourceType === RESOURCE_ENERGY && amount > 0 && (gameRoom.storage.store.getUsedCapacity(RESOURCE_ENERGY) < Util.STORAGE_ENERGY_LOW && gameRoom.terminal.store.getUsedCapacity(RESOURCE_ENERGY) < Util.TERMINAL_TARGET_ENERGY || amount > Util.FACTORY_TARGET_ENERGY)
                         ) {
                             new RoomVisual(gameRoom.name).text('🏭', factory.pos.x, factory.pos.y);
                             AddJob(roomJobs, 'FillStrg-' + factory.structureType + '(' + factory.pos.x + ',' + factory.pos.y + ',' + resourceType + ')' + gameRoom.name, factory.id, Util.OBJECT_JOB, 'T');
