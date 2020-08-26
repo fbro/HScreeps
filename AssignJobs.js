@@ -249,9 +249,9 @@ const AssignJobs = {
             let bestAvailableSpawnCounter;
             let timeToLiveMaxRoomRange;
             if(roomJob.CreepType === 'C' || roomJob.CreepType === 'R'){ //  creep with CLAIM body parts
-                timeToLiveMaxRoomRange = 12; // 600 time to live / 50 max room tile
+                timeToLiveMaxRoomRange = 9; // 600 time to live / 50 max room tile - 3 for elbow room
             }else {
-                timeToLiveMaxRoomRange = 30; // 1500 time to live / 50 max room tile
+                timeToLiveMaxRoomRange = 20; // 1500 time to live / 50 max room tile - 10 for elbow room
             }
             for (const availableSpawnCounter in availableSpawns) { // find closest spawn
                 const availableSpawn = availableSpawns[availableSpawnCounter];
@@ -266,12 +266,13 @@ const AssignJobs = {
                 } else {
                     const linearDistance = Game.map.getRoomLinearDistance(availableSpawn.pos.roomName, memRoomKey);
                     if(linearDistance > timeToLiveMaxRoomRange){
+                        //Util.Warning('AssignJobs','FindBestSpawn',linearDistance + ' > ' + timeToLiveMaxRoomRange + ' ' + availableSpawn.name + ' ' + availableSpawn.pos.roomName);
                         continue; // ignore this spawn - it is too far away
                     }
                     let energyAvailableModifier = 0;
                     if (roomJob.JobType === Util.FLAG_JOB) { // on flag jobs one wants to share the load between rooms with more energy
                         switch (true) {
-                            case !availableSpawn.room.storage || availableSpawn.room.storage.store.getUsedCapacity(RESOURCE_ENERGY) < Util.STORAGE_ENERGY_MEDIUM: // do not spawn for a flag job when the storage has under STORAGE_ENERGY_MEDIUM
+                            case !availableSpawn.room.storage || availableSpawn.room.storage.store.getUsedCapacity(RESOURCE_ENERGY) < Util.STORAGE_ENERGY_LOW: // do not spawn for a flag job when the storage has under STORAGE_ENERGY_MEDIUM
                                 energyAvailableModifier = Number.MAX_SAFE_INTEGER;
                                 break;
                             case availableSpawn.room.energyAvailable < 500:
@@ -345,7 +346,10 @@ const AssignJobs = {
                     Util.Warning('AssignJobs', 'SpawnCreep', 'failed ' + availableName + ' assigned to ' + roomJobKey + ' in ' + memRoomKey + ' spawnResult ' + spawnResult + ' spawn ' + bestAvailableSpawn.name + ' room energy: ' + Game.rooms[bestAvailableSpawn.pos.roomName].energyAvailable);
                     return false;
                 }
+            }else{
+                Util.Warning('AssignJobs', 'SpawnCreep', 'bestAvailableSpawn not found, assigned to ' + roomJobKey + ' in ' + memRoomKey);
             }
+
         }
 
         /**@return {array}*/
