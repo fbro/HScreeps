@@ -249,7 +249,7 @@ const AssignJobs = {
             let bestAvailableSpawnCounter;
             let timeToLiveMaxRoomRange;
             if(roomJob.CreepType === 'C' || roomJob.CreepType === 'R'){ //  creep with CLAIM body parts
-                timeToLiveMaxRoomRange = 9; // 600 time to live / 50 max room tile - 3 for elbow room
+                timeToLiveMaxRoomRange = 8; // 600 time to live / 50 max room tile - 4 for elbow room
             }else {
                 timeToLiveMaxRoomRange = 20; // 1500 time to live / 50 max room tile - 10 for elbow room
             }
@@ -265,58 +265,56 @@ const AssignJobs = {
                     }
                 } else {
                     const linearDistance = Game.map.getRoomLinearDistance(availableSpawn.pos.roomName, memRoomKey);
-                    if(linearDistance > timeToLiveMaxRoomRange){
-                        //Util.Warning('AssignJobs','FindBestSpawn',linearDistance + ' > ' + timeToLiveMaxRoomRange + ' ' + availableSpawn.name + ' ' + availableSpawn.pos.roomName);
-                        continue; // ignore this spawn - it is too far away
-                    }
-                    let energyAvailableModifier = 0;
-                    if (roomJob.JobType === Util.FLAG_JOB) { // on flag jobs one wants to share the load between rooms with more energy
-                        switch (true) {
-                            case !availableSpawn.room.storage || availableSpawn.room.storage.store.getUsedCapacity(RESOURCE_ENERGY) < Util.STORAGE_ENERGY_LOW: // do not spawn for a flag job when the storage has under STORAGE_ENERGY_MEDIUM
-                                energyAvailableModifier = Number.MAX_SAFE_INTEGER;
-                                break;
-                            case availableSpawn.room.energyAvailable < 500:
-                                energyAvailableModifier = -1;
-                                break;
-                            case availableSpawn.room.energyAvailable < 1000:
-                                energyAvailableModifier = -2;
-                                break;
-                            case availableSpawn.room.energyAvailable < 2000:
-                                energyAvailableModifier = -3;
-                                break;
-                            case availableSpawn.room.energyAvailable < 3000:
-                                energyAvailableModifier = -4;
-                                break;
-                            case availableSpawn.room.energyAvailable < 4000:
-                                energyAvailableModifier = -5;
-                                break;
-                            case availableSpawn.room.energyAvailable < 5000:
-                                energyAvailableModifier = -6;
-                                break;
-                            case availableSpawn.room.energyAvailable < 6000:
-                                energyAvailableModifier = -7;
-                                break;
-                            case availableSpawn.room.energyAvailable < 7000:
-                                energyAvailableModifier = -8;
-                                break;
-                            case availableSpawn.room.energyAvailable < 8000:
-                                energyAvailableModifier = -9;
-                                break;
-                            case availableSpawn.room.energyAvailable < 9000:
-                                energyAvailableModifier = -10;
-                                break;
-                            case availableSpawn.room.energyAvailable < 10000:
-                                energyAvailableModifier = -11;
-                                break;
-                            case availableSpawn.room.energyAvailable > 10000:
-                                energyAvailableModifier = -12;
-                                break;
+                    if(linearDistance <= timeToLiveMaxRoomRange) { // spawn cannot be too far away
+                        let energyAvailableModifier = 0;
+                        if (roomJob.JobType === Util.FLAG_JOB) { // on flag jobs one wants to share the load between rooms with more energy
+                            switch (true) {
+                                case !availableSpawn.room.storage || availableSpawn.room.storage.store.getUsedCapacity(RESOURCE_ENERGY) < Util.STORAGE_ENERGY_LOW: // do not spawn for a flag job when the storage has under STORAGE_ENERGY_MEDIUM
+                                    energyAvailableModifier = Number.MAX_SAFE_INTEGER;
+                                    break;
+                                case availableSpawn.room.energyAvailable < 500:
+                                    energyAvailableModifier = -1;
+                                    break;
+                                case availableSpawn.room.energyAvailable < 1000:
+                                    energyAvailableModifier = -2;
+                                    break;
+                                case availableSpawn.room.energyAvailable < 2000:
+                                    energyAvailableModifier = -3;
+                                    break;
+                                case availableSpawn.room.energyAvailable < 3000:
+                                    energyAvailableModifier = -4;
+                                    break;
+                                case availableSpawn.room.energyAvailable < 4000:
+                                    energyAvailableModifier = -5;
+                                    break;
+                                case availableSpawn.room.energyAvailable < 5000:
+                                    energyAvailableModifier = -6;
+                                    break;
+                                case availableSpawn.room.energyAvailable < 6000:
+                                    energyAvailableModifier = -7;
+                                    break;
+                                case availableSpawn.room.energyAvailable < 7000:
+                                    energyAvailableModifier = -8;
+                                    break;
+                                case availableSpawn.room.energyAvailable < 8000:
+                                    energyAvailableModifier = -9;
+                                    break;
+                                case availableSpawn.room.energyAvailable < 9000:
+                                    energyAvailableModifier = -10;
+                                    break;
+                                case availableSpawn.room.energyAvailable < 10000:
+                                    energyAvailableModifier = -11;
+                                    break;
+                                case availableSpawn.room.energyAvailable > 10000:
+                                    energyAvailableModifier = -12;
+                                    break;
+                            }
                         }
-                    }
-                    if ((energyAvailableModifier + linearDistance) < bestLinearDistance && energyAvailableModifier !== Number.MAX_SAFE_INTEGER) {
-                        bestLinearDistance = energyAvailableModifier + linearDistance;
-                        bestAvailableSpawn = availableSpawn;
-                        bestAvailableSpawnCounter = availableSpawnCounter;
+                        if ((energyAvailableModifier + linearDistance) < bestLinearDistance && energyAvailableModifier !== Number.MAX_SAFE_INTEGER) {
+                            bestLinearDistance = energyAvailableModifier + linearDistance;
+                            bestAvailableSpawn = availableSpawn;
+                            bestAvailableSpawnCounter = availableSpawnCounter;
+                        }
                     }
                 }
             }
@@ -340,10 +338,10 @@ const AssignJobs = {
                     if (Memory.MemRooms[memRoomKey].MaxCreeps[availableName.substring(0, 1)]) {
                         Memory.MemRooms[memRoomKey].MaxCreeps[availableName.substring(0, 1)][availableName] = availableName;
                     }
-                    Util.Info('AssignJobs', 'SpawnCreep', 'OK ' + availableName + ' assigned to ' + roomJobKey + ' in ' + memRoomKey + ' spawn ' + bestAvailableSpawn.name);
+                    Util.Info('AssignJobs', 'SpawnCreep', 'OK ' + availableName + ' assigned to ' + roomJobKey + ' in ' + memRoomKey + ' spawned at ' + bestAvailableSpawn.name + ' ' + bestAvailableSpawn.pos.roomName + (bestAvailableSpawn.pos.roomName !== memRoomKey ? ' distance ' + Game.map.getRoomLinearDistance(bestAvailableSpawn.pos.roomName, memRoomKey) : ''));
                     return true;
                 } else {
-                    Util.Warning('AssignJobs', 'SpawnCreep', 'failed ' + availableName + ' assigned to ' + roomJobKey + ' in ' + memRoomKey + ' spawnResult ' + spawnResult + ' spawn ' + bestAvailableSpawn.name + ' room energy: ' + Game.rooms[bestAvailableSpawn.pos.roomName].energyAvailable);
+                    Util.Warning('AssignJobs', 'SpawnCreep', 'failed ' + availableName + ' assigned to ' + roomJobKey + ' in ' + memRoomKey + ' spawnResult ' + spawnResult + ' spawn ' + bestAvailableSpawn.name + ' ' + bestAvailableSpawn.pos.roomName + ' room energy: ' + Game.rooms[bestAvailableSpawn.pos.roomName].energyAvailable);
                     return false;
                 }
             }else{
