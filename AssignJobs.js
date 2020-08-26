@@ -20,6 +20,7 @@ const AssignJobs = {
         * [G] gunner            RANGED_ATTACK and MOVE - needs clever attack pattern to avoid creeps with ATTACK body parts
         * [M] medic             HEAL
         * [D] distantHarvester  equal WORK and MOVE
+        * [L] lifter            50 MOVE - lifts other creeps TODO
         */
 
         AssignOrSpawnCreeps();
@@ -246,6 +247,12 @@ const AssignJobs = {
         function FindBestSpawn(availableSpawns, availableSpawnsInRoom, bestLinearDistance, roomJob, memRoomKey) {
             let bestAvailableSpawn;
             let bestAvailableSpawnCounter;
+            let timeToLiveMaxRoomRange;
+            if(roomJob.CreepType === 'C' || roomJob.CreepType === 'R'){ //  creep with CLAIM body parts
+                timeToLiveMaxRoomRange = 12; // 600 time to live / 50 max room tile
+            }else {
+                timeToLiveMaxRoomRange = 30; // 1500 time to live / 50 max room tile
+            }
             for (const availableSpawnCounter in availableSpawns) { // find closest spawn
                 const availableSpawn = availableSpawns[availableSpawnCounter];
 
@@ -258,6 +265,9 @@ const AssignJobs = {
                     }
                 } else {
                     const linearDistance = Game.map.getRoomLinearDistance(availableSpawn.pos.roomName, memRoomKey);
+                    if(linearDistance > timeToLiveMaxRoomRange){
+                        continue; // ignore this spawn - it is too far away
+                    }
                     let energyAvailableModifier = 0;
                     if (roomJob.JobType === Util.FLAG_JOB) { // on flag jobs one wants to share the load between rooms with more energy
                         switch (true) {
