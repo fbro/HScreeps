@@ -31,7 +31,7 @@ console.log(JSON.stringify(Game.rooms['E29S28'].controller.owner));
 for (const flagKey in Game.flags) {
     const flag = Game.flags[flagKey];
     console.log(flagKey + ' ' + JSON.stringify(flag));
-    if(flag.color === COLOR_ORANGE && flag.secondaryColor === COLOR_ORANGE){
+    if(flag.color === COLOR_ORANGE && flag.secondaryColor === COLOR_CYAN || flag.color === COLOR_ORANGE && flag.secondaryColor === COLOR_PURPLE){
         console.log('removing flag');
         flag.remove()
     }
