@@ -2722,84 +2722,79 @@ const ExecuteJobs = {
             }
             switch (true) {
                 case creep.pos.x < closestHostileCreep.pos.x && creep.pos.y < closestHostileCreep.pos.y:
-                    if (!FleeMove(creep, -1, -1, TOP_LEFT)) {
-                        if (!FleeMove(creep, 0, -1, TOP)) {
-                            FleeMove(creep, -1, 0, LEFT);
-                        }
-                    }
+                    FleeMove(creep, [-1, 0, -1], [-1, -1, 0], [TOP_LEFT, TOP, LEFT]);
                     break;
                 case creep.pos.x > closestHostileCreep.pos.x && creep.pos.y < closestHostileCreep.pos.y:
-                    if (!FleeMove(creep, 1, -1, TOP_RIGHT)) {
-                        if (!FleeMove(creep, 0, -1, TOP)) {
-                            FleeMove(creep, 1, 0, RIGHT);
-                        }
-                    }
+                    FleeMove(creep, [1, 0, 1], [-1, -1, 0], [TOP_RIGHT, TOP, RIGHT]);
                     break;
                 case creep.pos.x > closestHostileCreep.pos.x && creep.pos.y > closestHostileCreep.pos.y:
-                    if (!FleeMove(creep, 1, 1, BOTTOM_RIGHT)) {
-                        if (!FleeMove(creep, 0, 1, BOTTOM)) {
-                            FleeMove(creep, 1, 0, RIGHT);
-                        }
-                    }
+                    FleeMove(creep, [1, 0, 1], [1, 1, 0], [BOTTOM_RIGHT, BOTTOM, RIGHT]);
                     break;
                 case creep.pos.x < closestHostileCreep.pos.x && creep.pos.y > closestHostileCreep.pos.y:
-                    if (!FleeMove(creep, -1, 1, BOTTOM_LEFT)) {
-                        if (!FleeMove(creep, 0, 1, BOTTOM)) {
-                            FleeMove(creep, -1, 0, LEFT);
-                        }
-                    }
+                    FleeMove(creep, [-1, 0, -1], [1, 1, 0], [BOTTOM_LEFT, BOTTOM, LEFT]);
                     break;
                 case creep.pos.x < closestHostileCreep.pos.x && creep.pos.y === closestHostileCreep.pos.y:
-                    if (!FleeMove(creep, -1, 0, LEFT)) {
-                        if (!FleeMove(creep, -1, 1, BOTTOM_LEFT)) {
-                            FleeMove(creep, -1, -1, TOP_LEFT);
-                        }
-                    }
+                    FleeMove(creep, [-1, -1, -1], [0, 1, -1], [LEFT, BOTTOM_LEFT, TOP_LEFT]);
                     break;
                 case creep.pos.x > closestHostileCreep.pos.x && creep.pos.y === closestHostileCreep.pos.y:
-                    if (!FleeMove(creep, 1, 0, RIGHT)) {
-                        if (!FleeMove(creep, 1, 1, BOTTOM_RIGHT)) {
-                            FleeMove(creep, 1, -1, TOP_RIGHT);
-                        }
-                    }
+                    FleeMove(creep, [1, 1, 1], [0, 1, -1], [RIGHT, BOTTOM_RIGHT, TOP_RIGHT]);
                     break;
                 case creep.pos.x === closestHostileCreep.pos.x && creep.pos.y > closestHostileCreep.pos.y:
-                    if (!FleeMove(creep, 0, 1, BOTTOM)) {
-                        if (!FleeMove(creep, -1, 1, BOTTOM_LEFT)) {
-                            FleeMove(creep, 1, 1, BOTTOM_RIGHT);
-                        }
-                    }
+                    FleeMove(creep, [0, -1, 1], [1, 1, 1], [BOTTOM, BOTTOM_LEFT, BOTTOM_RIGHT]);
                     break;
                 case creep.pos.x === closestHostileCreep.pos.x && creep.pos.y < closestHostileCreep.pos.y:
-                    if (!FleeMove(creep, 0, -1, TOP)) {
-                        if (!FleeMove(creep, -1, -1, TOP_LEFT)) {
-                            FleeMove(creep, 1, -1, TOP_RIGHT);
-                        }
-                    }
+                    FleeMove(creep, [0, -1, 1], [-1, -1, -1], [TOP, TOP_LEFT, TOP_RIGHT]);
                     break;
                 default:
                     Util.ErrorLog('ExecuteJobs', 'Flee', 'flee move error ' + creep.name);
             }
         }
 
-        /** @return {boolean}*/
-        function FleeMove(creep, xMod, yMod, direction) {
-            let newX = (creep.pos.x + xMod);
-            if (newX <= 0 || newX >= 49) {
-                newX = creep.pos.x;
+        function FleeMove(creep, Xs, Ys, directions) {
+            let positions = [];
+            let bestPointer;
+            let bestPointHasRoad = false;
+            let bestPointHasCreep = false;
+            for(const count in directions){
+                let newX = (creep.pos.x + Xs[count]);
+                if (newX <= 0 || newX >= 49) {
+                    newX = creep.pos.x;
+                }
+                let newY = (creep.pos.y + Ys[count]);
+                if (newY <= 0 || newY >= 49) {
+                    newY = creep.pos.y;
+                }
+                const fleeToPos = new RoomPosition(newX, newY, creep.pos.roomName);
+                const look = fleeToPos.look();
+                let terrainOnPosition;
+                let isRoadOnPosition = false;
+                let structureTypeOnPosition;
+                let creepOnPosition;
+                for(const lookCount in look){
+                    if(look[lookCount].type === LOOK_TERRAIN){
+                        terrainOnPosition = look[lookCount].terrain;
+                    }else if(look[lookCount].type === LOOK_STRUCTURE){
+                        if(look[lookCount].structure.structureType === STRUCTURE_ROAD){
+                            isRoadOnPosition = true;
+                        }else if(look[lookCount].structure.structureType !== STRUCTURE_CONTAINER){
+                            structureTypeOnPosition = look[lookCount].structure.structureType;
+                        }
+                    }else if(look[lookCount].type === LOOK_CREEPS){
+                        creepOnPosition = look[lookCount].creep.name;
+                    }
+                }
+                positions.push({"fleeToPos": fleeToPos, "terrain" : terrainOnPosition, "hasRoad": isRoadOnPosition, "structureType" : structureTypeOnPosition, "creep" : creepOnPosition});
+
+                if(!positions[count].structureType && (!bestPointer && positions[count].terrain === 'swamp' && positions[count].terrain === 'plain' || positions[count].terrain === 'plain' && !bestPointHasRoad && !bestPointHasCreep)){
+                    bestPointer = count;
+                    bestPointHasRoad = positions[count].hasRoad;
+                    bestPointHasCreep = positions[count].creep;
+                }
             }
-            let newY = (creep.pos.y + yMod);
-            if (newY <= 0 || newY >= 49) {
-                newY = creep.pos.y;
+            if (bestPointer) {
+                const result = creep.move(directions[bestPointer]);
+                Util.Info('ExecuteJobs', 'FleeMove', creep.name + ' go to position ' + JSON.stringify(positions[bestPointer]) + ' orig ' + JSON.stringify(creep.pos) + " result " + result);
             }
-            const fleeToPos = new RoomPosition(newX, newY, creep.pos.roomName);
-            const terrain = fleeToPos.lookFor(LOOK_TERRAIN);
-            Util.Info('ExecuteJobs', 'FleeMove', 'terrain ' + terrain + ' ' + JSON.stringify(fleeToPos) + ' orig ' + JSON.stringify(creep.pos));
-            if (terrain[0] === 'plain') {
-                creep.move(direction);
-                return true;
-            }
-            return false;
         }
 
         //endregion

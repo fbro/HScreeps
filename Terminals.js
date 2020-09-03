@@ -131,7 +131,7 @@ const Terminals = {
                 let didSend = false;
                 // try to send energy or power to other owned terminals that needs it
                 if(resourceType === RESOURCE_ENERGY){
-                    didSend = SendToTerminal(Util.TERMINAL_MAX_ENERGY, resourceType, fromTerminal, terminals, Util.TERMINAL_TARGET_ENERGY);
+                    didSend = SendToTerminal(Util.STORAGE_ENERGY_MEDIUM_TRANSFER, resourceType, fromTerminal, terminals, Util.TERMINAL_TARGET_ENERGY);
                 }else if(resourceType === RESOURCE_POWER){
                     didSend = SendToTerminal(Util.TERMINAL_TARGET_RESOURCE, resourceType, fromTerminal, terminals, Util.TERMINAL_TARGET_RESOURCE);
                 }

@@ -604,8 +604,8 @@ const CreateJobs = {
                     let Low = Util.STORAGE_LOW; // 0
                     let LowTransfer = Util.STORAGE_LOW_TRANSFER; // 3000
                     if (resourceType === RESOURCE_ENERGY) {
-                        High = Util.STORAGE_ENERGY_HIGH; // 300000
-                        HighTransfer = Util.STORAGE_ENERGY_HIGH_TRANSFER; // 100000
+                        High = Util.STORAGE_ENERGY_HIGH; // 600000
+                        HighTransfer = Util.STORAGE_ENERGY_HIGH_TRANSFER; // 120000
                         Medium = Util.STORAGE_ENERGY_MEDIUM; // 100000
                         MediumTransfer = Util.STORAGE_ENERGY_MEDIUM_TRANSFER; // 80000
                         Low = Util.STORAGE_ENERGY_LOW; // 10000

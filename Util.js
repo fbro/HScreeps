@@ -10,11 +10,11 @@ const Util = {
 
     // if over max - then try and sell
     TERMINAL_MAX_RESOURCE: 6000,
-    TERMINAL_MAX_ENERGY: 90000,
+    TERMINAL_MAX_ENERGY: 100000,
     TERMINAL_BUFFER: 500, // buffer to avoid small sends/sales
     // if storage contains more or equal of high then creep should transfer to terminal until high_transfer is in terminal
-    STORAGE_ENERGY_HIGH: 300000,
-    STORAGE_ENERGY_HIGH_TRANSFER: 100000,
+    STORAGE_ENERGY_HIGH: 600000,
+    STORAGE_ENERGY_HIGH_TRANSFER: 120000,
     STORAGE_ENERGY_MEDIUM: 100000,
     STORAGE_ENERGY_MEDIUM_TRANSFER: 80000,
     STORAGE_ENERGY_LOW: 10000, // abort transfer when storage is lower than this

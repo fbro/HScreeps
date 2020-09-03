@@ -137,7 +137,7 @@ const Observers = {
                 if (powerBank && (powerBank.Deadline - 4000) > Game.time && powerBank.FreeSpaces >= 2 && powerBank.Power >= 1000) {
                     observerRoom.PowerBankFlag = powerBank;
                     const result = Game.rooms[powerBank.pos.roomName].createFlag(powerBank.pos, CreateFlagName(powerBank.Type, powerBank.pos, observerRoomKey), COLOR_ORANGE, COLOR_PURPLE);
-                    Util.InfoLog('Observers', 'AddPowerBankFlag', 'add ' + powerBank.pos.roomName + ' ' + powerBank.Type + ' ' + powerBank.pos + ' ' + powerBank.FreeSpaces + ' result ' + result);
+                    Util.InfoLog('Observers', 'AddPowerBankFlag', 'add ' + powerBank.pos.roomName + ' ' + powerBank.Type + ' ' + powerBank.pos + ' ' + powerBank.FreeSpaces + ' createFlag result ' + result);
                 }
             } else if (observerRoom.PowerBankFlag
                 && (observerRoom.PowerBankFlag.Deadline < Game.time
