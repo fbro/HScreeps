@@ -2760,7 +2760,7 @@ const ExecuteJobs = {
                 let newY = (creep.pos.y + Ys[count]);
                 if (newX <= 0 || newX >= 49 || newY <= 0 || newY >= 49) {
                     positions.push({'newX': newX, 'newY': newY});
-                    Util.Info('ExecuteJobs', 'FleeMove', 'border reached ' + newX + ',' + newY);
+                    //Util.Info('ExecuteJobs', 'FleeMove', 'border reached ' + newX + ',' + newY);
                 }else{
                     const fleeToPos = new RoomPosition(newX, newY, creep.pos.roomName);
                     const look = fleeToPos.look();
@@ -2782,7 +2782,7 @@ const ExecuteJobs = {
                         }
                     }
                     positions.push({"fleeToPos": fleeToPos, "terrain" : terrainOnPosition, "hasRoad": isRoadOnPosition, "structureType" : structureTypeOnPosition, "creep" : creepOnPosition});
-                    Util.Info('ExecuteJobs', 'FleeMove', 'obj ' + fleeToPos.x + ',' + fleeToPos.y + ' ' + terrainOnPosition + ' ' + structureTypeOnPosition + ' ' + creepOnPosition);
+                    //Util.Info('ExecuteJobs', 'FleeMove', 'obj ' + fleeToPos.x + ',' + fleeToPos.y + ' ' + terrainOnPosition + ' ' + structureTypeOnPosition + ' ' + creepOnPosition);
                     if(!positions[count].structureType && (!bestPointer && positions[count].terrain === 'swamp' && positions[count].terrain === 'plain' || positions[count].terrain === 'plain' && !bestPointHasRoad && !bestPointHasCreep)){
                         bestPointer = count;
                         bestPointHasRoad = positions[count].hasRoad;
