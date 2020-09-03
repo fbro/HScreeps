@@ -9,7 +9,7 @@ for (const creepName in Memory.creeps) {
     if (gc === undefined) {
         delete Memory.creeps[creepName];
     } else {
-        for(const memoryElementKey in gc.memory){
+        for (const memoryElementKey in gc.memory) {
             gc.memory[memoryElementKey] = undefined;
         }
         mc.JobName = 'idle(' + gc.pos.x + ',' + gc.pos.y + ')' + gc.pos.roomName;
@@ -31,7 +31,7 @@ console.log(JSON.stringify(Game.rooms['E29S28'].controller.owner));
 for (const flagKey in Game.flags) {
     const flag = Game.flags[flagKey];
     console.log(flagKey + ' ' + JSON.stringify(flag));
-    if(flag.color === COLOR_ORANGE && flag.secondaryColor === COLOR_CYAN || flag.color === COLOR_ORANGE && flag.secondaryColor === COLOR_PURPLE){
+    if (flag.color === COLOR_ORANGE && flag.secondaryColor === COLOR_CYAN || flag.color === COLOR_ORANGE && flag.secondaryColor === COLOR_PURPLE) {
         console.log('removing flag');
         flag.remove()
     }
@@ -47,7 +47,7 @@ console.log('RESOURCE_ENERGY ' + Game.getObjectById('5cf1a7158e8ea635474264ca').
 
 // destroy all structures
 const structures = Game.rooms['E29S31'].find(FIND_STRUCTURES);
-for(const structureKey in structures){
+for (const structureKey in structures) {
     structures[structureKey].destroy();
 }
 
@@ -66,9 +66,9 @@ console.log(JSON.stringify(Memory.MemRooms['E29S31'].MaxCreeps['T']['M']))
 
 // empty a terminal
 const terminal = Game.getObjectById('5cf1a7158e8ea635474264ca');
-for(const resourceType in terminal.store){
+for (const resourceType in terminal.store) {
     const amount = terminal.store[resourceType];
-    if(resourceType !== RESOURCE_ENERGY && amount > 1){
+    if (resourceType !== RESOURCE_ENERGY && amount > 1) {
         terminal.send(resourceType, amount - 1, 'E28S29');
     }
 }

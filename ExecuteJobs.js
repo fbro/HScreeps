@@ -2757,43 +2757,44 @@ const ExecuteJobs = {
             let bestPointHasCreep = false;
             for(const count in directions){
                 let newX = (creep.pos.x + Xs[count]);
-                if (newX <= 0 || newX >= 49) {
-                    newX = creep.pos.x;
-                }
                 let newY = (creep.pos.y + Ys[count]);
-                if (newY <= 0 || newY >= 49) {
-                    newY = creep.pos.y;
-                }
-                const fleeToPos = new RoomPosition(newX, newY, creep.pos.roomName);
-                const look = fleeToPos.look();
-                let terrainOnPosition;
-                let isRoadOnPosition = false;
-                let structureTypeOnPosition;
-                let creepOnPosition;
-                for(const lookCount in look){
-                    if(look[lookCount].type === LOOK_TERRAIN){
-                        terrainOnPosition = look[lookCount].terrain;
-                    }else if(look[lookCount].type === LOOK_STRUCTURE){
-                        if(look[lookCount].structure.structureType === STRUCTURE_ROAD){
-                            isRoadOnPosition = true;
-                        }else if(look[lookCount].structure.structureType !== STRUCTURE_CONTAINER){
-                            structureTypeOnPosition = look[lookCount].structure.structureType;
+                if (newX <= 0 || newX >= 49 || newY <= 0 || newY >= 49) {
+                    positions.push({'newX': newX, 'newY': newY});
+                    Util.Info('ExecuteJobs', 'FleeMove', 'border reached ' + newX + ',' + newY);
+                }else{
+                    const fleeToPos = new RoomPosition(newX, newY, creep.pos.roomName);
+                    const look = fleeToPos.look();
+                    let terrainOnPosition;
+                    let isRoadOnPosition = false;
+                    let structureTypeOnPosition;
+                    let creepOnPosition;
+                    for(const lookCount in look){
+                        if(look[lookCount].type === LOOK_TERRAIN){
+                            terrainOnPosition = look[lookCount].terrain;
+                        }else if(look[lookCount].type === LOOK_STRUCTURES){
+                            if(look[lookCount].structure.structureType === STRUCTURE_ROAD){
+                                isRoadOnPosition = true;
+                            }else if(look[lookCount].structure.structureType !== STRUCTURE_CONTAINER){
+                                structureTypeOnPosition = look[lookCount].structure.structureType;
+                            }
+                        }else if(look[lookCount].type === LOOK_CREEPS){
+                            creepOnPosition = look[lookCount].creep.name;
                         }
-                    }else if(look[lookCount].type === LOOK_CREEPS){
-                        creepOnPosition = look[lookCount].creep.name;
                     }
-                }
-                positions.push({"fleeToPos": fleeToPos, "terrain" : terrainOnPosition, "hasRoad": isRoadOnPosition, "structureType" : structureTypeOnPosition, "creep" : creepOnPosition});
-
-                if(!positions[count].structureType && (!bestPointer && positions[count].terrain === 'swamp' && positions[count].terrain === 'plain' || positions[count].terrain === 'plain' && !bestPointHasRoad && !bestPointHasCreep)){
-                    bestPointer = count;
-                    bestPointHasRoad = positions[count].hasRoad;
-                    bestPointHasCreep = positions[count].creep;
+                    positions.push({"fleeToPos": fleeToPos, "terrain" : terrainOnPosition, "hasRoad": isRoadOnPosition, "structureType" : structureTypeOnPosition, "creep" : creepOnPosition});
+                    Util.Info('ExecuteJobs', 'FleeMove', 'obj ' + fleeToPos.x + ',' + fleeToPos.y + ' ' + terrainOnPosition + ' ' + structureTypeOnPosition + ' ' + creepOnPosition);
+                    if(!positions[count].structureType && (!bestPointer && positions[count].terrain === 'swamp' && positions[count].terrain === 'plain' || positions[count].terrain === 'plain' && !bestPointHasRoad && !bestPointHasCreep)){
+                        bestPointer = count;
+                        bestPointHasRoad = positions[count].hasRoad;
+                        bestPointHasCreep = positions[count].creep;
+                    }
                 }
             }
             if (bestPointer) {
                 const result = creep.move(directions[bestPointer]);
                 Util.Info('ExecuteJobs', 'FleeMove', creep.name + ' go to position ' + JSON.stringify(positions[bestPointer]) + ' orig ' + JSON.stringify(creep.pos) + " result " + result);
+            }else{
+                Util.Info('ExecuteJobs', 'FleeMove', creep.name + ' could not find any viable positions ' + JSON.stringify(positions));
             }
         }
 
