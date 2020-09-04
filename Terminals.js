@@ -1,7 +1,7 @@
 let Util = require('Util');
 const Terminals = {
     run: function () {
-
+        let blackList;
         const terminals = LoadMyTerminals();
         TerminalActions(terminals);
 
@@ -196,7 +196,7 @@ const Terminals = {
             const resourceTypesNeeded = [];
             switch (factory.level) { // factory level
                 case undefined:
-                    switch (true) { // production chain
+                    switch (true) {
                         case(IsProductionChain(factory, RESOURCE_METAL, RESOURCE_ALLOY, RESOURCE_METAL)): // Mechanical chain
                             resourceTypesNeeded.push(RESOURCE_ZYNTHIUM);
                             resourceTypesNeeded.push(RESOURCE_METAL);
@@ -226,7 +226,7 @@ const Terminals = {
                     }
                     break;
                 case(1):
-                    switch (true) { // production chain
+                    switch (true) {
                         case(IsProductionChain(factory, RESOURCE_ALLOY, RESOURCE_TUBE, RESOURCE_METAL)): // Mechanical chain
                             resourceTypesNeeded.push(RESOURCE_ALLOY);
                             resourceTypesNeeded.push(RESOURCE_ZYNTHIUM_BAR);
@@ -250,7 +250,7 @@ const Terminals = {
                     }
                     break;
                 case(2):
-                    switch (true) { // production chain
+                    switch (true) {
                         case(IsProductionChain(factory, RESOURCE_ALLOY, RESOURCE_FIXTURES, RESOURCE_METAL)): // Mechanical chain
                             resourceTypesNeeded.push(RESOURCE_COMPOSITE);
                             resourceTypesNeeded.push(RESOURCE_ALLOY);
@@ -274,7 +274,7 @@ const Terminals = {
                     }
                     break;
                 case(3):
-                    switch (true) { // production chain
+                    switch (true) {
                         case(IsProductionChain(factory, RESOURCE_FIXTURES, RESOURCE_FRAME, RESOURCE_METAL)): // Mechanical chain
                             resourceTypesNeeded.push(RESOURCE_FIXTURES);
                             resourceTypesNeeded.push(RESOURCE_TUBE);
@@ -302,7 +302,7 @@ const Terminals = {
                     }
                     break;
                 case(4):
-                    switch (true) { // production chain
+                    switch (true) {
                         case(IsProductionChain(factory, RESOURCE_FIXTURES, RESOURCE_HYDRAULICS, RESOURCE_METAL)): // Mechanical chain
                             resourceTypesNeeded.push(RESOURCE_LIQUID); // not added in lower factory yet!
                             resourceTypesNeeded.push(RESOURCE_FIXTURES);
@@ -330,7 +330,7 @@ const Terminals = {
                     }
                     break;
                 case(5):
-                    switch (true) { // production chain
+                    switch (true) {
                         case(IsProductionChain(factory, RESOURCE_HYDRAULICS, RESOURCE_MACHINE, RESOURCE_METAL)): // Mechanical chain
                             resourceTypesNeeded.push(RESOURCE_HYDRAULICS);
                             resourceTypesNeeded.push(RESOURCE_FRAME);
