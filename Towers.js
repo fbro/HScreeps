@@ -85,12 +85,35 @@ const Towers = {
                 }
             });
             if (hostileTargets.length > 0) {
+                ActivateSafemode(hostileTargets);
+                SpawnDefenders(hostileTargets);
                 for (let i = 0; i < towers.length; i++) {
                     towers[i].attack(hostileTargets[((i + 1) % hostileTargets.length)]);
                 }
                 return true;
             }
             return false;
+        }
+
+        function ActivateSafemode(hostileTargets){
+            if(hostileTargets.length > 2){
+                for(const hostileTargetCount in hostileTargets){
+                    const hostileTarget = hostileTargets[hostileTargetCount];
+                    if(hostileTarget.owner.username !== 'Invader' && hostileTarget.body.length > 40 && !gameRoom.controller.safeMode && !gameRoom.controller.safeModeCooldown && gameRoom.controller.safeModeAvailable > 0){
+                        const isBoosted = _.find(hostileTarget.body, function (bodypart) {return bodypart.boost !== undefined;});
+                        if(isBoosted){
+                            const result = gameRoom.controller.activateSafeMode();
+                            Util.InfoLog('Towers', 'ActivateSafemode', gameRoom.name + ' ' + result + ' attacked from ' + hostileTarget.owner.username);
+                            Game.notify('safemode have been activated for room ' + gameRoom.name + ' ' + result + ' shard ' + Game.shard + ' attacked from ' + hostileTarget.owner.username, 0);
+                        }
+                    }
+                }
+            }
+        }
+
+        function SpawnDefenders(hostileTargets){
+            // TODO spawn defenders in room if under heavy attack
+
         }
 
         /**@return {boolean}*/

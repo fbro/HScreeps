@@ -114,7 +114,7 @@ const Terminals = {
             if (marketDealCount >= 10 || toTerminal.cooldown || toTerminal.used) {
                 return marketDealCount;
             }
-            if (toTerminal.store.getUsedCapacity(RESOURCE_POWER) === 0 && toTerminal.room.storage.store.getUsedCapacity(RESOURCE_POWER) === 0 && toTerminal.room.storage.store.getUsedCapacity(RESOURCE_ENERGY) >= Util.STORAGE_ENERGY_HIGH) {
+            if (toTerminal.store.getUsedCapacity(RESOURCE_POWER) === 0 && toTerminal.room.storage && toTerminal.room.storage.store.getUsedCapacity(RESOURCE_POWER) === 0 && toTerminal.room.storage.store.getUsedCapacity(RESOURCE_ENERGY) >= Util.STORAGE_ENERGY_HIGH) {
                 const didBuy = TryBuyResource(toTerminal, RESOURCE_POWER, Util.TERMINAL_TARGET_RESOURCE, 5);
                 if (didBuy) {
                     marketDealCount++;

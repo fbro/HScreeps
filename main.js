@@ -137,6 +137,8 @@ module.exports.loop = function () {
 
 // TODO create resource sales
 
+// TODO spawn defenders when under attack
+
 // attack NPC strongholds
 // harvest middle rooms
 // harvest neutral rooms

@@ -2548,12 +2548,14 @@ const ExecuteJobs = {
                 return hostileCreep.getActiveBodyparts(ATTACK) || hostileCreep.getActiveBodyparts(RANGED_ATTACK)
             });
             if (hostileCreepsWithAttack.length === 0 && (creep.getActiveBodyparts(ATTACK) || creep.getActiveBodyparts(RANGED_ATTACK))) {
-                for (const hostileCreepKey in hostileCreeps) {
-                    const hostileCreep = hostileCreeps[hostileCreepKey];
-                    if (hostileCreep.pos.getRangeTo(creep.pos) <= 3 && creep.getActiveBodyparts(RANGED_ATTACK) || hostileCreep.pos.getRangeTo(creep.pos) === 1 && creep.getActiveBodyparts(ATTACK)) {
-                        AttackHostileCreep(creep, null, null, hostileCreeps);
-                        Util.Info('ExecuteJobs', 'CreepHostileAction', 'harmless hostile - attack ' + creep.name + ' ' + creep.pos.roomName + ' hostile: ' + hostileCreep.name + ' ' + hostileCreep.owner.username);
-                        return CREEP_ATTACKED_HOSTILE; // no threat but can attack it - just do it
+                if(creep.room.controller && creep.room.controller.my){
+                    for (const hostileCreepKey in hostileCreeps) {
+                        const hostileCreep = hostileCreeps[hostileCreepKey];
+                        if (creep.getActiveBodyparts(RANGED_ATTACK) || creep.getActiveBodyparts(ATTACK)) {
+                            AttackHostileCreep(creep, null, null, hostileCreeps);
+                            Util.Info('ExecuteJobs', 'CreepHostileAction', 'harmless hostile - attack ' + creep.name + ' ' + creep.pos.roomName + ' hostile: ' + hostileCreep.name + ' ' + hostileCreep.owner.username);
+                            return CREEP_ATTACKED_HOSTILE; // no threat but can attack it - just do it
+                        }
                     }
                 }
                 return CREEP_IGNORED_HOSTILE;

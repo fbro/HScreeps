@@ -59,7 +59,7 @@ const Links = {
         function LinkTransfer(storageLink, controllerLink, harvesterLinks) {
             let hasTransferredToControllerLink = false;
             for (let i = 0; i < harvesterLinks.length; i++) {
-                if (harvesterLinks[i].store.getUsedCapacity(RESOURCE_ENERGY) >= 700) {
+                if (harvesterLinks[i] && harvesterLinks[i].store.getUsedCapacity(RESOURCE_ENERGY) >= 700) {
                     if (!hasTransferredToControllerLink && controllerLink && controllerLink.store.getUsedCapacity(RESOURCE_ENERGY) < 500) {
                         harvesterLinks[i].transferEnergy(controllerLink);
                         hasTransferredToControllerLink = true;

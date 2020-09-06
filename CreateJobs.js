@@ -240,7 +240,7 @@ const CreateJobs = {
             })[0];
             if (lab && (!lab.mineralType || lab.mineralType === mineral)) {
                 // flagname rules: GET-L-roomname = get lemergium from all rooms, BUY-L-roomname = get lemergium from all rooms or then buy it from the terminal
-                if (lab.store.getFreeCapacity(mineral) >= Util.TRANSPORTER_MAX_CARRY && (lab.room.storage.store.getUsedCapacity(mineral) > 0 || lab.room.terminal.store.getUsedCapacity(mineral) > 0)) {
+                if (lab.store.getFreeCapacity(mineral) >= Util.TRANSPORTER_MAX_CARRY && (lab.room.storage && lab.room.storage.store.getUsedCapacity(mineral) > 0 || lab.room.terminal && lab.room.terminal.store.getUsedCapacity(mineral) > 0)) {
                     jobs = CreateFlagJob(jobs, 'FillLabMin', gameFlagKey, gameFlag, 'T');
                 }
             } else { // flag must be on top of an existing lab!
@@ -262,7 +262,7 @@ const CreateJobs = {
             if (lab && (!lab.mineralType || lab.mineralType === mineral)) {
                 // flagname rules: EMPTY-GH-roomname = create the mineral and allows it to be emptied from the nearby lab to this lab
                 //Util.Info('CreateJobs', 'CreateFlagJobs', 'mineral ' + mineral + ' lab ' + lab.store.getUsedCapacity(mineral) + ' terminal ' + lab.room.terminal.store.getUsedCapacity(mineral));
-                if (lab.store.getUsedCapacity(mineral) >= Util.TRANSPORTER_MAX_CARRY && lab.room.terminal.store.getUsedCapacity(mineral) < Util.TERMINAL_MAX_RESOURCE) {
+                if (lab.store.getUsedCapacity(mineral) >= Util.TRANSPORTER_MAX_CARRY && lab.room.terminal && lab.room.terminal.store.getUsedCapacity(mineral) < Util.TERMINAL_MAX_RESOURCE) {
                     CreateFlagJob(jobs, 'EmptyLabMin', gameFlagKey, gameFlag, 'T');
                 }
             } else { // flag must be on top of an existing lab!

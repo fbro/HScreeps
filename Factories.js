@@ -18,7 +18,7 @@ const Factories = {
                     Util.InfoLog('Factories', '', 'add new factory in ' + gameRoomKey + ' FctrId ' + memRoom.FctrId);
                 }
             }
-            if (factory) {
+            if (factory && factory.room.storage) {
                 if (factory.cooldown === 0) {
                     let result;
                     const hasOperateFactoryEffect = factory.effects && factory.effects[0] && factory.effects[0].effect === PWR_OPERATE_FACTORY;
