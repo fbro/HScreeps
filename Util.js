@@ -50,8 +50,9 @@ const Util = {
     GAME_TIME_MODULO_2: 6,
     GAME_TIME_MODULO_3: 12,
     GAME_TIME_MODULO_4: 24,
-    GAME_TIME_MODULO_5: 10800,
-    GAME_TIME_MODULO_6: 216000,
+    GAME_TIME_MODULO_5: 24, // TODO change to 96
+    GAME_TIME_MODULO_6: 10800,
+    GAME_TIME_MODULO_7: 216000,
 
     ErrorLog: function (functionParentName, functionName, message) {
         const messageId = functionParentName + ' ' + functionName;

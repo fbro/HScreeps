@@ -10,6 +10,7 @@ let Util = require('Util');
 let Observers = require('Observers');
 let PowerCreeps = require('PowerCreeps');
 let Labs = require('Labs');
+let Constructions = require('Constructions');
 
 module.exports.loop = function () {
 
@@ -24,24 +25,27 @@ module.exports.loop = function () {
                 if (Game.time % Util.GAME_TIME_MODULO_4 === 0) {
                     CreateJobs.run();
                     Links.run();
-                    if (Game.time % Util.GAME_TIME_MODULO_5 === 0) {
-                        Util.Info('Main', 'Controller', '--------------- main reset of memory ---------------');
+                    if(Game.time % Util.GAME_TIME_MODULO_5 === 0){
+                        Constructions.run();
+                        if (Game.time % Util.GAME_TIME_MODULO_6 === 0) {
+                            Util.Info('Main', 'Controller', '--------------- main reset of memory ---------------');
 
-                        const foundCreeps = {};
-                        for (const memRoomKey in Memory.MemRooms) {
-                            const memRoom = Memory.MemRooms[memRoomKey];
-                            delete memRoom.links; // remove links - maybe the buildings have been deleted ect.
-                            delete memRoom.FctrId; // remove FctrId - maybe the buildings have been deleted ect.
-                            delete memRoom.PowerSpawnId; // remove PowerSpawnId - maybe the buildings have been deleted ect.
-                            delete memRoom.TowerIds; // remove TowerIds - maybe a tower have been deleted ect.
-                            delete memRoom.ObserverId; // remove ObserverId - maybe an observer have been deleted ect.
-                            MaxCreepsCleanup(memRoomKey, memRoom, foundCreeps);
-                            UnusedRoomsCleanup(memRoomKey, memRoom);
-                        }
-                        if (Game.time % Util.GAME_TIME_MODULO_6 === 0) { // approx every 3 days
-                            delete Memory.Paths; // remove Paths to make room for new paths
-                            delete Memory.InfoLog;
-                            Util.InfoLog('Main', 'Controller', 'reset memory logs ' + Game.time);
+                            const foundCreeps = {};
+                            for (const memRoomKey in Memory.MemRooms) {
+                                const memRoom = Memory.MemRooms[memRoomKey];
+                                delete memRoom.links; // remove links - maybe the buildings have been deleted ect.
+                                delete memRoom.FctrId; // remove FctrId - maybe the buildings have been deleted ect.
+                                delete memRoom.PowerSpawnId; // remove PowerSpawnId - maybe the buildings have been deleted ect.
+                                delete memRoom.TowerIds; // remove TowerIds - maybe a tower have been deleted ect.
+                                delete memRoom.ObserverId; // remove ObserverId - maybe an observer have been deleted ect.
+                                MaxCreepsCleanup(memRoomKey, memRoom, foundCreeps);
+                                UnusedRoomsCleanup(memRoomKey, memRoom);
+                            }
+                            if (Game.time % Util.GAME_TIME_MODULO_7 === 0) { // approx every 3 days
+                                delete Memory.Paths; // remove Paths to make room for new paths
+                                delete Memory.InfoLog;
+                                Util.InfoLog('Main', 'Controller', 'reset memory logs ' + Game.time);
+                            }
                         }
                     }
                 }
