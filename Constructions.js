@@ -11,7 +11,8 @@ const Constructions = {
 
 
         function build(gameRoom, roomTerrain){
-
+            // TODO at 2nd iteration the pattern is off
+            // TODO clean code
             buildExtensions(gameRoom, roomTerrain);
 
         }
