@@ -79,7 +79,8 @@ const Constructions = {
             return numberOfBuildableStructures - (extensions.length + extensionConstructionSites.length);
         }
 
-        function FindNumberOfBuildableStructures(gameRoom, structureType){
+        /**@return {number}*/
+        function FindNumberOfBuildableStructures(gameRoom, structureType) {
             switch (true){
                 case structureType === STRUCTURE_EXTENSION:
                     switch (gameRoom.controller.level){
