@@ -57,6 +57,11 @@ const structures = Game.rooms['E29S31'].find(FIND_STRUCTURES);
 for (const structureKey in structures) {
     structures[structureKey].destroy();
 }
+// destroy all constructions
+const constructions = Game.rooms['W17N41'].find(FIND_CONSTRUCTION_SITES);
+for (const key in constructions) {
+    constructions[key].remove();
+}
 
 
 // get something in a rooms memory
