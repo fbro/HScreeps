@@ -64,8 +64,7 @@ const AssignJobs = {
         function AssignCreep(roomJob, idleCreeps, roomJobKey, memRoomKey) {
             for (const idleCreepCounter in idleCreeps) {
                 const idleCreep = idleCreeps[idleCreepCounter];
-                if (idleCreep.pos.roomName === memRoomKey && idleCreep.name.startsWith(roomJob.CreepType)) {
-                    // idle creep is in memory room with vacant job and matching job type
+                if (idleCreep.pos.roomName === memRoomKey && idleCreep.name.startsWith(roomJob.CreepType)) { // idle creep is in memory room with vacant job and matching job type
                     idleCreep.memory.JobName = roomJobKey;
                     for (const memoryElementKey in idleCreep.memory) {
                         if (memoryElementKey !== 'JobName' && memoryElementKey !== 'Boost') { // creep.memory that should not be deleted
@@ -84,7 +83,7 @@ const AssignJobs = {
         /**@return {boolean}*/
         function AssignCreepOtherRoom(roomJob, idleCreeps, roomJobKey, memRoomKey) {
             if (roomJob.JobType === Util.FLAG_JOB
-                && (Game.rooms[memRoomKey] && Game.rooms[memRoomKey].controller && Game.rooms[memRoomKey].controller.my && Game.rooms[memRoomKey].controller.level < 8
+                && (Game.rooms[memRoomKey] && Game.rooms[memRoomKey].controller && Game.rooms[memRoomKey].controller.my //&& Game.rooms[memRoomKey].controller.level < 8
                     || !Game.rooms[memRoomKey]
                     || !Game.rooms[memRoomKey].controller
                     || !Game.rooms[memRoomKey].controller.my)) {
@@ -129,7 +128,7 @@ const AssignJobs = {
                                 if(!_.find(Game.spawns, function (spawn) {
                                     return spawn.pos.roomName === gameRoom;
                                 })){
-                                    Util.Info('AssignJobs', 'SpawnCreep', 'and no spawns at all' + roomJobKey);
+                                    Util.Info('AssignJobs', 'SpawnCreep', 'no spawns found ' + roomJobKey);
                                     maxLinearDistance = Number.MAX_SAFE_INTEGER;
                                 }
                             } else {

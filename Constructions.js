@@ -25,7 +25,9 @@ const Constructions = {
                     return structure.structureType === STRUCTURE_SPAWN;
                 }
             });
-            BuildCheckeredPattern(gameRoom, structureType, roomTerrain, numberOfPossibleConstructions, spawns[0].pos);
+            if(spawns.length > 0){
+                BuildCheckeredPattern(gameRoom, structureType, roomTerrain, numberOfPossibleConstructions, spawns[0].pos);
+            }
         }
 
         function BuildCheckeredPattern(gameRoom, structureType, roomTerrain, numberOfPossibleConstructions, buildPosition) {
