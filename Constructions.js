@@ -9,7 +9,6 @@ const Constructions = {
             }
         }
 
-
         function build(gameRoom, roomTerrain) {
             buildExtensions(gameRoom, roomTerrain);
             buildTowers(gameRoom, roomTerrain);
@@ -50,20 +49,42 @@ const Constructions = {
                     const yp = buildPosition.y + swy;
                     for (let swx = shiftPointer + (shiftPointer % 2 ? (swy % 2 ? 0 : 1) : swy % 2); swx < scanWidth; swx = swx + 2) { // scan width pointer for x plane
                         const xp = buildPosition.x + swx;
-                        const terrain = roomTerrain.get(xp, yp);
-                        if ((!terrain || terrain === 2)) { // plan and swamp is buildable
-                            const lookAtObjects = gameRoom.lookAt(xp, yp);
-                            const hasStructure = _.find(lookAtObjects, function (lookObject) {
-                                return lookObject.type === LOOK_STRUCTURES || lookObject.type === LOOK_CONSTRUCTION_SITES;
-                            });
-                            if (!hasStructure) {
-                                // TODO is near controller, source, mineral or exits then skip - maybe also walls to avoid blocking tight spots ?
-                                const result = gameRoom.createConstructionSite(xp, yp, structureType);
-                                if (result === OK) {
-                                    Util.InfoLog('Constructions', 'buildExtensions', gameRoom.name + ' at (' + xp + ',' + yp + ')');
-                                    numberOfPossibleConstructions--;
-                                    if (numberOfPossibleConstructions <= 0) {
-                                        return;
+                        if(xp < 45 && yp < 45 && xp >= 5 && yp >= 5){
+                            const newBuildPos = new RoomPosition(xp, yp, gameRoom.name);
+                            const terrain = roomTerrain.get(newBuildPos.x, newBuildPos.y);
+                            if ((!terrain || terrain === 2)) { // plan and swamp is buildable
+                                const lookAtObjects = gameRoom.lookAt(newBuildPos.x, newBuildPos.y);
+                                const hasStructure = _.find(lookAtObjects, function (lookObject) {
+                                    return lookObject.type === LOOK_STRUCTURES || lookObject.type === LOOK_CONSTRUCTION_SITES;
+                                });
+                                if (!hasStructure) {
+                                    let hasNearbyWall = HasNearbyWall(roomTerrain, newBuildPos);
+                                    if(!hasNearbyWall) {
+                                        const unwantedNearbyStructures = newBuildPos.findInRange(FIND_STRUCTURES, 1, {
+                                            filter: function (structure) {
+                                                return structure.structureType !== STRUCTURE_SPAWN
+                                                    && structure.structureType !== STRUCTURE_EXTENSION
+                                                    && structure.structureType !== STRUCTURE_TOWER
+                                                    && structure.structureType !== STRUCTURE_CONTAINER
+                                                    && structure.structureType !== STRUCTURE_ROAD;
+                                            }
+                                        });
+                                        if(unwantedNearbyStructures.length === 0){
+                                            const nearbySources = newBuildPos.findInRange(FIND_SOURCES, 1);
+                                            if(nearbySources.length === 0) {
+                                                const nearbyMineral = newBuildPos.findInRange(FIND_MINERALS, 1);
+                                                if(nearbyMineral.length === 0) {
+                                                    const result = gameRoom.createConstructionSite(newBuildPos.x, newBuildPos.y, structureType);
+                                                    if (result === OK) {
+                                                        Util.InfoLog('Constructions', 'buildExtensions', gameRoom.name + ' at (' + newBuildPos.x + ',' + newBuildPos.y + ')');
+                                                        numberOfPossibleConstructions--;
+                                                        if (numberOfPossibleConstructions <= 0) {
+                                                            return;
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
                                     }
                                 }
                             }
@@ -73,6 +94,19 @@ const Constructions = {
                 shiftPointer--; //move the placement pattern further out
                 scanWidth = scanWidth + 2;
             }
+        }
+
+        /**@return {boolean}*/
+        function HasNearbyWall(terrain, pos){
+            for(let terrainX = pos.x - 1; terrainX <= pos.x + 1; terrainX++){
+                for(let terrainY = pos.y - 1; terrainY <= pos.y + 1; terrainY++){
+                    const NearbyTerrain = terrain.get(terrainX, terrainY);
+                    if(NearbyTerrain === TERRAIN_MASK_WALL){
+                        return true;
+                    }
+                }
+            }
+            return false;
         }
 
         /**@return {Number}*/
@@ -120,15 +154,12 @@ const Constructions = {
                 case structureType === STRUCTURE_TOWER:
                     switch (gameRoom.controller.level) {
                         case 1:
-                            return 0;
                         case 2:
                             return 0;
                         case 3:
-                            return 1;
                         case 4:
                             return 1;
                         case 5:
-                            return 2;
                         case 6:
                             return 2;
                         case 7:

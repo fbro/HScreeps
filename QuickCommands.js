@@ -60,8 +60,10 @@ for (const structureKey in structures) {
 // destroy all constructions
 const constructions = Game.rooms['W17N41'].find(FIND_CONSTRUCTION_SITES);
 for (const key in constructions) {
-    console.log('removed ' + constructions[key].structureType + ' ' + constructions[key].pos)
-    constructions[key].remove();
+    if(!constructions[key].progress){
+        console.log('removed ' + constructions[key].structureType + ' ' + constructions[key].pos);
+        constructions[key].remove();
+    }
 }
 
 
