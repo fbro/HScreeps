@@ -10,13 +10,13 @@ const Constructions = {
         }
 
         function build(gameRoom, roomTerrain) {
-            buildExtensions(gameRoom, roomTerrain);
-            buildTowers(gameRoom, roomTerrain);
-
+            ConstructCoreBuilding(gameRoom, roomTerrain, STRUCTURE_EXTENSION);
+            ConstructCoreBuilding(gameRoom, roomTerrain, STRUCTURE_TOWER);
+            ConstructCoreBuilding(gameRoom, roomTerrain, STRUCTURE_SPAWN);
         }
 
-        function buildExtensions(gameRoom, roomTerrain) {
-            let numberOfPossibleConstructions = GetNumberOfPossibleConstructions(gameRoom, STRUCTURE_EXTENSION);
+        function ConstructCoreBuilding(gameRoom, roomTerrain, structureType){
+            let numberOfPossibleConstructions = GetNumberOfPossibleConstructions(gameRoom, structureType);
             if (!numberOfPossibleConstructions) {
                 return;
             }
@@ -25,20 +25,7 @@ const Constructions = {
                     return structure.structureType === STRUCTURE_SPAWN;
                 }
             });
-            BuildCheckeredPattern(gameRoom, STRUCTURE_EXTENSION, roomTerrain, numberOfPossibleConstructions, spawns[0].pos);
-        }
-
-        function buildTowers(gameRoom, roomTerrain) {
-            let numberOfPossibleConstructions = GetNumberOfPossibleConstructions(gameRoom, STRUCTURE_TOWER);
-            if (!numberOfPossibleConstructions) {
-                return;
-            }
-            const spawns = gameRoom.find(FIND_MY_STRUCTURES, {
-                filter: function (structure) {
-                    return structure.structureType === STRUCTURE_SPAWN;
-                }
-            });
-            BuildCheckeredPattern(gameRoom, STRUCTURE_TOWER, roomTerrain, numberOfPossibleConstructions, spawns[0].pos);
+            BuildCheckeredPattern(gameRoom, structureType, roomTerrain, numberOfPossibleConstructions, spawns[0].pos);
         }
 
         function BuildCheckeredPattern(gameRoom, structureType, roomTerrain, numberOfPossibleConstructions, buildPosition) {
@@ -166,6 +153,23 @@ const Constructions = {
                             return 3;
                         case 8:
                             return 6;
+                        default:
+                            Util.ErrorLog('Constructions', 'FindNumberOfBuildableStructures', 'controller.level ' + gameRoom.controller.level + ' not found ' + gameRoom.name + ' structureType ' + structureType);
+                    }
+                    break;
+                case structureType === STRUCTURE_SPAWN:
+                    switch (gameRoom.controller.level) {
+                        case 1:
+                        case 2:
+                        case 3:
+                        case 4:
+                        case 5:
+                        case 6:
+                            return 1;
+                        case 7:
+                            return 2;
+                        case 8:
+                            return 3;
                         default:
                             Util.ErrorLog('Constructions', 'FindNumberOfBuildableStructures', 'controller.level ' + gameRoom.controller.level + ' not found ' + gameRoom.name + ' structureType ' + structureType);
                     }
