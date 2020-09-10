@@ -559,6 +559,29 @@ const AssignJobs = {
                                 ATTACK, ATTACK, ATTACK
                             ];
                             break;
+                        case (energyAvailable >= 780): // energyCapacityAvailable: 1300
+                            body = [
+                                MOVE, MOVE, MOVE, MOVE, MOVE,
+                                MOVE,
+                                ATTACK, ATTACK, ATTACK, ATTACK, ATTACK,
+                                ATTACK
+                            ];
+                            break;
+                        case (energyAvailable >= 520): // energyCapacityAvailable: 550
+                            body = [
+                                MOVE, MOVE, MOVE, MOVE, ATTACK, ATTACK, ATTACK, ATTACK
+                            ];
+                            break;
+                        case (energyAvailable >= 390): // energyCapacityAvailable: 550
+                            body = [
+                                MOVE, MOVE, MOVE, ATTACK, ATTACK, ATTACK
+                            ];
+                            break;
+                        case (energyAvailable >= 260): // energyCapacityAvailable: 300
+                            body = [
+                                MOVE, MOVE, ATTACK, ATTACK
+                            ];
+                            break;
                     }
                     break;
                 // gunner

@@ -2886,7 +2886,12 @@ const ExecuteJobs = {
         function getInnerRoomPath(to, creep) {
             const nextRoom = Memory.Paths[to.roomName][creep.pos.roomName];
             const exitDirection = Game.map.findExit(creep.room, nextRoom);
-            const exitPosition = creep.pos.findClosestByPath(exitDirection);
+            const exitPosition = creep.pos.findClosestByPath(exitDirection, {
+                filter: function(pos) {
+                    const wall = pos.lookFor(LOOK_STRUCTURES)[0];
+                    return !wall;
+                }
+            });
             if (!exitPosition) {
                 Util.ErrorLog('ExecuteJobs', 'getInnerRoomPath', 'exitPosition not found ' + creep.pos.roomName + ' exitDirection ' + exitDirection + ' nextRoom ' + nextRoom);
                 return;
