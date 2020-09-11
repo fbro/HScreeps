@@ -24,13 +24,17 @@ const Towers = {
             let towers = [];
             let towersLoaded = true;
             if (Memory.MemRooms[gameRoom.name].TowerIds) {
-                for (let i = 0; i < Memory.MemRooms[gameRoom.name].TowerIds.length; i++) {
-                    towers[i] = Game.getObjectById(Memory.MemRooms[gameRoom.name].TowerIds[i]);
-                    if(!towers[i]){
-                        Util.ErrorLog('Towers', 'FindTowers', 'tower number ' + i + ' not found!');
-                        delete Memory.MemRooms[gameRoom.name].TowerIds;
-                        towersLoaded = false;
-                        break;
+                if(Memory.MemRooms[gameRoom.name].TowerIds.length !==Util.FindNumberOfBuildableStructures(gameRoom, STRUCTURE_TOWER)){
+                    towersLoaded = false;
+                }else{
+                    for (let i = 0; i < Memory.MemRooms[gameRoom.name].TowerIds.length; i++) {
+                        towers[i] = Game.getObjectById(Memory.MemRooms[gameRoom.name].TowerIds[i]);
+                        if(!towers[i]){
+                            Util.ErrorLog('Towers', 'FindTowers', 'tower number ' + i + ' not found!');
+                            delete Memory.MemRooms[gameRoom.name].TowerIds;
+                            towersLoaded = false;
+                            break;
+                        }
                     }
                 }
             }else{
@@ -81,7 +85,7 @@ const Towers = {
         function HostileCreeps(towers) {
             const hostileTargets = gameRoom.find(FIND_HOSTILE_CREEPS, {
                 filter: function (hostile) {
-                    return hostile.hits < hostile.hitsMax || hostile.pos.findInRange(FIND_STRUCTURES, 4).length > 0 || hostile.pos.findInRange(FIND_MY_CREEPS, 2).length > 0;
+                    return hostile.hits < hostile.hitsMax || hostile.pos.findInRange(FIND_STRUCTURES, 4).length >= 0 || hostile.pos.findInRange(FIND_MY_CREEPS, 3).length >= 0;
                 }
             });
             if (hostileTargets.length > 0) {

@@ -11,6 +11,8 @@ const Constructions = {
 
         function build(gameRoom, roomTerrain) {
             switch (true) {
+                case gameRoom.controller.level >= 1 :
+                    //ConstructContainers(gameRoom, roomTerrain);
                 case gameRoom.controller.level >= 2 :
                     ConstructCoreBuilding(gameRoom, roomTerrain, STRUCTURE_EXTENSION);
                 case gameRoom.controller.level >= 3 :
@@ -19,6 +21,28 @@ const Constructions = {
                 case gameRoom.controller.level >= 6 :
                     ConstructCoreBuilding(gameRoom, roomTerrain, STRUCTURE_SPAWN);
                     break;
+            }
+        }
+
+        function ConstructContainers(gameRoom, terrain){ // TODO add source containers
+            const controllerContainer = gameRoom.controller.pos.findInRange(FIND_STRUCTURES, 1, {
+                 filter: (s) => s.structureType === STRUCTURE_CONTAINER
+             })[0];
+            if(!controllerContainer){
+                ConstructAroundPos(gameRoom, terrain, gameRoom.controller.pos, STRUCTURE_CONTAINER);
+            }
+        }
+
+        function ConstructAroundPos(gameRoom, terrain, centerPos, structureType){
+            for (let y = centerPos.y - 1; y < centerPos.y + 1; y++) {
+                for (let x = centerPos.x - 1; x < centerPos.x + 1; x++) {
+                    const terrainAtPos = terrain.get(x, y);
+                    if(terrainAtPos !== TERRAIN_MASK_WALL){
+                        const result = gameRoom.createConstructionSite(x, y, structureType);
+                        Util.InfoLog('Constructions', 'ConstructAroundPos', x + ',' + y + ',' +  + ' to protect ' + structureType + ' result ' + result);
+                        return;
+                    }
+                }
             }
         }
 
@@ -38,9 +62,6 @@ const Constructions = {
         }
 
         function ConstructRampartsOn(gameRoom, roomTerrain, structureType){
-            if (gameRoom.controller.level < 4){
-                return;
-            }
             const structuresToPlaceRampartOn = gameRoom.find(FIND_MY_STRUCTURES, {
                 filter: function (structure) {
                     return structure.structureType === structureType;
@@ -134,7 +155,7 @@ const Constructions = {
 
         /**@return {Number}*/
         function GetNumberOfPossibleConstructions(gameRoom, structureType) {
-            const numberOfBuildableStructures = FindNumberOfBuildableStructures(gameRoom, structureType);
+            const numberOfBuildableStructures = Util.FindNumberOfBuildableStructures(gameRoom, structureType);
             const extensions = gameRoom.find(FIND_MY_STRUCTURES, {
                 filter: function (structure) {
                     return structure.structureType === structureType;
@@ -149,71 +170,7 @@ const Constructions = {
             return numberOfBuildableStructures - (extensions.length + extensionConstructionSites.length);
         }
 
-        /**@return {number}*/
-        function FindNumberOfBuildableStructures(gameRoom, structureType) {
-            switch (true) {
-                case structureType === STRUCTURE_EXTENSION:
-                    switch (gameRoom.controller.level) {
-                        case 1:
-                            return 0;
-                        case 2:
-                            return 5;
-                        case 3:
-                            return 10;
-                        case 4:
-                            return 20;
-                        case 5:
-                            return 30;
-                        case 6:
-                            return 40;
-                        case 7:
-                            return 50;
-                        case 8:
-                            return 60;
-                        default:
-                            Util.ErrorLog('Constructions', 'FindNumberOfBuildableStructures', 'controller.level ' + gameRoom.controller.level + ' not found ' + gameRoom.name + ' structureType ' + structureType);
-                    }
-                    break;
-                case structureType === STRUCTURE_TOWER:
-                    switch (gameRoom.controller.level) {
-                        case 1:
-                        case 2:
-                            return 0;
-                        case 3:
-                        case 4:
-                            return 1;
-                        case 5:
-                        case 6:
-                            return 2;
-                        case 7:
-                            return 3;
-                        case 8:
-                            return 6;
-                        default:
-                            Util.ErrorLog('Constructions', 'FindNumberOfBuildableStructures', 'controller.level ' + gameRoom.controller.level + ' not found ' + gameRoom.name + ' structureType ' + structureType);
-                    }
-                    break;
-                case structureType === STRUCTURE_SPAWN:
-                    switch (gameRoom.controller.level) {
-                        case 1:
-                        case 2:
-                        case 3:
-                        case 4:
-                        case 5:
-                        case 6:
-                            return 1;
-                        case 7:
-                            return 2;
-                        case 8:
-                            return 3;
-                        default:
-                            Util.ErrorLog('Constructions', 'FindNumberOfBuildableStructures', 'controller.level ' + gameRoom.controller.level + ' not found ' + gameRoom.name + ' structureType ' + structureType);
-                    }
-                    break;
-                default:
-                    Util.ErrorLog('Constructions', 'FindNumberOfBuildableStructures', 'structureType not found ' + gameRoom.name + ' structureType ' + structureType);
-            }
-        }
+
     }
 };
 module.exports = Constructions;

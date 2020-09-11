@@ -144,6 +144,72 @@ const Util = {
             'SourceNumber': sourceNumber, // number of sources in room
         };
         Util.Info('CreateJobs', 'CreateRoom', 'add new room ' + roomName + ' level ' + level + ' sourceNumber ' + sourceNumber + ' jobs ' + JSON.stringify(jobs))
+    },
+
+    /**@return {number}*/
+    FindNumberOfBuildableStructures: function(gameRoom, structureType) {
+        switch (true) {
+            case structureType === STRUCTURE_EXTENSION:
+                switch (gameRoom.controller.level) {
+                    case 1:
+                        return 0;
+                    case 2:
+                        return 5;
+                    case 3:
+                        return 10;
+                    case 4:
+                        return 20;
+                    case 5:
+                        return 30;
+                    case 6:
+                        return 40;
+                    case 7:
+                        return 50;
+                    case 8:
+                        return 60;
+                    default:
+                        Util.ErrorLog('Constructions', 'FindNumberOfBuildableStructures', 'controller.level ' + gameRoom.controller.level + ' not found ' + gameRoom.name + ' structureType ' + structureType);
+                }
+                break;
+            case structureType === STRUCTURE_TOWER:
+                switch (gameRoom.controller.level) {
+                    case 1:
+                    case 2:
+                        return 0;
+                    case 3:
+                    case 4:
+                        return 1;
+                    case 5:
+                    case 6:
+                        return 2;
+                    case 7:
+                        return 3;
+                    case 8:
+                        return 6;
+                    default:
+                        Util.ErrorLog('Constructions', 'FindNumberOfBuildableStructures', 'controller.level ' + gameRoom.controller.level + ' not found ' + gameRoom.name + ' structureType ' + structureType);
+                }
+                break;
+            case structureType === STRUCTURE_SPAWN:
+                switch (gameRoom.controller.level) {
+                    case 1:
+                    case 2:
+                    case 3:
+                    case 4:
+                    case 5:
+                    case 6:
+                        return 1;
+                    case 7:
+                        return 2;
+                    case 8:
+                        return 3;
+                    default:
+                        Util.ErrorLog('Constructions', 'FindNumberOfBuildableStructures', 'controller.level ' + gameRoom.controller.level + ' not found ' + gameRoom.name + ' structureType ' + structureType);
+                }
+                break;
+            default:
+                Util.ErrorLog('Constructions', 'FindNumberOfBuildableStructures', 'structureType not found ' + gameRoom.name + ' structureType ' + structureType);
+        }
     }
 };
 module.exports = Util;
