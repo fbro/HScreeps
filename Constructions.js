@@ -10,11 +10,16 @@ const Constructions = {
         }
 
         function build(gameRoom, roomTerrain) {
-            ConstructCoreBuilding(gameRoom, roomTerrain, STRUCTURE_EXTENSION);
-            ConstructCoreBuilding(gameRoom, roomTerrain, STRUCTURE_TOWER);
-            ConstructCoreBuilding(gameRoom, roomTerrain, STRUCTURE_SPAWN);
-
-            ConstructRampartsOn(gameRoom, roomTerrain, STRUCTURE_SPAWN);
+            switch (true) {
+                case gameRoom.controller.level >= 2 :
+                    ConstructCoreBuilding(gameRoom, roomTerrain, STRUCTURE_EXTENSION);
+                case gameRoom.controller.level >= 3 :
+                    ConstructCoreBuilding(gameRoom, roomTerrain, STRUCTURE_TOWER);
+                    ConstructRampartsOn(gameRoom, roomTerrain, STRUCTURE_SPAWN);
+                case gameRoom.controller.level >= 6 :
+                    ConstructCoreBuilding(gameRoom, roomTerrain, STRUCTURE_SPAWN);
+                    break;
+            }
         }
 
         function ConstructCoreBuilding(gameRoom, roomTerrain, structureType){
