@@ -13,6 +13,8 @@ const Constructions = {
             ConstructCoreBuilding(gameRoom, roomTerrain, STRUCTURE_EXTENSION);
             ConstructCoreBuilding(gameRoom, roomTerrain, STRUCTURE_TOWER);
             ConstructCoreBuilding(gameRoom, roomTerrain, STRUCTURE_SPAWN);
+
+            ConstructRampartsOn(gameRoom, roomTerrain, STRUCTURE_SPAWN);
         }
 
         function ConstructCoreBuilding(gameRoom, roomTerrain, structureType){
@@ -27,6 +29,33 @@ const Constructions = {
             });
             if(spawns.length > 0){
                 BuildCheckeredPattern(gameRoom, structureType, roomTerrain, numberOfPossibleConstructions, spawns[0].pos);
+            }
+        }
+
+        function ConstructRampartsOn(gameRoom, roomTerrain, structureType){
+            if (gameRoom.controller.level < 4){
+                return;
+            }
+            const structuresToPlaceRampartOn = gameRoom.find(FIND_MY_STRUCTURES, {
+                filter: function (structure) {
+                    return structure.structureType === structureType;
+                }
+            });
+            for(const structuresToPlaceRampartOnCount in structuresToPlaceRampartOn){
+                const structure = structuresToPlaceRampartOn[structuresToPlaceRampartOnCount];
+                const structuresOnPos = structure.pos.lookFor(LOOK_STRUCTURES);
+                let foundRampart = false;
+                for(const structuresOnPosCount in structuresOnPos) {
+                    const structureOnPos = structuresOnPos[structuresOnPosCount];
+                    if(structureOnPos.structureType === STRUCTURE_RAMPART){
+                        foundRampart = true;
+                        break;
+                    }
+                }
+                if(!foundRampart){
+                    const result = gameRoom.createConstructionSite(structure.pos.x, structure.pos.y, STRUCTURE_RAMPART);
+                    Util.InfoLog('Constructions', 'ConstructRampartsOn', structure.pos  + ' to protect ' + structureType + ' result ' + result);
+                }
             }
         }
 
