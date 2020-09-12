@@ -207,6 +207,22 @@ const Util = {
                         Util.ErrorLog('Constructions', 'FindNumberOfBuildableStructures', 'controller.level ' + gameRoom.controller.level + ' not found ' + gameRoom.name + ' structureType ' + structureType);
                 }
                 break;
+            case structureType === STRUCTURE_STORAGE:
+                switch (gameRoom.controller.level) {
+                    case 1:
+                    case 2:
+                    case 3:
+                        return 0;
+                    case 4:
+                    case 5:
+                    case 6:
+                    case 7:
+                    case 8:
+                        return 1;
+                    default:
+                        Util.ErrorLog('Constructions', 'FindNumberOfBuildableStructures', 'controller.level ' + gameRoom.controller.level + ' not found ' + gameRoom.name + ' structureType ' + structureType);
+                }
+                break;
             default:
                 Util.ErrorLog('Constructions', 'FindNumberOfBuildableStructures', 'structureType not found ' + gameRoom.name + ' structureType ' + structureType);
         }
