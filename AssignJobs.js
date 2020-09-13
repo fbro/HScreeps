@@ -248,9 +248,9 @@ const AssignJobs = {
             let bestAvailableSpawnCounter;
             let timeToLiveMaxRoomRange;
             if(roomJob.CreepType === 'C' || roomJob.CreepType === 'R'){ //  creep with CLAIM body parts
-                timeToLiveMaxRoomRange = 8; // 600 time to live / 50 max room tile - 4 for elbow room
+                timeToLiveMaxRoomRange = 6; // 600 time to live / 50 max room tile - 6 for elbow room
             }else {
-                timeToLiveMaxRoomRange = 20; // 1500 time to live / 50 max room tile - 10 for elbow room
+                timeToLiveMaxRoomRange = 16; // 1500 time to live / 50 max room tile - 14 for elbow room
             }
             for (const availableSpawnCounter in availableSpawns) { // find closest spawn
                 const availableSpawn = availableSpawns[availableSpawnCounter];

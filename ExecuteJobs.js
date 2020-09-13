@@ -1357,13 +1357,19 @@ const ExecuteJobs = {
                 },
                 /**@return {int}*/
                 Fetch: function (fetchObject, jobObject) {
-                    let result = creep.claimController(fetchObject);
-                    if (result === OK) {
-                        Util.InfoLog('ExecuteJobs', 'JobClaimController', 'done ' + creep.name + ' in ' + jobObject.pos.roomName + ' tag ' + jobObject.name);
-                        jobObject.remove();
-                        return JOB_IS_DONE;
-                    } else {
+                    if(!fetchObject.my){
+                        let result = creep.attackController(fetchObject);
+                        Util.Info('ExecuteJobs', 'JobClaimController', 'attackController ' + creep.name + ' in ' + jobObject.pos.roomName + ' tag ' + jobObject.name);
                         return result;
+                    }else{
+                        let result = creep.claimController(fetchObject);
+                        if (result === OK) {
+                            Util.InfoLog('ExecuteJobs', 'JobClaimController', 'done ' + creep.name + ' in ' + jobObject.pos.roomName + ' tag ' + jobObject.name);
+                            jobObject.remove();
+                            return JOB_IS_DONE;
+                        } else {
+                            return result;
+                        }
                     }
                 },
             });

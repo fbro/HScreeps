@@ -38,6 +38,7 @@ const Constructions = {
                     ConstructAroundPos(gameRoom, terrain, gameRoom.controller.pos, STRUCTURE_CONTAINER);
                 }
             }
+
             const sources = gameRoom.find(FIND_SOURCES);
             for (const sourceCount in sources) {
                 const source = sources[sourceCount];
@@ -72,11 +73,12 @@ const Constructions = {
             if(spawn){
                 let bestPos;
                 let bestRange = Number.MAX_SAFE_INTEGER;
-                for (let y = centerPos.y - 1; y < centerPos.y + 1; y++) {
-                    for (let x = centerPos.x - 1; x < centerPos.x + 1; x++) {
+                for (let y = centerPos.y - 1; y <= centerPos.y + 1; y++) {
+                    for (let x = centerPos.x - 1; x <= centerPos.x + 1; x++) {
                         const terrainAtPos = terrain.get(x, y);
                         if (terrainAtPos !== TERRAIN_MASK_WALL) {
                             const range = spawn.pos.findPathTo(x, y);
+
                             if (!bestPos || range < bestRange) {
                                 bestPos = new RoomPosition(x, y, gameRoom.name);
                                 bestRange = range;
@@ -84,6 +86,7 @@ const Constructions = {
                         }
                     }
                 }
+
                 if (bestPos) {
                     const result = gameRoom.createConstructionSite(bestPos.x, bestPos.y, structureType);
                     Util.InfoLog('Constructions', 'ConstructAroundPos', bestPos.x + ',' + bestPos.y + ',' + bestPos.roomName + ' to protect ' + structureType + ' result ' + result);
@@ -114,11 +117,12 @@ const Constructions = {
             });
             for (const structuresToPlaceRampartOnCount in structuresToPlaceRampartOn) {
                 const structure = structuresToPlaceRampartOn[structuresToPlaceRampartOnCount];
-                const structuresOnPos = structure.pos.lookFor(LOOK_STRUCTURES);
+                const structuresOnPos = structure.pos.look();
                 let foundRampart = false;
                 for (const structuresOnPosCount in structuresOnPos) {
                     const structureOnPos = structuresOnPos[structuresOnPosCount];
-                    if (structureOnPos.structureType === STRUCTURE_RAMPART) {
+                    if (structureOnPos.structure && structureOnPos.structure.structureType === STRUCTURE_RAMPART
+                        || structureOnPos.constructionSite && structureOnPos.constructionSite.structureType === STRUCTURE_RAMPART) {
                         foundRampart = true;
                         break;
                     }
