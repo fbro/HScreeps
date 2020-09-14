@@ -42,15 +42,18 @@ const Util = {
     DO_EXTRACTING_WHEN_STORAGE_UNDER_MINERAL: 200000, // stop extracting mineral when one has more than this
     RAMPART_WALL_MAX_HITS_WHEN_STORAGE_ENERGY: 300000, // when storage energy is over this value then go crazy with upgrading ramparts and walls
     RAMPART_WALL_HITS_U_LVL5: 1000,
+    RAMPART_WALL_HITS_U_LVL5_REPAIR: 500,
     RAMPART_WALL_HITS_U_LVL8: 100000,
+    RAMPART_WALL_HITS_U_LVL8_REPAIR: 70000,
     RAMPART_WALL_HITS_LVL8: 2000000,
+    RAMPART_WALL_HITS_LVL8_REPAIR: 1700000,
 
     // Game.time % modulo value below - stack expensive ticks on top of each other
     GAME_TIME_MODULO_1: 2,
     GAME_TIME_MODULO_2: 6,
     GAME_TIME_MODULO_3: 12,
     GAME_TIME_MODULO_4: 24,
-    GAME_TIME_MODULO_5: 96, // create constructions
+    GAME_TIME_MODULO_5: 24, // TODO 96, // create constructions
     GAME_TIME_MODULO_6: 10800,
     GAME_TIME_MODULO_7: 216000,
 
@@ -229,6 +232,7 @@ const Util = {
                     case 2:
                     case 3:
                     case 4:
+                        return 0;
                     case 5:
                         return 2;
                     case 6:

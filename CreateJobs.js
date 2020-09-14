@@ -351,9 +351,9 @@ const CreateJobs = {
                         (
                             (
                                 (s.structureType === STRUCTURE_RAMPART || s.structureType === STRUCTURE_WALL)
-                                && (gameRoom.controller.level < 5 && s.hits < Util.RAMPART_WALL_HITS_U_LVL5
-                                    || gameRoom.controller.level >= 5 && gameRoom.controller.level < 8 && s.hits < Util.RAMPART_WALL_HITS_U_LVL8
-                                    || gameRoom.controller.level === 8 && (s.hits < Util.RAMPART_WALL_HITS_LVL8 || gameRoom.storage && gameRoom.storage.store.getUsedCapacity(RESOURCE_ENERGY) > Util.RAMPART_WALL_MAX_HITS_WHEN_STORAGE_ENERGY))
+                                && (gameRoom.controller.level < 5 && s.hits < Util.RAMPART_WALL_HITS_U_LVL5_REPAIR
+                                    || gameRoom.controller.level >= 5 && gameRoom.controller.level < 8 && s.hits < Util.RAMPART_WALL_HITS_U_LVL8_REPAIR
+                                    || gameRoom.controller.level === 8 && (s.hits < Util.RAMPART_WALL_HITS_LVL8_REPAIR || gameRoom.storage && gameRoom.storage.store.getUsedCapacity(RESOURCE_ENERGY) > Util.RAMPART_WALL_MAX_HITS_WHEN_STORAGE_ENERGY))
                                 ||
                                 s.structureType === STRUCTURE_ROAD && s.hits < s.hitsMax / 2
                             )

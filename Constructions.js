@@ -18,6 +18,7 @@ const Constructions = {
                 case gameRoom.controller.level >= 3 :
                     ConstructCoreBuilding(gameRoom, roomTerrain, STRUCTURE_TOWER);
                     ConstructRampartsOn(gameRoom, roomTerrain, STRUCTURE_SPAWN);
+                    ConstructRoads(gameRoom, roomTerrain);
                 case gameRoom.controller.level >= 4 :
                     ConstructCoreBuilding(gameRoom, roomTerrain, STRUCTURE_STORAGE);
                 case gameRoom.controller.level >= 5 :
@@ -37,7 +38,7 @@ const Constructions = {
             const sources = gameRoom.find(FIND_SOURCES);
             for (const sourceCount in sources) {
                 const source = sources[sourceCount];
-                if(!FindExistingStructure(source.pos, STRUCTURE_CONTAINER, 1)){
+                if (!FindExistingStructure(source.pos, STRUCTURE_CONTAINER, 1)) {
                     ConstructAroundPos(gameRoom, terrain, source.pos, STRUCTURE_CONTAINER);
                 }
             }
@@ -83,25 +84,35 @@ const Constructions = {
             }
         }
 
-        function ConstructLinks(gameRoom, terrain){
+        function ConstructRoads(gameRoom, roomTerrain){
+            if(gameRoom.storage){
+                gameRoom.createConstructionSite(gameRoom.storage.pos.x+1, gameRoom.storage.pos.y,   STRUCTURE_ROAD);
+                gameRoom.createConstructionSite(gameRoom.storage.pos.x-1, gameRoom.storage.pos.y,   STRUCTURE_ROAD);
+                gameRoom.createConstructionSite(gameRoom.storage.pos.x,   gameRoom.storage.pos.y+1, STRUCTURE_ROAD);
+                gameRoom.createConstructionSite(gameRoom.storage.pos.x,   gameRoom.storage.pos.y-1, STRUCTURE_ROAD);
+            }
+        }
+
+        function ConstructLinks(gameRoom, terrain) {
             let numberOfPossibleConstructions = GetNumberOfPossibleConstructions(gameRoom, STRUCTURE_LINK);
             if (!numberOfPossibleConstructions) {
                 return;
             }
-            if(FindExistingStructure(gameRoom.controller.pos, STRUCTURE_LINK, 2)){
-                const result = ConstructAroundPos(gameRoom, terrain, gameRoom.controller.pos, STRUCTURE_LINK, 2);
-                if(result === OK){
+            const container = FindExistingStructure(gameRoom.controller.pos, STRUCTURE_CONTAINER);
+            if (container && !FindExistingStructure(container.pos, STRUCTURE_LINK)) {
+                const result = ConstructAroundPos(gameRoom, terrain, container.pos, STRUCTURE_LINK);
+                if (result === OK) {
                     numberOfPossibleConstructions--;
-                    if(numberOfPossibleConstructions <= 0){
+                    if (numberOfPossibleConstructions <= 0) {
                         return;
                     }
                 }
             }
-            if(gameRoom.storage && FindExistingStructure(gameRoom.storage.pos, STRUCTURE_LINK, 1)){
+            if (gameRoom.storage && !FindExistingStructure(gameRoom.storage.pos, STRUCTURE_LINK)) {
                 const result = ConstructAroundPos(gameRoom, terrain, gameRoom.storage.pos, STRUCTURE_LINK, 1, true);
-                if(result === OK){
+                if (result === OK) {
                     numberOfPossibleConstructions--;
-                    if(numberOfPossibleConstructions <= 0){
+                    if (numberOfPossibleConstructions <= 0) {
                         return;
                     }
                 }
@@ -109,11 +120,12 @@ const Constructions = {
             const sources = gameRoom.find(FIND_SOURCES);
             for (const sourceCount in sources) {
                 const source = sources[sourceCount];
-                if (FindExistingStructure(source.pos, STRUCTURE_LINK, 2)) {
-                    const result = ConstructAroundPos(gameRoom, terrain, source.pos, STRUCTURE_LINK, 2);
-                    if(result === OK){
+                const container = FindExistingStructure(source.pos, STRUCTURE_CONTAINER);
+                if (container && !FindExistingStructure(container.pos, STRUCTURE_LINK)) {
+                    const result = ConstructAroundPos(gameRoom, terrain, container, STRUCTURE_LINK, 2);
+                    if (result === OK) {
                         numberOfPossibleConstructions--;
-                        if(numberOfPossibleConstructions <= 0){
+                        if (numberOfPossibleConstructions <= 0) {
                             return;
                         }
                     }
@@ -121,7 +133,7 @@ const Constructions = {
             }
         }
 
-        function FindExistingStructure(targetPos, structureType, radius){
+        function FindExistingStructure(targetPos, structureType, radius) {
             let structure = targetPos.findInRange(FIND_STRUCTURES, radius, {
                 filter: (s) => s.structureType === structureType
             })[0];
@@ -139,25 +151,31 @@ const Constructions = {
                     return structure.structureType === STRUCTURE_SPAWN;
                 }
             })[0];
-            if(!spawn){
+            if (!spawn) {
                 spawn = gameRoom.find(FIND_CONSTRUCTION_SITES, {
                     filter: function (structure) {
                         return structure.structureType === STRUCTURE_SPAWN;
                     }
                 })[0];
             }
-            if(spawn){
+            if (spawn) {
                 let bestPos;
                 let bestRange = Number.MAX_SAFE_INTEGER;
                 for (let y = centerPos.y - radius; y <= centerPos.y + radius; y++) {
-                    for (let x = isCheckered ? (((y - centerPos.y) % 2) ? centerPos.x - radius : centerPos.x) : centerPos.x - radius; x <= centerPos.x + radius; (isCheckered ? x = x + 2: x++)) {
+                    for (let x = isCheckered ? (((y - centerPos.y) % 2) ? centerPos.x - radius : centerPos.x) : centerPos.x - radius; x <= centerPos.x + radius; (isCheckered ? x = x + 2 : x++)) {
                         const terrainAtPos = terrain.get(x, y);
                         if (terrainAtPos !== TERRAIN_MASK_WALL) {
-                            const range = spawn.pos.findPathTo(x, y);
+                            const lookAtObjects = gameRoom.lookAt(x, y);
+                            const hasStructure = _.find(lookAtObjects, function (lookObject) {
+                                return lookObject.type === LOOK_STRUCTURES || lookObject.type === LOOK_CONSTRUCTION_SITES;
+                            });
+                            if(!hasStructure){
+                                const range = spawn.pos.findPathTo(x, y);
 
-                            if (!bestPos || range < bestRange) {
-                                bestPos = new RoomPosition(x, y, gameRoom.name);
-                                bestRange = range;
+                                if (!bestPos || range < bestRange) {
+                                    bestPos = new RoomPosition(x, y, gameRoom.name);
+                                    bestRange = range;
+                                }
                             }
                         }
                     }
@@ -165,7 +183,7 @@ const Constructions = {
 
                 if (bestPos) {
                     const result = gameRoom.createConstructionSite(bestPos.x, bestPos.y, structureType);
-                    Util.InfoLog('Constructions', 'ConstructAroundPos', bestPos.x + ',' + bestPos.y + ',' + bestPos.roomName + ' to protect ' + structureType + ' result ' + result);
+                    Util.InfoLog('Constructions', 'ConstructAroundPos', bestPos.x + ',' + bestPos.y + ',' + bestPos.roomName + ' structureType ' + structureType + ' result ' + result);
                     return result;
                 }
             }
