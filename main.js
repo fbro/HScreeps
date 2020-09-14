@@ -143,11 +143,15 @@ module.exports.loop = function () {
 
 // TODO spawn defenders when under attack
 
+// TODO constructions
+    // roads
+    // special buildings - terminals, powerspawn, observer, labs
+    // perimiter fence with walls and ramparts
+
 // attack NPC strongholds
 // harvest middle rooms
 // harvest neutral rooms
 // move creeps in formation
 
 // if doing long distance work creep should make sure it has enough timeToLive to do the job
-// add constructions
 // monitor creeps and see if they can work more quickly by optimizing its actions - remove 'pausing' ticks

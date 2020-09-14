@@ -249,6 +249,7 @@ const AssignJobs = {
             let timeToLiveMaxRoomRange;
             if(roomJob.CreepType === 'C' || roomJob.CreepType === 'R'){ //  creep with CLAIM body parts
                 timeToLiveMaxRoomRange = 6; // 600 time to live / 50 max room tile - 6 for elbow room
+                Util.Info('AssignJobs', 'FindBestSpawn', 'availableSpawns ' + availableSpawns + ' availableSpawnsInRoom ' + availableSpawnsInRoom + ' bestLinearDistance ' + bestLinearDistance + ' roomJob ' + roomJob + ' memRoomKey ' + memRoomKey);
             }else {
                 timeToLiveMaxRoomRange = 16; // 1500 time to live / 50 max room tile - 14 for elbow room
             }
@@ -269,7 +270,7 @@ const AssignJobs = {
                         if (roomJob.JobType === Util.FLAG_JOB) { // on flag jobs one wants to share the load between rooms with more energy
                             switch (true) {
                                 case !availableSpawn.room.storage || availableSpawn.room.storage.store.getUsedCapacity(RESOURCE_ENERGY) < Util.STORAGE_ENERGY_LOW: // do not spawn for a flag job when the storage has under STORAGE_ENERGY_MEDIUM
-                                    energyAvailableModifier = Number.MAX_SAFE_INTEGER;
+                                    energyAvailableModifier = 2;
                                     break;
                                 case availableSpawn.room.energyAvailable < 500:
                                     energyAvailableModifier = -1;
