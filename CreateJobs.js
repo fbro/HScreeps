@@ -142,7 +142,7 @@ const CreateJobs = {
             AddFlagJobsToNeutralRooms(flagJobs);
         }
 
-        function WeaveFlagJobsIntoRoomJobs(flagJobs, jobs, gameRoomKey){
+        function WeaveFlagJobsIntoRoomJobs(flagJobs, jobs, gameRoomKey) {
             // weave flag jobs into the job array that is in this room object and removes matched jobs from the flagJobs array
             for (const flagJobKey in flagJobs) {
                 if (flagJobKey.split(')').pop() === gameRoomKey) {
@@ -154,7 +154,7 @@ const CreateJobs = {
             }
         }
 
-        function UpdateMemRoom(gameRoom, jobs){
+        function UpdateMemRoom(gameRoom, jobs) {
             // add new jobs
             for (const newJobKey in jobs) { // loop through new jobs
                 if (!Memory.MemRooms[gameRoom.name].RoomJobs[newJobKey]) { // new job does not already exist
@@ -199,7 +199,7 @@ const CreateJobs = {
             }
         }
 
-        function AddFlagJobsToNeutralRooms(flagJobs){
+        function AddFlagJobsToNeutralRooms(flagJobs) {
             // now some flag jobs might still be unplaced, loop trough them and add them maybe also create the room object
             // they might still be unplaced because they are in a room that is not in MemRooms
             for (const flagJobKey in flagJobs) {
@@ -287,14 +287,14 @@ const CreateJobs = {
 
         //region room jobs
 
-        function TagControllerJobs(gameRoom){
+        function TagControllerJobs(gameRoom) {
             if (!gameRoom.controller.pos.lookFor(LOOK_FLAGS)[0] && (!gameRoom.controller.sign || gameRoom.controller.sign.text !== 'Homebrewed code @ github.com/fbro/HScreeps ' + gameRoom.name)) {
                 const result = gameRoom.createFlag(gameRoom.controller.pos, 'Homebrewed code @ github.com/fbro/HScreeps ' + gameRoom.name, COLOR_ORANGE, COLOR_ORANGE);
                 Util.InfoLog('CreateJobs', 'CreateObjJobs', 'createFlag sign flag ' + gameRoom.controller.pos + ' ' + result);
             }
         }
 
-        function SourceJobs(gameRoom, roomJobs){
+        function SourceJobs(gameRoom, roomJobs) {
             const sources = gameRoom.find(FIND_SOURCES);
             for (const sourceKey in sources) {
                 const source = sources[sourceKey];
@@ -309,7 +309,7 @@ const CreateJobs = {
             }
         }
 
-        function ControllerJobs(gameRoom, roomJobs){
+        function ControllerJobs(gameRoom, roomJobs) {
             new RoomVisual(gameRoom.name).text('🧠', gameRoom.controller.pos.x, gameRoom.controller.pos.y);
             if (!gameRoom.storage || gameRoom.storage.store.getUsedCapacity(RESOURCE_ENERGY) >= Util.STORAGE_ENERGY_LOW || gameRoom.controller.ticksToDowngrade < 20000) {
                 AddJob(roomJobs, 'Ctrl(' + gameRoom.controller.pos.x + ',' + gameRoom.controller.pos.y + ')' + gameRoom.name, gameRoom.controller.id, Util.OBJECT_JOB, 'B');
@@ -470,7 +470,7 @@ const CreateJobs = {
                         if (gameRoom.storage.store.getUsedCapacity(resourceType) < Util.STORAGE_MEDIUM
                             && gameRoom.terminal.store.getUsedCapacity(resourceType) < Util.STORAGE_MEDIUM_TRANSFER
                             && (
-                                (      resourceType === RESOURCE_LEMERGIUM_BAR
+                                (resourceType === RESOURCE_LEMERGIUM_BAR
                                     || resourceType === RESOURCE_ZYNTHIUM_BAR
                                     || resourceType === RESOURCE_UTRIUM_BAR
                                     || resourceType === RESOURCE_KEANIUM_BAR
@@ -655,9 +655,9 @@ const CreateJobs = {
                     if (factory.store.getUsedCapacity(RESOURCE_ENERGY) < Util.FACTORY_TARGET_ENERGY && gameRoom.storage.store.getUsedCapacity(RESOURCE_ENERGY) >= Util.STORAGE_ENERGY_MEDIUM) {
                         AddJob(roomJobs, 'FillFctr(' + RESOURCE_ENERGY + ')' + gameRoom.name, factory.id, Util.OBJECT_JOB, 'T');
                     }
-                    if(gameRoom.storage.store.getUsedCapacity(RESOURCE_ENERGY) <= Util.STORAGE_ENERGY_LOW
+                    if (gameRoom.storage.store.getUsedCapacity(RESOURCE_ENERGY) <= Util.STORAGE_ENERGY_LOW
                         && gameRoom.terminal.store.getUsedCapacity(RESOURCE_ENERGY) <= Util.TERMINAL_TARGET_ENERGY
-                        && factory.store.getUsedCapacity(RESOURCE_BATTERY) > 0){ // energy is needed!
+                        && factory.store.getUsedCapacity(RESOURCE_BATTERY) > 0) { // energy is needed!
                         AddJob(roomJobs, 'FillFctr(' + RESOURCE_BATTERY + ')' + gameRoom.name, factory.id, Util.OBJECT_JOB, 'T');
                     }
 

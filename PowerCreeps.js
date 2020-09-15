@@ -4,7 +4,7 @@ const PowerCreeps = {
         const NO_RESULT_FOUND = -20;
         RunPowerCreeps();
 
-        function RunPowerCreeps(){
+        function RunPowerCreeps() {
             const powerCreepSpawnFlags = _.filter(Game.flags, function (flag) {
                 return flag.color === COLOR_BLUE && flag.secondaryColor === COLOR_ORANGE;
             });
@@ -32,9 +32,9 @@ const PowerCreeps = {
                             flagWithCreepName.remove();
                         }
                     } else if (powerCreep.shard) { // flag is found and the creep is spawned - do something
-                        if(powerCreep.memory.JobName && !powerCreep.memory.JobName.startsWith('Unemployed')){
+                        if (powerCreep.memory.JobName && !powerCreep.memory.JobName.startsWith('Unemployed')) {
                             result = PowerCreepsActions(powerCreep);
-                        }else{
+                        } else {
                             result = FindPowerCreepsActions(powerCreep);
                         }
                     }
@@ -42,7 +42,7 @@ const PowerCreeps = {
             }
         }
 
-        function PowerCreepsActions(powerCreep){
+        function PowerCreepsActions(powerCreep) {
             let result = NO_RESULT_FOUND;
             const jobName = powerCreep.memory.JobName;
             switch (true) {
@@ -124,7 +124,7 @@ const PowerCreeps = {
                 }*/ /*else if ((!powerCreep.memory.spawns || _.filter(powerCreep.memory.spawns, function (s) {return s < Game.time;}).length > 0) && powerCreep.store.getUsedCapacity(RESOURCE_OPS) >= 100 && powerCreep.powers[PWR_OPERATE_SPAWN] && powerCreep.powers[PWR_OPERATE_SPAWN].cooldown === 0) {
                     result = OperateSpawn(powerCreep);
                 }*/
-                else{
+                else {
                     powerCreep.memory.JobName = 'Unemployed';
                 }
             }
@@ -184,13 +184,13 @@ const PowerCreeps = {
             let result = powerCreep.enableRoom(powerCreep.room.controller);
             if (result === ERR_NOT_IN_RANGE) {
                 result = powerCreep.moveTo(powerCreep.room.controller);
-            }else{
+            } else {
                 powerCreep.memory.JobName = 'Unemployed';
             }
             return result;
         }
 
-        function GenerateOps(powerCreep){
+        function GenerateOps(powerCreep) {
             const result = powerCreep.usePower(PWR_GENERATE_OPS); // if power creep is an operator - always use this power when available
             powerCreep.memory.JobName = 'Unemployed';
             return result;
@@ -319,7 +319,7 @@ const PowerCreeps = {
             Util.Info('PowerCreeps', 'DepositOps', powerCreep.name + ' ' + result + ' amount ' + powerCreep.store.getUsedCapacity(RESOURCE_OPS));
             if (result === ERR_NOT_IN_RANGE) {
                 result = powerCreep.moveTo(powerCreep.room.storage);
-            }else{
+            } else {
                 powerCreep.memory.JobName = 'Unemployed';
             }
             return result;
@@ -346,7 +346,7 @@ const PowerCreeps = {
             }
             if (result === ERR_NOT_IN_RANGE) {
                 result = powerCreep.moveTo(target);
-            }else{
+            } else {
                 powerCreep.memory.JobName = 'Unemployed';
             }
             return result;

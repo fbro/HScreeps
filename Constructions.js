@@ -84,12 +84,65 @@ const Constructions = {
             }
         }
 
-        function ConstructRoads(gameRoom, roomTerrain){
-            if(gameRoom.storage){
-                gameRoom.createConstructionSite(gameRoom.storage.pos.x+1, gameRoom.storage.pos.y,   STRUCTURE_ROAD);
-                gameRoom.createConstructionSite(gameRoom.storage.pos.x-1, gameRoom.storage.pos.y,   STRUCTURE_ROAD);
-                gameRoom.createConstructionSite(gameRoom.storage.pos.x,   gameRoom.storage.pos.y+1, STRUCTURE_ROAD);
-                gameRoom.createConstructionSite(gameRoom.storage.pos.x,   gameRoom.storage.pos.y-1, STRUCTURE_ROAD);
+        function ConstructRoads(gameRoom, roomTerrain) {
+            let structures = gameRoom.find(FIND_MY_STRUCTURES, {
+                filter: function (structure) {
+                    return structure.structureType === STRUCTURE_SPAWN
+                        || structure.structureType === STRUCTURE_EXTENSION
+                        || structure.structureType === STRUCTURE_TOWER
+                        || structure.structureType === STRUCTURE_TERMINAL
+                        || structure.structureType === STRUCTURE_STORAGE
+                        || structure.structureType === STRUCTURE_FACTORY
+                        || structure.structureType === STRUCTURE_NUKER
+                        || structure.structureType === STRUCTURE_POWER_SPAWN;
+                }
+            });
+            const spawns = [];
+            for (const structureCount in structures) {
+                const structure = structures[structureCount];
+                if (roomTerrain.get(structure.pos.x + 1, structure.pos.y) !== TERRAIN_MASK_WALL) {
+                    gameRoom.createConstructionSite(structure.pos.x + 1, structure.pos.y, STRUCTURE_ROAD);
+                }
+                if (roomTerrain.get(structure.pos.x - 1, structure.pos.y) !== TERRAIN_MASK_WALL) {
+                    gameRoom.createConstructionSite(structure.pos.x - 1, structure.pos.y, STRUCTURE_ROAD);
+                }
+                if (roomTerrain.get(structure.pos.x, structure.pos.y + 1) !== TERRAIN_MASK_WALL) {
+                    gameRoom.createConstructionSite(structure.pos.x, structure.pos.y + 1, STRUCTURE_ROAD);
+                }
+                if (roomTerrain.get(structure.pos.x, structure.pos.y - 1) !== TERRAIN_MASK_WALL) {
+                    gameRoom.createConstructionSite(structure.pos.x, structure.pos.y - 1, STRUCTURE_ROAD);
+                }
+                if (structure.structureType === STRUCTURE_SPAWN) {
+                    spawns.push(structure);
+                }
+            }
+            for (const spawnCount in spawns) {
+                const spawn = spawns[spawnCount];
+                BuildRoadTo(gameRoom, spawn, gameRoom.controller);
+                if (gameRoom.storage) {
+                    BuildRoadTo(gameRoom, spawn, gameRoom.storage);
+                }
+                if (gameRoom.terminal) {
+                    BuildRoadTo(gameRoom, spawn, gameRoom.terminal);
+                }
+                const sources = gameRoom.find(FIND_SOURCES);
+                for (const sourceCount in sources) {
+                    const source = sources[sourceCount];
+                    BuildRoadTo(gameRoom, spawn, source);
+                }
+            }
+        }
+
+        function BuildRoadTo(gameRoom, fromStructure, toStructure) {
+            const pathSteps = gameRoom.findPath(fromStructure.pos, toStructure.pos, {
+                swampCost: 1, ignoreCreeps: true, range: 1
+            });
+            for (const pathStepCount in pathSteps) {
+                const pathStep = pathSteps[pathStepCount];
+                const result = gameRoom.createConstructionSite(pathStep.x, pathStep.y, STRUCTURE_ROAD);
+                if (result === OK) {
+                    Util.InfoLog('Constructions', 'ConstructRoads', 'from ' + fromStructure + ' to ' + (toStructure.structureType ? toStructure.structureType : toStructure.id) + ' ' + pathStep.x + ',' + pathStep.y + ',' + gameRoom.name);
+                }
             }
         }
 
@@ -169,7 +222,7 @@ const Constructions = {
                             const hasStructure = _.find(lookAtObjects, function (lookObject) {
                                 return lookObject.type === LOOK_STRUCTURES || lookObject.type === LOOK_CONSTRUCTION_SITES;
                             });
-                            if(!hasStructure){
+                            if (!hasStructure) {
                                 const range = spawn.pos.findPathTo(x, y);
 
                                 if (!bestPos || range < bestRange) {

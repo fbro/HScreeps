@@ -54,10 +54,10 @@ const Factories = {
                     if (result === OK) return;
                     result = Produce(factory, RESOURCE_ALLOY, Util.FACTORY_TARGET_RESOURCE, RESOURCE_METAL, 100, RESOURCE_ZYNTHIUM_BAR, 20, RESOURCE_ENERGY, 40);
                     if (result === OK) return;
-                    if(factory.room.storage.store.getUsedCapacity(RESOURCE_ENERGY) >= Util.STORAGE_ENERGY_MEDIUM){
+                    if (factory.room.storage.store.getUsedCapacity(RESOURCE_ENERGY) >= Util.STORAGE_ENERGY_MEDIUM) {
                         result = Produce(factory, RESOURCE_BATTERY, Util.FACTORY_TARGET_RESOURCE, RESOURCE_ENERGY, 600);
                         if (result === OK) return;
-                    }else if(factory.room.storage.store.getUsedCapacity(RESOURCE_ENERGY) <= Util.STORAGE_ENERGY_LOW && factory.room.terminal.store.getUsedCapacity(RESOURCE_ENERGY) <= Util.TERMINAL_TARGET_ENERGY){
+                    } else if (factory.room.storage.store.getUsedCapacity(RESOURCE_ENERGY) <= Util.STORAGE_ENERGY_LOW && factory.room.terminal.store.getUsedCapacity(RESOURCE_ENERGY) <= Util.TERMINAL_TARGET_ENERGY) {
                         result = Produce(factory, RESOURCE_ENERGY, Number.MAX_SAFE_INTEGER, RESOURCE_BATTERY, 50);
                         if (result === OK) {
                             Util.Warning('Factories', '', 'extracting energy from batteries in ' + factory.pos.roomName + ' energy status: storage ' + factory.room.storage.store.getUsedCapacity(RESOURCE_ENERGY) + ' terminal ' + factory.room.terminal.store.getUsedCapacity(RESOURCE_ENERGY));
@@ -79,7 +79,7 @@ const Factories = {
                          res3Name, res3MinAmount,
                          res4Name, res4MinAmount,
                          res5Name, res5MinAmount) {
-            if (                 factory.store.getUsedCapacity(res1Name) >= res1MinAmount
+            if (factory.store.getUsedCapacity(res1Name) >= res1MinAmount
                 && (!res2Name || factory.store.getUsedCapacity(res2Name) >= res2MinAmount)
                 && (!res3Name || factory.store.getUsedCapacity(res3Name) >= res3MinAmount)
                 && (!res4Name || factory.store.getUsedCapacity(res4Name) >= res4MinAmount)

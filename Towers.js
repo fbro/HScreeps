@@ -24,12 +24,12 @@ const Towers = {
             let towers = [];
             let towersLoaded = true;
             if (Memory.MemRooms[gameRoom.name].TowerIds) {
-                if(Memory.MemRooms[gameRoom.name].TowerIds.length !==Util.FindNumberOfBuildableStructures(gameRoom, STRUCTURE_TOWER)){
+                if (Memory.MemRooms[gameRoom.name].TowerIds.length !== Util.FindNumberOfBuildableStructures(gameRoom, STRUCTURE_TOWER)) {
                     towersLoaded = false;
-                }else{
+                } else {
                     for (let i = 0; i < Memory.MemRooms[gameRoom.name].TowerIds.length; i++) {
                         towers[i] = Game.getObjectById(Memory.MemRooms[gameRoom.name].TowerIds[i]);
-                        if(!towers[i]){
+                        if (!towers[i]) {
                             Util.ErrorLog('Towers', 'FindTowers', 'tower number ' + i + ' not found!');
                             delete Memory.MemRooms[gameRoom.name].TowerIds;
                             towersLoaded = false;
@@ -37,10 +37,10 @@ const Towers = {
                         }
                     }
                 }
-            }else{
+            } else {
                 towersLoaded = false;
             }
-            if(!towersLoaded) {
+            if (!towersLoaded) {
                 towers = gameRoom.find(FIND_MY_STRUCTURES, {
                     filter: function (tower) {
                         return tower.structureType === STRUCTURE_TOWER && tower.store.getUsedCapacity(RESOURCE_ENERGY) > 0;
@@ -99,13 +99,15 @@ const Towers = {
             return false;
         }
 
-        function ActivateSafemode(hostileTargets){
-            if(hostileTargets.length > 2){
-                for(const hostileTargetCount in hostileTargets){
+        function ActivateSafemode(hostileTargets) {
+            if (hostileTargets.length > 2) {
+                for (const hostileTargetCount in hostileTargets) {
                     const hostileTarget = hostileTargets[hostileTargetCount];
-                    if(hostileTarget.owner.username !== 'Invader' && hostileTarget.body.length > 40 && !gameRoom.controller.safeMode && !gameRoom.controller.safeModeCooldown && gameRoom.controller.safeModeAvailable > 0){
-                        const isBoosted = _.find(hostileTarget.body, function (bodypart) {return bodypart.boost !== undefined;});
-                        if(isBoosted){
+                    if (hostileTarget.owner.username !== 'Invader' && hostileTarget.body.length > 40 && !gameRoom.controller.safeMode && !gameRoom.controller.safeModeCooldown && gameRoom.controller.safeModeAvailable > 0) {
+                        const isBoosted = _.find(hostileTarget.body, function (bodypart) {
+                            return bodypart.boost !== undefined;
+                        });
+                        if (isBoosted) {
                             const result = gameRoom.controller.activateSafeMode();
                             Util.InfoLog('Towers', 'ActivateSafemode', gameRoom.name + ' ' + result + ' attacked from ' + hostileTarget.owner.username);
                             Game.notify('safemode have been activated for room ' + gameRoom.name + ' ' + result + ' shard ' + Game.shard + ' attacked from ' + hostileTarget.owner.username, 0);
@@ -115,7 +117,7 @@ const Towers = {
             }
         }
 
-        function SpawnDefenders(hostileTargets){
+        function SpawnDefenders(hostileTargets) {
             // TODO spawn defenders in room if under heavy attack
 
         }

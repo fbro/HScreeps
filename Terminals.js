@@ -41,7 +41,7 @@ const Terminals = {
                 const factory = Game.getObjectById(memRoom.FctrId);
                 if (factory) {
                     const resourceTypesNeeded = GetListOfFactoryResources(factory);
-                    for(const resourceNeedKey in resourceTypesNeeded){
+                    for (const resourceNeedKey in resourceTypesNeeded) {
                         const resourceTypeNeeded = resourceTypesNeeded[resourceNeedKey];
                         const amountNeeded = Util.TERMINAL_TARGET_RESOURCE - toTerminal.store.getUsedCapacity(resourceTypeNeeded);
                         if (amountNeeded > Util.TERMINAL_BUFFER) {
@@ -100,10 +100,10 @@ const Terminals = {
             if (toTerminal.store.getUsedCapacity(RESOURCE_ENERGY) === 0 && toTerminal.room.storage.store.getUsedCapacity(RESOURCE_ENERGY) === 0) {
                 let didSend = false;
                 const memRoom = Memory.MemRooms[toTerminal.pos.roomName];
-                if(toTerminal.room.controller.level === 8 || memRoom.FctrId && memRoom.FctrId !== '-'){
+                if (toTerminal.room.controller.level === 8 || memRoom.FctrId && memRoom.FctrId !== '-') {
                     didSend = GetFromTerminal(Util.TERMINAL_TARGET_RESOURCE, RESOURCE_BATTERY, toTerminal, terminals, Util.TERMINAL_TARGET_RESOURCE);
                 }
-                if(!didSend){
+                if (!didSend) {
                     didSend = GetFromTerminal(Util.STORAGE_ENERGY_LOW, RESOURCE_ENERGY, toTerminal, terminals, Util.TERMINAL_TARGET_ENERGY);
                 }
 
@@ -130,9 +130,9 @@ const Terminals = {
                 }
                 let didSend = false;
                 // try to send energy or power to other owned terminals that needs it
-                if(resourceType === RESOURCE_ENERGY){
+                if (resourceType === RESOURCE_ENERGY) {
                     didSend = SendToTerminal(Util.STORAGE_ENERGY_MEDIUM_TRANSFER, resourceType, fromTerminal, terminals, Util.TERMINAL_TARGET_ENERGY);
-                }else if(resourceType === RESOURCE_POWER){
+                } else if (resourceType === RESOURCE_POWER) {
                     didSend = SendToTerminal(Util.TERMINAL_TARGET_RESOURCE, resourceType, fromTerminal, terminals, Util.TERMINAL_TARGET_RESOURCE);
                 }
 
@@ -154,11 +154,11 @@ const Terminals = {
         //region helper functions
 
         /**@return {boolean}*/
-        function GetFromTerminal(amountNeeded, resourceTypeNeeded, toTerminal, terminals, minFromTerminalAmount){
+        function GetFromTerminal(amountNeeded, resourceTypeNeeded, toTerminal, terminals, minFromTerminalAmount) {
             let didSend = false;
             for (const fromTerminalKey in terminals) { // try to get resource from other terminal
                 const fromTerminal = terminals[fromTerminalKey];
-                if(fromTerminal.store.getUsedCapacity(resourceTypeNeeded) > minFromTerminalAmount){
+                if (fromTerminal.store.getUsedCapacity(resourceTypeNeeded) > minFromTerminalAmount) {
                     didSend = TrySendResource(amountNeeded, resourceTypeNeeded, fromTerminal, toTerminal);
                     if (didSend) {
                         break;
@@ -169,16 +169,16 @@ const Terminals = {
         }
 
         /**@return {boolean}*/
-        function SendToTerminal(amountToKeep, resourceTypeToSend, fromTerminal, terminals, maxToTerminalAmount){
+        function SendToTerminal(amountToKeep, resourceTypeToSend, fromTerminal, terminals, maxToTerminalAmount) {
             let didSend = false;
             if (fromTerminal.store.getUsedCapacity(resourceTypeToSend) > (amountToKeep + Util.TERMINAL_BUFFER)) {
                 let amountToSend = fromTerminal.store.getUsedCapacity(resourceTypeToSend) - amountToKeep;
                 for (const toTerminalKey in terminals) { // try to get resource from other terminal
                     const toTerminal = terminals[toTerminalKey];
-                    if(toTerminal.store.getUsedCapacity(resourceTypeToSend) < maxToTerminalAmount){
-                        if(amountToSend > maxToTerminalAmount - toTerminal.store.getUsedCapacity(resourceTypeToSend)){
+                    if (toTerminal.store.getUsedCapacity(resourceTypeToSend) < maxToTerminalAmount) {
+                        if (amountToSend > maxToTerminalAmount - toTerminal.store.getUsedCapacity(resourceTypeToSend)) {
                             amountToSend = maxToTerminalAmount - toTerminal.store.getUsedCapacity(resourceTypeToSend);
-                            if(amountToSend < Util.TERMINAL_BUFFER){
+                            if (amountToSend < Util.TERMINAL_BUFFER) {
                                 break;
                             }
                         }
@@ -192,7 +192,7 @@ const Terminals = {
             return didSend;
         }
 
-        function GetListOfFactoryResources(factory){
+        function GetListOfFactoryResources(factory) {
             const resourceTypesNeeded = [];
             switch (factory.level) { // factory level
                 case undefined:
@@ -376,7 +376,7 @@ const Terminals = {
         }
 
         /**@return {number}*/
-        function GetNeededFactoryLeftoverResource(resourceType){
+        function GetNeededFactoryLeftoverResource(resourceType) {
             switch (resourceType) {
                 // Electronical
                 case RESOURCE_SWITCH      : // factory lvl 1

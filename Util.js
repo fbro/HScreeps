@@ -130,7 +130,7 @@ const Util = {
         Memory.MemRooms[roomName].RoomJobs[jobKey] = undefined;
     },
 
-    CreateRoom: function(roomName, jobs) {
+    CreateRoom: function (roomName, jobs) {
         const gameRoom = Game.rooms[roomName];
         let level = -1;
         let sourceNumber = 0;
@@ -150,7 +150,7 @@ const Util = {
     },
 
     /**@return {number}*/
-    FindNumberOfBuildableStructures: function(gameRoom, structureType) {
+    FindNumberOfBuildableStructures: function (gameRoom, structureType) {
         switch (true) {
             case structureType === STRUCTURE_EXTENSION:
                 switch (gameRoom.controller.level) {

@@ -1357,13 +1357,13 @@ const ExecuteJobs = {
                 },
                 /**@return {int}*/
                 Fetch: function (fetchObject, jobObject) {
-                    if(!fetchObject.my && fetchObject.owner){
+                    if (!fetchObject.my && fetchObject.owner) {
                         let result = creep.attackController(fetchObject);
-                        if(result === OK){
+                        if (result === OK) {
                             Util.InfoLog('ExecuteJobs', 'JobClaimController', 'attackController ' + creep.name + ' in ' + jobObject.pos.roomName + ' tag ' + jobObject.name);
                         }
                         return result;
-                    }else{
+                    } else {
                         let result = creep.claimController(fetchObject);
                         if (result === OK) {
                             Util.InfoLog('ExecuteJobs', 'JobClaimController', 'done ' + creep.name + ' in ' + jobObject.pos.roomName + ' tag ' + jobObject.name);
@@ -2556,7 +2556,7 @@ const ExecuteJobs = {
                 return hostileCreep.getActiveBodyparts(ATTACK) || hostileCreep.getActiveBodyparts(RANGED_ATTACK)
             });
             if (hostileCreepsWithAttack.length === 0 && (creep.getActiveBodyparts(ATTACK) || creep.getActiveBodyparts(RANGED_ATTACK))) {
-                if(creep.room.controller && creep.room.controller.my){
+                if (creep.room.controller && creep.room.controller.my) {
                     for (const hostileCreepKey in hostileCreeps) {
                         const hostileCreep = hostileCreeps[hostileCreepKey];
                         if (creep.getActiveBodyparts(RANGED_ATTACK) || creep.getActiveBodyparts(ATTACK)) {
@@ -2765,35 +2765,41 @@ const ExecuteJobs = {
             let bestPointer;
             let bestPointHasRoad = false;
             let bestPointHasCreep = false;
-            for(const count in directions){
+            for (const count in directions) {
                 let newX = (creep.pos.x + Xs[count]);
                 let newY = (creep.pos.y + Ys[count]);
                 if (newX <= 0 || newX >= 49 || newY <= 0 || newY >= 49) {
                     positions.push({'newX': newX, 'newY': newY});
                     //Util.Info('ExecuteJobs', 'FleeMove', 'border reached ' + newX + ',' + newY);
-                }else{
+                } else {
                     const fleeToPos = new RoomPosition(newX, newY, creep.pos.roomName);
                     const look = fleeToPos.look();
                     let terrainOnPosition;
                     let isRoadOnPosition = false;
                     let structureTypeOnPosition;
                     let creepOnPosition;
-                    for(const lookCount in look){
-                        if(look[lookCount].type === LOOK_TERRAIN){
+                    for (const lookCount in look) {
+                        if (look[lookCount].type === LOOK_TERRAIN) {
                             terrainOnPosition = look[lookCount].terrain;
-                        }else if(look[lookCount].type === LOOK_STRUCTURES){
-                            if(look[lookCount].structure.structureType === STRUCTURE_ROAD){
+                        } else if (look[lookCount].type === LOOK_STRUCTURES) {
+                            if (look[lookCount].structure.structureType === STRUCTURE_ROAD) {
                                 isRoadOnPosition = true;
-                            }else if(look[lookCount].structure.structureType !== STRUCTURE_CONTAINER){
+                            } else if (look[lookCount].structure.structureType !== STRUCTURE_CONTAINER) {
                                 structureTypeOnPosition = look[lookCount].structure.structureType;
                             }
-                        }else if(look[lookCount].type === LOOK_CREEPS){
+                        } else if (look[lookCount].type === LOOK_CREEPS) {
                             creepOnPosition = look[lookCount].creep.name;
                         }
                     }
-                    positions.push({"fleeToPos": fleeToPos, "terrain" : terrainOnPosition, "hasRoad": isRoadOnPosition, "structureType" : structureTypeOnPosition, "creep" : creepOnPosition});
+                    positions.push({
+                        "fleeToPos": fleeToPos,
+                        "terrain": terrainOnPosition,
+                        "hasRoad": isRoadOnPosition,
+                        "structureType": structureTypeOnPosition,
+                        "creep": creepOnPosition
+                    });
                     //Util.Info('ExecuteJobs', 'FleeMove', 'obj ' + fleeToPos.x + ',' + fleeToPos.y + ' ' + terrainOnPosition + ' ' + structureTypeOnPosition + ' ' + creepOnPosition);
-                    if(!positions[count].structureType && (!bestPointer && positions[count].terrain === 'swamp' && positions[count].terrain === 'plain' || positions[count].terrain === 'plain' && !bestPointHasRoad && !bestPointHasCreep)){
+                    if (!positions[count].structureType && (!bestPointer && positions[count].terrain === 'swamp' && positions[count].terrain === 'plain' || positions[count].terrain === 'plain' && !bestPointHasRoad && !bestPointHasCreep)) {
                         bestPointer = count;
                         bestPointHasRoad = positions[count].hasRoad;
                         bestPointHasCreep = positions[count].creep;
@@ -2803,7 +2809,7 @@ const ExecuteJobs = {
             if (bestPointer) {
                 const result = creep.move(directions[bestPointer]);
                 Util.Info('ExecuteJobs', 'FleeMove', creep.name + ' go to position ' + JSON.stringify(positions[bestPointer]) + ' orig ' + JSON.stringify(creep.pos) + " result " + result);
-            }else{
+            } else {
                 Util.Info('ExecuteJobs', 'FleeMove', creep.name + ' could not find any viable positions ' + JSON.stringify(positions));
             }
         }
@@ -2895,7 +2901,7 @@ const ExecuteJobs = {
             const nextRoom = Memory.Paths[to.roomName][creep.pos.roomName];
             const exitDirection = Game.map.findExit(creep.room, nextRoom);
             const exitPosition = creep.pos.findClosestByPath(exitDirection, {
-                filter: function(pos) {
+                filter: function (pos) {
                     const wall = pos.lookFor(LOOK_STRUCTURES)[0];
                     return !wall;
                 }
