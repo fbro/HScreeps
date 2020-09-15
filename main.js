@@ -62,7 +62,7 @@ module.exports.loop = function () {
         for (const gameRoomKey in Game.rooms) {
             const gameRoom = Game.rooms[gameRoomKey];
             if (gameRoom.controller && gameRoom.controller.my && Memory.MemRooms[gameRoom.name]) {
-                Game.map.visual.text(gameRoom.controller.level, new RoomPosition(5, 5, gameRoomKey), {
+                Game.map.visual.text(gameRoom.controller.level, new RoomPosition(4, 5, gameRoomKey), {
                     color: '#00ff00',
                     fontSize: 7,
                     opacity: 1
