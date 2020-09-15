@@ -144,8 +144,7 @@ module.exports.loop = function () {
 // TODO spawn defenders when under attack
 
 // TODO constructions
-// roads
-// special buildings - terminals, powerspawn, observer, labs
+// special buildings - labs
 // perimiter fence with walls and ramparts
 
 // attack NPC strongholds
