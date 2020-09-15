@@ -62,6 +62,16 @@ module.exports.loop = function () {
         for (const gameRoomKey in Game.rooms) {
             const gameRoom = Game.rooms[gameRoomKey];
             if (gameRoom.controller && gameRoom.controller.my && Memory.MemRooms[gameRoom.name]) {
+                Game.map.visual.text(gameRoom.controller.level, new RoomPosition(5, 5, gameRoomKey), {
+                    color: '#00ff00',
+                    fontSize: 7,
+                    opacity: 1
+                });
+                Game.map.visual.poly([new RoomPosition(1, 1, gameRoom.name), new RoomPosition(49, 1, gameRoom.name), new RoomPosition(49, 49, gameRoom.name), new RoomPosition(1, 49, gameRoom.name), new RoomPosition(1, 1, gameRoom.name)], {
+                    stroke: '#00ff00',
+                    strokeWidth: 0.2,
+                    opacity: 1
+                });
                 Towers.run(gameRoom);
                 if (gameRoom.controller.level >= 7) {
                     Factories.run(gameRoom, gameRoomKey);
