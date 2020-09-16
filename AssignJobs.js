@@ -335,10 +335,17 @@ const AssignJobs = {
                 if (spawnResult === OK) {
                     Game.creeps[availableName].memory.JobName = roomJobKey;
                     roomJob.Creep = availableName;
-                    if (Memory.MemRooms[memRoomKey].MaxCreeps[availableName.substring(0, 1)]) {
-                        Memory.MemRooms[memRoomKey].MaxCreeps[availableName.substring(0, 1)][availableName] = availableName;
+                    const creepType = availableName.substring(0, 1);
+                    if (Memory.MemRooms[memRoomKey].MaxCreeps[creepType]) {
+                        Memory.MemRooms[memRoomKey].MaxCreeps[creepType][availableName] = availableName;
                     }
                     Util.Info('AssignJobs', 'SpawnCreep', 'OK ' + availableName + ' assigned to ' + roomJobKey + ' in ' + memRoomKey + ' spawned at ' + bestAvailableSpawn.name + ' ' + bestAvailableSpawn.pos.roomName + (bestAvailableSpawn.pos.roomName !== memRoomKey ? ' distance ' + Game.map.getRoomLinearDistance(bestAvailableSpawn.pos.roomName, memRoomKey) : ''));
+                    Game.map.visual.circle(bestAvailableSpawn.pos, {radius: 8, stroke: '#000000', opacity: 1});
+                    Game.map.visual.text(availableName, bestAvailableSpawn.pos, {
+                        color: creepType === 'B' ? '#ffff00' : creepType === 'T' ? '#7f7f7f' : creepType === 'H' ? '#8080ff' : '#000000',
+                        fontSize: 6,
+                        opacity: 1
+                    });
                     return true;
                 } else {
                     Util.Warning('AssignJobs', 'SpawnCreep', 'failed ' + availableName + ' assigned to ' + roomJobKey + ' in ' + memRoomKey + ' spawnResult ' + spawnResult + ' spawn ' + bestAvailableSpawn.name + ' ' + bestAvailableSpawn.pos.roomName + ' room energy: ' + Game.rooms[bestAvailableSpawn.pos.roomName].energyAvailable);

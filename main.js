@@ -67,11 +67,7 @@ module.exports.loop = function () {
                     fontSize: 7,
                     opacity: 1
                 });
-                Game.map.visual.poly([new RoomPosition(1, 1, gameRoom.name), new RoomPosition(49, 1, gameRoom.name), new RoomPosition(49, 49, gameRoom.name), new RoomPosition(1, 49, gameRoom.name), new RoomPosition(1, 1, gameRoom.name)], {
-                    stroke: '#00ff00',
-                    strokeWidth: 0.2,
-                    opacity: 1
-                });
+                Game.map.visual.rect(new RoomPosition(0, 0, gameRoomKey), 50, 50, {stroke: '#00ff00', opacity: 0.1, strokeWidth: 1});
                 Towers.run(gameRoom);
                 if (gameRoom.controller.level >= 7) {
                     Factories.run(gameRoom, gameRoomKey);
