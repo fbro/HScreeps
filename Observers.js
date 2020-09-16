@@ -98,7 +98,7 @@ const Observers = {
                             return h.getActiveBodyparts(ATTACK) || h.getActiveBodyparts(RANGED_ATTACK) || h.getActiveBodyparts(HEAL)
                         }
                     });
-                    if (walls[0] || hostileCreeps.length >= 4) {
+                    if (walls[0] || hostileCreeps.length >= 2) {
                         clearRoomOfFlags(roomKey, observerRoom);
                     } else {
                         AddPowerBankFlag(observerRoom, roomKey, observer);

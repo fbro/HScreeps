@@ -153,10 +153,6 @@ module.exports.loop = function () {
 
 // TODO spawn defenders when under attack
 
-// TODO constructions
-// special buildings - labs
-// perimiter fence with walls and ramparts
-
 // attack NPC strongholds
 // harvest middle rooms
 // harvest neutral rooms

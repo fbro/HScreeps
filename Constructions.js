@@ -12,9 +12,10 @@ const Constructions = {
         function build(gameRoom, roomTerrain) {
             const level = gameRoom.controller.level;
             if (level >= 1) {
-                ConstructContainers(gameRoom, roomTerrain);
+                ConstructContainerAt(gameRoom, roomTerrain, undefined/*source*/)
                 if (level >= 2) {
                     ConstructCoreBuilding(gameRoom, roomTerrain, STRUCTURE_EXTENSION);
+                    ConstructContainerAt(gameRoom, roomTerrain, STRUCTURE_CONTROLLER);
                     if (level >= 3) {
                         ConstructCoreBuilding(gameRoom, roomTerrain, STRUCTURE_TOWER);
                         ConstructRoads(gameRoom, roomTerrain);
@@ -28,9 +29,12 @@ const Constructions = {
                                 if (level >= 6) {
                                     ConstructCoreBuilding(gameRoom, roomTerrain, STRUCTURE_SPAWN);
                                     ConstructExtractor(gameRoom);
+                                    ConstructContainerAt(gameRoom, roomTerrain, STRUCTURE_EXTRACTOR);
                                     ConstructAtStorage(gameRoom, roomTerrain, STRUCTURE_TERMINAL);
                                     ConstructRampartsOn(gameRoom, roomTerrain, STRUCTURE_TERMINAL);
-                                    if (level === 7) {
+                                    ConstructPerimeter(gameRoom, roomTerrain);
+                                    ConstructLabs(gameRoom, roomTerrain);
+                                    if (level >= 7) {
                                         ConstructAtStorage(gameRoom, roomTerrain, STRUCTURE_FACTORY);
                                         ConstructRampartsOn(gameRoom, roomTerrain, STRUCTURE_FACTORY);
                                         ConstructRampartsOn(gameRoom, roomTerrain, STRUCTURE_CONTAINER);
@@ -48,16 +52,26 @@ const Constructions = {
             }
         }
 
-        function ConstructContainers(gameRoom, terrain) {
-            if (!FindExistingStructure(gameRoom.controller.pos, STRUCTURE_CONTAINER, 1)) {
-                ConstructAroundPos(gameRoom, terrain, gameRoom.controller.pos, STRUCTURE_CONTAINER);
-            }
-
-            const sources = gameRoom.find(FIND_SOURCES);
-            for (const sourceCount in sources) {
-                const source = sources[sourceCount];
-                if (!FindExistingStructure(source.pos, STRUCTURE_CONTAINER, 1)) {
-                    ConstructAroundPos(gameRoom, terrain, source.pos, STRUCTURE_CONTAINER);
+        function ConstructContainerAt(gameRoom, terrain, structureType = undefined) {
+            if (!structureType) {
+                const sources = gameRoom.find(FIND_SOURCES);
+                for (const sourceCount in sources) {
+                    const source = sources[sourceCount];
+                    if (!FindExistingStructure(source.pos, STRUCTURE_CONTAINER, 1)) {
+                        ConstructAroundPos(gameRoom, terrain, source.pos, STRUCTURE_CONTAINER);
+                    }
+                }
+            } else {
+                const structures = gameRoom.find(FIND_STRUCTURES, {
+                    filter: function (structure) {
+                        return structure.structureType === structureType;
+                    }
+                });
+                for (const structureCount in structures) {
+                    const structure = structures[structureCount];
+                    if (!FindExistingStructure(structure.pos, STRUCTURE_CONTAINER, 1)) {
+                        ConstructAroundPos(gameRoom, terrain, structure.pos, STRUCTURE_CONTAINER);
+                    }
                 }
             }
         }
@@ -211,7 +225,7 @@ const Constructions = {
                     return s.type === LOOK_STRUCTURES || s.type === LOOK_CONSTRUCTION_SITES;
                 }); // can only be extractor or the construction of extractor
                 if (!extractor) {
-                    const result = gameRoom.createConstructionSite(mineral.x, mineral.y, STRUCTURE_EXTRACTOR);
+                    const result = gameRoom.createConstructionSite(mineral.pos.x, mineral.pos.y, STRUCTURE_EXTRACTOR);
                     if (result === OK) {
                         Util.InfoLog('Constructions', 'ConstructExtractor', mineral.pos);
                     }
@@ -227,6 +241,16 @@ const Constructions = {
             if (gameRoom.storage && !FindExistingStructure(gameRoom.storage.pos, structureType, 1)) {
                 ConstructAroundPos(gameRoom, roomTerrain, gameRoom.storage.pos, structureType, 1, true);
             }
+        }
+
+        function ConstructPerimeter(gameRoom, roomTerrain) {
+            // TODO construct perimeter
+
+        }
+
+        function ConstructLabs(gameRoom, roomTerrain){
+            // TODO construct labs
+
         }
 
         function FindExistingStructure(targetPos, structureType, radius) {
