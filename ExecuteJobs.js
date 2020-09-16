@@ -1329,6 +1329,7 @@ const ExecuteJobs = {
 
         /**@return {int}*/
         function JobClaimController(creep, roomJob) {
+            Game.map.visual.circle(creep.pos, {radius: 4, fill: '#00ff00', stroke: '#00ff00', lineStyle: 'dotted', strokeWidth: 2});
             const result = GenericFlagAction(creep, roomJob, {
                 /**@return {int}*/
                 JobStatus: function (jobObject) {
