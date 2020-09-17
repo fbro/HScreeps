@@ -12,15 +12,21 @@ const Constructions = {
         function build(gameRoom, roomTerrain) {
             const level = gameRoom.controller.level;
             if (level >= 1) {
-                ConstructContainerAt(gameRoom, roomTerrain, undefined/*source*/)
+                ConstructContainerAt(gameRoom, roomTerrain, undefined/*source*/);
                 if (level >= 2) {
                     ConstructCoreBuilding(gameRoom, roomTerrain, STRUCTURE_EXTENSION);
-                    ConstructContainerAt(gameRoom, roomTerrain, STRUCTURE_CONTROLLER);
+                    if(Memory.MemRooms[gameRoom.name] && !Memory.MemRooms[gameRoom.name].CtrlConId){
+                        ConstructContainerAt(gameRoom, roomTerrain, STRUCTURE_CONTROLLER);
+                    }
                     if (level >= 3) {
-                        ConstructCoreBuilding(gameRoom, roomTerrain, STRUCTURE_TOWER);
+                        if (Memory.MemRooms[gameRoom.name] && Util.FindNumberOfBuildableStructures(gameRoom, STRUCTURE_TOWER) > Memory.MemRooms[gameRoom.name].TowerIds.length) {
+                            ConstructCoreBuilding(gameRoom, roomTerrain, STRUCTURE_TOWER);
+                        }
                         ConstructRoads(gameRoom, roomTerrain);
                         if (level >= 4) {
-                            ConstructCoreBuilding(gameRoom, roomTerrain, STRUCTURE_STORAGE);
+                            if(!gameRoom.storage){
+                                ConstructCoreBuilding(gameRoom, roomTerrain, STRUCTURE_STORAGE);
+                            }
                             ConstructRampartsOn(gameRoom, roomTerrain, STRUCTURE_SPAWN);
                             if (level >= 5) {
                                 ConstructLinks(gameRoom, roomTerrain);
@@ -174,6 +180,13 @@ const Constructions = {
         }
 
         function ConstructLinks(gameRoom, terrain) {
+            if(Memory.MemRooms[gameRoom.name]
+                && Memory.MemRooms[gameRoom.name].Links
+                && Memory.MemRooms[gameRoom.name].Links.StorageLinkId
+                && Memory.MemRooms[gameRoom.name].Links.ControllerLinkId
+                && Memory.MemRooms[gameRoom.name].Links.HarvesterLinksId.length >= 2){
+                return;
+            }
             let numberOfPossibleConstructions = GetNumberOfPossibleConstructions(gameRoom, STRUCTURE_LINK);
             if (!numberOfPossibleConstructions) {
                 return;

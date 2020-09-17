@@ -8,12 +8,12 @@ const Links = {
             let storageLink = undefined;
             let controllerLink = undefined;
             let harvesterLinks = [];
-            if (memRoom.links && memRoom.links.StorageLinkId && memRoom.links.ControllerLinkId && memRoom.links.HarvesterLinksId.length === memRoom.SourceNumber) {
-                storageLink = Game.getObjectById(memRoom.links.StorageLinkId);
-                controllerLink = Game.getObjectById(memRoom.links.ControllerLinkId);
-                harvesterLinks[0] = Game.getObjectById(memRoom.links.HarvesterLinksId[0]);
-                if (memRoom.links.HarvesterLinksId[1]) {
-                    harvesterLinks[1] = Game.getObjectById(memRoom.links.HarvesterLinksId[1]);
+            if (memRoom.Links && memRoom.Links.StorageLinkId && memRoom.Links.ControllerLinkId && memRoom.Links.HarvesterLinksId.length === memRoom.SourceNumber) {
+                storageLink = Game.getObjectById(memRoom.Links.StorageLinkId);
+                controllerLink = Game.getObjectById(memRoom.Links.ControllerLinkId);
+                harvesterLinks[0] = Game.getObjectById(memRoom.Links.HarvesterLinksId[0]);
+                if (memRoom.Links.HarvesterLinksId[1]) {
+                    harvesterLinks[1] = Game.getObjectById(memRoom.Links.HarvesterLinksId[1]);
                 }
             } else if (gameRoom && gameRoom.controller !== undefined && gameRoom.controller.my && gameRoom.storage) {
                 const links = gameRoom.find(FIND_MY_STRUCTURES, {
@@ -44,7 +44,7 @@ const Links = {
                         harvesterLinksId.push(links[i].id);
                     }
                 }
-                memRoom.links = {
+                memRoom.Links = {
                     'StorageLinkId': storageLinkId,
                     'ControllerLinkId': controllerLinkId,
                     'HarvesterLinksId': harvesterLinksId
