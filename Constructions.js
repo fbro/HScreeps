@@ -1,6 +1,7 @@
 let Util = require('Util');
 const Constructions = {
     run: function () {
+
         for (const gameRoomKey in Game.rooms) {
             const gameRoom = Game.rooms[gameRoomKey];
             if (gameRoom.controller && gameRoom.controller.my) {
@@ -83,6 +84,7 @@ const Constructions = {
         }
 
         function ConstructCoreBuilding(gameRoom, roomTerrain, structureType) {
+            console.log('test ' + gameRoom.name + ' structureType ' + structureType);
             let numberOfPossibleConstructions = GetNumberOfPossibleConstructions(gameRoom, structureType);
             if (!numberOfPossibleConstructions) {
                 return;
@@ -387,6 +389,9 @@ const Constructions = {
                                                         if (numberOfPossibleConstructions <= 0) {
                                                             return;
                                                         }
+                                                    }else{
+                                                        Util.Warning('Constructions', 'buildExtensions', gameRoom.name + ' at (' + newBuildPos.x + ',' + newBuildPos.y + ') result ' + result);
+                                                        return;
                                                     }
                                                 }
                                             }
