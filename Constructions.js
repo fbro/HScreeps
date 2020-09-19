@@ -84,7 +84,6 @@ const Constructions = {
         }
 
         function ConstructCoreBuilding(gameRoom, roomTerrain, structureType) {
-            console.log('test ' + gameRoom.name + ' structureType ' + structureType);
             let numberOfPossibleConstructions = GetNumberOfPossibleConstructions(gameRoom, structureType);
             if (!numberOfPossibleConstructions) {
                 return;
@@ -203,15 +202,6 @@ const Constructions = {
                     }
                 }
             }
-            if (gameRoom.storage && !FindExistingStructure(gameRoom.storage.pos, STRUCTURE_LINK, 1)) {
-                const result = ConstructAroundPos(gameRoom, terrain, gameRoom.storage.pos, STRUCTURE_LINK, 1, true);
-                if (result === OK) {
-                    numberOfPossibleConstructions--;
-                    if (numberOfPossibleConstructions <= 0) {
-                        return;
-                    }
-                }
-            }
             const sources = gameRoom.find(FIND_SOURCES);
             for (const sourceCount in sources) {
                 const source = sources[sourceCount];
@@ -223,6 +213,15 @@ const Constructions = {
                         if (numberOfPossibleConstructions <= 0) {
                             return;
                         }
+                    }
+                }
+            }
+            if (gameRoom.storage && !FindExistingStructure(gameRoom.storage.pos, STRUCTURE_LINK, 1)) {
+                const result = ConstructAroundPos(gameRoom, terrain, gameRoom.storage.pos, STRUCTURE_LINK, 1, true);
+                if (result === OK) {
+                    numberOfPossibleConstructions--;
+                    if (numberOfPossibleConstructions <= 0) {
+                        return;
                     }
                 }
             }
