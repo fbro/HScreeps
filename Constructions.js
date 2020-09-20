@@ -16,7 +16,7 @@ const Constructions = {
                 ConstructContainerAt(gameRoom, roomTerrain, undefined/*source*/);
                 if (level >= 2) {
                     ConstructCoreBuilding(gameRoom, roomTerrain, STRUCTURE_EXTENSION);
-                    if(Memory.MemRooms[gameRoom.name] && !Memory.MemRooms[gameRoom.name].CtrlConId){
+                    if (Memory.MemRooms[gameRoom.name] && !Memory.MemRooms[gameRoom.name].CtrlConId) {
                         ConstructContainerAt(gameRoom, roomTerrain, STRUCTURE_CONTROLLER);
                     }
                     if (level >= 3) {
@@ -25,7 +25,7 @@ const Constructions = {
                         }
                         ConstructRoads(gameRoom, roomTerrain);
                         if (level >= 4) {
-                            if(!gameRoom.storage){
+                            if (!gameRoom.storage) {
                                 ConstructCoreBuilding(gameRoom, roomTerrain, STRUCTURE_STORAGE);
                             }
                             ConstructRampartsOn(gameRoom, roomTerrain, STRUCTURE_SPAWN);
@@ -181,11 +181,11 @@ const Constructions = {
         }
 
         function ConstructLinks(gameRoom, terrain) {
-            if(Memory.MemRooms[gameRoom.name]
+            if (Memory.MemRooms[gameRoom.name]
                 && Memory.MemRooms[gameRoom.name].Links
                 && Memory.MemRooms[gameRoom.name].Links.StorageLinkId
                 && Memory.MemRooms[gameRoom.name].Links.ControllerLinkId
-                && Memory.MemRooms[gameRoom.name].Links.HarvesterLinksId.length >= 2){
+                && Memory.MemRooms[gameRoom.name].Links.HarvesterLinksId.length >= 2) {
                 return;
             }
             let numberOfPossibleConstructions = GetNumberOfPossibleConstructions(gameRoom, STRUCTURE_LINK);
@@ -262,7 +262,7 @@ const Constructions = {
 
         }
 
-        function ConstructLabs(gameRoom, roomTerrain){
+        function ConstructLabs(gameRoom, roomTerrain) {
             // TODO construct labs
 
         }
@@ -365,8 +365,8 @@ const Constructions = {
                                     return lookObject.type === LOOK_STRUCTURES || lookObject.type === LOOK_CONSTRUCTION_SITES;
                                 });
                                 if (!hasStructure) {
-                                    let hasNearbyWall = HasNearbyWall(roomTerrain, newBuildPos);
-                                    if (!hasNearbyWall) {
+                                    let numOfNearbyWalls = NumOfNearbyWalls(roomTerrain, newBuildPos);
+                                    if (numOfNearbyWalls < 2) {
                                         const unwantedNearbyStructures = newBuildPos.findInRange(FIND_STRUCTURES, 1, {
                                             filter: function (structure) {
                                                 return structure.structureType !== STRUCTURE_SPAWN
@@ -388,7 +388,7 @@ const Constructions = {
                                                         if (numberOfPossibleConstructions <= 0) {
                                                             return;
                                                         }
-                                                    }else{
+                                                    } else {
                                                         Util.Warning('Constructions', 'buildExtensions', gameRoom.name + ' at (' + newBuildPos.x + ',' + newBuildPos.y + ') result ' + result);
                                                         return;
                                                     }
@@ -398,6 +398,9 @@ const Constructions = {
                                     }
                                 }
                             }
+                        } else if ((xp >= 100 || xp < -50) && (yp >= 100 || yp < -50)) {
+                            Util.ErrorLog('Constructions', 'buildExtensions', 'looped too far out! ' + xp + ',' + yp + ',' + gameRoom.name);
+                            return;
                         }
                     }
                 }
@@ -406,17 +409,18 @@ const Constructions = {
             }
         }
 
-        /**@return {boolean}*/
-        function HasNearbyWall(terrain, pos) {
+        /**@return {Number}*/
+        function NumOfNearbyWalls(terrain, pos) {
+            let numOfNearbyWalls = 0;
             for (let terrainX = pos.x - 1; terrainX <= pos.x + 1; terrainX++) {
                 for (let terrainY = pos.y - 1; terrainY <= pos.y + 1; terrainY++) {
                     const NearbyTerrain = terrain.get(terrainX, terrainY);
                     if (NearbyTerrain === TERRAIN_MASK_WALL) {
-                        return true;
+                        numOfNearbyWalls++;
                     }
                 }
             }
-            return false;
+            return numOfNearbyWalls;
         }
 
         /**@return {Number}*/
