@@ -33,12 +33,12 @@ module.exports.loop = function () {
                             const foundCreeps = {};
                             for (const memRoomKey in Memory.MemRooms) {
                                 const memRoom = Memory.MemRooms[memRoomKey];
-                                delete memRoom.links; // remove links - maybe the buildings have been deleted ect. TODO remove
                                 delete memRoom.Links; // remove links - maybe the buildings have been deleted ect.
                                 delete memRoom.FctrId; // remove FctrId - maybe the buildings have been deleted ect.
                                 delete memRoom.PowerSpawnId; // remove PowerSpawnId - maybe the buildings have been deleted ect.
                                 delete memRoom.TowerIds; // remove TowerIds - maybe a tower have been deleted ect.
                                 delete memRoom.ObserverId; // remove ObserverId - maybe an observer have been deleted ect.
+                                delete memRoom.BuiltRoads; // remove BuiltRoads - maybe some of the road have eroded away?
                                 MaxCreepsCleanup(memRoomKey, memRoom, foundCreeps);
                                 UnusedRoomsCleanup(memRoomKey, memRoom);
                             }
