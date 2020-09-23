@@ -38,7 +38,7 @@ module.exports.loop = function () {
                                 delete memRoom.PowerSpawnId; // remove PowerSpawnId - maybe the buildings have been deleted ect.
                                 delete memRoom.TowerIds; // remove TowerIds - maybe a tower have been deleted ect.
                                 delete memRoom.ObserverId; // remove ObserverId - maybe an observer have been deleted ect.
-                                delete memRoom.BuiltRoads; // remove BuiltRoads - maybe some of the road have eroded away?
+                                delete memRoom.Built; // remove BuiltRoads - maybe some of the road have eroded away?
                                 MaxCreepsCleanup(memRoomKey, memRoom, foundCreeps);
                                 UnusedRoomsCleanup(memRoomKey, memRoom);
                             }

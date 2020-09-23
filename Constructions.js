@@ -6,9 +6,9 @@ const Constructions = {
             const gameRoom = Game.rooms[gameRoomKey];
             if (gameRoom.controller && gameRoom.controller.my) {
                 const roomTerrain = gameRoom.getTerrain();
-                //const startCpu = Game.cpu.getUsed(); // TODO cputest
+                //const startCpu = Game.cpu.getUsed();
                 build(gameRoom, roomTerrain);
-                //const elapsed = Game.cpu.getUsed() - startCpu; // TODO cputest
+                //const elapsed = Game.cpu.getUsed() - startCpu;
                 //Util.Info('Constructions', '', elapsed + ' ' + gameRoom.name + ' ' + gameRoom.controller.level);
             }
         }
@@ -67,7 +67,7 @@ const Constructions = {
         //region construct functions
 
         function ConstructContainerAt(gameRoom, terrain, structureType = undefined) {
-            if(Memory.MemRooms[gameRoom.name].Built && Memory.MemRooms[gameRoom.name].Built === gameRoom.controller.level){
+            if (Memory.MemRooms[gameRoom.name].Built && Memory.MemRooms[gameRoom.name].Built === gameRoom.controller.level) {
                 return;
             }
             if (!structureType) {
@@ -111,7 +111,7 @@ const Constructions = {
         }
 
         function ConstructRampartsOn(gameRoom, roomTerrain, structureType) {
-            if(Memory.MemRooms[gameRoom.name].Built && Memory.MemRooms[gameRoom.name].Built === gameRoom.controller.level){
+            if (Memory.MemRooms[gameRoom.name].Built && Memory.MemRooms[gameRoom.name].Built === gameRoom.controller.level) {
                 return;
             }
             const structuresToPlaceRampartOn = gameRoom.find(FIND_STRUCTURES, {
@@ -140,7 +140,7 @@ const Constructions = {
         }
 
         function ConstructRoads(gameRoom, roomTerrain) {
-            if(Memory.MemRooms[gameRoom.name].Built && Memory.MemRooms[gameRoom.name].Built === gameRoom.controller.level){
+            if (Memory.MemRooms[gameRoom.name].Built && Memory.MemRooms[gameRoom.name].Built === gameRoom.controller.level) {
                 return;
             }
             let donePlacingRoads = true;
@@ -157,54 +157,69 @@ const Constructions = {
                 }
             });
             let constructions = gameRoom.find(FIND_CONSTRUCTION_SITES, {
-                filter: function (structure) {
-                    return structure.structureType === STRUCTURE_SPAWN
-                        || structure.structureType === STRUCTURE_EXTENSION
-                        || structure.structureType === STRUCTURE_TOWER
-                        || structure.structureType === STRUCTURE_TERMINAL
-                        || structure.structureType === STRUCTURE_STORAGE
-                        || structure.structureType === STRUCTURE_FACTORY
-                        || structure.structureType === STRUCTURE_NUKER
-                        || structure.structureType === STRUCTURE_POWER_SPAWN;
+                filter: function (construction) {
+                    return construction.structureType === STRUCTURE_SPAWN
+                        || construction.structureType === STRUCTURE_EXTENSION
+                        || construction.structureType === STRUCTURE_TOWER
+                        || construction.structureType === STRUCTURE_TERMINAL
+                        || construction.structureType === STRUCTURE_STORAGE
+                        || construction.structureType === STRUCTURE_FACTORY
+                        || construction.structureType === STRUCTURE_NUKER
+                        || construction.structureType === STRUCTURE_POWER_SPAWN;
                 }
             });
-            structures.concat(constructions);
+            structures = structures.concat(constructions);
             const spawns = [];
             for (const structureCount in structures) {
                 const structure = structures[structureCount];
                 if (roomTerrain.get(structure.pos.x + 1, structure.pos.y) !== TERRAIN_MASK_WALL) {
                     const result = gameRoom.createConstructionSite(structure.pos.x + 1, structure.pos.y, STRUCTURE_ROAD);
-                    if(!result){donePlacingRoads = false;}
+                    if (!result) {
+                        donePlacingRoads = false;
+                    }
                 }
                 if (roomTerrain.get(structure.pos.x - 1, structure.pos.y) !== TERRAIN_MASK_WALL) {
                     const result = gameRoom.createConstructionSite(structure.pos.x - 1, structure.pos.y, STRUCTURE_ROAD);
-                    if(!result){donePlacingRoads = false;}
+                    if (!result) {
+                        donePlacingRoads = false;
+                    }
                 }
                 if (roomTerrain.get(structure.pos.x, structure.pos.y + 1) !== TERRAIN_MASK_WALL) {
                     const result = gameRoom.createConstructionSite(structure.pos.x, structure.pos.y + 1, STRUCTURE_ROAD);
-                    if(!result){donePlacingRoads = false;}
+                    if (!result) {
+                        donePlacingRoads = false;
+                    }
                 }
                 if (roomTerrain.get(structure.pos.x, structure.pos.y - 1) !== TERRAIN_MASK_WALL) {
                     const result = gameRoom.createConstructionSite(structure.pos.x, structure.pos.y - 1, STRUCTURE_ROAD);
-                    if(!result){donePlacingRoads = false;}
+                    if (!result) {
+                        donePlacingRoads = false;
+                    }
                 }
                 if (structure.structureType === STRUCTURE_SPAWN) {
                     spawns.push(structure);
                 }
             }
+            // build roads from main spawn to controller, storage, terminal, extractor and sources
             const spawn = spawns[0];
-            if(!spawn){
+            if (!spawn) {
                 return;
             }
             const result = BuildRoadTo(gameRoom, spawn, gameRoom.controller);
-            if(!result){donePlacingRoads = false;}
+            if (!result) {
+                donePlacingRoads = false;
+            }
             if (gameRoom.storage) {
                 const result = BuildRoadTo(gameRoom, spawn, gameRoom.storage);
-                if(!result){donePlacingRoads = false;}
+                if (!result) {
+                    donePlacingRoads = false;
+                }
             }
             if (gameRoom.terminal) {
                 const result = BuildRoadTo(gameRoom, spawn, gameRoom.terminal);
-                if(!result){donePlacingRoads = false;}
+                if (!result) {
+                    donePlacingRoads = false;
+                }
             }
             const extractor = gameRoom.find(FIND_MY_STRUCTURES, {
                 filter: function (structure) {
@@ -213,16 +228,32 @@ const Constructions = {
             })[0];
             if (extractor) {
                 const result = BuildRoadTo(gameRoom, spawn, extractor);
-                if(!result){donePlacingRoads = false;}
+                if (!result) {
+                    donePlacingRoads = false;
+                }
             }
             const sources = gameRoom.find(FIND_SOURCES);
             for (const sourceCount in sources) {
                 const source = sources[sourceCount];
                 const result = BuildRoadTo(gameRoom, spawn, source);
-                if(!result){donePlacingRoads = false;}
+                if (!result) {
+                    donePlacingRoads = false;
+                }
+                // build roads around each source
+                for (let y = source.pos.y - 1; y <= source.pos.y + 1; y++) {
+                    for (let x = source.pos.x - 1; x <= source.pos.x + 1; x++) {
+                        const terrainAtPos = roomTerrain.get(x, y);
+                        if (terrainAtPos !== TERRAIN_MASK_WALL && (y !== source.pos.y || x !== source.pos.x)) {
+                            const result = gameRoom.createConstructionSite(x, y, STRUCTURE_ROAD);
+                            if (result === OK) {
+                                Util.InfoLog('Constructions', 'ConstructRoads', 'around source ' + x + ',' + y + ',' + gameRoom.name);
+                            }
+                        }
+                    }
+                }
             }
             Util.Info('Constructions', 'ConstructRoads', gameRoom.name + ' donePlacingRoads ' + donePlacingRoads);
-            if(donePlacingRoads){
+            if (donePlacingRoads) {
                 Memory.MemRooms[gameRoom.name].Built = gameRoom.controller.level;
             }
         }
@@ -303,6 +334,14 @@ const Constructions = {
             }
             if (gameRoom.storage && !FindExistingStructure(gameRoom.storage.pos, structureType, 1)) {
                 ConstructAroundPos(gameRoom, roomTerrain, gameRoom.storage.pos, structureType, 1, true);
+                const extensionsAtStorage = gameRoom.storage.pos.findInRange(FIND_MY_STRUCTURES, 1, {
+                    filter: (s) => s.structureType === STRUCTURE_EXTENSION
+                });
+                for (const extensionAtStorageCount in extensionsAtStorage) {
+                    const extensionAtStorage = extensionsAtStorage[extensionAtStorageCount];
+                    const result = extensionAtStorage.destroy();
+                    Util.InfoLog('Constructions', 'ConstructAtStorage', 'destroyed extension near storage ' + gameRoom.storage.pos + ' result ' + result);
+                }
             }
             Util.Info('Constructions', 'ConstructAtStorage', gameRoom.name + ' structureType ' + structureType);
         }
@@ -356,7 +395,7 @@ const Constructions = {
                 const result = gameRoom.createConstructionSite(pathStep.x, pathStep.y, STRUCTURE_ROAD);
                 if (result === OK) {
                     Util.InfoLog('Constructions', 'BuildRoadTo', 'from ' + fromStructure + ' to ' + (toStructure.structureType ? toStructure.structureType : toStructure.id) + ' ' + pathStep.x + ',' + pathStep.y + ',' + gameRoom.name);
-                }else if(result !== ERR_INVALID_TARGET){
+                } else if (result !== ERR_INVALID_TARGET) {
                     donePlacingRoads = false;
                 }
             }

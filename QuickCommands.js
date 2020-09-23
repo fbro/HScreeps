@@ -95,3 +95,9 @@ delete Memory.MemRooms['E29S29'].FctrId;
 
 const hostiles = Game.rooms['W17N41'].find(FIND_HOSTILE_CREEPS);
 console.log('hostiles ' + JSON.stringify(hostiles[0].owner.username));
+
+for(const roomName in Memory.MemRooms){
+    const memRoom = Memory.MemRooms[roomName];
+    delete memRoom.Built;
+}
+delete Memory.MemRooms['W17N49'].Built;

@@ -180,7 +180,7 @@ const AssignJobs = {
                     case 'B': // builder
                         maxCreepsInRoom = 2;
                         if (memRoom.RoomLevel < 8) {
-                            maxCreepsInRoom += 1;
+                            maxCreepsInRoom += 2;
                             if (memRoom.RoomLevel < 3) {
                                 maxCreepsInRoom += 1;
                             }
