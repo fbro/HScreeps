@@ -465,7 +465,7 @@ const Constructions = {
                                 });
                                 if (!hasStructure) {
                                     let numOfNearbyWalls = NumOfNearbyWalls(roomTerrain, newBuildPos);
-                                    if (numOfNearbyWalls < 2) {
+                                    if (numOfNearbyWalls <= 5) {
                                         const unwantedNearbyStructures = newBuildPos.findInRange(FIND_STRUCTURES, 1, {
                                             filter: function (structure) {
                                                 return structure.structureType !== STRUCTURE_SPAWN

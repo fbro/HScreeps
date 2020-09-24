@@ -100,17 +100,17 @@ const Towers = {
         }
 
         function ActivateSafemode(hostileTargets) {
-            if (hostileTargets.length > 2) {
+            if (hostileTargets.length >= 2) {
                 for (const hostileTargetCount in hostileTargets) {
                     const hostileTarget = hostileTargets[hostileTargetCount];
-                    if (hostileTarget.owner.username !== 'Invader' && hostileTarget.body.length > 40 && !gameRoom.controller.safeMode && !gameRoom.controller.safeModeCooldown && gameRoom.controller.safeModeAvailable > 0) {
+                    if (hostileTarget.owner.username !== 'Invader' && hostileTarget.body.length > 40 && (hostileTarget.getActiveBodyparts(RANGED_ATTACK) || hostileTarget.getActiveBodyparts(ATTACK) || hostileTarget.getActiveBodyparts(HEAL)) && !gameRoom.controller.safeMode && !gameRoom.controller.safeModeCooldown && gameRoom.controller.safeModeAvailable > 0) {
                         const isBoosted = _.find(hostileTarget.body, function (bodypart) {
                             return bodypart.boost !== undefined;
                         });
                         if (isBoosted) {
                             const result = gameRoom.controller.activateSafeMode();
                             Util.InfoLog('Towers', 'ActivateSafemode', gameRoom.name + ' ' + result + ' attacked from ' + hostileTarget.owner.username);
-                            Game.notify('safemode have been activated for room ' + gameRoom.name + ' ' + result + ' shard ' + Game.shard + ' attacked from ' + hostileTarget.owner.username, 0);
+                            Game.notify('safemode have been activated for room ' + gameRoom.name + ' activateSafeMode result ' + result + ' shard ' + Game.shard + ' attacked from ' + hostileTarget.owner.username, 0);
                         }
                     }
                 }
