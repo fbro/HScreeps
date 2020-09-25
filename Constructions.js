@@ -424,7 +424,7 @@ const Constructions = {
                         if (terrainAtPos !== TERRAIN_MASK_WALL) {
                             const lookAtObjects = gameRoom.lookAt(x, y);
                             const hasStructure = _.find(lookAtObjects, function (lookObject) {
-                                return lookObject.type === LOOK_STRUCTURES && (structureType !== STRUCTURE_CONTAINER || !lookObject.structureType === STRUCTURE_ROAD)
+                                return lookObject.type === LOOK_STRUCTURES && (structureType !== STRUCTURE_CONTAINER || lookObject.structureType !== STRUCTURE_ROAD)
                                     || lookObject.type === LOOK_CONSTRUCTION_SITES;
                             });
                             if (!hasStructure) {
