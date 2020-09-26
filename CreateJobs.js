@@ -300,10 +300,10 @@ const CreateJobs = {
                 const source = sources[sourceKey];
                 new RoomVisual(gameRoom.name).text('🏭', source.pos.x, source.pos.y);
                 AddJob(roomJobs, 'Src(' + source.pos.x + ',' + source.pos.y + ')' + gameRoom.name, source.id, Util.OBJECT_JOB, 'H');
-                if (gameRoom.controller.level < 3) {
+                if (gameRoom.controller.level < 4) {
                     const freeSpaces = Util.FreeSpaces(source.pos);
                     if (freeSpaces > 1) {
-                        AddJob(roomJobs, 'Src(' + source.pos.x + ',' + source.pos.y + ')' + gameRoom.name, source.id, Util.OBJECT_JOB, 'H');
+                        AddJob(roomJobs, 'Src1(' + source.pos.x + ',' + source.pos.y + ')' + gameRoom.name, source.id, Util.OBJECT_JOB, 'H');
                     }
                 }
             }

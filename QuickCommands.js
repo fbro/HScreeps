@@ -3,6 +3,7 @@ Memory.MemRooms = {};
 Memory.ErrorLog = undefined;
 Memory.InfoLog = undefined;
 Memory.Paths = undefined;
+Memory.powerCreeps = undefined;
 for (const creepName in Memory.creeps) {
     const gc = Game.creeps[creepName];
     const mc = Memory.creeps[creepName];
@@ -72,7 +73,7 @@ for(const roomName in Memory.MemRooms){
 Memory.MemRooms['E31S31'].FctrId = undefined;
 
 // test spawn transporters
-Game.spawns['Spawn3'].spawnCreep([CARRY, CARRY, MOVE], 'T51');
+Game.spawns['Spawn1'].spawnCreep([CARRY, CARRY, MOVE], 'T1');
 Game.spawns['Spawn17'].spawnCreep([CARRY, CARRY, MOVE], 'T52');
 Game.spawns['Spawn9'].spawnCreep([CARRY, CARRY, MOVE], 'T53');
 

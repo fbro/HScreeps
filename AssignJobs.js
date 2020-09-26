@@ -417,6 +417,9 @@ const AssignJobs = {
                         case (energyAvailable >= 150): // energyCapacityAvailable: 300
                             body = [CARRY, CARRY, MOVE];
                             break;
+                        case (energyAvailable >= 100): // energyCapacityAvailable: 300
+                            body = [CARRY, MOVE];
+                            break;
                     }
                     break;
                 // builder

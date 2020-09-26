@@ -548,8 +548,14 @@ const ExecuteJobs = {
                         })[0];
                         if (spawnConstruction) {
                             fetchObject = spawnConstruction;
+                        } else {
+                            const nearbyConstruction = creep.pos.findInRange(FIND_MY_CONSTRUCTION_SITES, 2)[0];
+                            if (nearbyConstruction) {
+                                fetchObject = nearbyConstruction;
+                            }
                         }
-                    } else if (!fetchObject) { // nothing can be found then drop
+                    }
+                    if (!fetchObject) { // nothing can be found then drop
                         fetchObject = 'DROP';
                     } else if (!creep.memory.LinkId && fetchObject.structureType === STRUCTURE_LINK && creep.pos.getRangeTo(fetchObject.pos) < 2) { // if fetchObject is link then save in memory
                         creep.memory.LinkId = fetchObject.id
@@ -565,7 +571,7 @@ const ExecuteJobs = {
                 /**@return {int}*/
                 Fetch: function (fetchObject, jobObject) {
                     let result = ERR_NO_RESULT_FOUND;
-                    if (fetchObject.structureType === STRUCTURE_SPAWN) {
+                    if (fetchObject.progressTotal) {
                         result = creep.build(fetchObject);
                         if (result === OK) {
                             result = ERR_BUSY;
@@ -1329,7 +1335,13 @@ const ExecuteJobs = {
 
         /**@return {int}*/
         function JobClaimController(creep, roomJob) {
-            Game.map.visual.circle(creep.pos, {radius: 4, fill: '#00ff00', stroke: '#00ff00', lineStyle: 'dotted', strokeWidth: 2});
+            Game.map.visual.circle(creep.pos, {
+                radius: 4,
+                fill: '#00ff00',
+                stroke: '#00ff00',
+                lineStyle: 'dotted',
+                strokeWidth: 2
+            });
             const result = GenericFlagAction(creep, roomJob, {
                 /**@return {int}*/
                 JobStatus: function (jobObject) {
