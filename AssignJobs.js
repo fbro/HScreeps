@@ -173,7 +173,7 @@ const AssignJobs = {
                         } else {
                             maxCreepsInRoom = memRoom.SourceNumber;
                         }
-                        if (memRoom.RoomLevel < 3) {
+                        if (memRoom.RoomLevel <= 3) {
                             maxCreepsInRoom += memRoom.SourceNumber;
                         }
                         break;
@@ -181,7 +181,7 @@ const AssignJobs = {
                         maxCreepsInRoom = 2;
                         if (memRoom.RoomLevel < 8) {
                             maxCreepsInRoom += 2;
-                            if (memRoom.RoomLevel < 3) {
+                            if (memRoom.RoomLevel <= 3) {
                                 maxCreepsInRoom += 1;
                             }
                         }
@@ -248,10 +248,10 @@ const AssignJobs = {
             let bestAvailableSpawnCounter;
             let timeToLiveMaxRoomRange;
             if (roomJob.CreepType === 'C' || roomJob.CreepType === 'R') { //  creep with CLAIM body parts
-                timeToLiveMaxRoomRange = 6; // 600 time to live / 50 max room tile - 6 for elbow room
+                timeToLiveMaxRoomRange = 8; // 600 time to live / 50 max room tile
                 Util.Info('AssignJobs', 'FindBestSpawn', 'availableSpawns ' + availableSpawns + ' availableSpawnsInRoom ' + availableSpawnsInRoom + ' bestLinearDistance ' + bestLinearDistance + ' roomJob ' + roomJob + ' memRoomKey ' + memRoomKey);
             } else {
-                timeToLiveMaxRoomRange = 16; // 1500 time to live / 50 max room tile - 14 for elbow room
+                timeToLiveMaxRoomRange = 16; // 1500 time to live / 50 max room tile
             }
             for (const availableSpawnCounter in availableSpawns) { // find closest spawn
                 const availableSpawn = availableSpawns[availableSpawnCounter];
