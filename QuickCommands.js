@@ -54,7 +54,7 @@ console.log(Game.rooms['E28S29'].energyAvailable);
 console.log('RESOURCE_ENERGY ' + Game.getObjectById('5cf1a7158e8ea635474264ca').store.getUsedCapacity(RESOURCE_POWER));
 
 // destroy all structures
-const structures = Game.rooms['W19N49'].find(FIND_STRUCTURES);
+const structures = Game.rooms['W51N59'].find(FIND_STRUCTURES);
 for (const structureKey in structures) {
     structures[structureKey].destroy();
 }
