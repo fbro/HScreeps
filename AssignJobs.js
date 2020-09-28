@@ -309,6 +309,17 @@ const AssignJobs = {
                                     energyAvailableModifier = -12;
                                     break;
                             }
+                        } else if (Game.rooms[memRoomKey].controller.level <= 3) { // JobType === Util.OBJECT_JOB
+                            let spawns = Game.rooms[memRoomKey].find(FIND_MY_STRUCTURES, {
+                                filter: function (structure) {
+                                    return structure.structureType === STRUCTURE_SPAWN;
+                                }
+                            });
+                            // only help other rooms if the helping room is of a proper controller level
+                            // or there are no spawns at the room that needs help
+                            if (availableSpawn.room.controller.level < 7 && spawns.length > 0) {
+                                energyAvailableModifier = Number.MAX_SAFE_INTEGER; // do not help
+                            }
                         }
                         if ((energyAvailableModifier + linearDistance) < bestLinearDistance && energyAvailableModifier !== Number.MAX_SAFE_INTEGER) {
                             bestLinearDistance = energyAvailableModifier + linearDistance;
@@ -340,7 +351,13 @@ const AssignJobs = {
                         Memory.MemRooms[memRoomKey].MaxCreeps[creepType][availableName] = availableName;
                     }
                     Util.Info('AssignJobs', 'SpawnCreep', 'OK ' + availableName + ' assigned to ' + roomJobKey + ' in ' + memRoomKey + ' spawned at ' + bestAvailableSpawn.name + ' ' + bestAvailableSpawn.pos.roomName + (bestAvailableSpawn.pos.roomName !== memRoomKey ? ' distance ' + Game.map.getRoomLinearDistance(bestAvailableSpawn.pos.roomName, memRoomKey) : ''));
-                    Game.map.visual.circle(bestAvailableSpawn.pos, {radius: 8, stroke: '#000000', opacity: 1, lineStyle:'dashed', strokeWidth: 1});
+                    Game.map.visual.circle(bestAvailableSpawn.pos, {
+                        radius: 8,
+                        stroke: '#000000',
+                        opacity: 1,
+                        lineStyle: 'dashed',
+                        strokeWidth: 1
+                    });
                     Game.map.visual.text(availableName, bestAvailableSpawn.pos, {
                         color: creepType === 'B' ? '#808000' : creepType === 'T' ? '#7f7f7f' : creepType === 'H' ? '#8080ff' : '#000000',
                         fontSize: 6,
