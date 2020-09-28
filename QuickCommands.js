@@ -56,7 +56,9 @@ console.log('RESOURCE_ENERGY ' + Game.getObjectById('5cf1a7158e8ea635474264ca').
 // destroy all structures
 const structures = Game.rooms['W51N59'].find(FIND_STRUCTURES);
 for (const structureKey in structures) {
-    structures[structureKey].destroy();
+    if(structures[structureKey].structureType === STRUCTURE_WALL){
+        structures[structureKey].destroy();
+    }
 }
 // destroy all constructions
 

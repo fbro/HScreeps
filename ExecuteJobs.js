@@ -783,7 +783,7 @@ const ExecuteJobs = {
                  * @return {undefined}*/
                 FindFetchObject: function (jobObject) {
                     let energySupply = FindFetchResource(creep, jobObject, RESOURCE_ENERGY);
-                    if (!energySupply && creep.room.controller && creep.room.controller.my && creep.room.controller.level < 3) { // try and harvest
+                    if (!energySupply) { // try and harvest
                         const source = creep.pos.findClosestByPath(FIND_SOURCES_ACTIVE);
                         if (source) {
                             return source;
@@ -793,7 +793,7 @@ const ExecuteJobs = {
                 },
                 /**@return {int}*/
                 Fetch: function (fetchObject, jobObject) {
-                    if (fetchObject.energyCapacity && creep.room.controller && creep.room.controller.my && creep.room.controller.level < 3) { // this is a source - harvest it
+                    if (fetchObject.energyCapacity) { // this is a source - harvest it
                         let result = creep.harvest(fetchObject);
                         if (result === ERR_NOT_IN_RANGE) {
                             result = Move(creep, fetchObject);

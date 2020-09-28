@@ -386,7 +386,7 @@ const CreateJobs = {
                     Memory.MemRooms[gameRoom.name].CtrlConId = undefined;
                 }
             } else if (!controllerContainer && Memory.MemRooms[gameRoom.name]) {
-                controllerContainer = gameRoom.controller.pos.findInRange(FIND_STRUCTURES, 3, {
+                controllerContainer = gameRoom.controller.pos.findInRange(FIND_STRUCTURES, 1, {
                     filter: (s) => {
                         return s.structureType === STRUCTURE_CONTAINER;
                     }

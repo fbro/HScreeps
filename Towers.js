@@ -4,7 +4,7 @@ const Towers = {
         let anyTowerActionLastTick = Memory.MemRooms[gameRoom.name].AnyTowerAction;
         if (anyTowerActionLastTick || Game.time % Util.GAME_TIME_MODULO_1 === 0) {
             const towers = FindTowers(gameRoom);
-            let anyTowerAction = HostileCreeps(towers);
+            let anyTowerAction = HostileCreeps(gameRoom, towers);
             if (!anyTowerAction) {
                 anyTowerAction = DamagedCreeps(towers);
             }
@@ -82,15 +82,14 @@ const Towers = {
         }
 
         /**@return {boolean}*/
-        function HostileCreeps(towers) {
+        function HostileCreeps(gameRoom, towers) {
             const hostileTargets = gameRoom.find(FIND_HOSTILE_CREEPS, {
                 filter: function (hostile) {
                     return hostile.hits < hostile.hitsMax || hostile.pos.findInRange(FIND_STRUCTURES, 4).length >= 0 || hostile.pos.findInRange(FIND_MY_CREEPS, 3).length >= 0;
                 }
             });
             if (hostileTargets.length > 0) {
-                ActivateSafemode(hostileTargets);
-                SpawnDefenders(hostileTargets);
+                ActivateDefensiveMeasures(gameRoom, hostileTargets);
                 for (let i = 0; i < towers.length; i++) {
                     towers[i].attack(hostileTargets[((i + 1) % hostileTargets.length)]);
                 }
@@ -99,25 +98,57 @@ const Towers = {
             return false;
         }
 
-        function ActivateSafemode(hostileTargets) {
+        function ActivateDefensiveMeasures(gameRoom, hostileTargets) {
+            let numOfDefendersToSpawn = 0;
             for (const hostileTargetCount in hostileTargets) {
                 const hostileTarget = hostileTargets[hostileTargetCount];
-                if (hostileTarget.owner.username !== 'Invader' && hostileTarget.body.length > 40 && (hostileTarget.getActiveBodyparts(RANGED_ATTACK) || hostileTarget.getActiveBodyparts(ATTACK) || hostileTarget.getActiveBodyparts(HEAL)) && !gameRoom.controller.safeMode && !gameRoom.controller.safeModeCooldown && gameRoom.controller.safeModeAvailable > 0) {
+                if (hostileTarget.owner.username !== 'Invader' && (hostileTarget.getActiveBodyparts(RANGED_ATTACK) || hostileTarget.getActiveBodyparts(ATTACK) || hostileTarget.getActiveBodyparts(HEAL))) {
                     const isBoosted = _.find(hostileTarget.body, function (bodypart) {
                         return bodypart.boost !== undefined;
                     });
-                    if (isBoosted) {
+                    if (isBoosted && !gameRoom.controller.safeMode && !gameRoom.controller.safeModeCooldown && gameRoom.controller.safeModeAvailable > 0) {
                         const result = gameRoom.controller.activateSafeMode();
                         Util.InfoLog('Towers', 'ActivateSafemode', gameRoom.name + ' ' + result + ' attacked from ' + hostileTarget.owner.username);
                         Game.notify('safemode have been activated for room ' + gameRoom.name + ' activateSafeMode result ' + result + ' shard ' + Game.shard + ' attacked from ' + hostileTarget.owner.username, 0);
                     }
+                    numOfDefendersToSpawn++;
                 }
+            }
+            if (numOfDefendersToSpawn > 0) {
+                SpawnDefenders(gameRoom, numOfDefendersToSpawn);
             }
         }
 
-        function SpawnDefenders(hostileTargets) {
-            // TODO spawn defenders in room if under heavy attack
-
+        function SpawnDefenders(gameRoom, numOfDefendersToSpawn) {
+            Util.InfoLog('Towers', 'SpawnDefenders', gameRoom.name + ' numOfDefendersToSpawn ' + numOfDefendersToSpawn);
+            let spawn = gameRoom.find(FIND_MY_STRUCTURES, {
+                filter: function (spawn) {
+                    return spawn.structureType === STRUCTURE_SPAWN
+                }
+            })[0];
+            let numOfDefenderFlagsPlaced = 0;
+            for (let x = spawn.pos.x - 2; x <= spawn.pos.x + 2; x++) {
+                for (let y = spawn.pos.y - 2; y <= spawn.pos.y + 2; y++) {
+                    if ((y === spawn.pos.y + 2 || y === spawn.pos.y - 2) && (x === spawn.pos.x + 2 || x === spawn.pos.x - 2)) { // a ring of flags is created
+                        const existingDefendFlags = _.filter(gameRoom.lookForAt(LOOK_FLAGS, x, y), function (flag) {
+                            return flag.name.startsWith('defend');
+                        });
+                        if (existingDefendFlags.length > 0) {
+                            numOfDefenderFlagsPlaced = numOfDefenderFlagsPlaced + existingDefendFlags.length;
+                        } else {
+                            const nameOfFlag = 'defend_' + gameRoom.name + '_' + (numOfDefenderFlagsPlaced + 1);
+                            const result = gameRoom.createFlag(spawn.pos, nameOfFlag, COLOR_RED, COLOR_BLUE);
+                            Util.InfoLog('Towers', 'SpawnDefenders', gameRoom.name + ' placed defender flag ' + result);
+                            if (result === nameOfFlag) {
+                                numOfDefenderFlagsPlaced++;
+                            }
+                        }
+                        if (numOfDefenderFlagsPlaced >= numOfDefendersToSpawn) {
+                            return;
+                        }
+                    }
+                }
+            }
         }
 
         /**@return {boolean}*/

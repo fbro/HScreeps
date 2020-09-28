@@ -41,6 +41,7 @@ module.exports.loop = function () {
                                 delete memRoom.Built; // remove BuiltRoads - maybe some of the road have eroded away?
                                 MaxCreepsCleanup(memRoomKey, memRoom, foundCreeps);
                                 UnusedRoomsCleanup(memRoomKey, memRoom);
+                                DefendFlagsCleanup(memRoomKey);
                             }
                             if (Game.time % Util.GAME_TIME_MODULO_7 === 0) { // approx every 3 days
                                 delete Memory.Paths; // remove Paths to make room for new paths
@@ -55,7 +56,7 @@ module.exports.loop = function () {
             }
             Labs.run();
             if (Game.cpu.bucket >= 8000) {
-                //Util.Info('Main', 'Controller', 'Game.cpu.bucket ' + Game.cpu.bucket);
+                Util.Info('Main', 'Controller', 'Game.cpu.bucket ' + Game.cpu.bucket + ' generatePixel');
                 Game.cpu.generatePixel();
             }
         }
@@ -68,7 +69,11 @@ module.exports.loop = function () {
                     fontSize: 7,
                     opacity: 1
                 });
-                Game.map.visual.rect(new RoomPosition(0, 0, gameRoomKey), 50, 50, {stroke: '#00ff00', opacity: 0.1, strokeWidth: 1});
+                Game.map.visual.rect(new RoomPosition(0, 0, gameRoomKey), 50, 50, {
+                    stroke: '#00ff00',
+                    opacity: 0.1,
+                    strokeWidth: 1
+                });
                 Towers.run(gameRoom);
                 if (gameRoom.controller.level >= 7) {
                     Factories.run(gameRoom, gameRoomKey);
@@ -137,6 +142,19 @@ module.exports.loop = function () {
             }
         }
     }
+
+    function DefendFlagsCleanup(memRoomKey) {
+        const defendFlags = Game.rooms[memRoomKey].find(FIND_FLAGS, {
+            filter: function (flag) {
+                return flag.name.startsWith('defend')
+            }
+        });
+        for (const defendFlagCount in defendFlags) {
+            const defendFlag = defendFlags[defendFlagCount];
+            Util.InfoLog('Main', 'DefendFlagsCleanup', defendFlag.name);
+            defendFlag.remove();
+        }
+    }
 };
 
 // TODOs:
@@ -148,7 +166,7 @@ module.exports.loop = function () {
 
 // TODO create resource sales
 
-// TODO spawn defenders when under attack
+// TODO set flag that enables buying alot of energy to boost constructions etc.
 
 // attack NPC strongholds
 // harvest middle rooms
