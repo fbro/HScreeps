@@ -144,6 +144,9 @@ module.exports.loop = function () {
     }
 
     function DefendFlagsCleanup(memRoomKey) {
+        if(!Game.rooms[memRoomKey]){
+            return;
+        }
         const defendFlags = Game.rooms[memRoomKey].find(FIND_FLAGS, {
             filter: function (flag) {
                 return flag.name.startsWith('defend')

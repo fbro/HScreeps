@@ -54,16 +54,16 @@ console.log(Game.rooms['E28S29'].energyAvailable);
 console.log('RESOURCE_ENERGY ' + Game.getObjectById('5cf1a7158e8ea635474264ca').store.getUsedCapacity(RESOURCE_POWER));
 
 // destroy all structures
-const structures = Game.rooms['W51N59'].find(FIND_STRUCTURES);
+const structures = Game.rooms['W48N49'].find(FIND_STRUCTURES);
 for (const structureKey in structures) {
-    if(structures[structureKey].structureType === STRUCTURE_WALL){
+    /*if(structures[structureKey].structureType === STRUCTURE_WALL){*/
         structures[structureKey].destroy();
-    }
+    /*}*/
 }
 // destroy all constructions
 
 for(const roomName in Memory.MemRooms){
-    const constructions = Game.rooms[roomName].find(FIND_CONSTRUCTION_SITES);
+    const constructions = Game.rooms[/*roomName*/'W48N49'].find(FIND_CONSTRUCTION_SITES);
     for (const key in constructions) {
         console.log('removed ' + constructions[key].structureType + ' ' + constructions[key].pos);
         constructions[key].remove();

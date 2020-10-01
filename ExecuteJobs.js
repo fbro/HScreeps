@@ -1453,6 +1453,10 @@ const ExecuteJobs = {
                         return hostileCreep;
                     } else {
                         if (jobObject) {
+                            const structure = jobObject.pos.findInRange(FIND_STRUCTURES, 0)[0];
+                            if (structure) {
+                                return structure;
+                            }
                             const hostileStructure = jobObject.pos.findClosestByPath(FIND_HOSTILE_STRUCTURES);
                             if (hostileStructure) {
                                 return hostileStructure;

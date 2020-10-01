@@ -248,7 +248,7 @@ const AssignJobs = {
             let bestAvailableSpawnCounter;
             let timeToLiveMaxRoomRange;
             if (roomJob.CreepType === 'C' || roomJob.CreepType === 'R') { //  creep with CLAIM body parts
-                timeToLiveMaxRoomRange = 8; // 600 time to live / 50 max room tile
+                timeToLiveMaxRoomRange = 10; // 600 time to live / 50 max room tile
                 Util.Info('AssignJobs', 'FindBestSpawn', 'availableSpawns ' + availableSpawns + ' availableSpawnsInRoom ' + availableSpawnsInRoom + ' bestLinearDistance ' + bestLinearDistance + ' roomJob ' + roomJob + ' memRoomKey ' + memRoomKey);
             } else {
                 timeToLiveMaxRoomRange = 16; // 1500 time to live / 50 max room tile
