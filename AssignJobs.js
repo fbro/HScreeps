@@ -50,6 +50,10 @@ const AssignJobs = {
                                     return spawn && spawn.room.name === memRoomKey;
                                 });
                                 creepFound = SpawnCreep(roomJob, availableSpawnsInRoom, roomJobKey, memRoomKey);
+                                if(!creepFound){
+                                    Util.Warning('AssignJobs', 'AssignOrSpawnCreeps', 'giving up assigning jobs in ' + memRoomKey + ' because of job ' + roomJobKey);
+                                    break;
+                                }
                             }
                         }
                     }
@@ -147,6 +151,7 @@ const AssignJobs = {
 
                 return SpawningCreep(bestAvailableSpawn, spawnLargeVersion, roomJob, roomJobKey, memRoomKey);
             }
+            return true;
         }
 
         /**@return {boolean}*/
@@ -245,7 +250,7 @@ const AssignJobs = {
             let timeToLiveMaxRoomRange;
             let minEnergyCapacityNeeded = 300;
             if (roomJob.CreepType === 'C' || roomJob.CreepType === 'R') { //  creep with CLAIM body parts
-                minEnergyCapacityNeeded = 650
+                minEnergyCapacityNeeded = 650;
                 timeToLiveMaxRoomRange = 10; // 600 time to live / 50 max room tiles
                 Util.Info('AssignJobs', 'FindBestSpawn', 'availableSpawns ' + Game.spawns + ' availableSpawnsInRoom ' + availableSpawnsInRoom + ' bestLinearDistance ' + bestLinearDistance + ' roomJob ' + roomJob + ' memRoomKey ' + memRoomKey);
             } else {
@@ -255,10 +260,12 @@ const AssignJobs = {
                 const availableSpawn = Game.spawns[availableSpawnCounter];
                 if (availableSpawn.room.energyCapacityAvailable >= minEnergyCapacityNeeded) {
                     if (availableSpawnsInRoom.length > 0) { // spawn in room
-                        if (availableSpawn.id === availableSpawnsInRoom[0].id && (!availableSpawn.HasSpawned && !availableSpawn.spawning)) {
+                        if (availableSpawn.id === availableSpawnsInRoom[0].id) {
                             bestAvailableSpawn = availableSpawnsInRoom[0];
                             bestAvailableSpawnCounter = availableSpawnCounter;
-                            break;
+                            if (!availableSpawn.HasSpawned && !availableSpawn.spawning) {
+                                break;
+                            }
                         }
                     } else { // no spawn in room - look in other rooms
                         const linearDistance = Game.map.getRoomLinearDistance(availableSpawn.pos.roomName, memRoomKey);
@@ -322,9 +329,12 @@ const AssignJobs = {
                     return false;
                 }
             } else {
-                Util.Warning('AssignJobs', 'SpawnCreep', 'no valid spawn for ' + availableName + ', job ' + roomJobKey + (bestAvailableSpawn ? ' spawn ' + bestAvailableSpawn.name + ' in ' + bestAvailableSpawn.pos.roomName + ' HasSpawned ' + bestAvailableSpawn.HasSpawned + ' spawning ' + bestAvailableSpawn.spawning : ' no spawn found!'));
+                Util.Warning('AssignJobs', 'SpawnCreep', 'no valid spawn for ' + availableName + ', job ' + roomJobKey +
+                    (bestAvailableSpawn ? ' spawn ' + bestAvailableSpawn.name + ' in ' + bestAvailableSpawn.pos.roomName
+                        + (bestAvailableSpawn.HasSpawned ? ' HasSpawned ' + bestAvailableSpawn.HasSpawned : ' ')
+                        + (bestAvailableSpawn.spawning ? ' spawning ' + bestAvailableSpawn.spawning : ' ') : ' no spawn found!'));
+                return false;
             }
-
         }
 
         /**@return {array}*/
