@@ -1625,7 +1625,7 @@ const ExecuteJobs = {
                 /**@return {int}*/
                 JobStatus: function (jobObject) {
                     if (!creep.memory.HealthCheck) {
-                        if (creep.ticksToLive > 1000) {
+                        if (creep.ticksToLive > 1000 || (creep.name.startsWith('C') || creep.name.startsWith('R')) && creep.ticksToLive > 550) {
                             creep.memory.HealthCheck = true;
                         } else {
                             Util.Info('ExecuteJobs', 'JobMoveToPosition', creep.name + ' committed suicide ticksToLive ' + creep.ticksToLive);
