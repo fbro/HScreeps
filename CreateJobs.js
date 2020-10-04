@@ -37,9 +37,11 @@ const CreateJobs = {
                         jobs = CreateFlagJob(jobs, 'TrnsprtP', gameFlagKey, gameFlag, 'T');
                     } else if (secColor === COLOR_CYAN) { // flag that observers create and put on deposits and deletes again when deadline is reached
                         jobs = CreateFlagJob(jobs, 'HrvstDpst', gameFlagKey, gameFlag, 'D');
-                    } else if (secColor === COLOR_GREEN) { // harvester, transporter and builder move to pos
-                        jobs = CreateFlagJob(jobs, 'HarvestPos', gameFlagKey, gameFlag, 'H');
+                    } else if (secColor === COLOR_BROWN) { // transporter move to pos
                         jobs = CreateFlagJob(jobs, 'TransPos', gameFlagKey, gameFlag, 'T');
+                    } else if (secColor === COLOR_BLUE) { // harvester move to pos
+                        jobs = CreateFlagJob(jobs, 'HarvestPos', gameFlagKey, gameFlag, 'H');
+                    } else if (secColor === COLOR_GREEN) { // builder move to pos
                         jobs = CreateFlagJob(jobs, 'BuildPos', gameFlagKey, gameFlag, 'B');
                     } else {
                         notFound = true;

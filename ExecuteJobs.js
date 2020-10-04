@@ -310,9 +310,9 @@ const ExecuteJobs = {
         /**@return {number}*/
         function TryPickupDropOrTombstone(creepMemory, gameCreep, result) {
             const drop = gameCreep.pos.findInRange(FIND_DROPPED_RESOURCES, 1)[0];
-            if (drop && (!gameCreep.name.startsWith('D') || drop.resourceType === RESOURCE_SILICON || drop.resourceType === RESOURCE_BIOMASS || drop.resourceType === RESOURCE_METAL || drop.resourceType === RESOURCE_MIST)) {
+            if (drop && (!gameCreep.name.startsWith('H') && !gameCreep.name.startsWith('D') || drop.resourceType === RESOURCE_SILICON || drop.resourceType === RESOURCE_BIOMASS || drop.resourceType === RESOURCE_METAL || drop.resourceType === RESOURCE_MIST)) {
                 result = gameCreep.pickup(drop); // it may do that 'double' but it really does not matter
-                //Util.Info('ExecuteJobs', 'ExecuteRoomJobs', creep.name + ' picked up adjacent resource (' + drop.pos.x + ',' + drop.pos.y + ',' + drop.pos.roomName + ',' + drop.amount + ',' + drop.resourceType + ')');
+                //Util.Info('ExecuteJobs', 'ExecuteRoomJobs', gameCreep.name + ' picked up adjacent resource (' + drop.pos.x + ',' + drop.pos.y + ',' + drop.pos.roomName + ',' + drop.amount + ',' + drop.resourceType + ')');
             } else {
                 const tombstone = gameCreep.pos.findInRange(FIND_TOMBSTONES, 1, {
                     filter: (t) => {
@@ -513,7 +513,6 @@ const ExecuteJobs = {
                                 result = creep.transfer(fetchObject, RESOURCE_ENERGY);
                             }
                         }
-
                         if (result !== OK) {
                             fetchObject = Game.getObjectById(creep.memory.ClosestFreeStoreId);
                             if (fetchObject) {
@@ -521,12 +520,10 @@ const ExecuteJobs = {
 
                             }
                         }
-
                         if (result === OK) {
                             creep.memory.FetchObjectId = undefined;
                             return SHOULD_ACT;
                         }
-
                     }
                     return this.JobStatus(jobObject);
                 },
@@ -540,7 +537,7 @@ const ExecuteJobs = {
                     } else {
                         fetchObject = FindClosestFreeStore(creep, 2);
                     }
-                    if (jobObject.room.controller.level < 3) {
+                    if (jobObject.room.controller.level <= 3) {
                         const spawnConstruction = jobObject.room.find(FIND_MY_CONSTRUCTION_SITES, { // if there is a spawn that should be built - then built it
                             filter: function (c) {
                                 return c.structureType === STRUCTURE_SPAWN;
@@ -571,39 +568,19 @@ const ExecuteJobs = {
                 /**@return {int}*/
                 Fetch: function (fetchObject, jobObject) {
                     let result = ERR_NO_RESULT_FOUND;
-                    if (fetchObject.progressTotal) {
-                        result = creep.build(fetchObject);
-                        if (result === OK) {
-                            result = ERR_BUSY;
-                        } else if (result !== ERR_NOT_IN_RANGE) {
-                            result = OK;
+                    if (creep.store.getUsedCapacity(RESOURCE_ENERGY) > 0) {
+                        if (fetchObject.progressTotal) {
+                            result = creep.build(fetchObject);
                         }
-                    } else if (fetchObject !== 'DROP') {
-                        const toRepair = creep.pos.findInRange(FIND_STRUCTURES, 2, {
-                            filter: (structure) => {
-                                return (structure.structureType !== STRUCTURE_WALL
-                                    && structure.structureType !== STRUCTURE_RAMPART) && structure.hits < structure.hitsMax;
+                        if (fetchObject === 'DROP') {
+                            for (const resourceType in creep.store) {
+                                if (creep.store.getUsedCapacity(resourceType) > 0) {
+                                    result = creep.drop(resourceType);
+                                    break;
+                                }
                             }
-                        })[0];
-                        if (toRepair) { // repair on the road
-                            result = creep.repair(toRepair);
-                            let amountToTransfer = creep.store.getUsedCapacity(RESOURCE_ENERGY) - creep.getActiveBodyparts(WORK);
-                            if (result !== OK || amountToTransfer <= 0) {
-                                amountToTransfer = undefined;
-                            }
-                            result = creep.transfer(fetchObject, RESOURCE_ENERGY, amountToTransfer);
-                        } else if (creep.store.getUsedCapacity() === 0) {
-                            Util.InfoLog('ExecuteJobs', 'JobSource', creep.name + ' nothing to store! ' + creep.store.getUsedCapacity());
-                            result = OK;
-                        } else {
+                        } else if (result === ERR_NO_RESULT_FOUND) {
                             result = DepositCreepStore(creep, fetchObject);
-                        }
-                    } else {
-                        for (const resourceType in creep.store) {
-                            if (creep.store.getUsedCapacity(resourceType) > 0) {
-                                result = creep.drop(resourceType);
-                                break;
-                            }
                         }
                     }
                     return result;
@@ -1468,8 +1445,12 @@ const ExecuteJobs = {
                 /**@return {int}*/
                 Fetch: function (fetchObject, jobObject) {
                     if (jobObject !== fetchObject) { // hostileCreep or hostileStructure
+                        if (fetchObject.structureType === STRUCTURE_PORTAL) {
+                            Util.InfoLog('ExecuteJobs', 'JobGuardPosition', 'entering portal! ' + fetchObject.pos.roomName);
+                            return ERR_NOT_IN_RANGE;
+                        }
                         return creep.attack(fetchObject);
-                    } else if (creep.pos.isEqualTo(jobObject)) {
+                    } else if (creep.pos.x === jobObject.pos.x && creep.pos.y === jobObject.pos.y && creep.pos.roomName === jobObject.pos.roomName) {
                         return OK; // when OK is returned FindFetchObject is checking each tick for new hostileCreeps
                     } else if (jobObject === fetchObject) { // move to flag
                         return ERR_NOT_IN_RANGE;
@@ -2518,11 +2499,19 @@ const ExecuteJobs = {
                         }
                     });
                     closestFreeStore = closestFreeStores[0];
-                    if (resourceTypeToStore === RESOURCE_ENERGY) { // if the type to store is energy then try and prioritize links
+                    if(closestFreeStore){
+                        let bestRange = closestFreeStore.pos.getRangeTo(creep.pos);
                         for (const closestFreeStoreKey in closestFreeStores) {
-                            if (closestFreeStores[closestFreeStoreKey].structureType === STRUCTURE_LINK) {
-                                closestFreeStore = closestFreeStores[closestFreeStoreKey];
-                                break;
+                            if (closestFreeStores[closestFreeStoreKey].id !== closestFreeStore.id) {
+                                if(resourceTypeToStore === RESOURCE_ENERGY && closestFreeStores[closestFreeStoreKey].structureType === STRUCTURE_LINK){ // if the type to store is energy then try and prioritize links
+                                    closestFreeStore = closestFreeStores[closestFreeStoreKey];
+                                    break;
+                                }
+                                const range = closestFreeStores[closestFreeStoreKey].pos.getRangeTo(creep.pos);
+                                if(range < bestRange){
+                                    closestFreeStore = closestFreeStores[closestFreeStoreKey];
+                                    bestRange = range;
+                                }
                             }
                         }
                     }
