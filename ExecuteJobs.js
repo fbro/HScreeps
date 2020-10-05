@@ -115,6 +115,7 @@ const ExecuteJobs = {
                 const removedMaxCreepsInRoom = FindAndRemoveMaxCreeps(jobRoomName, creepName);
                 delete Memory.creeps[creepName];
             } else { // idle creep is alive
+                // TODO if creep can repair or build - do that before depositing
                 // if idle creep is carrying something - move it to storage
                 if (gameCreep.room.storage && gameCreep.room.storage.store.getUsedCapacity() < gameCreep.room.storage.store.getCapacity() && gameCreep.store.getUsedCapacity() > 0) {
                     result = DepositCreepStore(gameCreep, gameCreep.room.storage);

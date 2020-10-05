@@ -331,8 +331,8 @@ const AssignJobs = {
             } else {
                 Util.Warning('AssignJobs', 'SpawnCreep', 'no valid spawn for ' + availableName + ', job ' + roomJobKey +
                     (bestAvailableSpawn ? ' spawn ' + bestAvailableSpawn.name + ' in ' + bestAvailableSpawn.pos.roomName
-                        + (bestAvailableSpawn.HasSpawned ? ' HasSpawned ' + bestAvailableSpawn.HasSpawned : ' ')
-                        + (bestAvailableSpawn.spawning ? ' spawning ' + bestAvailableSpawn.spawning : ' ') : ' no spawn found!'));
+                        + (bestAvailableSpawn.HasSpawned ? ' has just begun spawning a new creep': '')
+                        + (bestAvailableSpawn.spawning ? ' is in the process of spawning ' + bestAvailableSpawn.spawning.name : '') : ' no spawn found!'));
                 return false;
             }
         }

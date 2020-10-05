@@ -56,7 +56,7 @@ module.exports.loop = function () {
             }
             Labs.run();
             if (Game.cpu.bucket >= 8000) {
-                Util.Info('Main', 'Controller', 'Game.cpu.bucket ' + Game.cpu.bucket + ' generatePixel');
+                //Util.Info('Main', 'Controller', 'Game.cpu.bucket ' + Game.cpu.bucket + ' generatePixel');
                 Game.cpu.generatePixel();
             }
         }

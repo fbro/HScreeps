@@ -104,3 +104,6 @@ for(const roomName in Memory.MemRooms){
     delete memRoom.Built;
 }
 delete Memory.MemRooms['W17N49'].Built;
+
+// move a creep
+Game.creeps['H1'].move(LEFT);
