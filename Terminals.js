@@ -97,7 +97,7 @@ const Terminals = {
         }
 
         function GetEnergy(toTerminal, terminals) {
-            if (toTerminal.store.getUsedCapacity(RESOURCE_ENERGY) === 0 && toTerminal.room.storage.store.getUsedCapacity(RESOURCE_ENERGY) === 0) {
+            if (!toTerminal.store.getUsedCapacity(RESOURCE_ENERGY) && !toTerminal.room.storage.store.getUsedCapacity(RESOURCE_ENERGY)) {
                 let didSend = false;
                 const memRoom = Memory.MemRooms[toTerminal.pos.roomName];
                 if (toTerminal.room.controller.level === 8 || memRoom.FctrId && memRoom.FctrId !== '-') {
@@ -114,7 +114,7 @@ const Terminals = {
             if (marketDealCount >= 10 || toTerminal.cooldown || toTerminal.used) {
                 return marketDealCount;
             }
-            if (toTerminal.store.getUsedCapacity(RESOURCE_POWER) === 0 && toTerminal.room.storage && toTerminal.room.storage.store.getUsedCapacity(RESOURCE_POWER) === 0 && toTerminal.room.storage.store.getUsedCapacity(RESOURCE_ENERGY) >= Util.STORAGE_ENERGY_HIGH) {
+            if (!toTerminal.store.getUsedCapacity(RESOURCE_POWER) && toTerminal.room.storage && !toTerminal.room.storage.store.getUsedCapacity(RESOURCE_POWER) && toTerminal.room.storage.store.getUsedCapacity(RESOURCE_ENERGY) >= Util.STORAGE_ENERGY_HIGH) {
                 const didBuy = TryBuyResource(toTerminal, RESOURCE_POWER, Util.TERMINAL_TARGET_RESOURCE, 5);
                 if (didBuy) {
                     marketDealCount++;

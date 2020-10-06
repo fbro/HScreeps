@@ -598,7 +598,7 @@ const ExecuteJobs = {
             const result = GenericJobAction(creep, roomJob, {
                 /**@return {int}*/
                 JobStatus: function (jobObject) {
-                    if (creep.store.getUsedCapacity(RESOURCE_ENERGY) === 0 || creep.memory.FetchObjectId) { // fetch
+                    if (!creep.store.getUsedCapacity(RESOURCE_ENERGY) || creep.memory.FetchObjectId) { // fetch
                         return SHOULD_FETCH;
                     } else { // action not done yet
                         return SHOULD_ACT;
@@ -663,7 +663,7 @@ const ExecuteJobs = {
                 JobStatus: function (jobObject) {
                     if (jobObject.store.getFreeCapacity() === 0) {
                         return JOB_IS_DONE;
-                    } else if (creep.store.getUsedCapacity(RESOURCE_ENERGY) === 0) { // fetch
+                    } else if (!creep.store.getUsedCapacity(RESOURCE_ENERGY)) { // fetch
                         return SHOULD_FETCH;
                     } else { // action not done yet
                         return SHOULD_ACT;
@@ -701,7 +701,7 @@ const ExecuteJobs = {
                 JobStatus: function (jobObject) {
                     if (jobObject.hits === jobObject.hitsMax) {
                         return JOB_IS_DONE;
-                    } else if (creep.store.getUsedCapacity(RESOURCE_ENERGY) === 0) { // fetch
+                    } else if (!creep.store.getUsedCapacity(RESOURCE_ENERGY)) { // fetch
                         return SHOULD_FETCH;
                     } else { // action not done yet
                         return SHOULD_ACT;
@@ -743,7 +743,7 @@ const ExecuteJobs = {
             const result = GenericJobAction(creep, roomJob, {
                 /**@return {int}*/
                 JobStatus: function (jobObject) {
-                    if (creep.store.getUsedCapacity(RESOURCE_ENERGY) === 0 || creep.memory.FetchObjectId) { // fetch
+                    if (!creep.store.getUsedCapacity(RESOURCE_ENERGY) || creep.memory.FetchObjectId) { // fetch
                         return SHOULD_FETCH;
                     } else { // action not done yet
                         return SHOULD_ACT;
@@ -751,7 +751,12 @@ const ExecuteJobs = {
                 },
                 /**@return {int}*/
                 Act: function (jobObject) {
-                    return creep.build(jobObject);
+                    // TODO error when trying to build but has no energy !!ERROR!! ExecuteJobs JobAction | error invalid Constr-extension(31,26)W59N51 -7 B2
+                    const result = creep.build(jobObject);
+                    if(result === ERR_INVALID_TARGET){
+                        Util.ErrorLog('ExecuteJobs', 'JobConstruction', creep.name + ' ERR_INVALID_TARGET when building in ' + creep.pos.roomName);
+                    }
+                    return result;
                 },
                 /**@return {int}*/
                 IsJobDone: function (jobObject) {
@@ -794,7 +799,7 @@ const ExecuteJobs = {
                 JobStatus: function (jobObject) {
                     if (jobObject.store.getUsedCapacity(RESOURCE_ENERGY) === jobObject.store.getCapacity(RESOURCE_ENERGY)) { // is job done?
                         return JOB_IS_DONE;
-                    } else if (creep.store.getUsedCapacity(RESOURCE_ENERGY) === 0) { // fetch
+                    } else if (!creep.store.getUsedCapacity(RESOURCE_ENERGY)) { // fetch
                         return SHOULD_FETCH;
                     } else { // action not done yet
                         return SHOULD_ACT;
@@ -833,7 +838,7 @@ const ExecuteJobs = {
                 JobStatus: function (jobObject) {
                     if (jobObject.store.getUsedCapacity(RESOURCE_ENERGY) === jobObject.store.getCapacity(RESOURCE_ENERGY)) {
                         return JOB_IS_DONE;
-                    } else if (creep.store.getUsedCapacity(RESOURCE_ENERGY) === 0) { // fetch
+                    } else if (!creep.store.getUsedCapacity(RESOURCE_ENERGY)) { // fetch
                         return SHOULD_FETCH;
                     } else { // action not done yet
                         return SHOULD_ACT;
@@ -877,7 +882,7 @@ const ExecuteJobs = {
             const result = GenericJobAction(creep, roomJob, {
                 /**@return {int}*/
                 JobStatus: function (jobObject) {
-                    if (creep.store.getUsedCapacity() === 0) { // if creep is not carrying anything
+                    if (!creep.store.getUsedCapacity()) { // if creep is not carrying anything
                         // if the target is a dropped resource it may just disappear because it was picked up
                         if (!jobObject ||
                             !jobObject.resourceType/*drop*/ && jobObject.store.getUsedCapacity(resourceType) <= GetDesiredLeftoverResource(jobObject.structureType, resourceType, jobObject.room.storage) // check if target is "empty"
@@ -1012,7 +1017,7 @@ const ExecuteJobs = {
                 JobStatus: function (terminal) {
                     const storage = terminal.room.storage;
                     storageResourceAmount = storage.store.getUsedCapacity(resourceType);
-                    if (creep.store.getUsedCapacity(resourceType) === 0) {
+                    if (!creep.store.getUsedCapacity(resourceType)) {
                         if (storageResourceAmount <= Low && resourceType === RESOURCE_ENERGY // low resource in storage abort only if energy
 
                             || storageResourceAmount === 0
@@ -1027,7 +1032,7 @@ const ExecuteJobs = {
                             && terminal.store.getUsedCapacity(resourceType) >= HighTransfer
                         ) {
                             return JOB_IS_DONE;
-                        } else if (creep.store.getUsedCapacity(resourceType) === 0) { // fetch
+                        } else if (!creep.store.getUsedCapacity(resourceType)) { // fetch
                             return SHOULD_FETCH;
                         }
                     } else { // action not done yet
@@ -1092,10 +1097,10 @@ const ExecuteJobs = {
                     const usedCapacity = jobObject.store.getUsedCapacity(resourceType);
                     if (resourceType === RESOURCE_ENERGY && usedCapacity >= Util.FACTORY_TARGET_ENERGY
                         || resourceType !== RESOURCE_ENERGY && usedCapacity >= Util.FACTORY_TARGET_RESOURCE
-                        || creep.store.getUsedCapacity(resourceType) === 0 && creep.room.storage.store.getUsedCapacity(resourceType) === 0 && creep.room.terminal.store.getUsedCapacity(resourceType) === 0
+                        || creep.store.getUsedCapacity(resourceType) === 0 && !creep.room.storage.store.getUsedCapacity(resourceType) && !creep.room.terminal.store.getUsedCapacity(resourceType)
                     ) {
                         return JOB_IS_DONE;
-                    } else if (creep.store.getUsedCapacity(resourceType) === 0) { // fetch
+                    } else if (!creep.store.getUsedCapacity(resourceType)) { // fetch
                         return SHOULD_FETCH;
                     } else { // action not done yet
                         return SHOULD_ACT;
@@ -1148,7 +1153,7 @@ const ExecuteJobs = {
                 JobStatus: function (jobObject) {
                     if (jobObject.store.getUsedCapacity(RESOURCE_ENERGY) === jobObject.store.getCapacity(RESOURCE_ENERGY)) {
                         return JOB_IS_DONE;
-                    } else if (creep.store.getUsedCapacity(RESOURCE_ENERGY) === 0) { // fetch
+                    } else if (!creep.store.getUsedCapacity(RESOURCE_ENERGY)) { // fetch
                         return SHOULD_FETCH;
                     } else { // action not done yet
                         return SHOULD_ACT;
@@ -1186,7 +1191,7 @@ const ExecuteJobs = {
                 JobStatus: function (jobObject) {
                     if (jobObject.store.getUsedCapacity(RESOURCE_ENERGY) === jobObject.store.getCapacity(RESOURCE_ENERGY)) {
                         return JOB_IS_DONE;
-                    } else if (creep.store.getUsedCapacity(RESOURCE_ENERGY) === 0) { // fetch
+                    } else if (!creep.store.getUsedCapacity(RESOURCE_ENERGY)) { // fetch
                         return SHOULD_FETCH;
                     } else { // action not done yet
                         return SHOULD_ACT;
@@ -1228,7 +1233,7 @@ const ExecuteJobs = {
                 JobStatus: function (jobObject) {
                     if (jobObject.store.getFreeCapacity(RESOURCE_POWER) === 0) {
                         return JOB_IS_DONE;
-                    } else if (creep.store.getUsedCapacity(RESOURCE_POWER) === 0) { // fetch
+                    } else if (!creep.store.getUsedCapacity(RESOURCE_POWER)) { // fetch
                         return SHOULD_FETCH;
                     } else { // action not done yet
                         return SHOULD_ACT;
@@ -2045,7 +2050,7 @@ const ExecuteJobs = {
             const result = GenericFlagAction(creep, roomJob, {
                 /**@return {int}*/
                 JobStatus: function (jobObject) {
-                    if (creep.store.getUsedCapacity() === 0 && creep.ticksToLive < 400) {
+                    if (!creep.store.getUsedCapacity() && creep.ticksToLive < 400) {
                         //Util.Info('ExecuteJobs', 'JobHarvestDeposit', creep.name + ' committed suicide creep.ticksToLive ' + creep.ticksToLive + ' JOB_IS_DONE');
                         creep.suicide();
                         return JOB_IS_DONE;
@@ -2224,7 +2229,7 @@ const ExecuteJobs = {
             if (creep.memory.ResourceSupply) {
                 resourceSupply = Game.getObjectById(creep.memory.ResourceSupply);// closest link then container then droppedRes then storage
                 // if the saved resourceSupply does not have any energy then remove it to make way for a new search
-                if (!resourceSupply || !resourceSupply.store || resourceSupply.store.getUsedCapacity(resourceToFetch) === 0) {
+                if (!resourceSupply || !resourceSupply.store || !resourceSupply.store.getUsedCapacity(resourceToFetch)) {
                     resourceSupply = undefined;
                     creep.memory.ResourceSupply = undefined;
                 } else if (resourceSupply && resourceSupply.structureType === STRUCTURE_STORAGE && creep.pos.roomName === jobObject.pos.roomName && creep.pos.getRangeTo(jobObject.pos) > 2) { // creep should have a chance at finding stores that are closer
@@ -2958,6 +2963,9 @@ const ExecuteJobs = {
                         if (result === ERR_NO_BODYPART) { // no MOVE bodypart
                             Util.InfoLog('ExecuteJobs', 'Move', creep.name + ' ERR_NO_BODYPART ' + creep.pos.roomName + ' committing suicide');
                             creep.suicide();
+                        }
+                        if(result === ERR_INVALID_TARGET){
+                            Util.ErrorLog('ExecuteJobs', 'Move', creep.name + ' ERR_INVALID_TARGET when moving ' + creep.pos.roomName);
                         }
                         creep.memory.MoveErrWait = undefined;
                         result = JOB_IS_DONE;
