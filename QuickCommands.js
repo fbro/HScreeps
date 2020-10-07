@@ -54,11 +54,9 @@ console.log(Game.rooms['E28S29'].energyAvailable);
 console.log('RESOURCE_ENERGY ' + Game.getObjectById('5cf1a7158e8ea635474264ca').store.getUsedCapacity(RESOURCE_POWER));
 
 // destroy all structures
-const structures = Game.rooms['W49N48'].find(FIND_STRUCTURES);
+const structures = Game.rooms['W51N41'].find(FIND_STRUCTURES);
 for (const structureKey in structures) {
-    if(structures[structureKey].structureType !== STRUCTURE_WALL && structures[structureKey].structureType !== STRUCTURE_RAMPART){
         structures[structureKey].destroy();
-    }
 }
 // destroy all constructions
 

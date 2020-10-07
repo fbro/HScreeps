@@ -18,17 +18,17 @@ const Constructions = {
             if (level >= 1) {
                 ConstructContainerAt(gameRoom, roomTerrain, undefined/*source*/);
                 if (level >= 2) {
-                    ConstructCoreBuilding(gameRoom, roomTerrain, STRUCTURE_EXTENSION);
+                    ConstructCoreBuilding(gameRoom, roomTerrain, STRUCTURE_EXTENSION, 5);
                     if (Memory.MemRooms[gameRoom.name] && !Memory.MemRooms[gameRoom.name].CtrlConId) {
                         ConstructContainerAt(gameRoom, roomTerrain, STRUCTURE_CONTROLLER);
                     }
                     if (level >= 3) {
                         if (Memory.MemRooms[gameRoom.name] && Util.FindNumberOfBuildableStructures(gameRoom, STRUCTURE_TOWER) > Memory.MemRooms[gameRoom.name].TowerIds.length) {
-                            ConstructCoreBuilding(gameRoom, roomTerrain, STRUCTURE_TOWER);
+                            ConstructCoreBuilding(gameRoom, roomTerrain, STRUCTURE_TOWER, 4);
                         }
                         if (level >= 4) {
                             if (!gameRoom.storage) {
-                                ConstructCoreBuilding(gameRoom, roomTerrain, STRUCTURE_STORAGE);
+                                ConstructCoreBuilding(gameRoom, roomTerrain, STRUCTURE_STORAGE, 0);
                             }
                             ConstructRampartsOn(gameRoom, roomTerrain, STRUCTURE_SPAWN);
                             if (level >= 5) {
@@ -36,7 +36,7 @@ const Constructions = {
                                 ConstructRampartsOn(gameRoom, roomTerrain, STRUCTURE_STORAGE);
                                 ConstructRampartsOn(gameRoom, roomTerrain, STRUCTURE_TOWER);
                                 if (level >= 6) {
-                                    ConstructCoreBuilding(gameRoom, roomTerrain, STRUCTURE_SPAWN);
+                                    ConstructCoreBuilding(gameRoom, roomTerrain, STRUCTURE_SPAWN, 0);
                                     ConstructExtractor(gameRoom);
                                     ConstructContainerAt(gameRoom, roomTerrain, STRUCTURE_EXTRACTOR);
                                     if (!gameRoom.terminal) {
@@ -50,7 +50,7 @@ const Constructions = {
                                         ConstructRampartsOn(gameRoom, roomTerrain, STRUCTURE_CONTAINER);
                                         if (level === 8) {
                                             ConstructAtStorage(gameRoom, roomTerrain, STRUCTURE_POWER_SPAWN);
-                                            ConstructCoreBuilding(gameRoom, roomTerrain, STRUCTURE_OBSERVER);
+                                            ConstructCoreBuilding(gameRoom, roomTerrain, STRUCTURE_OBSERVER, 8);
                                             ConstructRampartsOn(gameRoom, roomTerrain, STRUCTURE_FACTORY);
                                             ConstructRampartsOn(gameRoom, roomTerrain, STRUCTURE_POWER_SPAWN);
                                         }
@@ -95,7 +95,7 @@ const Constructions = {
             Util.Info('Constructions', 'ConstructContainerAt', gameRoom.name + ' ' + (structureType ? structureType : 'sources'));
         }
 
-        function ConstructCoreBuilding(gameRoom, roomTerrain, structureType) {
+        function ConstructCoreBuilding(gameRoom, roomTerrain, structureType, acceptedNumOfNearbyWalls) {
             let numberOfPossibleConstructions = GetNumberOfPossibleConstructions(gameRoom, structureType);
             if (!numberOfPossibleConstructions) {
                 return;
@@ -106,7 +106,7 @@ const Constructions = {
                 }
             })[0];
             if (spawn) {
-                BuildCheckeredPattern(gameRoom, structureType, roomTerrain, numberOfPossibleConstructions, spawn.pos);
+                BuildCheckeredPattern(gameRoom, structureType, roomTerrain, numberOfPossibleConstructions, spawn.pos, acceptedNumOfNearbyWalls);
             }
             Util.Info('Constructions', 'ConstructCoreBuilding', gameRoom.name + ' ' + structureType);
         }
@@ -417,7 +417,7 @@ const Constructions = {
             }
         }
 
-        function BuildCheckeredPattern(gameRoom, structureType, roomTerrain, numberOfPossibleConstructions, buildPosition) {
+        function BuildCheckeredPattern(gameRoom, structureType, roomTerrain, numberOfPossibleConstructions, buildPosition, acceptedNumOfNearbyWalls) {
             let shiftPointer = -1;
             let scanWidth = 3;
             while (numberOfPossibleConstructions) { // try adding constructionSites in a larger pattern
@@ -435,7 +435,7 @@ const Constructions = {
                                 });
                                 if (!hasStructure) {
                                     let numOfNearbyWalls = NumOfNearbyWalls(roomTerrain, newBuildPos);
-                                    if (numOfNearbyWalls <= 5) {
+                                    if (numOfNearbyWalls <= acceptedNumOfNearbyWalls) {
                                         const unwantedNearbyStructures = newBuildPos.findInRange(FIND_STRUCTURES, 1, {
                                             filter: function (structure) {
                                                 return structure.structureType !== STRUCTURE_SPAWN
