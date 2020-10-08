@@ -171,6 +171,8 @@ module.exports.loop = function () {
 
 // TODO set flag that enables buying alot of energy to boost constructions etc.
 
+// TODO spawn agile creeps that do not rely on roads
+
 // attack NPC strongholds
 // harvest middle rooms
 // harvest neutral rooms

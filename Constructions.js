@@ -16,6 +16,14 @@ const Constructions = {
         function build(gameRoom, roomTerrain) {
             const level = gameRoom.controller.level;
             if (level >= 1) {
+                const flags = gameRoom.find(FIND_FLAGS, {
+                    filter: function (flag) { // construction flags
+                        return flag.color === COLOR_GREEN && flag.secondaryColor === COLOR_GREY;
+                    }
+                });
+                if (flags.length > 0) {
+                    ConstructFirstSpawnAtFlag(gameRoom, flags);
+                }
                 ConstructContainerAt(gameRoom, roomTerrain, undefined/*source*/);
                 if (level >= 2) {
                     ConstructCoreBuilding(gameRoom, roomTerrain, STRUCTURE_EXTENSION, 5);
@@ -66,6 +74,17 @@ const Constructions = {
         }
 
         //region construct functions
+
+        function ConstructFirstSpawnAtFlag(gameRoom, flags) {
+            const spawnFlag = _.filter(flags, function (flag) {
+                return flag.color === COLOR_GREEN && flag.secondaryColor === COLOR_GREY;
+            })[0];
+            if (spawnFlag) {
+                const result = gameRoom.createConstructionSite(spawnFlag.pos.x, spawnFlag.pos.y, STRUCTURE_SPAWN);
+                Util.InfoLog('Constructions', 'ConstructFirstSpawnAtFlag', spawnFlag.pos + ' result ' + result);
+                spawnFlag.remove();
+            }
+        }
 
         function ConstructContainerAt(gameRoom, terrain, structureType = undefined) {
             if (Memory.MemRooms[gameRoom.name].Built && Memory.MemRooms[gameRoom.name].Built === gameRoom.controller.level) {

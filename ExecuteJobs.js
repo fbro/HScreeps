@@ -559,7 +559,7 @@ const ExecuteJobs = {
                         creep.memory.LinkId = fetchObject.id
                     } else if (creep.memory.LinkId && fetchObject.structureType !== STRUCTURE_LINK) { // if fetchObject is not link and a link is saved in memory then take that instead
                         const link = Game.getObjectById(creep.memory.LinkId);
-                        if (link && link.store.getFreeCapacity() > 200 && isOnlyEnergy) {
+                        if (link && link.store.getFreeCapacity(RESOURCE_ENERGY) > 200 && isOnlyEnergy) {
                             fetchObject = link;
                             creep.memory.ClosestFreeStoreId = fetchObject;
                         }
@@ -751,12 +751,7 @@ const ExecuteJobs = {
                 },
                 /**@return {int}*/
                 Act: function (jobObject) {
-                    // TODO error when trying to build but has no energy !!ERROR!! ExecuteJobs JobAction | error invalid Constr-extension(31,26)W59N51 -7 B2
-                    const result = creep.build(jobObject);
-                    if(result === ERR_INVALID_TARGET){
-                        Util.ErrorLog('ExecuteJobs', 'JobConstruction', creep.name + ' ERR_INVALID_TARGET when building in ' + creep.pos.roomName);
-                    }
-                    return result;
+                    return creep.build(jobObject);
                 },
                 /**@return {int}*/
                 IsJobDone: function (jobObject) {
@@ -776,7 +771,7 @@ const ExecuteJobs = {
                 },
                 /**@return {int}*/
                 Fetch: function (fetchObject, jobObject) {
-                    if (fetchObject.energyCapacity) { // this is a source - harvest it
+                    if (fetchObject.energyCapacity && !fetchObject.structureType) { // this is a source - harvest it
                         let result = creep.harvest(fetchObject);
                         if (result === ERR_NOT_IN_RANGE) {
                             result = Move(creep, fetchObject);
@@ -2262,6 +2257,7 @@ const ExecuteJobs = {
                         return r.store.getUsedCapacity(resourceToFetch) >= 30;
                     }
                 }));
+                //const closestSupply = jobObject.pos.findClosestByPath()
                 let bestDistance = Number.MAX_SAFE_INTEGER;
                 for (let i = 0; i < resourceSupplies.length; i++) {
                     let distance = Math.sqrt(Math.pow(resourceSupplies[i].pos.x - jobObject.pos.x, 2) + Math.pow(resourceSupplies[i].pos.y - jobObject.pos.y, 2));
@@ -2377,9 +2373,9 @@ const ExecuteJobs = {
         }
 
         /**@return {int}*/
-        function FetchResource(creep, fetchObject, resourceToFetch, max = -1) {
+        function FetchResource(creep, fetchObject, resourceToFetch, max = -1/*withdraw to max carry capacity when -1 else withdraw until 'max' capacity is reached*/) {
             let result;
-            if (fetchObject.amount > 0) { // pickup
+            if (fetchObject.amount) { // identified as dropped resource - pickup
                 if (max === -1) {
                     result = creep.pickup(fetchObject);
                 } else {
@@ -2390,8 +2386,9 @@ const ExecuteJobs = {
                     }
                 }
             } else { // store withdraw
+                // first try and see if it needs to get rid of unwanted resources
                 if (creep.store.getUsedCapacity(resourceToFetch) !== creep.store.getUsedCapacity()) {
-                    if (creep.pos.isNearTo(fetchObject)) {
+                    if (creep.pos.isNearTo(fetchObject.pos)) {
                         result = ERR_FULL; // throw this error to force the creep to transfer unwanted resource that it is carrying
                     } else {
                         result = ERR_NOT_IN_RANGE;
@@ -2420,16 +2417,16 @@ const ExecuteJobs = {
                 }
             }
             if (result === ERR_FULL) { // creep store is full with anything other than resourceToFetch - get rid of it asap
-                if (fetchObject.store && fetchObject.store.getFreeCapacity() > 0) {
+                if (fetchObject.store && fetchObject.store.getFreeCapacity(resourceToFetch) && fetchObject.structureType !== STRUCTURE_LINK) {
                     for (const resourceType in creep.store) {
-                        if (creep.store.getUsedCapacity(resourceType) > 0 && resourceType !== resourceToFetch) {
+                        if (creep.store.getUsedCapacity(resourceType) && resourceType !== resourceToFetch) {
                             result = creep.transfer(fetchObject, resourceType);
                             break;
                         }
                     }
                 } else { // DROP, TOMBSTONE or RUIN
                     for (const resourceType in creep.store) {
-                        if (creep.store.getUsedCapacity(resourceType) > 0 && resourceType !== resourceToFetch) {
+                        if (creep.store.getUsedCapacity(resourceType) && resourceType !== resourceToFetch) {
                             result = creep.drop(resourceType);
                             break;
                         }
@@ -2565,7 +2562,7 @@ const ExecuteJobs = {
             // when any nearby hostiles in the room have been seen
             // decides if the battle is winnable - CREEP_IGNORED_HOSTILE, CREEP_ATTACKED_HOSTILE or CREEP_FLED_HOSTILE
             const hostileCreepsWithAttack = _.filter(hostileCreeps, function (hostileCreep) {
-                return hostileCreep.getActiveBodyparts(ATTACK) || hostileCreep.getActiveBodyparts(RANGED_ATTACK)
+                return hostileCreep.getActiveBodyparts(ATTACK) || hostileCreep.getActiveBodyparts(RANGED_ATTACK);
             });
             if (hostileCreepsWithAttack.length === 0 && (creep.getActiveBodyparts(ATTACK) || creep.getActiveBodyparts(RANGED_ATTACK))) {
                 if (creep.room.controller && creep.room.controller.my) {

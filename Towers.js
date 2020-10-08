@@ -120,31 +120,33 @@ const Towers = {
         }
 
         function SpawnDefenders(gameRoom, numOfDefendersToSpawn) {
-            Util.InfoLog('Towers', 'SpawnDefenders', gameRoom.name + ' numOfDefendersToSpawn ' + numOfDefendersToSpawn);
             let spawn = gameRoom.find(FIND_MY_STRUCTURES, {
                 filter: function (spawn) {
                     return spawn.structureType === STRUCTURE_SPAWN
                 }
             })[0];
             let numOfDefenderFlagsPlaced = 0;
-            for (let x = spawn.pos.x - 2; x <= spawn.pos.x + 2; x++) {
-                for (let y = spawn.pos.y - 2; y <= spawn.pos.y + 2; y++) {
-                    if ((y === spawn.pos.y + 2 || y === spawn.pos.y - 2) && (x === spawn.pos.x + 2 || x === spawn.pos.x - 2)) { // a ring of flags is created
-                        const existingDefendFlags = _.filter(gameRoom.lookForAt(LOOK_FLAGS, x, y), function (flag) {
-                            return flag.name.startsWith('defend');
-                        });
-                        if (existingDefendFlags.length > 0) {
-                            numOfDefenderFlagsPlaced = numOfDefenderFlagsPlaced + existingDefendFlags.length;
-                        } else {
-                            const nameOfFlag = 'defend_' + gameRoom.name + '_' + (numOfDefenderFlagsPlaced + 1);
-                            const result = gameRoom.createFlag(spawn.pos, nameOfFlag, COLOR_RED, COLOR_BLUE);
-                            Util.InfoLog('Towers', 'SpawnDefenders', gameRoom.name + ' placed defender flag ' + result);
-                            if (result === nameOfFlag) {
-                                numOfDefenderFlagsPlaced++;
+            if(spawn){
+                Util.InfoLog('Towers', 'SpawnDefenders', gameRoom.name + ' numOfDefendersToSpawn ' + numOfDefendersToSpawn);
+                for (let x = spawn.pos.x - 2; x <= spawn.pos.x + 2; x++) {
+                    for (let y = spawn.pos.y - 2; y <= spawn.pos.y + 2; y++) {
+                        if ((y === spawn.pos.y + 2 || y === spawn.pos.y - 2) && (x === spawn.pos.x + 2 || x === spawn.pos.x - 2)) { // a ring of flags is created
+                            const existingDefendFlags = _.filter(gameRoom.lookForAt(LOOK_FLAGS, x, y), function (flag) {
+                                return flag.name.startsWith('defend');
+                            });
+                            if (existingDefendFlags.length > 0) {
+                                numOfDefenderFlagsPlaced = numOfDefenderFlagsPlaced + existingDefendFlags.length;
+                            } else {
+                                const nameOfFlag = 'defend_' + gameRoom.name + '_' + (numOfDefenderFlagsPlaced + 1);
+                                const result = gameRoom.createFlag(spawn.pos, nameOfFlag, COLOR_RED, COLOR_BLUE);
+                                Util.InfoLog('Towers', 'SpawnDefenders', gameRoom.name + ' placed defender flag ' + result);
+                                if (result === nameOfFlag) {
+                                    numOfDefenderFlagsPlaced++;
+                                }
                             }
-                        }
-                        if (numOfDefenderFlagsPlaced >= numOfDefendersToSpawn) {
-                            return;
+                            if (numOfDefenderFlagsPlaced >= numOfDefendersToSpawn) {
+                                return;
+                            }
                         }
                     }
                 }

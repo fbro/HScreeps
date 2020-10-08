@@ -73,6 +73,8 @@ const CreateJobs = {
                         jobs = ReserveRoomJobs(jobs, gameFlagKey, gameFlag);
                     } else if (secColor === COLOR_ORANGE) { // claimer move to pos - used when one wants to enter a portal
                         jobs = CreateFlagJob(jobs, 'ClaimPos', gameFlagKey, gameFlag, 'C');
+                    }else if(secColor === COLOR_GREY){
+                        // construction of spawn
                     } else {
                         notFound = true;
                     }
