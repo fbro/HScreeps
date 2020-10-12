@@ -595,6 +595,23 @@ const AssignJobs = {
                             body = [RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK,
                                 MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, RANGED_ATTACK];
                             break;
+                        case (energyAvailable >= 1200): // energyCapacityAvailable: 1300
+                            body = [
+                                RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK, RANGED_ATTACK,
+                                MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,
+                                RANGED_ATTACK
+                            ];
+                            break;
+                        case (energyAvailable >= 400): // energyCapacityAvailable: 550
+                            body = [
+                                RANGED_ATTACK, MOVE, MOVE, RANGED_ATTACK
+                            ];
+                            break;
+                        case (energyAvailable >= 260): // energyCapacityAvailable: 300
+                            body = [
+                                THOUGH, MOVE, MOVE, RANGED_ATTACK
+                            ];
+                            break;
                     }
                     break;
                 // medic

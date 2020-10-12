@@ -80,9 +80,23 @@ const Constructions = {
                 return flag.color === COLOR_GREEN && flag.secondaryColor === COLOR_GREY;
             })[0];
             if (spawnFlag) {
+                const structures = gameRoom.find(FIND_STRUCTURES);
+                const constructions = gameRoom.find(FIND_CONSTRUCTION_SITES, {
+                    filter: function (construction) {
+                        return !construction.my;
+                    }
+                });
+                for (const structureKey in structures) {
+                    structures[structureKey].destroy();
+                }
+                for (const constructionKey in constructions) {
+                    constructions[constructionKey].remove();
+                }
                 const result = gameRoom.createConstructionSite(spawnFlag.pos.x, spawnFlag.pos.y, STRUCTURE_SPAWN);
-                Util.InfoLog('Constructions', 'ConstructFirstSpawnAtFlag', spawnFlag.pos + ' result ' + result);
-                spawnFlag.remove();
+                if(result === OK){
+                    Util.InfoLog('Constructions', 'ConstructFirstSpawnAtFlag', spawnFlag.pos + ' result ' + result);
+                    spawnFlag.remove();
+                }
             }
         }
 
