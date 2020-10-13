@@ -5,8 +5,8 @@ const Links = {
         for (const memRoomKey in Memory.MemRooms) {
             const memRoom = Memory.MemRooms[memRoomKey];
             const gameRoom = Game.rooms[memRoomKey];
-            let storageLink = undefined;
-            let controllerLink = undefined;
+            let storageLink;
+            let controllerLink;
             let harvesterLinks = [];
             if (memRoom.Links && memRoom.Links.StorageLinkId && memRoom.Links.ControllerLinkId && memRoom.Links.HarvesterLinksId.length === memRoom.SourceNumber) {
                 storageLink = Game.getObjectById(memRoom.Links.StorageLinkId);
@@ -15,14 +15,14 @@ const Links = {
                 if (memRoom.Links.HarvesterLinksId[1]) {
                     harvesterLinks[1] = Game.getObjectById(memRoom.Links.HarvesterLinksId[1]);
                 }
-            } else if (gameRoom && gameRoom.controller !== undefined && gameRoom.controller.my && gameRoom.storage) {
+            } else if (gameRoom && gameRoom.controller && gameRoom.controller.my && gameRoom.storage) {
                 const links = gameRoom.find(FIND_MY_STRUCTURES, {
                     filter: (s) => {
                         return s.structureType === STRUCTURE_LINK;
                     }
                 });
-                let storageLinkId = undefined;
-                let controllerLinkId = undefined;
+                let storageLinkId;
+                let controllerLinkId;
                 let harvesterLinksId = [];
                 for (let i = 0; i < links.length; i++) {
                     if (links[i].pos.findInRange(FIND_MY_STRUCTURES, 1, {
@@ -32,16 +32,24 @@ const Links = {
                     }).length > 0) {
                         storageLink = links[i];
                         storageLinkId = storageLink.id;
-                    } else if (links[i].pos.findInRange(FIND_STRUCTURES, 2, {
-                        filter: (s) => {
-                            return s.structureType === STRUCTURE_CONTROLLER;
+                    }else {
+                        let container = links[i].pos.findInRange(FIND_STRUCTURES, 1, {
+                            filter: (s) => {
+                                return s.structureType === STRUCTURE_CONTAINER;
+                            }
+                        })[0];
+
+                        if(container.pos.findInRange(FIND_STRUCTURES, 1, {
+                            filter: (s) => {
+                                return s.structureType === STRUCTURE_CONTROLLER;
+                            }
+                        }).length > 0){
+                            controllerLink = links[i];
+                            controllerLinkId = controllerLink.id;
+                        }else if(container.pos.findInRange(FIND_SOURCES, 1).length > 0){
+                            harvesterLinks.push(links[i]);
+                            harvesterLinksId.push(links[i].id);
                         }
-                    }).length > 0) {
-                        controllerLink = links[i];
-                        controllerLinkId = controllerLink.id;
-                    } else if (links[i].pos.findInRange(FIND_SOURCES, 2).length > 0) {
-                        harvesterLinks.push(links[i]);
-                        harvesterLinksId.push(links[i].id);
                     }
                 }
                 memRoom.Links = {

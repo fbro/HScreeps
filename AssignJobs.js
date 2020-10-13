@@ -268,6 +268,7 @@ const AssignJobs = {
                             }
                         }
                     } else { // no spawn in room - look in other rooms
+                        // TODO should be manhatten distance! - should reuse the pathfinding from creep movement
                         const linearDistance = Game.map.getRoomLinearDistance(availableSpawn.pos.roomName, memRoomKey);
                         if (linearDistance <= timeToLiveMaxRoomRange) { // spawn cannot be too far away
                             let energyAvailableModifier = 0;

@@ -24,11 +24,11 @@ const Constructions = {
                 if (flags.length > 0) {
                     ConstructFirstSpawnAtFlag(gameRoom, flags);
                 }
-                ConstructContainerAt(gameRoom, roomTerrain, undefined/*source*/);
+                ConstructContainerAt(gameRoom, roomTerrain, FIND_SOURCES);
                 if (level >= 2) {
                     ConstructCoreBuilding(gameRoom, roomTerrain, STRUCTURE_EXTENSION, 5);
                     if (Memory.MemRooms[gameRoom.name] && !Memory.MemRooms[gameRoom.name].CtrlConId) {
-                        ConstructContainerAt(gameRoom, roomTerrain, STRUCTURE_CONTROLLER);
+                        ConstructContainerAt(gameRoom, roomTerrain, FIND_STRUCTURES, STRUCTURE_CONTROLLER);
                     }
                     if (level >= 3) {
                         if (Memory.MemRooms[gameRoom.name] && Util.FindNumberOfBuildableStructures(gameRoom, STRUCTURE_TOWER) > Memory.MemRooms[gameRoom.name].TowerIds.length) {
@@ -46,7 +46,7 @@ const Constructions = {
                                 if (level >= 6) {
                                     ConstructCoreBuilding(gameRoom, roomTerrain, STRUCTURE_SPAWN, 0);
                                     ConstructExtractor(gameRoom);
-                                    ConstructContainerAt(gameRoom, roomTerrain, STRUCTURE_EXTRACTOR);
+                                    ConstructContainerAt(gameRoom, roomTerrain, FIND_MINERALS);
                                     if (!gameRoom.terminal) {
                                         ConstructAtStorage(gameRoom, roomTerrain, STRUCTURE_TERMINAL);
                                     }
@@ -93,39 +93,30 @@ const Constructions = {
                     constructions[constructionKey].remove();
                 }
                 const result = gameRoom.createConstructionSite(spawnFlag.pos.x, spawnFlag.pos.y, STRUCTURE_SPAWN);
-                if(result === OK){
+                if (result === OK) {
                     Util.InfoLog('Constructions', 'ConstructFirstSpawnAtFlag', spawnFlag.pos + ' result ' + result);
                     spawnFlag.remove();
                 }
             }
         }
 
-        function ConstructContainerAt(gameRoom, terrain, structureType = undefined) {
+        function ConstructContainerAt(gameRoom, terrain, findType, structureType = undefined) {
             if (Memory.MemRooms[gameRoom.name].Built && Memory.MemRooms[gameRoom.name].Built === gameRoom.controller.level) {
                 return;
             }
-            if (!structureType) {
-                const sources = gameRoom.find(FIND_SOURCES);
-                for (const sourceCount in sources) {
-                    const source = sources[sourceCount];
-                    if (!FindExistingStructure(source.pos, STRUCTURE_CONTAINER, 1)) {
-                        ConstructAroundPos(gameRoom, terrain, source.pos, STRUCTURE_CONTAINER);
-                    }
+
+            const targets = gameRoom.find(findType, {
+                filter: function (target) {
+                    return !structureType || target.structureType === structureType;
                 }
-            } else {
-                const structures = gameRoom.find(FIND_STRUCTURES, {
-                    filter: function (structure) {
-                        return structure.structureType === structureType;
-                    }
-                });
-                for (const structureCount in structures) {
-                    const structure = structures[structureCount];
-                    if (!FindExistingStructure(structure.pos, STRUCTURE_CONTAINER, 1)) {
-                        ConstructAroundPos(gameRoom, terrain, structure.pos, STRUCTURE_CONTAINER);
-                    }
+            });
+            for (const targetCount in targets) {
+                const target = targets[targetCount];
+                if (!FindExistingStructure(target.pos, STRUCTURE_CONTAINER, 1)) {
+                    ConstructAroundPos(gameRoom, terrain, target.pos, STRUCTURE_CONTAINER);
                 }
             }
-            Util.Info('Constructions', 'ConstructContainerAt', gameRoom.name + ' ' + (structureType ? structureType : 'sources'));
+            Util.Info('Constructions', 'ConstructContainerAt', gameRoom.name + ' ' + findType + ' ' + (structureType ? structureType : ''));
         }
 
         function ConstructCoreBuilding(gameRoom, roomTerrain, structureType, acceptedNumOfNearbyWalls) {

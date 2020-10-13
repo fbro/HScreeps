@@ -538,7 +538,7 @@ const ExecuteJobs = {
                     } else {
                         fetchObject = FindClosestFreeStore(creep, 2);
                     }
-                    if (jobObject.room.controller.level <= 3) {
+                    if (!fetchObject && jobObject.room.controller.level <= 3) {
                         const spawnConstruction = jobObject.room.find(FIND_MY_CONSTRUCTION_SITES, { // if there is a spawn that should be built - then built it
                             filter: function (c) {
                                 return c.structureType === STRUCTURE_SPAWN;
@@ -583,6 +583,8 @@ const ExecuteJobs = {
                         } else if (result === ERR_NO_RESULT_FOUND) {
                             result = DepositCreepStore(creep, fetchObject);
                         }
+                    } else {
+                        result = OK;
                     }
                     return result;
                 },
@@ -2140,11 +2142,19 @@ const ExecuteJobs = {
         /**@return {int}*/
         function GenericFlagAction(creep, roomJob, actionFunctions) {
             const flagObj = Game.flags[roomJob.JobId];
-            const nearbyHostileCreeps = creep.pos.findInRange(FIND_HOSTILE_CREEPS, 6);
+            const nearbyHostileCreeps = creep.pos.findInRange(FIND_HOSTILE_CREEPS, 7);
             if (nearbyHostileCreeps.length > 0) {
-                const hostileActionResult = CreepHostileAction(creep, nearbyHostileCreeps);
-                if (hostileActionResult !== CREEP_IGNORED_HOSTILE) {
-                    return OK;
+                if (creep.memory.FleeCounter && creep.pos.findInRange(FIND_HOSTILE_CREEPS, 5).length > 0) {
+                    if (creep.memory.FleeCounter > 0) {
+                        creep.memory.FleeCounter--;
+                    } else {
+                        delete creep.memory.FleeCounter;
+                    }
+                } else {
+                    const hostileActionResult = CreepHostileAction(creep, nearbyHostileCreeps);
+                    if (hostileActionResult !== CREEP_IGNORED_HOSTILE) {
+                        return OK;
+                    }
                 }
             }
             return GenericAction(creep, roomJob, actionFunctions, flagObj);
@@ -2502,16 +2512,16 @@ const ExecuteJobs = {
                         }
                     });
                     closestFreeStore = closestFreeStores[0];
-                    if(closestFreeStore){
+                    if (closestFreeStore) {
                         let bestRange = closestFreeStore.pos.getRangeTo(creep.pos);
                         for (const closestFreeStoreKey in closestFreeStores) {
                             if (closestFreeStores[closestFreeStoreKey].id !== closestFreeStore.id) {
-                                if(resourceTypeToStore === RESOURCE_ENERGY && closestFreeStores[closestFreeStoreKey].structureType === STRUCTURE_LINK){ // if the type to store is energy then try and prioritize links
+                                if (resourceTypeToStore === RESOURCE_ENERGY && closestFreeStores[closestFreeStoreKey].structureType === STRUCTURE_LINK) { // if the type to store is energy then try and prioritize links
                                     closestFreeStore = closestFreeStores[closestFreeStoreKey];
                                     break;
                                 }
                                 const range = closestFreeStores[closestFreeStoreKey].pos.getRangeTo(creep.pos);
-                                if(range < bestRange){
+                                if (range < bestRange) {
                                     closestFreeStore = closestFreeStores[closestFreeStoreKey];
                                     bestRange = range;
                                 }
@@ -2605,6 +2615,7 @@ const ExecuteJobs = {
             if (friendlyAttackNum === 0 || friendlyAttackNum + friendlyHealNum <= hostileAttackNum + hostileHealNum) { // outnumbered
                 Flee(creep, hostileCreepsWithAttack);
                 Util.Info('ExecuteJobs', 'CreepHostileAction', 'overwhelming hostiles - flee ' + creep.name + ' ' + creep.pos.roomName);
+                creep.memory.FleeCounter = 50;
                 return CREEP_FLED_HOSTILE; // always flee
             } else if (friendlyAttackNum + friendlyHealNum > hostileAttackNum + hostileHealNum) {
                 if (creep.getActiveBodyparts(HEAL)) {
@@ -2961,7 +2972,7 @@ const ExecuteJobs = {
                             Util.InfoLog('ExecuteJobs', 'Move', creep.name + ' ERR_NO_BODYPART ' + creep.pos.roomName + ' committing suicide');
                             creep.suicide();
                         }
-                        if(result === ERR_INVALID_TARGET){
+                        if (result === ERR_INVALID_TARGET) {
                             Util.ErrorLog('ExecuteJobs', 'Move', creep.name + ' ERR_INVALID_TARGET when moving ' + creep.pos.roomName);
                         }
                         creep.memory.MoveErrWait = undefined;
