@@ -2869,52 +2869,13 @@ const ExecuteJobs = {
                     }
                 }
                 if (result === ERR_NO_RESULT_FOUND) { // calculate path
-                    generateOuterRoomPath(to, from, creep); // saves result in Memory.Paths
+                    Util.generateOuterRoomPath(to.roomName, from.roomName); // saves result in Memory.Paths
                     getInnerRoomPath(to, creep);
                     result = creep.moveByPath(creep.memory.CachedPath);
                 }
             }
             result = MoveAnalysis(to, from, creep, result, obj);
             return result;
-        }
-
-        function generateOuterRoomPath(to, from, creep) {
-            if (!Memory.Paths) {
-                Memory.Paths = {};
-            }
-            let shouldCalculate = true;
-            if (Memory.Paths[to.roomName] && Memory.Paths[to.roomName][from.roomName]) {
-                shouldCalculate = false;
-            }
-            if (shouldCalculate) { // Use `findRoute` to calculate a high-level plan for this path,
-                // prioritizing highways and owned rooms
-                const route = Game.map.findRoute(from.roomName, to.roomName, {
-                    routeCallback(roomName) {
-                        const isHighway = Util.IsHighway(roomName);
-                        let isMyRoom = false;
-                        if (Game.rooms[roomName] && Game.rooms[roomName].controller) {
-                            if (Game.rooms[roomName].controller.my) {
-                                isMyRoom = true;
-                            }
-                        }
-                        if (isHighway || isMyRoom) {
-                            return 1;
-                        } else {
-                            return 10;
-                        }
-                    }
-                });
-                if (!Memory.Paths[to.roomName]) {
-                    Memory.Paths[to.roomName] = {};
-                }
-                let lastRoom = from.roomName;
-                for (const roomInRouteKey in route) {
-                    const roomInRoute = route[roomInRouteKey];
-                    Memory.Paths[to.roomName][lastRoom] = roomInRoute.room;
-                    lastRoom = roomInRoute.room
-                }
-                Util.Info('ExecuteJobs', 'Move', 'new path from ' + from.roomName + ' to ' + to.roomName + ' ' + creep.name + ' paths ' + JSON.stringify(Memory.Paths[to.roomName]));
-            }
         }
 
         function getInnerRoomPath(to, creep) {

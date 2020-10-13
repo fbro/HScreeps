@@ -71,6 +71,7 @@ const Util = {
             Memory.ErrorLog[messageId][message] = Memory.ErrorLog[messageId][message] + 1;
         }
     },
+
     InfoLog: function (functionParentName, functionName, message) {
         const messageId = functionParentName + ' ' + functionName;
         console.log('--------------------------------------------------------------------------');
@@ -87,12 +88,15 @@ const Util = {
             Memory.InfoLog[messageId][message] = Memory.InfoLog[messageId][message] + 1;
         }
     },
+
     Info: function (functionParentName, functionName, message) {
         console.log(functionParentName + ' ' + functionName + ' | ' + message);
     },
+
     Warning: function (functionParentName, functionName, message) {
         console.log('--WARNING-- ' + functionParentName + ' ' + functionName + ' | ' + message);
     },
+
     /**@return {number}*/
     FreeSpaces: function (pos) { // get the number of free spaces around a pos
         let freeSpaces = 0;
@@ -106,12 +110,6 @@ const Util = {
             }
         }
         return freeSpaces;
-    },
-
-    /**@return {boolean}*/
-    IsHighway: function (roomName) {
-        const parsed = /^[WE]([0-9]+)[NS]([0-9]+)$/.exec(roomName);
-        return (parsed[1] % 10 === 0) || (parsed[2] % 10 === 0);
     },
 
     DeleteJob: function (job, jobKey, roomName) {
@@ -144,7 +142,7 @@ const Util = {
             'MaxCreeps': {}, // object that gives information on how many of each type of creep may be in the room and what creeps of that type is in the room
             'SourceNumber': sourceNumber, // number of sources in room
         };
-        Util.Info('CreateJobs', 'CreateRoom', 'add new room ' + roomName + ' level ' + level + ' sourceNumber ' + sourceNumber + ' jobs ' + JSON.stringify(jobs))
+        Util.Info('Util', 'CreateRoom', 'add new room ' + roomName + ' level ' + level + ' sourceNumber ' + sourceNumber + ' jobs ' + JSON.stringify(jobs))
     },
 
     /**@return {number}*/
@@ -326,6 +324,65 @@ const Util = {
             default:
                 Util.ErrorLog('Constructions', 'FindNumberOfBuildableStructures', 'structureType not found ' + gameRoom.name + ' structureType ' + structureType);
         }
-    }
+    },
+
+    /**@return {boolean}*/
+    IsHighway: function (roomName) {
+        const parsed = /^[WE]([0-9]+)[NS]([0-9]+)$/.exec(roomName);
+        return (parsed[1] % 10 === 0) || (parsed[2] % 10 === 0);
+    },
+
+    generateOuterRoomPath: function (to, from) { // return length - saves path in Memory
+        if (!Memory.Paths) {
+            Memory.Paths = {};
+        }
+        let shouldCalculate = true;
+        if (Memory.Paths[to] && Memory.Paths[to][from]) {
+            shouldCalculate = false;
+        }
+        if (shouldCalculate) { // Use `findRoute` to calculate a high-level plan for this path,
+            // prioritizing highways and owned rooms
+            const route = Game.map.findRoute(from, to, {
+                routeCallback(roomName) {
+                    const isHighway = Util.IsHighway(roomName);
+                    let isMyRoom = false;
+                    if (Game.rooms[roomName] && Game.rooms[roomName].controller) {
+                        if (Game.rooms[roomName].controller.my) {
+                            isMyRoom = true;
+                        }
+                    }
+                    if (isHighway || isMyRoom) {
+                        return 1;
+                    } else {
+                        return 4;
+                    }
+                }
+            });
+            if (!Memory.Paths[to]) {
+                Memory.Paths[to] = {};
+            }
+            let lastRoom = from;
+            for (const roomInRouteKey in route) {
+                const roomInRoute = route[roomInRouteKey];
+                Memory.Paths[to][lastRoom] = roomInRoute.room;
+                lastRoom = roomInRoute.room
+            }
+            Util.Info('Util', 'generateOuterRoomPath', 'new path length ' + route.length + ' from ' + from + ' to ' + to + ' paths ' + JSON.stringify(Memory.Paths[to]));
+            return route.length;
+        }else{
+            let length = 0;
+            let hasFoundDestination = false;
+            let pointer = from;
+            while(!hasFoundDestination){
+                pointer = Memory.Paths[to][pointer];
+                length++;
+                if(pointer === to){
+                    hasFoundDestination = true;
+                }
+            }
+            Util.Info('Util', 'generateOuterRoomPath', 'calculated old path length ' + length + ' from ' + from + ' to ' + to);
+            return length;
+        }
+    },
 };
 module.exports = Util;
