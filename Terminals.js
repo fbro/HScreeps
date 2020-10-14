@@ -1,7 +1,6 @@
 let Util = require('Util');
 const Terminals = {
     run: function () {
-        let blackList;
         const terminals = LoadMyTerminals();
         TerminalActions(terminals);
 
@@ -100,7 +99,7 @@ const Terminals = {
             if (!toTerminal.store.getUsedCapacity(RESOURCE_ENERGY) && !toTerminal.room.storage.store.getUsedCapacity(RESOURCE_ENERGY)) {
                 let didSend = false;
                 const memRoom = Memory.MemRooms[toTerminal.pos.roomName];
-                if (toTerminal.room.controller.level === 8 || memRoom.FctrId && memRoom.FctrId !== '-') {
+                if (toTerminal.room.controller.level === 8 || memRoom.FctrId !== '-') {
                     didSend = GetFromTerminal(Util.TERMINAL_TARGET_RESOURCE, RESOURCE_BATTERY, toTerminal, terminals, Util.TERMINAL_TARGET_RESOURCE);
                 }
                 if (!didSend) {
