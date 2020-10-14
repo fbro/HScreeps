@@ -251,7 +251,7 @@ const AssignJobs = {
             let minEnergyCapacityNeeded = 300;
             if (roomJob.CreepType === 'C' || roomJob.CreepType === 'R') { //  creep with CLAIM body parts
                 minEnergyCapacityNeeded = 650;
-                timeToLiveMaxRoomRange = 10; // 600 time to live / 50 max room tiles
+                timeToLiveMaxRoomRange = 12; // 600 time to live / 50 max room tiles
                 Util.Info('AssignJobs', 'FindBestSpawn', 'availableSpawns ' + Game.spawns + ' availableSpawnsInRoom ' + availableSpawnsInRoom + ' bestLinearDistance ' + bestLinearDistance + ' roomJob ' + roomJob + ' memRoomKey ' + memRoomKey);
             } else {
                 timeToLiveMaxRoomRange = 16; // 1500 time to live / 50 max room tiles
@@ -310,7 +310,7 @@ const AssignJobs = {
                     if (Memory.MemRooms[memRoomKey].MaxCreeps[creepType]) {
                         Memory.MemRooms[memRoomKey].MaxCreeps[creepType][availableName] = availableName;
                     }
-                    Util.Info('AssignJobs', 'SpawnCreep', 'OK ' + (spawnAgileVersion ? 'agile ':'') + (spawnLargeVersion ? 'large ':'') + availableName + ' assigned to ' + roomJobKey + ' in ' + memRoomKey + ' spawned at ' + bestAvailableSpawn.name + ' ' + bestAvailableSpawn.pos.roomName + (bestAvailableSpawn.pos.roomName !== memRoomKey ? ' distance ' + Game.map.getRoomLinearDistance(bestAvailableSpawn.pos.roomName, memRoomKey) : ''));
+                    Util.Info('AssignJobs', 'SpawnCreep', 'OK ' + (spawnAgileVersion ? 'agile ':'') + (spawnLargeVersion ? 'large ':'') + availableName + ' assigned to ' + roomJobKey + ' in ' + memRoomKey + ' spawned at ' + bestAvailableSpawn.name + ' ' + bestAvailableSpawn.pos.roomName);
                     Game.map.visual.circle(bestAvailableSpawn.pos, {
                         radius: 8,
                         stroke: '#000000',
