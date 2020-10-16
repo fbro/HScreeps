@@ -29,7 +29,7 @@ const Terminals = {
 
                 GetEnergy(terminal, terminals); // get energy from other terminals
 
-                marketDealCount = BuyPower(terminal, marketDealCount);
+                marketDealCount = BuyResources(terminal, marketDealCount);
 
                 marketDealCount = SendExcess(terminal, marketDealCount); // selected terminal will actively send/sell resources out
             }
@@ -109,7 +109,7 @@ const Terminals = {
             }
         }
 
-        function BuyPower(toTerminal, marketDealCount) {
+        function BuyResources(toTerminal, marketDealCount) {
             if (marketDealCount >= 10 || toTerminal.cooldown || toTerminal.used) {
                 return marketDealCount;
             }
@@ -117,6 +117,14 @@ const Terminals = {
                 const didBuy = TryBuyResource(toTerminal, RESOURCE_POWER, Util.TERMINAL_TARGET_RESOURCE, 5);
                 if (didBuy) {
                     marketDealCount++;
+                    return marketDealCount;
+                }
+            }
+            if(toTerminal.room.controller.level < 8 && Game.market.credits > 100000000){
+                const didBuy = TryBuyResource(toTerminal, RESOURCE_ENERGY, Util.TERMINAL_MAX_ENERGY, 0.3);
+                if (didBuy) {
+                    marketDealCount++;
+                    return marketDealCount;
                 }
             }
             return marketDealCount;
@@ -130,12 +138,12 @@ const Terminals = {
                 let didSend = false;
                 // try to send energy or power to other owned terminals that needs it
                 if (resourceType === RESOURCE_ENERGY) {
-                    didSend = SendToTerminal(Util.STORAGE_ENERGY_MEDIUM_TRANSFER, resourceType, fromTerminal, terminals, Util.TERMINAL_TARGET_ENERGY);
+                    didSend = SendToTerminals(Util.STORAGE_ENERGY_MEDIUM_TRANSFER, resourceType, fromTerminal, terminals, Util.TERMINAL_TARGET_ENERGY);
                 } else if (resourceType === RESOURCE_POWER) {
-                    didSend = SendToTerminal(Util.TERMINAL_TARGET_RESOURCE, resourceType, fromTerminal, terminals, Util.TERMINAL_TARGET_RESOURCE);
+                    didSend = SendToTerminals(Util.TERMINAL_TARGET_RESOURCE, resourceType, fromTerminal, terminals, Util.TERMINAL_TARGET_RESOURCE);
                 }
 
-                const max = GetMaxResourceToSell(resourceType);
+                const max = GetMaxResourceToSell(resourceType, fromTerminal);
                 if (!didSend && fromTerminal.store.getUsedCapacity(resourceType) > (max === 0 ? 0 : (max + Util.TERMINAL_BUFFER))) {
                     const amount = fromTerminal.store.getUsedCapacity(resourceType) - max;
                     const didSell = TrySellResource(fromTerminal, resourceType, amount);
@@ -168,7 +176,7 @@ const Terminals = {
         }
 
         /**@return {boolean}*/
-        function SendToTerminal(amountToKeep, resourceTypeToSend, fromTerminal, terminals, maxToTerminalAmount) {
+        function SendToTerminals(amountToKeep, resourceTypeToSend, fromTerminal, terminals, maxToTerminalAmount) {
             let didSend = false;
             if (fromTerminal.store.getUsedCapacity(resourceTypeToSend) > (amountToKeep + Util.TERMINAL_BUFFER)) {
                 let amountToSend = fromTerminal.store.getUsedCapacity(resourceTypeToSend) - amountToKeep;
@@ -420,11 +428,13 @@ const Terminals = {
         }
 
         /**@return {number}*/
-        function GetMaxResourceToSell(resourceType) {
+        function GetMaxResourceToSell(resourceType, fromTerminal) {
             switch (resourceType) {
                 case RESOURCE_ENERGY :
-                    return Util.TERMINAL_MAX_ENERGY;
-
+                    if(fromTerminal.room.controller.level === 8){
+                        return Util.TERMINAL_MAX_ENERGY;
+                    }
+                    return TERMINAL_CAPACITY;
                 case RESOURCE_POWER       : // power
 
                 // Electronical

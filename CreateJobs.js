@@ -176,7 +176,7 @@ const CreateJobs = {
             }
             // room level change
             if (gameRoom.controller && Memory.MemRooms[gameRoom.name].RoomLevel !== gameRoom.controller.level) {
-                Util.InfoLog('CreateJobs', 'UpdateMemRoom', 'room level change from ' + Memory.MemRooms[gameRoom.name].RoomLevel + ' to ' + gameRoom.controller.level);
+                Util.InfoLog('CreateJobs', 'UpdateMemRoom', 'room ' + gameRoom.name + ' level change from ' + Memory.MemRooms[gameRoom.name].RoomLevel + ' to ' + gameRoom.controller.level);
                 Memory.MemRooms[gameRoom.name].RoomLevel = gameRoom.controller.level;
                 Memory.MemRooms[gameRoom.name].SourceNumber = gameRoom.find(FIND_SOURCES).length;
                 for (const maxCreepKey in Memory.MemRooms[gameRoom.name].MaxCreeps) {
