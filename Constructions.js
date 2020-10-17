@@ -50,8 +50,6 @@ const Constructions = {
                                     if (!gameRoom.terminal) {
                                         ConstructAtStorage(gameRoom, roomTerrain, STRUCTURE_TERMINAL);
                                     }
-                                    ConstructPerimeter(gameRoom, roomTerrain); // TODO
-                                    ConstructLabs(gameRoom, roomTerrain); // TODO
                                     if (level >= 7) {
                                         ConstructAtStorage(gameRoom, roomTerrain, STRUCTURE_FACTORY);
                                         ConstructRampartsOn(gameRoom, roomTerrain, STRUCTURE_TERMINAL);
@@ -61,6 +59,8 @@ const Constructions = {
                                             ConstructCoreBuilding(gameRoom, roomTerrain, STRUCTURE_OBSERVER, 8);
                                             ConstructRampartsOn(gameRoom, roomTerrain, STRUCTURE_FACTORY);
                                             ConstructRampartsOn(gameRoom, roomTerrain, STRUCTURE_POWER_SPAWN);
+                                            ConstructPerimeter(gameRoom, roomTerrain); // TODO
+                                            ConstructLabs(gameRoom, roomTerrain); // TODO
                                         }
                                     }
                                 }

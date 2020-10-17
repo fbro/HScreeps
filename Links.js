@@ -67,11 +67,11 @@ const Links = {
         function LinkTransfer(storageLink, controllerLink, harvesterLinks) {
             let hasTransferredToControllerLink = false;
             for (let i = 0; i < harvesterLinks.length; i++) {
-                if (harvesterLinks[i] && harvesterLinks[i].store.getUsedCapacity(RESOURCE_ENERGY) >= 700) {
-                    if (!hasTransferredToControllerLink && controllerLink && controllerLink.store.getUsedCapacity(RESOURCE_ENERGY) < 500) {
+                if (harvesterLinks[i] && harvesterLinks[i].store.getUsedCapacity(RESOURCE_ENERGY) >= (LINK_CAPACITY / 2)) {
+                    if (!hasTransferredToControllerLink && controllerLink && controllerLink.store.getUsedCapacity(RESOURCE_ENERGY) < LINK_CAPACITY) {
                         harvesterLinks[i].transferEnergy(controllerLink);
                         hasTransferredToControllerLink = true;
-                    } else if (storageLink && storageLink.store.getUsedCapacity(RESOURCE_ENERGY) < 600) {
+                    } else if (storageLink && storageLink.store.getUsedCapacity(RESOURCE_ENERGY) < LINK_CAPACITY) {
                         harvesterLinks[i].transferEnergy(storageLink);
                     }
                 }

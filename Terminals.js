@@ -120,8 +120,8 @@ const Terminals = {
                     return marketDealCount;
                 }
             }
-            if(toTerminal.room.controller.level < 8 && Game.market.credits > 100000000){
-                const didBuy = TryBuyResource(toTerminal, RESOURCE_ENERGY, Util.TERMINAL_MAX_ENERGY, 0.3);
+            if(toTerminal.room.controller.level < 8 && Game.market.credits > 100000000 && toTerminal.store.getUsedCapacity(RESOURCE_ENERGY) < Util.TERMINAL_MAX_ENERGY){
+                const didBuy = TryBuyResource(toTerminal, RESOURCE_ENERGY, Util.TERMINAL_MAX_ENERGY - (toTerminal.store.getUsedCapacity(RESOURCE_ENERGY) * 0.8), 0.3);
                 if (didBuy) {
                     marketDealCount++;
                     return marketDealCount;

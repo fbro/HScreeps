@@ -24,7 +24,6 @@ module.exports.loop = function () {
             if (Game.time % Util.GAME_TIME_MODULO_3 === 0) {
                 if (Game.time % Util.GAME_TIME_MODULO_4 === 0) {
                     CreateJobs.run();
-                    Links.run();
                     if (Game.time % Util.GAME_TIME_MODULO_5 === 0) {
                         Constructions.run();
                         if (Game.time % Util.GAME_TIME_MODULO_6 === 0) {
@@ -51,6 +50,7 @@ module.exports.loop = function () {
                         }
                     }
                 }
+                Links.run();
                 Terminals.run();
                 AssignJobs.run();
             }
@@ -168,8 +168,6 @@ module.exports.loop = function () {
 // TODO powercreeps should hook into the job memory and check if there are any free transporter jobs
 
 // TODO create resource sales
-
-// TODO set flag that enables buying alot of energy to boost constructions etc.
 
 // TODO spawn agile creeps that do not rely on roads
 
