@@ -36,24 +36,23 @@ const AssignJobs = {
             });
             for (const memRoomKey in Memory.MemRooms) {
                 const memRoom = Memory.MemRooms[memRoomKey];
-                if (!memRoom) {
-                    continue;
-                }
-                for (const roomJobKey in memRoom.RoomJobs) {
-                    const roomJob = memRoom.RoomJobs[roomJobKey];
-                    if (roomJob && roomJob.Creep === 'vacant') {
-                        let creepFound = AssignCreep(roomJob, idleCreeps, roomJobKey, memRoomKey); // first try and assign a creep from the room the job is in
-                        if (!creepFound) {
-                            creepFound = AssignCreepOtherRoom(roomJob, idleCreeps, roomJobKey, memRoomKey); // then see if there are nearby idle creep in other room
+                if (memRoom) {
+                    for (const roomJobKey in memRoom.RoomJobs) {
+                        const roomJob = memRoom.RoomJobs[roomJobKey];
+                        if (roomJob && roomJob.Creep === 'vacant') {
+                            let creepFound = AssignCreep(roomJob, idleCreeps, roomJobKey, memRoomKey); // first try and assign a creep from the room the job is in
                             if (!creepFound) {
-                                const availableSpawnsInRoom = _.filter(Game.spawns, function (spawn) {
-                                    return spawn && spawn.room.name === memRoomKey;
-                                });
-                                creepFound = SpawnCreep(roomJob, availableSpawnsInRoom, roomJobKey, memRoomKey);
-                                //if(!creepFound){ // TODO
-                                //    Util.Warning('AssignJobs', 'AssignOrSpawnCreeps', 'giving up assigning jobs in ' + memRoomKey + ' because of job ' + roomJobKey);
-                                //    break;
-                                //}
+                                creepFound = AssignCreepOtherRoom(roomJob, idleCreeps, roomJobKey, memRoomKey); // then see if there are nearby idle creep in other room
+                                if (!creepFound) {
+                                    const availableSpawnsInRoom = _.filter(Game.spawns, function (spawn) {
+                                        return spawn && spawn.room.name === memRoomKey;
+                                    });
+                                    creepFound = SpawnCreep(roomJob, availableSpawnsInRoom, roomJobKey, memRoomKey);
+                                    if (!creepFound && availableSpawnsInRoom.length > 0) {
+                                        Util.Warning('AssignJobs', 'AssignOrSpawnCreeps', 'giving up assigning jobs in ' + memRoomKey + ' because of job ' + roomJobKey);
+                                        break;
+                                    }
+                                }
                             }
                         }
                     }
@@ -310,7 +309,7 @@ const AssignJobs = {
                     if (Memory.MemRooms[memRoomKey].MaxCreeps[creepType]) {
                         Memory.MemRooms[memRoomKey].MaxCreeps[creepType][availableName] = availableName;
                     }
-                    Util.Info('AssignJobs', 'SpawnCreep', 'OK ' + (spawnAgileVersion ? 'agile ':'') + (spawnLargeVersion ? 'large ':'') + availableName + ' assigned to ' + roomJobKey + ' in ' + memRoomKey + ' spawned at ' + bestAvailableSpawn.name + ' ' + bestAvailableSpawn.pos.roomName);
+                    Util.Info('AssignJobs', 'SpawnCreep', 'OK ' + (spawnAgileVersion ? 'agile ' : '') + (spawnLargeVersion ? 'large ' : '') + availableName + ' assigned to ' + roomJobKey + ' in ' + memRoomKey + ' spawned at ' + bestAvailableSpawn.name + ' ' + bestAvailableSpawn.pos.roomName);
                     Game.map.visual.circle(bestAvailableSpawn.pos, {
                         radius: 8,
                         stroke: '#000000',
@@ -331,7 +330,7 @@ const AssignJobs = {
             } else {
                 Util.Warning('AssignJobs', 'SpawnCreep', 'no valid spawn for ' + availableName + ', job ' + roomJobKey +
                     (bestAvailableSpawn ? ' spawn ' + bestAvailableSpawn.name + ' in ' + bestAvailableSpawn.pos.roomName
-                        + (bestAvailableSpawn.HasSpawned ? ' has just begun spawning a new creep': '')
+                        + (bestAvailableSpawn.HasSpawned ? ' has just begun spawning a new creep' : '')
                         + (bestAvailableSpawn.spawning ? ' is in the process of spawning ' + bestAvailableSpawn.spawning.name : '') : ' no spawn found!'));
                 return false;
             }

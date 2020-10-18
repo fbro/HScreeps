@@ -169,8 +169,6 @@ module.exports.loop = function () {
 
 // TODO create resource sales
 
-// TODO spawn agile creeps that do not rely on roads
-
 // attack NPC strongholds
 // harvest middle rooms
 // harvest neutral rooms
