@@ -169,6 +169,8 @@ module.exports.loop = function () {
 
 // TODO create resource sales
 
+// TODO when under level 8 - enable creep emptying terminals with energy - this will boost controller upgrading
+
 // attack NPC strongholds
 // harvest middle rooms
 // harvest neutral rooms
