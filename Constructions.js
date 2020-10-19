@@ -57,8 +57,11 @@ const Constructions = {
                                         if (level === 8) {
                                             ConstructAtStorage(gameRoom, roomTerrain, STRUCTURE_POWER_SPAWN);
                                             ConstructCoreBuilding(gameRoom, roomTerrain, STRUCTURE_OBSERVER, 8);
+                                            ConstructCoreBuilding(gameRoom, roomTerrain, STRUCTURE_NUKER, 8);
                                             ConstructRampartsOn(gameRoom, roomTerrain, STRUCTURE_FACTORY);
                                             ConstructRampartsOn(gameRoom, roomTerrain, STRUCTURE_POWER_SPAWN);
+                                            ConstructRampartsOn(gameRoom, roomTerrain, STRUCTURE_OBSERVER);
+                                            ConstructRampartsOn(gameRoom, roomTerrain, STRUCTURE_NUKER);
                                             ConstructPerimeter(gameRoom, roomTerrain); // TODO
                                             ConstructLabs(gameRoom, roomTerrain); // TODO
                                         }
@@ -341,6 +344,26 @@ const Constructions = {
         }
 
         function ConstructPerimeter(gameRoom, roomTerrain) {
+            // TODO
+            // strategy: at lvl 8 when all buildings have been placed
+            // make alternating wall, wall,  rampart
+            // in a 3 range from all core buildings
+            if(gameRoom.name !== 'W51N59'){ // TODO test room
+                return;
+            }
+            const coreStructures = gameRoom.find(FIND_MY_STRUCTURES, {
+                filter: function (structure) {
+                    return structure.structureType === STRUCTURE_SPAWN
+                        || structure.structureType === STRUCTURE_EXTENSION
+                        || structure.structureType === STRUCTURE_TOWER
+                        || structure.structureType === STRUCTURE_TERMINAL
+                        || structure.structureType === STRUCTURE_FACTORY
+                        || structure.structureType === STRUCTURE_POWER_SPAWN
+                        || structure.structureType === STRUCTURE_NUKER
+                        || structure.structureType === STRUCTURE_OBSERVER;
+                }
+            });
+
             // TODO construct perimeter
             Util.Info('Constructions', 'ConstructPerimeter', gameRoom.name + ' TODO!');
 
@@ -465,6 +488,11 @@ const Constructions = {
                                                 return structure.structureType !== STRUCTURE_SPAWN
                                                     && structure.structureType !== STRUCTURE_EXTENSION
                                                     && structure.structureType !== STRUCTURE_TOWER
+                                                    && structure.structureType !== STRUCTURE_TERMINAL
+                                                    && structure.structureType !== STRUCTURE_FACTORY
+                                                    && structure.structureType !== STRUCTURE_POWER_SPAWN
+                                                    && structure.structureType !== STRUCTURE_NUKER
+                                                    && structure.structureType !== STRUCTURE_OBSERVER
                                                     && structure.structureType !== STRUCTURE_LINK
                                                     && structure.structureType !== STRUCTURE_CONTAINER
                                                     && structure.structureType !== STRUCTURE_ROAD
