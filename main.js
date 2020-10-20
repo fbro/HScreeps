@@ -24,8 +24,8 @@ module.exports.loop = function () {
             if (Game.time % Util.GAME_TIME_MODULO_3 === 0) {
                 if (Game.time % Util.GAME_TIME_MODULO_4 === 0) {
                     CreateJobs.run();
+                    Constructions.run();
                     if (Game.time % Util.GAME_TIME_MODULO_5 === 0) {
-                        Constructions.run();
                         if (Game.time % Util.GAME_TIME_MODULO_6 === 0) {
                             Util.Info('Main', 'Controller', '--------------- main reset of memory ---------------');
 
@@ -144,7 +144,7 @@ module.exports.loop = function () {
     }
 
     function DefendFlagsCleanup(memRoomKey) {
-        if(!Game.rooms[memRoomKey]){
+        if (!Game.rooms[memRoomKey]) {
             return;
         }
         const defendFlags = Game.rooms[memRoomKey].find(FIND_FLAGS, {

@@ -62,7 +62,7 @@ const Constructions = {
                                             ConstructRampartsOn(gameRoom, roomTerrain, STRUCTURE_POWER_SPAWN);
                                             ConstructRampartsOn(gameRoom, roomTerrain, STRUCTURE_OBSERVER);
                                             ConstructRampartsOn(gameRoom, roomTerrain, STRUCTURE_NUKER);
-                                            ConstructPerimeter(gameRoom, roomTerrain); // TODO
+                                            ConstructPerimeter(gameRoom);
                                             ConstructLabs(gameRoom, roomTerrain); // TODO
                                         }
                                     }
@@ -343,15 +343,11 @@ const Constructions = {
             Util.Info('Constructions', 'ConstructAtStorage', gameRoom.name + ' structureType ' + structureType);
         }
 
-        function ConstructPerimeter(gameRoom, roomTerrain) {
-            // TODO
-            // strategy: at lvl 8 when all buildings have been placed
-            // make alternating wall, wall,  rampart
-            // in a 3 range from all core buildings
-            if(gameRoom.name !== 'W51N59'){ // TODO test room
+        function ConstructPerimeter(gameRoom) {
+            if (Memory.MemRooms[gameRoom.name].Built && Memory.MemRooms[gameRoom.name].Built === gameRoom.controller.level) {
                 return;
             }
-            const coreStructures = gameRoom.find(FIND_MY_STRUCTURES, {
+            let coreStructures = gameRoom.find(FIND_MY_STRUCTURES, {
                 filter: function (structure) {
                     return structure.structureType === STRUCTURE_SPAWN
                         || structure.structureType === STRUCTURE_EXTENSION
@@ -363,10 +359,51 @@ const Constructions = {
                         || structure.structureType === STRUCTURE_OBSERVER;
                 }
             });
+            let constructions = gameRoom.find(FIND_CONSTRUCTION_SITES, {
+                filter: function (construction) {
+                    return construction.structureType === STRUCTURE_SPAWN
+                        || construction.structureType === STRUCTURE_EXTENSION
+                        || construction.structureType === STRUCTURE_TOWER
+                        || construction.structureType === STRUCTURE_TERMINAL
+                        || construction.structureType === STRUCTURE_FACTORY
+                        || construction.structureType === STRUCTURE_POWER_SPAWN
+                        || construction.structureType === STRUCTURE_NUKER
+                        || construction.structureType === STRUCTURE_OBSERVER;
+                }
+            });
+            coreStructures = coreStructures.concat(constructions);
+            const map = {};
+            for (let i = 0; i < 50; i++) {
+                map[i] = {};
+                for (let e = 0; e < 50; e++) {
+                    map[i][e] = 0;
+                }
+            }
+            for (const coreStructureKey in coreStructures) {
+                const coreStructure = coreStructures[coreStructureKey];
+                for (let i = -3; i <= 3; i++) {
+                    for (let e = -3; e <= 3; e++) {
+                        if (i === -3 || i === 3 || e === -3 || e === 3) {
+                            map[i + coreStructure.pos.x][e + coreStructure.pos.y]++;
+                        } else {
+                            map[i + coreStructure.pos.x][e + coreStructure.pos.y] = 10;
+                        }
+                    }
+                }
+            }
 
-            // TODO construct perimeter
-            Util.Info('Constructions', 'ConstructPerimeter', gameRoom.name + ' TODO!');
-
+            console.log("     0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 11 12 13 14 15 16 17 18 19 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49");
+            for (let i = 0; i < 50; i++) {
+                let row = (i < 10 ? " " + i : i) + ":";
+                for (let e = 0; e < 50; e++) {
+                    row = row + " " + (map[i][e] < 10 ? "0" + map[i][e] : map[i][e]);
+                    if (map[i][e] !== 0 && map[i][e] < 5) {
+                        const buildPos = new RoomPosition(i, e, gameRoom.name);
+                        buildPos.createConstructionSite(STRUCTURE_RAMPART);
+                    }
+                }
+                console.log(row);
+            }
         }
 
         function ConstructLabs(gameRoom, roomTerrain) {

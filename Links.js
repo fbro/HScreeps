@@ -8,7 +8,7 @@ const Links = {
             let storageLink;
             let controllerLink;
             let harvesterLinks = [];
-            if (memRoom.Links && memRoom.Links.StorageLinkId && memRoom.Links.ControllerLinkId && memRoom.Links.HarvesterLinksId.length === memRoom.SourceNumber) {
+            if (memRoom && memRoom.Links && memRoom.Links.StorageLinkId && memRoom.Links.ControllerLinkId && memRoom.Links.HarvesterLinksId.length === memRoom.SourceNumber) {
                 storageLink = Game.getObjectById(memRoom.Links.StorageLinkId);
                 controllerLink = Game.getObjectById(memRoom.Links.ControllerLinkId);
                 harvesterLinks[0] = Game.getObjectById(memRoom.Links.HarvesterLinksId[0]);
