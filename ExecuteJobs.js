@@ -572,6 +572,9 @@ const ExecuteJobs = {
                     if (creep.store.getUsedCapacity(RESOURCE_ENERGY) > 0) {
                         if (fetchObject.progressTotal) {
                             result = creep.build(fetchObject);
+                            if(result === OK && ){
+                                result = ERR_BUSY; // keep building
+                            }
                         }
                         if (fetchObject === 'DROP') {
                             for (const resourceType in creep.store) {
@@ -589,6 +592,9 @@ const ExecuteJobs = {
                     return result;
                 },
             });
+            if(result === ERR_BUSY){
+                console.log("TEST result === ERR_BUSY");
+            }
             if (result !== OK && result !== JOB_MOVING && result !== ERR_TIRED && result !== ERR_BUSY) {
                 Util.Warning('ExecuteJobs', 'JobSource', 'harvester result is not OK ' + result + ' ' + creep.name + '(' + creep.pos.x + ',' + creep.pos.y + ',' + creep.pos.roomName + ')');
             }

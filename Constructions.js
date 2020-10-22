@@ -112,7 +112,7 @@ const Constructions = {
                     const spawnConstruction = spawnFlag.pos.lookFor(LOOK_CONSTRUCTION_SITES)[0];
                     if(!spawnConstruction || spawnConstruction.structureType !== STRUCTURE_SPAWN){
                         const spawnStructure = spawnFlag.pos.lookFor(LOOK_STRUCTURES)[0];
-                        if(spawnStructure.structureType === STRUCTURE_SPAWN){
+                        if(spawnStructure && spawnStructure.structureType === STRUCTURE_SPAWN){
                             spawnFlag.remove();
                             defenderFlag.remove();
                         }else{
