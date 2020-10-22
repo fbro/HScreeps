@@ -572,7 +572,7 @@ const ExecuteJobs = {
                     if (creep.store.getUsedCapacity(RESOURCE_ENERGY) > 0) {
                         if (fetchObject.progressTotal) {
                             result = creep.build(fetchObject);
-                            if(result === OK && ){
+                            if (result === OK && creep.store.getFreeCapacity() > (creep.getActiveBodyparts(WORK) * 5)) {
                                 result = ERR_BUSY; // keep building
                             }
                         }
@@ -592,7 +592,7 @@ const ExecuteJobs = {
                     return result;
                 },
             });
-            if(result === ERR_BUSY){
+            if (result === ERR_BUSY) {
                 console.log("TEST result === ERR_BUSY");
             }
             if (result !== OK && result !== JOB_MOVING && result !== ERR_TIRED && result !== ERR_BUSY) {

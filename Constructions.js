@@ -18,7 +18,7 @@ const Constructions = {
             if (level >= 1) {
                 const flags = gameRoom.find(FIND_FLAGS, {
                     filter: function (flag) { // construction flags
-                        return flag.color === COLOR_GREEN && flag.secondaryColor === COLOR_GREY;
+                        return flag.color === COLOR_GREEN && flag.secondaryColor === COLOR_GREY; // construct first spawn
                     }
                 });
                 if (flags.length > 0) {
