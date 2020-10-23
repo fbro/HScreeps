@@ -354,7 +354,7 @@ const Util = {
                     if (isHighway || isMyRoom) {
                         return 1;
                     } else {
-                        return 4;
+                        return 6;
                     }
                 }
             });
