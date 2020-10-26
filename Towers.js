@@ -126,7 +126,7 @@ const Towers = {
                 }
             })[0];
             let numOfDefenderFlagsPlaced = 0;
-            if(spawn){
+            if (spawn) {
                 Util.InfoLog('Towers', 'SpawnDefenders', gameRoom.name + ' numOfDefendersToSpawn ' + numOfDefendersToSpawn);
                 for (let x = spawn.pos.x - 2; x <= spawn.pos.x + 2; x++) {
                     for (let y = spawn.pos.y - 2; y <= spawn.pos.y + 2; y++) {
@@ -138,8 +138,8 @@ const Towers = {
                                 numOfDefenderFlagsPlaced = numOfDefenderFlagsPlaced + existingDefendFlags.length;
                             } else {
                                 const nameOfFlag = 'defend_' + gameRoom.name + '_' + (numOfDefenderFlagsPlaced + 1);
-                                const result = gameRoom.createFlag(x, y, spawn.pos.name, nameOfFlag, COLOR_RED, COLOR_BLUE);
-                                Util.InfoLog('Towers', 'SpawnDefenders', gameRoom.name + ' placed defender flag ' + result);
+                                const result = gameRoom.createFlag(x, y, nameOfFlag, COLOR_RED, COLOR_BLUE);
+                                Util.InfoLog('Towers', 'SpawnDefenders', 'placed defender flag at (' + x + ',' + y + ',' + gameRoom.name + ') resut ' + result + ' existingDefendFlags ' + existingDefendFlags.length + ' numOfDefenderFlagsPlaced ' + numOfDefenderFlagsPlaced);
                                 if (result === nameOfFlag) {
                                     numOfDefenderFlagsPlaced++;
                                 }
