@@ -89,7 +89,7 @@ const Towers = {
                 }
             });
             if (hostileTargets.length > 0) {
-                ActivateDefensiveMeasures(gameRoom, hostileTargets);
+                ActivateDefensiveMeasures(gameRoom, hostileTargets, towers);
                 for (let i = 0; i < towers.length; i++) {
                     towers[i].attack(hostileTargets[((i + 1) % hostileTargets.length)]);
                 }
@@ -98,17 +98,17 @@ const Towers = {
             return false;
         }
 
-        function ActivateDefensiveMeasures(gameRoom, hostileTargets) {
+        function ActivateDefensiveMeasures(gameRoom, hostileTargets, towers) {
             let numOfDefendersToSpawn = 0;
             for (const hostileTargetCount in hostileTargets) {
                 const hostileTarget = hostileTargets[hostileTargetCount];
-                if (hostileTarget.owner.username !== 'Invader' && (hostileTarget.getActiveBodyparts(RANGED_ATTACK) || hostileTarget.getActiveBodyparts(ATTACK) || hostileTarget.getActiveBodyparts(HEAL))) {
+                if (towers.length === 0 || hostileTarget.owner.username !== 'Invader' && (hostileTarget.getActiveBodyparts(RANGED_ATTACK) || hostileTarget.getActiveBodyparts(ATTACK) || hostileTarget.getActiveBodyparts(HEAL))) {
                     const isBoosted = _.find(hostileTarget.body, function (bodypart) {
                         return bodypart.boost !== undefined;
                     });
                     if (isBoosted && !gameRoom.controller.safeMode && !gameRoom.controller.safeModeCooldown && gameRoom.controller.safeModeAvailable > 0) {
                         const result = gameRoom.controller.activateSafeMode();
-                        Util.InfoLog('Towers', 'ActivateSafemode', gameRoom.name + ' ' + result + ' attacked from ' + hostileTarget.owner.username);
+                        Util.InfoLog('Towers', 'ActivateSafemode', gameRoom.name + ' ' + result + ' attacked from ' + hostileTarget.owner.username + ' towers ' + towers.length);
                         Game.notify('safemode have been activated for room ' + gameRoom.name + ' activateSafeMode result ' + result + ' shard ' + Game.shard + ' attacked from ' + hostileTarget.owner.username, 0);
                     }
                     numOfDefendersToSpawn++;
@@ -138,7 +138,7 @@ const Towers = {
                                 numOfDefenderFlagsPlaced = numOfDefenderFlagsPlaced + existingDefendFlags.length;
                             } else {
                                 const nameOfFlag = 'defend_' + gameRoom.name + '_' + (numOfDefenderFlagsPlaced + 1);
-                                const result = gameRoom.createFlag(spawn.pos, nameOfFlag, COLOR_RED, COLOR_BLUE);
+                                const result = gameRoom.createFlag(x, y, spawn.pos.name, nameOfFlag, COLOR_RED, COLOR_BLUE);
                                 Util.InfoLog('Towers', 'SpawnDefenders', gameRoom.name + ' placed defender flag ' + result);
                                 if (result === nameOfFlag) {
                                     numOfDefenderFlagsPlaced++;

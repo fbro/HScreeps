@@ -1435,7 +1435,7 @@ const ExecuteJobs = {
                 /**@return {object} @return {undefined}*/
                 FindFetchObject: function (jobObject) {
                     const hostileCreep = creep.pos.findClosestByPath(FIND_HOSTILE_CREEPS);
-                    if (hostileCreep && hostileCreep.pos.getRangeTo(creep.pos) < 6) {
+                    if (hostileCreep && (hostileCreep.pos.getRangeTo(creep.pos) < 6 || creep.room.controller && creep.room.controller.my)) {
                         return hostileCreep;
                     } else {
                         if (jobObject) {
@@ -1491,7 +1491,7 @@ const ExecuteJobs = {
                 /**@return {object} @return {undefined}*/
                 FindFetchObject: function (jobObject) {
                     const hostileCreep = creep.pos.findClosestByPath(FIND_HOSTILE_CREEPS);
-                    if (hostileCreep && hostileCreep.pos.getRangeTo(creep.pos) < 6) {
+                    if (hostileCreep && (hostileCreep.pos.getRangeTo(creep.pos) < 6 || creep.room.controller && creep.room.controller.my)) {
                         return hostileCreep;
                     } else {
                         if (jobObject) {
