@@ -1,7 +1,7 @@
 let CreateJobs = require('CreateJobs');
 let AssignJobs = require('AssignJobs');
 let ExecuteJobs = require('ExecuteJobs');
-let Towers = require('Towers');
+let RoomDefences = require('RoomDefences');
 let Links = require('Links');
 let Terminals = require('Terminals');
 let Factories = require('Factories');
@@ -74,7 +74,7 @@ module.exports.loop = function () {
                     opacity: 0.1,
                     strokeWidth: 1
                 });
-                Towers.run(gameRoom);
+                RoomDefences.run(gameRoom);
                 if (gameRoom.controller.level >= 7) {
                     Factories.run(gameRoom, gameRoomKey);
                     if (gameRoom.controller.level >= 8) {

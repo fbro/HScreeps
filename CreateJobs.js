@@ -68,12 +68,12 @@ const CreateJobs = {
                     }
                 } else if (color === COLOR_GREEN) { // claimer actions
                     if (secColor === COLOR_GREEN) { // claimer claim
-                        jobs = CreateFlagJob(jobs, 'ClaimCtrl', gameFlagKey, gameFlag, 'C');
+                        jobs = ClaimControllerJobs(jobs, gameFlagKey, gameFlag);
                     } else if (secColor === COLOR_YELLOW) { // claimer reserve
                         jobs = ReserveRoomJobs(jobs, gameFlagKey, gameFlag);
                     } else if (secColor === COLOR_ORANGE) { // claimer move to pos - used when one wants to enter a portal
                         jobs = CreateFlagJob(jobs, 'ClaimPos', gameFlagKey, gameFlag, 'C');
-                    }else if(secColor === COLOR_GREY){
+                    } else if (secColor === COLOR_GREY) {
                         // construction of spawn
                     } else {
                         notFound = true;
@@ -232,6 +232,23 @@ const CreateJobs = {
             jobs = CreateFlagJob(jobs, 'AtkP2', gameFlagKey, gameFlag, 'W');
             jobs = CreateFlagJob(jobs, 'MedP1', gameFlagKey, gameFlag, 'M');
             jobs = CreateFlagJob(jobs, 'MedP2', gameFlagKey, gameFlag, 'M');
+            return jobs;
+        }
+
+        function ClaimControllerJobs(jobs, gameFlagKey, gameFlag){
+            jobs = CreateFlagJob(jobs, 'ClaimCtrl', gameFlagKey, gameFlag, 'C');
+            const constructSpawnFlag = _.filter(Game.flags, function (flag) {
+                return flag.pos.roomName === gameFlag.pos.roomName && flag.color === COLOR_GREEN && flag.secondaryColor === COLOR_GREY;
+            })[0];
+            if(!constructSpawnFlag){
+                new RoomVisual(gameFlag.pos.roomName).text('NO SPAWN!', gameFlag.pos.x, gameFlag.pos.y);
+                Util.Warning('CreateJobs','ClaimControllerJobs',gameFlag.pos.roomName + ' no spawn flag found, add flag with primary color green and secondary color grey');
+                Game.map.visual.text('NO SPAWN FLAG!', new RoomPosition(5, 20, gameFlag.pos.roomName), {
+                    color: '#ff0000',
+                    fontSize: 10,
+                    opacity: 1
+                });
+            }
             return jobs;
         }
 

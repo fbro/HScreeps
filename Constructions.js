@@ -79,10 +79,10 @@ const Constructions = {
         //region construct functions
 
         function ConstructFirstSpawnAtFlag(gameRoom, flags) {
-            const spawnFlag = _.filter(flags, function (flag) {
+            const constructSpawnFlag = _.filter(flags, function (flag) {
                 return flag.color === COLOR_GREEN && flag.secondaryColor === COLOR_GREY;
             })[0];
-            if (spawnFlag) {
+            if (constructSpawnFlag) {
                 const structures = gameRoom.find(FIND_STRUCTURES, {
                     filter: function (structure) {
                         return !structure.my && structure.structureType !== STRUCTURE_CONTAINER;
@@ -100,25 +100,25 @@ const Constructions = {
                     constructions[constructionKey].remove();
                 }
                 const defenderFlagName = "Defend build site " + gameRoom.name;
-                const defenderFlag = spawnFlag.pos.findInRange(FIND_FLAGS, 1, {
+                const defenderFlag = constructSpawnFlag.pos.findInRange(FIND_FLAGS, 1, {
                     filter: function (flag) {
                         return flag.name === defenderFlagName && flag.color === COLOR_RED && flag.secondaryColor === COLOR_RED;
                     }
                 })[0];
                 if (!defenderFlag) {
-                    gameRoom.createFlag(spawnFlag.pos.x, spawnFlag.pos.y + 1, defenderFlagName, COLOR_RED, COLOR_RED);
+                    gameRoom.createFlag(constructSpawnFlag.pos.x, constructSpawnFlag.pos.y + 1, defenderFlagName, COLOR_RED, COLOR_RED);
                     Util.InfoLog('Constructions', 'ConstructFirstSpawnAtFlag', defenderFlagName);
                 }else{
-                    const spawnConstruction = spawnFlag.pos.lookFor(LOOK_CONSTRUCTION_SITES)[0];
+                    const spawnConstruction = constructSpawnFlag.pos.lookFor(LOOK_CONSTRUCTION_SITES)[0];
                     if(!spawnConstruction || spawnConstruction.structureType !== STRUCTURE_SPAWN){
-                        const spawnStructure = spawnFlag.pos.lookFor(LOOK_STRUCTURES)[0];
+                        const spawnStructure = constructSpawnFlag.pos.lookFor(LOOK_STRUCTURES)[0];
                         if(spawnStructure && spawnStructure.structureType === STRUCTURE_SPAWN){
-                            spawnFlag.remove();
+                            constructSpawnFlag.remove();
                             defenderFlag.remove();
                         }else{
-                            const result = gameRoom.createConstructionSite(spawnFlag.pos.x, spawnFlag.pos.y, STRUCTURE_SPAWN);
+                            const result = gameRoom.createConstructionSite(constructSpawnFlag.pos.x, constructSpawnFlag.pos.y, STRUCTURE_SPAWN);
                             if (result === OK) {
-                                Util.InfoLog('Constructions', 'ConstructFirstSpawnAtFlag', spawnFlag.pos + ' result ' + result);
+                                Util.InfoLog('Constructions', 'ConstructFirstSpawnAtFlag', constructSpawnFlag.pos + ' result ' + result);
                             }
                         }
                     }
