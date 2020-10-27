@@ -158,7 +158,7 @@ const Constructions = {
             if (spawn) {
                 BuildCheckeredPattern(gameRoom, structureType, roomTerrain, numberOfPossibleConstructions, spawn.pos, acceptedNumOfNearbyWalls);
             }
-            Util.Info('Constructions', 'ConstructCoreBuilding', gameRoom.name + ' ' + structureType);
+            Util.Info('Constructions', 'ConstructCoreBuilding', gameRoom.name + ' ' + structureType + ' spawn used ' + spawn);
         }
 
         function ConstructRampartsOn(gameRoom, roomTerrain, structureType) {

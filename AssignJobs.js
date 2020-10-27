@@ -86,7 +86,8 @@ const AssignJobs = {
                 && (Game.rooms[memRoomKey] && Game.rooms[memRoomKey].controller && Game.rooms[memRoomKey].controller.my && Game.rooms[memRoomKey].controller.level < 8
                     || !Game.rooms[memRoomKey]
                     || !Game.rooms[memRoomKey].controller
-                    || !Game.rooms[memRoomKey].controller.my)) {
+                    || !Game.rooms[memRoomKey].controller.my
+                )) {
                 // loop through all creeps of desired creepType and assign the nearest one to the job
                 let nearestCreep;
                 let bestRange = Number.MAX_SAFE_INTEGER;
@@ -124,13 +125,9 @@ const AssignJobs = {
                     if (gameRoom.controller) { // flag in controller-less room
                         if (gameRoom.controller.my) { // only use my room
                             if (availableSpawnsInRoom.length === 0) { // no spawn in my room
-                                Util.Info('AssignJobs', 'SpawnCreep', 'job in room has no available spawns ' + roomJobKey);
-                                if (!_.find(Game.spawns, function (spawn) {
-                                    return spawn.pos.roomName === gameRoom;
-                                })) {
-                                    Util.Info('AssignJobs', 'SpawnCreep', 'no spawns found in ' + gameRoom + ' for ' + roomJobKey);
-                                    maxLinearDistance = Number.MAX_SAFE_INTEGER;
-                                }
+                                //Util.Info('AssignJobs', 'SpawnCreep', 'job in room has no spawns ' + roomJobKey);
+                                maxLinearDistance = Number.MAX_SAFE_INTEGER;
+                                Util.MissingSpawnNotification(gameRoom.controller.pos);
                             } else {
                                 spawnLargeVersion = ShouldSpawnLargeVersion(gameRoom, roomJob);
                             }
@@ -267,7 +264,7 @@ const AssignJobs = {
                             }
                         }
                     } else { // no spawn in room - look in other rooms
-                        const linearDistance = Util.generateOuterRoomPath(memRoomKey, availableSpawn.pos.roomName);
+                        const linearDistance = Util.GenerateOuterRoomPath(memRoomKey, availableSpawn.pos.roomName);
                         if (linearDistance <= timeToLiveMaxRoomRange) { // spawn cannot be too far away
                             let energyAvailableModifier = 0;
                             if (!availableSpawn.room.storage || availableSpawn.room.storage.store.getUsedCapacity(RESOURCE_ENERGY) < Util.STORAGE_ENERGY_LOW) {
@@ -328,10 +325,10 @@ const AssignJobs = {
                     return false;
                 }
             } else {
-                Util.Warning('AssignJobs', 'SpawnCreep', 'no valid spawn for ' + availableName + ', job ' + roomJobKey +
-                    (bestAvailableSpawn ? ' spawn ' + bestAvailableSpawn.name + ' in ' + bestAvailableSpawn.pos.roomName
-                        + (bestAvailableSpawn.HasSpawned ? ' has just begun spawning a new creep' : '')
-                        + (bestAvailableSpawn.spawning ? ' is in the process of spawning ' + bestAvailableSpawn.spawning.name : '') : ' no spawn found!'));
+                //Util.Warning('AssignJobs', 'SpawnCreep', 'no valid spawn for ' + availableName + ', job ' + roomJobKey +
+                //    (bestAvailableSpawn ? ' spawn ' + bestAvailableSpawn.name + ' in ' + bestAvailableSpawn.pos.roomName
+                //        + (bestAvailableSpawn.HasSpawned ? ' has just begun spawning a new creep' : '')
+                //        + (bestAvailableSpawn.spawning ? ' is in the process of spawning ' + bestAvailableSpawn.spawning.name : '') : ' no spawn found!'));
                 return false;
             }
         }

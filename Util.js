@@ -332,7 +332,7 @@ const Util = {
         return (parsed[1] % 10 === 0) || (parsed[2] % 10 === 0);
     },
 
-    generateOuterRoomPath: function (to, from) { // return length - saves path in Memory
+    GenerateOuterRoomPath: function (to, from) { // return length - saves path in Memory
         if (!Memory.Paths) {
             Memory.Paths = {};
         }
@@ -362,13 +362,17 @@ const Util = {
                 Memory.Paths[to] = {};
             }
             let lastRoom = from;
-            for (const roomInRouteKey in route) {
-                const roomInRoute = route[roomInRouteKey];
-                Memory.Paths[to][lastRoom] = roomInRoute.room;
-                lastRoom = roomInRoute.room
+            if(route === ERR_NO_PATH){
+                //Util.Warning('Util', 'GenerateOuterRoomPath', 'Path can not be found! from ' + from + ' to ' + to);
+            }else{
+                for (const roomInRouteKey in route) {
+                    const roomInRoute = route[roomInRouteKey];
+                    Memory.Paths[to][lastRoom] = roomInRoute.room;
+                    lastRoom = roomInRoute.room
+                }
+                Util.Info('Util', 'GenerateOuterRoomPath', 'new path length ' + route.length + ' from ' + from + ' to ' + to + ' paths ' + JSON.stringify(Memory.Paths[to]));
+                return route.length;
             }
-            Util.Info('Util', 'generateOuterRoomPath', 'new path length ' + route.length + ' from ' + from + ' to ' + to + ' paths ' + JSON.stringify(Memory.Paths[to]));
-            return route.length;
         }else{
             let length = 0;
             let hasFoundDestination = false;
@@ -380,8 +384,26 @@ const Util = {
                     hasFoundDestination = true;
                 }
             }
-            Util.Info('Util', 'generateOuterRoomPath', 'calculated old path length ' + length + ' from ' + from + ' to ' + to);
+            //Util.Info('Util', 'GenerateOuterRoomPath', 'calculated old path length ' + length + ' from ' + from + ' to ' + to);
             return length;
+        }
+    },
+
+    MissingSpawnNotification: function (objectPosition) {
+        if(Memory.MemRooms[objectPosition.roomName].MissingSpawn !== Game.time){
+            const constructSpawnFlag = _.filter(Game.flags, function (flag) {
+                return flag.pos.roomName === objectPosition.roomName && flag.color === COLOR_GREEN && flag.secondaryColor === COLOR_GREY;
+            })[0];
+            if(!constructSpawnFlag){
+                new RoomVisual(objectPosition.roomName).text('NO SPAWN!', objectPosition.x, objectPosition.y);
+                Util.Warning('Util','MissingSpawnNotification',objectPosition.roomName + ' no spawn flag found, add flag with primary color green and secondary color grey');
+                Game.map.visual.text('NO SPAWN FLAG!', new RoomPosition(25, 25, objectPosition.roomName), {
+                    color: '#ff0000',
+                    fontSize: 10,
+                    opacity: 1
+                });
+            }
+            Memory.MemRooms[objectPosition.roomName].MissingSpawn = Game.time; // only notify once
         }
     },
 };

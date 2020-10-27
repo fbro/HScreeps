@@ -38,6 +38,7 @@ module.exports.loop = function () {
                                 delete memRoom.TowerIds; // remove TowerIds - maybe a tower have been deleted ect.
                                 delete memRoom.ObserverId; // remove ObserverId - maybe an observer have been deleted ect.
                                 delete memRoom.Built; // remove BuiltRoads - maybe some of the road have eroded away?
+                                delete memRoom.MissingSpawn; // remove the missing spawn notification handler
                                 MaxCreepsCleanup(memRoomKey, memRoom, foundCreeps);
                                 UnusedRoomsCleanup(memRoomKey, memRoom);
                                 DefendFlagsCleanup(memRoomKey);

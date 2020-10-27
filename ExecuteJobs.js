@@ -900,7 +900,7 @@ const ExecuteJobs = {
                 },
                 /**@return {int}*/
                 Act: function (jobObject) { // get the resource
-                    if (jobObject.resourceType) { // drop
+                    if (jobObject.resourceType) { // drop type
                         return creep.pickup(jobObject);
                     } else {
                         return creep.withdraw(jobObject, resourceType);
@@ -935,7 +935,9 @@ const ExecuteJobs = {
                 if (resourceType === RESOURCE_ENERGY) {
                     if (storage.store.getUsedCapacity(RESOURCE_ENERGY) < Util.STORAGE_ENERGY_LOW) {
                         return 0;
-                    } else {
+                    } else if(storage.room.controller.level < 8){
+                        return Util.TERMINAL_TARGET_ENERGY;
+                    }else {
                         return Util.TERMINAL_EMPTY_ENERGY;
                     }
                 } else {
@@ -1619,6 +1621,7 @@ const ExecuteJobs = {
                             creep.memory.HealthCheck = true;
                         } else {
                             Util.Info('ExecuteJobs', 'JobMoveToPosition', creep.name + ' committed suicide ticksToLive ' + creep.ticksToLive);
+                            new RoomVisual(creep.pos.roomName).text("💀", creep.pos);
                             creep.suicide();
                             return OK;
                         }
@@ -2875,7 +2878,7 @@ const ExecuteJobs = {
                     }
                 }
                 if (result === ERR_NO_RESULT_FOUND) { // calculate path
-                    Util.generateOuterRoomPath(to.roomName, from.roomName); // saves result in Memory.Paths
+                    Util.GenerateOuterRoomPath(to.roomName, from.roomName); // saves result in Memory.Paths
                     getInnerRoomPath(to, creep);
                     result = creep.moveByPath(creep.memory.CachedPath);
                 }

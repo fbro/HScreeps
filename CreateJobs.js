@@ -37,11 +37,13 @@ const CreateJobs = {
                         jobs = CreateFlagJob(jobs, 'TrnsprtP', gameFlagKey, gameFlag, 'T');
                     } else if (secColor === COLOR_CYAN) { // flag that observers create and put on deposits and deletes again when deadline is reached
                         jobs = CreateFlagJob(jobs, 'HrvstDpst', gameFlagKey, gameFlag, 'D');
-                    } else if (secColor === COLOR_BROWN) { // transporter move to pos
+                    } else if (secColor === COLOR_BROWN) { // transporter move to pos - used when one wants to enter a portal
                         jobs = CreateFlagJob(jobs, 'TransPos', gameFlagKey, gameFlag, 'T');
-                    } else if (secColor === COLOR_BLUE) { // harvester move to pos
+                    } else if (secColor === COLOR_BLUE) { // harvester move to pos - used when one wants to enter a portal
                         jobs = CreateFlagJob(jobs, 'HarvestPos', gameFlagKey, gameFlag, 'H');
-                    } else if (secColor === COLOR_GREEN) { // builder move to pos
+                    } else if (secColor === COLOR_GREEN) { // claimer move to pos - used when one wants to enter a portal
+                        jobs = CreateFlagJob(jobs, 'ClaimPos', gameFlagKey, gameFlag, 'C');
+                    } else if (secColor === COLOR_WHITE) { // builder move to pos - used when one wants to enter a portal
                         jobs = CreateFlagJob(jobs, 'BuildPos', gameFlagKey, gameFlag, 'B');
                     } else {
                         notFound = true;
@@ -71,8 +73,6 @@ const CreateJobs = {
                         jobs = ClaimControllerJobs(jobs, gameFlagKey, gameFlag);
                     } else if (secColor === COLOR_YELLOW) { // claimer reserve
                         jobs = ReserveRoomJobs(jobs, gameFlagKey, gameFlag);
-                    } else if (secColor === COLOR_ORANGE) { // claimer move to pos - used when one wants to enter a portal
-                        jobs = CreateFlagJob(jobs, 'ClaimPos', gameFlagKey, gameFlag, 'C');
                     } else if (secColor === COLOR_GREY) {
                         // construction of spawn
                     } else {
@@ -237,18 +237,7 @@ const CreateJobs = {
 
         function ClaimControllerJobs(jobs, gameFlagKey, gameFlag){
             jobs = CreateFlagJob(jobs, 'ClaimCtrl', gameFlagKey, gameFlag, 'C');
-            const constructSpawnFlag = _.filter(Game.flags, function (flag) {
-                return flag.pos.roomName === gameFlag.pos.roomName && flag.color === COLOR_GREEN && flag.secondaryColor === COLOR_GREY;
-            })[0];
-            if(!constructSpawnFlag){
-                new RoomVisual(gameFlag.pos.roomName).text('NO SPAWN!', gameFlag.pos.x, gameFlag.pos.y);
-                Util.Warning('CreateJobs','ClaimControllerJobs',gameFlag.pos.roomName + ' no spawn flag found, add flag with primary color green and secondary color grey');
-                Game.map.visual.text('NO SPAWN FLAG!', new RoomPosition(5, 20, gameFlag.pos.roomName), {
-                    color: '#ff0000',
-                    fontSize: 10,
-                    opacity: 1
-                });
-            }
+            Util.MissingSpawnNotification(gameFlag.pos);
             return jobs;
         }
 
@@ -478,14 +467,14 @@ const CreateJobs = {
             // terminal
             if (gameRoom.terminal) {
                 for (const resourceType in gameRoom.terminal.store) {
-                    const amount = gameRoom.terminal.store.getUsedCapacity(resourceType);
+                    const terminalAmount = gameRoom.terminal.store.getUsedCapacity(resourceType);
                     if (
                         resourceType === RESOURCE_ENERGY && (
-                            amount >= Util.TERMINAL_EMPTY_ENERGY
-                            || (gameRoom.storage.store.getUsedCapacity(resourceType) < Util.STORAGE_ENERGY_LOW || !gameRoom.storage.store.getUsedCapacity(resourceType))
-                            && amount >= Util.TERMINAL_TARGET_ENERGY
+                            terminalAmount >= Util.TERMINAL_EMPTY_ENERGY
+                            || (gameRoom.storage.store.getUsedCapacity(resourceType) < Util.STORAGE_ENERGY_LOW || !gameRoom.storage.store.getUsedCapacity(resourceType) || gameRoom.controller.level < 8)
+                            && terminalAmount >= Util.TERMINAL_TARGET_ENERGY // must have at least this energy amount else job should not be created
                         )
-                        || amount !== RESOURCE_ENERGY && amount > Util.TERMINAL_EMPTY_RESOURCE
+                        || terminalAmount !== RESOURCE_ENERGY && terminalAmount > Util.TERMINAL_EMPTY_RESOURCE
                     ) {
                         AddJob(roomJobs, 'FillStrg-' + gameRoom.terminal.structureType + '(' + gameRoom.terminal.pos.x + ',' + gameRoom.terminal.pos.y + ',' + resourceType + ')' + gameRoom.name, gameRoom.terminal.id, Util.OBJECT_JOB, 'T');
                     }
