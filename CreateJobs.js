@@ -38,13 +38,13 @@ const CreateJobs = {
                     } else if (secColor === COLOR_CYAN) { // flag that observers create and put on deposits and deletes again when deadline is reached
                         jobs = CreateFlagJob(jobs, 'HrvstDpst', gameFlagKey, gameFlag, 'D');
                     } else if (secColor === COLOR_BROWN) { // transporter move to pos - used when one wants to enter a portal
-                        jobs = CreateFlagJob(jobs, 'TransPos', gameFlagKey, gameFlag, 'T');
+                        jobs = CreateFlagJob(jobs, 'TransPos', gameFlagKey, gameFlag, 'T', true);
                     } else if (secColor === COLOR_BLUE) { // harvester move to pos - used when one wants to enter a portal
-                        jobs = CreateFlagJob(jobs, 'HarvestPos', gameFlagKey, gameFlag, 'H');
+                        jobs = CreateFlagJob(jobs, 'HarvestPos', gameFlagKey, gameFlag, 'H', true);
                     } else if (secColor === COLOR_GREEN) { // claimer move to pos - used when one wants to enter a portal
-                        jobs = CreateFlagJob(jobs, 'ClaimPos', gameFlagKey, gameFlag, 'C');
+                        jobs = CreateFlagJob(jobs, 'ClaimPos', gameFlagKey, gameFlag, 'C', true);
                     } else if (secColor === COLOR_WHITE) { // builder move to pos - used when one wants to enter a portal
-                        jobs = CreateFlagJob(jobs, 'BuildPos', gameFlagKey, gameFlag, 'B');
+                        jobs = CreateFlagJob(jobs, 'BuildPos', gameFlagKey, gameFlag, 'B', true);
                     } else {
                         notFound = true;
                     }
@@ -94,9 +94,14 @@ const CreateJobs = {
             return jobs;
         }
 
-        function CreateFlagJob(jobs, jobName, gameFlagKey, gameFlag, creepType) {
+        function CreateFlagJob(jobs, jobName, gameFlagKey, gameFlag, creepType, isForeignRoom = false) {
             //Util.Info('CreateJobs', 'CreateFlagJob', 'AddJob ' + gameFlagKey);
-            return AddJob(jobs, jobName + '-' + gameFlagKey + '(' + gameFlag.pos.x + ',' + gameFlag.pos.y + ')' + gameFlag.pos.roomName, gameFlagKey, Util.FLAG_JOB, creepType);
+            const jobStringName = jobName + '-' + gameFlagKey + '(' + gameFlag.pos.x + ',' + gameFlag.pos.y + ')' + gameFlag.pos.roomName;
+            jobs = AddJob(jobs, jobStringName, gameFlagKey, Util.FLAG_JOB, creepType);
+            if(isForeignRoom){
+                jobs[jobStringName].IsForeignRoom = true;
+            }
+            return jobs;
         }
 
         function CreateObjJobs(flagJobs) {

@@ -290,7 +290,7 @@ const AssignJobs = {
 
         /**@return {boolean}*/
         function SpawningCreep(bestAvailableSpawn, spawnLargeVersion, roomJob, roomJobKey, memRoomKey) {
-            const availableName = GetAvailableName(roomJob.CreepType);
+            const availableName = GetAvailableName(roomJob.CreepType, roomJob.IsForeignRoom);
             if (bestAvailableSpawn && !bestAvailableSpawn.HasSpawned && !bestAvailableSpawn.spawning) { // the closest spawn is found
                 let spawnAgileVersion = false;
                 if (memRoomKey !== bestAvailableSpawn.pos.roomName) {
@@ -775,8 +775,8 @@ const AssignJobs = {
         }
 
         /**@return {string}*/
-        function GetAvailableName(creepType) {
-            let availableCount = 1;
+        function GetAvailableName(creepType, isForeignRoom) {
+            let availableCount = isForeignRoom ? Game.shard.name * 1000 : 1;
             while (true) {
                 if (Memory.creeps[creepType + availableCount]) {
                     availableCount++;

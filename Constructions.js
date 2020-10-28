@@ -164,12 +164,11 @@ const Constructions = {
 
         function ConstructCoreBuilding(gameRoom, roomTerrain, structureType, mainSpawn, acceptedNumOfNearbyWalls) {
             let numberOfPossibleConstructions = GetNumberOfPossibleConstructions(gameRoom, structureType);
-            if (!numberOfPossibleConstructions) {
+            if (!mainSpawn || !numberOfPossibleConstructions) {
                 return;
             }
-            if (mainSpawn) {
-                BuildCheckeredPattern(gameRoom, structureType, roomTerrain, numberOfPossibleConstructions, mainSpawn.pos, acceptedNumOfNearbyWalls);
-            }
+            BuildCheckeredPattern(gameRoom, structureType, roomTerrain, numberOfPossibleConstructions, mainSpawn.pos, acceptedNumOfNearbyWalls);
+
             Util.Info('Constructions', 'ConstructCoreBuilding', gameRoom.name + ' ' + structureType + ' spawn used ' + mainSpawn);
         }
 
@@ -338,9 +337,9 @@ const Constructions = {
             Util.Info('Constructions', 'ConstructLinks', gameRoom.name);
         }
 
-        function ConstructExtractor(gameRoom) {
+        function ConstructExtractor(gameRoom, mainSpawn) {
             let numberOfPossibleConstructions = GetNumberOfPossibleConstructions(gameRoom, STRUCTURE_EXTRACTOR);
-            if (!numberOfPossibleConstructions) {
+            if (!mainSpawn || !numberOfPossibleConstructions) {
                 return;
             }
             const mineral = gameRoom.find(FIND_MINERALS)[0];
