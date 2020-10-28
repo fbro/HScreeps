@@ -564,6 +564,9 @@ const AssignJobs = {
                         case (energyAvailable >= 800): // energyCapacityAvailable: 1300
                             body = [WORK, WORK, WORK, WORK, WORK, WORK, CARRY, MOVE, MOVE, MOVE];
                             break;
+                        case (energyAvailable >= 300): // energyCapacityAvailable: 1300
+                            body = [WORK, WORK, CARRY, MOVE];
+                            break;
                     }
                     break;
                 // scout
@@ -776,7 +779,7 @@ const AssignJobs = {
 
         /**@return {string}*/
         function GetAvailableName(creepType, isForeignRoom) {
-            let availableCount = isForeignRoom ? Game.shard.name * 1000 : 1;
+            let availableCount = isForeignRoom ? Game.shard.name.substring(5,6) * 1000 : 1;
             while (true) {
                 if (Memory.creeps[creepType + availableCount]) {
                     availableCount++;

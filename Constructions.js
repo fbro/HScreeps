@@ -498,7 +498,9 @@ const Constructions = {
                         return structure.structureType === STRUCTURE_SPAWN;
                     }
                 })[0];
-                spawnPos = constructionSpawn.pos
+                if(constructionSpawn){
+                    spawnPos = constructionSpawn.pos
+                }
             }else{
                 spawnPos = mainSpawn.pos;
             }

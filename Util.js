@@ -390,7 +390,7 @@ const Util = {
     },
 
     MissingSpawnNotification: function (objectPosition) {
-        if(Memory.MemRooms[objectPosition.roomName].MissingSpawn !== Game.time){
+        if(Memory.MemRooms[objectPosition.roomName] && Memory.MemRooms[objectPosition.roomName].MissingSpawn !== Game.time){
             const constructSpawnFlag = _.filter(Game.flags, function (flag) {
                 return flag.pos.roomName === objectPosition.roomName && flag.color === COLOR_GREEN && flag.secondaryColor === COLOR_GREY;
             })[0];

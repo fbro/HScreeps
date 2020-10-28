@@ -538,7 +538,7 @@ const ExecuteJobs = {
                     } else {
                         fetchObject = FindClosestFreeStore(creep, 2);
                     }
-                    if (!fetchObject && jobObject.room.controller.level <= 3) {
+                    if (!fetchObject && Memory.MemRooms[jobObject.room.name].MissingSpawn) {
                         const spawnConstruction = jobObject.room.find(FIND_MY_CONSTRUCTION_SITES, { // if there is a spawn that should be built - then built it
                             filter: function (c) {
                                 return c.structureType === STRUCTURE_SPAWN;

@@ -13,7 +13,6 @@ let Labs = require('Labs');
 let Constructions = require('Constructions');
 
 module.exports.loop = function () {
-
     Controller();
 
     function Controller() {
