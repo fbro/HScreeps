@@ -592,9 +592,6 @@ const ExecuteJobs = {
                     return result;
                 },
             });
-            if (result === ERR_BUSY) {
-                console.log("TEST result === ERR_BUSY");
-            }
             if (result !== OK && result !== JOB_MOVING && result !== ERR_TIRED && result !== ERR_BUSY) {
                 Util.Warning('ExecuteJobs', 'JobSource', 'harvester result is not OK ' + result + ' ' + creep.name + '(' + creep.pos.x + ',' + creep.pos.y + ',' + creep.pos.roomName + ')');
             }
@@ -935,9 +932,9 @@ const ExecuteJobs = {
                 if (resourceType === RESOURCE_ENERGY) {
                     if (storage.store.getUsedCapacity(RESOURCE_ENERGY) < Util.STORAGE_ENERGY_LOW) {
                         return 0;
-                    } else if(storage.room.controller.level < 8){
+                    } else if (storage.room.controller.level < 8) {
                         return Util.TERMINAL_TARGET_ENERGY;
-                    }else {
+                    } else {
                         return Util.TERMINAL_EMPTY_ENERGY;
                     }
                 } else {
@@ -1361,16 +1358,19 @@ const ExecuteJobs = {
                     if (!fetchObject.my && fetchObject.owner) {
                         let result = creep.attackController(fetchObject);
                         if (result === OK) {
-                            Util.InfoLog('ExecuteJobs', 'JobClaimController', 'attackController ' + creep.name + ' in ' + jobObject.pos.roomName + ' tag ' + jobObject.name);
+                            Util.InfoLog('ExecuteJobs', 'JobClaimController', 'attackController ' + creep.name + ' in ' + jobObject.pos.roomName + ' flag ' + jobObject.name);
                         }
                         return result;
                     } else {
                         let result = creep.claimController(fetchObject);
                         if (result === OK) {
-                            Util.InfoLog('ExecuteJobs', 'JobClaimController', 'done ' + creep.name + ' in ' + jobObject.pos.roomName + ' tag ' + jobObject.name);
+                            Util.InfoLog('ExecuteJobs', 'JobClaimController', 'done ' + creep.name + ' in ' + jobObject.pos.roomName + ' flag ' + jobObject.name);
                             jobObject.remove();
                             return JOB_IS_DONE;
                         } else {
+                            if(result === ERR_GCL_NOT_ENOUGH){
+                                Util.Warning('ExecuteJobs', 'JobClaimController', 'ERR_GCL_NOT_ENOUGH ' + creep.name + ' in ' + jobObject.pos.roomName + ' flag ' + jobObject.name);
+                            }
                             return result;
                         }
                     }
@@ -2151,15 +2151,15 @@ const ExecuteJobs = {
         /**@return {int}*/
         function GenericFlagAction(creep, roomJob, actionFunctions) {
             const flagObj = Game.flags[roomJob.JobId];
-            const nearbyHostileCreeps = creep.pos.findInRange(FIND_HOSTILE_CREEPS, 7);
-            if (nearbyHostileCreeps.length > 0) {
-                if (creep.memory.FleeCounter && creep.pos.findInRange(FIND_HOSTILE_CREEPS, 5).length > 0) {
-                    if (creep.memory.FleeCounter > 0) {
-                        creep.memory.FleeCounter--;
-                    } else {
-                        delete creep.memory.FleeCounter;
-                    }
+            if (creep.memory.FleeCounter) { // ignore hostiles - move on
+                if (creep.memory.FleeCounter > 0) {
+                    creep.memory.FleeCounter--;
                 } else {
+                    delete creep.memory.FleeCounter;
+                }
+            } else {
+                const nearbyHostileCreeps = creep.pos.findInRange(FIND_HOSTILE_CREEPS, 7);
+                if (nearbyHostileCreeps.length > 0) {
                     const hostileActionResult = CreepHostileAction(creep, nearbyHostileCreeps);
                     if (hostileActionResult !== CREEP_IGNORED_HOSTILE) {
                         return OK;

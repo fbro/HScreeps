@@ -171,6 +171,10 @@ module.exports.loop = function () {
 
 // TODO when under level 8 - enable creep emptying terminals with energy - this will boost controller upgrading
 
+// TODO test gunner creep attack logic
+
+// TODO find out why this fails: shard 3 !!ERROR!! ExecuteJobs JobAction | ERR_NO_RESULT_FOUND BuildPos-Flag2(29,43)W50N50 -20 B11
+
 // attack NPC strongholds
 // harvest middle rooms
 // harvest neutral rooms
