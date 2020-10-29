@@ -32,21 +32,21 @@ const Links = {
                     }).length > 0) {
                         storageLink = links[i];
                         storageLinkId = storageLink.id;
-                    }else {
+                    } else {
                         let container = links[i].pos.findInRange(FIND_STRUCTURES, 1, {
                             filter: (s) => {
                                 return s.structureType === STRUCTURE_CONTAINER;
                             }
                         })[0];
 
-                        if(container && container.pos.findInRange(FIND_STRUCTURES, 1, {
+                        if (container && container.pos.findInRange(FIND_STRUCTURES, 1, {
                             filter: (s) => {
                                 return s.structureType === STRUCTURE_CONTROLLER;
                             }
-                        }).length > 0){
+                        }).length > 0) {
                             controllerLink = links[i];
                             controllerLinkId = controllerLink.id;
-                        }else if(container && container.pos.findInRange(FIND_SOURCES, 1).length > 0){
+                        } else if (container && container.pos.findInRange(FIND_SOURCES, 1).length > 0) {
                             harvesterLinks.push(links[i]);
                             harvesterLinksId.push(links[i].id);
                         }

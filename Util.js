@@ -362,9 +362,9 @@ const Util = {
                 Memory.Paths[to] = {};
             }
             let lastRoom = from;
-            if(route === ERR_NO_PATH){
+            if (route === ERR_NO_PATH) {
                 //Util.Warning('Util', 'GenerateOuterRoomPath', 'Path can not be found! from ' + from + ' to ' + to);
-            }else{
+            } else {
                 for (const roomInRouteKey in route) {
                     const roomInRoute = route[roomInRouteKey];
                     Memory.Paths[to][lastRoom] = roomInRoute.room;
@@ -373,14 +373,14 @@ const Util = {
                 Util.Info('Util', 'GenerateOuterRoomPath', 'new path length ' + route.length + ' from ' + from + ' to ' + to + ' paths ' + JSON.stringify(Memory.Paths[to]));
                 return route.length;
             }
-        }else{
+        } else {
             let length = 0;
             let hasFoundDestination = false;
             let pointer = from;
-            while(!hasFoundDestination){
+            while (!hasFoundDestination) {
                 pointer = Memory.Paths[to][pointer];
                 length++;
-                if(pointer === to){
+                if (pointer === to) {
                     hasFoundDestination = true;
                 }
             }
@@ -390,13 +390,13 @@ const Util = {
     },
 
     MissingSpawnNotification: function (objectPosition) {
-        if(Memory.MemRooms[objectPosition.roomName] && Memory.MemRooms[objectPosition.roomName].MissingSpawn !== Game.time){
+        if (Memory.MemRooms[objectPosition.roomName] && Memory.MemRooms[objectPosition.roomName].MissingSpawn !== Game.time) {
             const constructSpawnFlag = _.filter(Game.flags, function (flag) {
                 return flag.pos.roomName === objectPosition.roomName && flag.color === COLOR_GREEN && flag.secondaryColor === COLOR_GREY;
             })[0];
-            if(!constructSpawnFlag){
+            if (!constructSpawnFlag) {
                 new RoomVisual(objectPosition.roomName).text('NO SPAWN!', objectPosition.x, objectPosition.y);
-                Util.Warning('Util','MissingSpawnNotification',objectPosition.roomName + ' no spawn flag found, add flag with primary color green and secondary color grey');
+                Util.Warning('Util', 'MissingSpawnNotification', objectPosition.roomName + ' no spawn flag found, add flag with primary color green and secondary color grey');
                 Game.map.visual.text('NO SPAWN FLAG!', new RoomPosition(25, 25, objectPosition.roomName), {
                     color: '#ff0000',
                     fontSize: 10,

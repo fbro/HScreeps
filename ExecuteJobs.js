@@ -1366,7 +1366,7 @@ const ExecuteJobs = {
                             jobObject.remove();
                             return JOB_IS_DONE;
                         } else {
-                            if(result === ERR_GCL_NOT_ENOUGH){
+                            if (result === ERR_GCL_NOT_ENOUGH) {
                                 Util.Warning('ExecuteJobs', 'JobClaimController', 'ERR_GCL_NOT_ENOUGH ' + creep.name + ' in ' + jobObject.pos.roomName + ' flag ' + jobObject.name);
                             }
                             return result;
@@ -2644,7 +2644,7 @@ const ExecuteJobs = {
                 result = creep.attack(closestHostile);
             }
             // ranged attacker logic
-            if((result === ERR_NO_RESULT_FOUND || result === ERR_NOT_IN_RANGE) && creep.getActiveBodyparts(RANGED_ATTACK)){
+            if ((result === ERR_NO_RESULT_FOUND || result === ERR_NOT_IN_RANGE) && creep.getActiveBodyparts(RANGED_ATTACK)) {
                 result = creep.rangedAttack(closestHostile);
                 if (result === OK && creep.pos.getRangeTo(closestHostile) <= 2) { // creep could do a ranged attack - maybe it should move away?
                     const nearestRampart = creep.pos.findClosestByPath(FIND_MY_STRUCTURES, {

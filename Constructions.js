@@ -110,14 +110,14 @@ const Constructions = {
                 if (!defenderFlag) {
                     gameRoom.createFlag(constructSpawnFlag.pos.x, constructSpawnFlag.pos.y + 1, defenderFlagName, COLOR_RED, COLOR_RED);
                     Util.InfoLog('Constructions', 'ConstructFirstSpawnAtFlag', defenderFlagName);
-                }else{
+                } else {
                     const spawnConstruction = constructSpawnFlag.pos.lookFor(LOOK_CONSTRUCTION_SITES)[0];
-                    if(!spawnConstruction || spawnConstruction.structureType !== STRUCTURE_SPAWN){
+                    if (!spawnConstruction || spawnConstruction.structureType !== STRUCTURE_SPAWN) {
                         const spawnStructure = constructSpawnFlag.pos.lookFor(LOOK_STRUCTURES)[0];
-                        if(spawnStructure && spawnStructure.structureType === STRUCTURE_SPAWN){
+                        if (spawnStructure && spawnStructure.structureType === STRUCTURE_SPAWN) {
                             constructSpawnFlag.remove();
                             defenderFlag.remove();
-                        }else{
+                        } else {
                             const result = gameRoom.createConstructionSite(constructSpawnFlag.pos.x, constructSpawnFlag.pos.y, STRUCTURE_SPAWN);
                             if (result === OK) {
                                 Util.InfoLog('Constructions', 'ConstructFirstSpawnAtFlag', constructSpawnFlag.pos + ' result ' + result);
@@ -128,15 +128,15 @@ const Constructions = {
             }
         }
 
-        function FindMainSpawn(gameRoom){
+        function FindMainSpawn(gameRoom) {
             let mainSpawn = Game.getObjectById(Memory.MemRooms[gameRoom.name].MainSpawnId);
-            if(!mainSpawn){
+            if (!mainSpawn) {
                 mainSpawn = gameRoom.find(FIND_MY_STRUCTURES, {
                     filter: function (structure) {
                         return structure.structureType === STRUCTURE_SPAWN;
                     }
                 })[0];
-                if(mainSpawn){
+                if (mainSpawn) {
                     Memory.MemRooms[gameRoom.name].MainSpawnId = mainSpawn.id;
                 }
             }
@@ -498,10 +498,10 @@ const Constructions = {
                         return structure.structureType === STRUCTURE_SPAWN;
                     }
                 })[0];
-                if(constructionSpawn){
+                if (constructionSpawn) {
                     spawnPos = constructionSpawn.pos
                 }
-            }else{
+            } else {
                 spawnPos = mainSpawn.pos;
             }
             if (spawnPos) {

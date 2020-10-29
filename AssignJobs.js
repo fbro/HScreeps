@@ -380,24 +380,19 @@ const AssignJobs = {
                     switch (true) {
                         case (energyAvailable >= 2000 && spawnAgileVersion): // energyCapacityAvailable: 12900
                             body = [
-                                CARRY, CARRY, CARRY, CARRY, CARRY,
-                                CARRY, CARRY, CARRY, CARRY, CARRY,
-                                CARRY, CARRY, CARRY, CARRY, CARRY,
-                                CARRY, CARRY, CARRY, CARRY, CARRY,
-                                MOVE, MOVE, MOVE, MOVE, MOVE,
-                                MOVE, MOVE, MOVE, MOVE, MOVE,
-                                MOVE, MOVE, MOVE, MOVE, MOVE,
-                                MOVE, MOVE, MOVE, MOVE, MOVE
+                                CARRY, MOVE, CARRY, MOVE, CARRY, MOVE, CARRY, MOVE, CARRY, MOVE,
+                                CARRY, MOVE, CARRY, MOVE, CARRY, MOVE, CARRY, MOVE, CARRY, MOVE,
+                                CARRY, MOVE, CARRY, MOVE, CARRY, MOVE, CARRY, MOVE, CARRY, MOVE,
+                                CARRY, MOVE, CARRY, MOVE, CARRY, MOVE, CARRY, MOVE, CARRY, MOVE
                             ];
                             break;
                         case (energyAvailable >= 1500 && !spawnAgileVersion): // energyCapacityAvailable: 12900
                             body = [
-                                CARRY, CARRY, CARRY, CARRY, CARRY,
-                                CARRY, CARRY, CARRY, CARRY, CARRY,
-                                CARRY, CARRY, CARRY, CARRY, CARRY,
-                                CARRY, CARRY, CARRY, CARRY, CARRY,
-                                MOVE, MOVE, MOVE, MOVE, MOVE,
-                                MOVE, MOVE, MOVE, MOVE, MOVE
+                                CARRY, CARRY, MOVE, CARRY, CARRY, MOVE,
+                                CARRY, CARRY, MOVE, CARRY, CARRY, MOVE,
+                                CARRY, CARRY, MOVE, CARRY, CARRY, MOVE,
+                                CARRY, CARRY, MOVE, CARRY, CARRY, MOVE,
+                                CARRY, CARRY, MOVE, CARRY, CARRY, MOVE,
                             ];
                             break;
                         case (energyAvailable >= 1500 && spawnAgileVersion): // energyCapacityAvailable: 5600
@@ -788,7 +783,7 @@ const AssignJobs = {
                     break; // name is free
                 }
             }
-            return creepType + (isForeignRoom ? Game.shard.name.substring(5,6) * 1000 + availableCount : availableCount);
+            return creepType + (isForeignRoom ? Game.shard.name.substring(5, 6) * 1000 + availableCount : availableCount);
         }
     }
 };

@@ -98,7 +98,7 @@ const CreateJobs = {
             //Util.Info('CreateJobs', 'CreateFlagJob', 'AddJob ' + gameFlagKey);
             const jobStringName = jobName + '-' + gameFlagKey + '(' + gameFlag.pos.x + ',' + gameFlag.pos.y + ')' + gameFlag.pos.roomName;
             jobs = AddJob(jobs, jobStringName, gameFlagKey, Util.FLAG_JOB, creepType);
-            if(isForeignRoom){
+            if (isForeignRoom) {
                 jobs[jobStringName].IsForeignRoom = true;
             }
             return jobs;
@@ -240,7 +240,7 @@ const CreateJobs = {
             return jobs;
         }
 
-        function ClaimControllerJobs(jobs, gameFlagKey, gameFlag){
+        function ClaimControllerJobs(jobs, gameFlagKey, gameFlag) {
             jobs = CreateFlagJob(jobs, 'ClaimCtrl', gameFlagKey, gameFlag, 'C');
             Util.MissingSpawnNotification(gameFlag.pos);
             return jobs;

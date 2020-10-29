@@ -107,7 +107,7 @@ const RoomDefences = {
                         return bodypart.boost !== undefined;
                     });
                     if (isBoosted) {
-                        Util.InfoLog('RoomDefences', 'ActivateSafemode', gameRoom.name + ' attacked from ' + hostileTarget.owner.username + ' towers ' + towers.length + ' time ' + Game.time);
+                        Util.InfoLog('RoomDefences', 'ActivateSafemode', gameRoom.name + ' attacked from ' + hostileTarget.owner.username + ' towers ' + towers.length);
                         if (!gameRoom.controller.safeMode && !gameRoom.controller.safeModeCooldown && gameRoom.controller.safeModeAvailable > 0) {
                             const result = gameRoom.controller.activateSafeMode();
                             Util.InfoLog('RoomDefences', 'ActivateSafemode', gameRoom.name + ' ' + result + ' attacked from ' + hostileTarget.owner.username + ' towers ' + towers.length + ' time ' + Game.time);
@@ -132,7 +132,6 @@ const RoomDefences = {
             })[0];
             let numOfDefenderFlagsPlaced = 0;
             if (spawn) {
-                Util.InfoLog('RoomDefences', 'SpawnDefenders', gameRoom.name + ' numOfDefendersToSpawn ' + numOfDefendersToSpawn);
                 for (let x = spawn.pos.x - 2; x <= spawn.pos.x + 2; x++) {
                     for (let y = spawn.pos.y - 2; y <= spawn.pos.y + 2; y++) {
                         if (y === spawn.pos.y + 2 || y === spawn.pos.y - 2 || x === spawn.pos.x + 2 || x === spawn.pos.x - 2) { // a ring of flags is created
@@ -144,7 +143,7 @@ const RoomDefences = {
                             } else {
                                 const nameOfFlag = 'defend_' + gameRoom.name + '_' + (numOfDefenderFlagsPlaced + 1);
                                 const result = gameRoom.createFlag(x, y, nameOfFlag, COLOR_RED, COLOR_BLUE);
-                                Util.InfoLog('RoomDefences', 'SpawnDefenders', 'placed defender flag at (' + x + ',' + y + ',' + gameRoom.name + ') result ' + result + ' existingDefendFlags ' + existingDefendFlags.length + ' numOfDefenderFlagsPlaced ' + numOfDefenderFlagsPlaced);
+                                Util.InfoLog('RoomDefences', 'SpawnDefenders', 'placed defender flag at (' + x + ',' + y + ',' + gameRoom.name + ') result ' + result + ' numOfDefenderFlagsPlaced ' + numOfDefenderFlagsPlaced);
                                 if (result === nameOfFlag) {
                                     numOfDefenderFlagsPlaced++;
                                 }
