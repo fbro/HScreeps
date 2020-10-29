@@ -135,7 +135,7 @@ const RoomDefences = {
                 Util.InfoLog('RoomDefences', 'SpawnDefenders', gameRoom.name + ' numOfDefendersToSpawn ' + numOfDefendersToSpawn);
                 for (let x = spawn.pos.x - 2; x <= spawn.pos.x + 2; x++) {
                     for (let y = spawn.pos.y - 2; y <= spawn.pos.y + 2; y++) {
-                        if ((y === spawn.pos.y + 2 || y === spawn.pos.y - 2) && (x === spawn.pos.x + 2 || x === spawn.pos.x - 2)) { // a ring of flags is created
+                        if (y === spawn.pos.y + 2 || y === spawn.pos.y - 2 || x === spawn.pos.x + 2 || x === spawn.pos.x - 2) { // a ring of flags is created
                             const existingDefendFlags = _.filter(gameRoom.lookForAt(LOOK_FLAGS, x, y), function (flag) {
                                 return flag.name.startsWith('defend');
                             });

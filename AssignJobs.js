@@ -83,6 +83,7 @@ const AssignJobs = {
         /**@return {boolean}*/
         function AssignCreepOtherRoom(roomJob, idleCreeps, roomJobKey, memRoomKey) {
             if (roomJob.JobType === Util.FLAG_JOB
+                && !roomJob.IsForeignRoom // when the job is sending creeps to other rooms then force new spawn with proper creep name
                 && (Game.rooms[memRoomKey] && Game.rooms[memRoomKey].controller && Game.rooms[memRoomKey].controller.my && Game.rooms[memRoomKey].controller.level < 8
                     || !Game.rooms[memRoomKey]
                     || !Game.rooms[memRoomKey].controller

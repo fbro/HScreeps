@@ -932,13 +932,11 @@ const ExecuteJobs = {
                 if (resourceType === RESOURCE_ENERGY) {
                     if (storage.store.getUsedCapacity(RESOURCE_ENERGY) < Util.STORAGE_ENERGY_LOW) {
                         return 0;
-                    } else if (storage.room.controller.level < 8) {
-                        return Util.TERMINAL_TARGET_ENERGY;
                     } else {
-                        return Util.TERMINAL_EMPTY_ENERGY;
+                        return Util.TERMINAL_TARGET_ENERGY;
                     }
                 } else {
-                    return Util.TERMINAL_EMPTY_RESOURCE;
+                    return Util.TERMINAL_TARGET_RESOURCE;
                 }
             } else {
                 return 0;
@@ -1000,19 +998,19 @@ const ExecuteJobs = {
             }
             const creepCarry = creep.store.getCapacity(); // when a creep withdraws from storage then the amount is diminished - the job might end because of that diminish - it should not
             let storageResourceAmount = 0;
-            let Low = Util.STORAGE_LOW - creepCarry;
-            let LowTransfer = Util.STORAGE_LOW_TRANSFER;
-            let Medium = Util.STORAGE_MEDIUM - creepCarry;
-            let MediumTransfer = Util.STORAGE_MEDIUM_TRANSFER;
             let High = Util.STORAGE_HIGH - creepCarry;
             let HighTransfer = Util.STORAGE_HIGH_TRANSFER;
+            let Medium = Util.STORAGE_MEDIUM - creepCarry;
+            let MediumTransfer = Util.STORAGE_MEDIUM_TRANSFER;
+            let Low = Util.STORAGE_LOW - creepCarry;
+            let LowTransfer = Util.STORAGE_LOW_TRANSFER;
             if (resourceType === RESOURCE_ENERGY) {
-                Low = Util.STORAGE_ENERGY_LOW - creepCarry;
-                LowTransfer = Util.STORAGE_ENERGY_LOW_TRANSFER;
-                Medium = Util.STORAGE_ENERGY_MEDIUM - creepCarry;
-                MediumTransfer = Util.STORAGE_ENERGY_MEDIUM_TRANSFER;
                 High = Util.STORAGE_ENERGY_HIGH - creepCarry;
                 HighTransfer = Util.STORAGE_ENERGY_HIGH_TRANSFER;
+                Medium = Util.STORAGE_ENERGY_MEDIUM - creepCarry;
+                MediumTransfer = Util.STORAGE_ENERGY_MEDIUM_TRANSFER;
+                Low = Util.STORAGE_ENERGY_LOW - creepCarry;
+                LowTransfer = Util.STORAGE_ENERGY_LOW_TRANSFER;
             }
             const result = GenericJobAction(creep, roomJob, {
                 /**@return {int}*/
@@ -1507,46 +1505,9 @@ const ExecuteJobs = {
                 },
                 /**@return {int}*/
                 Fetch: function (fetchObject, jobObject) {
-                    if (jobObject !== fetchObject) { // hostileCreep
+                    if (jobObject !== fetchObject) { // hostileCreep or structure
                         let result = creep.rangedAttack(fetchObject);
-                        if (result === OK && !fetchObject.structureType && creep.pos.getRangeTo(fetchObject) <= 2) { // creep could do a ranged attack - maybe it should move away?
-                            const nearestRampart = creep.pos.findClosestByPath(FIND_MY_STRUCTURES, {
-                                filter: function (s) {
-                                    return (s.structureType === STRUCTURE_RAMPART);
-                                }
-                            });
-                            switch (true) {
-                                case nearestRampart:
-                                    result = Move(creep, nearestRampart);
-                                    break;
-                                case creep.pos.x < fetchObject.pos.x && creep.pos.y < fetchObject.pos.y:
-                                    result = creep.move(TOP_LEFT);
-                                    break;
-                                case creep.pos.x > fetchObject.pos.x && creep.pos.y < fetchObject.pos.y:
-                                    result = creep.move(TOP_RIGHT);
-                                    break;
-                                case creep.pos.x > fetchObject.pos.x && creep.pos.y > fetchObject.pos.y:
-                                    result = creep.move(BOTTOM_RIGHT);
-                                    break;
-                                case creep.pos.x < fetchObject.pos.x && creep.pos.y > fetchObject.pos.y:
-                                    result = creep.move(BOTTOM_LEFT);
-                                    break;
-                                case creep.pos.x < fetchObject.pos.x && creep.pos.y === fetchObject.pos.y:
-                                    result = creep.move(LEFT);
-                                    break;
-                                case creep.pos.x > fetchObject.pos.x && creep.pos.y === fetchObject.pos.y:
-                                    result = creep.move(RIGHT);
-                                    break;
-                                case creep.pos.x === fetchObject.pos.x && creep.pos.y > fetchObject.pos.y:
-                                    result = creep.move(BOTTOM);
-                                    break;
-                                case creep.pos.x === fetchObject.pos.x && creep.pos.y < fetchObject.pos.y:
-                                    result = creep.move(TOP);
-                                    break;
-                                default:
-                                    Util.ErrorLog('ExecuteJobs', 'JobGuardGunnerPosition', 'gunner move error ' + creep.name);
-                            }
-                        } else if (result === OK && fetchObject.structureType && creep.pos.getRangeTo(fetchObject) > 2) {
+                        if (result === OK && creep.pos.getRangeTo(fetchObject) > 1) {
                             return ERR_NOT_IN_RANGE; // always try and move closer to the structure it is attacking
                         }
                         return result;
@@ -2678,11 +2639,51 @@ const ExecuteJobs = {
                 Util.ErrorLog('ExecuteJobs', 'AttackHostileCreep', 'no hostiles found error ' + creep.name + ' ' + creep.pos.roomName);
                 return OK;
             }
-            let result;
-            if (creep.getActiveBodyparts(RANGED_ATTACK)) {
-                result = creep.rangedMassAttack();
-            } else {
+            let result = ERR_NO_RESULT_FOUND;
+            if (creep.getActiveBodyparts(ATTACK)) {
                 result = creep.attack(closestHostile);
+            }
+            // ranged attacker logic
+            if((result === ERR_NO_RESULT_FOUND || result === ERR_NOT_IN_RANGE) && creep.getActiveBodyparts(RANGED_ATTACK)){
+                result = creep.rangedAttack(closestHostile);
+                if (result === OK && creep.pos.getRangeTo(closestHostile) <= 2) { // creep could do a ranged attack - maybe it should move away?
+                    const nearestRampart = creep.pos.findClosestByPath(FIND_MY_STRUCTURES, {
+                        filter: function (s) {
+                            return (s.structureType === STRUCTURE_RAMPART);
+                        }
+                    });
+                    switch (true) {
+                        case nearestRampart:
+                            result = Move(creep, nearestRampart);
+                            break;
+                        case creep.pos.x < closestHostile.pos.x && creep.pos.y < closestHostile.pos.y:
+                            result = creep.move(TOP_LEFT);
+                            break;
+                        case creep.pos.x > closestHostile.pos.x && creep.pos.y < closestHostile.pos.y:
+                            result = creep.move(TOP_RIGHT);
+                            break;
+                        case creep.pos.x > closestHostile.pos.x && creep.pos.y > closestHostile.pos.y:
+                            result = creep.move(BOTTOM_RIGHT);
+                            break;
+                        case creep.pos.x < closestHostile.pos.x && creep.pos.y > closestHostile.pos.y:
+                            result = creep.move(BOTTOM_LEFT);
+                            break;
+                        case creep.pos.x < closestHostile.pos.x && creep.pos.y === closestHostile.pos.y:
+                            result = creep.move(LEFT);
+                            break;
+                        case creep.pos.x > closestHostile.pos.x && creep.pos.y === closestHostile.pos.y:
+                            result = creep.move(RIGHT);
+                            break;
+                        case creep.pos.x === closestHostile.pos.x && creep.pos.y > closestHostile.pos.y:
+                            result = creep.move(BOTTOM);
+                            break;
+                        case creep.pos.x === closestHostile.pos.x && creep.pos.y < closestHostile.pos.y:
+                            result = creep.move(TOP);
+                            break;
+                        default:
+                            Util.ErrorLog('ExecuteJobs', 'AttackHostileCreep', 'ranged attacker move error ' + creep.name);
+                    }
+                }
             }
             if (result === ERR_NOT_IN_RANGE) {
                 result = Move(creep, closestHostile);

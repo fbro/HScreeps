@@ -565,7 +565,6 @@ const Constructions = {
                                                     && structure.structureType !== STRUCTURE_POWER_SPAWN
                                                     && structure.structureType !== STRUCTURE_NUKER
                                                     && structure.structureType !== STRUCTURE_OBSERVER
-                                                    && structure.structureType !== STRUCTURE_LINK
                                                     && structure.structureType !== STRUCTURE_CONTAINER
                                                     && structure.structureType !== STRUCTURE_ROAD
                                                     && structure.structureType !== STRUCTURE_RAMPART;

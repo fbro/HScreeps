@@ -23,8 +23,8 @@ module.exports.loop = function () {
             if (Game.time % Util.GAME_TIME_MODULO_3 === 0) {
                 if (Game.time % Util.GAME_TIME_MODULO_4 === 0) {
                     CreateJobs.run();
-                    Constructions.run();
                     if (Game.time % Util.GAME_TIME_MODULO_5 === 0) {
+                        Constructions.run();
                         if (Game.time % Util.GAME_TIME_MODULO_6 === 0) {
                             Util.Info('Main', 'Controller', '--------------- main reset of memory ---------------');
 
@@ -169,11 +169,7 @@ module.exports.loop = function () {
 
 // TODO create resource sales
 
-// TODO when under level 8 - enable creep emptying terminals with energy - this will boost controller upgrading
-
 // TODO test gunner creep attack logic
-
-// TODO find out why this fails: shard 3 !!ERROR!! ExecuteJobs JobAction | ERR_NO_RESULT_FOUND BuildPos-Flag2(29,43)W50N50 -20 B11
 
 // attack NPC strongholds
 // harvest middle rooms

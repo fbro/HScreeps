@@ -94,7 +94,7 @@ const CreateJobs = {
             return jobs;
         }
 
-        function CreateFlagJob(jobs, jobName, gameFlagKey, gameFlag, creepType, isForeignRoom = false) {
+        function CreateFlagJob(jobs, jobName, gameFlagKey, gameFlag, creepType, isForeignRoom = false/*shard number will be added to creep name*/) {
             //Util.Info('CreateJobs', 'CreateFlagJob', 'AddJob ' + gameFlagKey);
             const jobStringName = jobName + '-' + gameFlagKey + '(' + gameFlag.pos.x + ',' + gameFlag.pos.y + ')' + gameFlag.pos.roomName;
             jobs = AddJob(jobs, jobStringName, gameFlagKey, Util.FLAG_JOB, creepType);
@@ -634,7 +634,7 @@ const CreateJobs = {
                         Medium = Util.STORAGE_ENERGY_MEDIUM; // 100000
                         MediumTransfer = Util.STORAGE_ENERGY_MEDIUM_TRANSFER; // 80000
                         Low = Util.STORAGE_ENERGY_LOW; // 10000
-                        LowTransfer = Util.STORAGE_ENERGY_LOW_TRANSFER; // 50000
+                        LowTransfer = Util.STORAGE_ENERGY_LOW_TRANSFER; // 0
                     }
                     // if storage contains alot of the specified resource then allow the terminal to be filled to an extent where it will sell out
                     if (storageResourceAmount >= High) {
