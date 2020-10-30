@@ -2652,36 +2652,10 @@ const ExecuteJobs = {
                             return (s.structureType === STRUCTURE_RAMPART);
                         }
                     });
-                    switch (true) {
-                        case nearestRampart:
-                            result = Move(creep, nearestRampart);
-                            break;
-                        case creep.pos.x < closestHostile.pos.x && creep.pos.y < closestHostile.pos.y:
-                            result = creep.move(TOP_LEFT);
-                            break;
-                        case creep.pos.x > closestHostile.pos.x && creep.pos.y < closestHostile.pos.y:
-                            result = creep.move(TOP_RIGHT);
-                            break;
-                        case creep.pos.x > closestHostile.pos.x && creep.pos.y > closestHostile.pos.y:
-                            result = creep.move(BOTTOM_RIGHT);
-                            break;
-                        case creep.pos.x < closestHostile.pos.x && creep.pos.y > closestHostile.pos.y:
-                            result = creep.move(BOTTOM_LEFT);
-                            break;
-                        case creep.pos.x < closestHostile.pos.x && creep.pos.y === closestHostile.pos.y:
-                            result = creep.move(LEFT);
-                            break;
-                        case creep.pos.x > closestHostile.pos.x && creep.pos.y === closestHostile.pos.y:
-                            result = creep.move(RIGHT);
-                            break;
-                        case creep.pos.x === closestHostile.pos.x && creep.pos.y > closestHostile.pos.y:
-                            result = creep.move(BOTTOM);
-                            break;
-                        case creep.pos.x === closestHostile.pos.x && creep.pos.y < closestHostile.pos.y:
-                            result = creep.move(TOP);
-                            break;
-                        default:
-                            Util.ErrorLog('ExecuteJobs', 'AttackHostileCreep', 'ranged attacker move error ' + creep.name);
+                    if(nearestRampart){
+                        result = Move(creep, nearestRampart);
+                    }else{
+                        result = FleeMatrix(creep, closestHostile);
                     }
                 }
             }
@@ -2760,31 +2734,27 @@ const ExecuteJobs = {
             if (creep.getActiveBodyparts(RANGED_ATTACK) > 0) {
                 creep.rangedAttack(closestHostileCreep);
             }
+            return FleeMatrix(creep, closestHostileCreep);
+        }
+
+        function FleeMatrix(creep, closestHostileCreep){
             switch (true) {
                 case creep.pos.x < closestHostileCreep.pos.x && creep.pos.y < closestHostileCreep.pos.y:
-                    FleeMove(creep, [-1, 0, -1], [-1, -1, 0], [TOP_LEFT, TOP, LEFT]);
-                    break;
+                    return FleeMove(creep, [-1, 0, -1], [-1, -1, 0], [TOP_LEFT, TOP, LEFT]);
                 case creep.pos.x > closestHostileCreep.pos.x && creep.pos.y < closestHostileCreep.pos.y:
-                    FleeMove(creep, [1, 0, 1], [-1, -1, 0], [TOP_RIGHT, TOP, RIGHT]);
-                    break;
+                    return FleeMove(creep, [1, 0, 1], [-1, -1, 0], [TOP_RIGHT, TOP, RIGHT]);
                 case creep.pos.x > closestHostileCreep.pos.x && creep.pos.y > closestHostileCreep.pos.y:
-                    FleeMove(creep, [1, 0, 1], [1, 1, 0], [BOTTOM_RIGHT, BOTTOM, RIGHT]);
-                    break;
+                    return FleeMove(creep, [1, 0, 1], [1, 1, 0], [BOTTOM_RIGHT, BOTTOM, RIGHT]);
                 case creep.pos.x < closestHostileCreep.pos.x && creep.pos.y > closestHostileCreep.pos.y:
-                    FleeMove(creep, [-1, 0, -1], [1, 1, 0], [BOTTOM_LEFT, BOTTOM, LEFT]);
-                    break;
+                    return FleeMove(creep, [-1, 0, -1], [1, 1, 0], [BOTTOM_LEFT, BOTTOM, LEFT]);
                 case creep.pos.x < closestHostileCreep.pos.x && creep.pos.y === closestHostileCreep.pos.y:
-                    FleeMove(creep, [-1, -1, -1], [0, 1, -1], [LEFT, BOTTOM_LEFT, TOP_LEFT]);
-                    break;
+                    return FleeMove(creep, [-1, -1, -1], [0, 1, -1], [LEFT, BOTTOM_LEFT, TOP_LEFT]);
                 case creep.pos.x > closestHostileCreep.pos.x && creep.pos.y === closestHostileCreep.pos.y:
-                    FleeMove(creep, [1, 1, 1], [0, 1, -1], [RIGHT, BOTTOM_RIGHT, TOP_RIGHT]);
-                    break;
+                    return FleeMove(creep, [1, 1, 1], [0, 1, -1], [RIGHT, BOTTOM_RIGHT, TOP_RIGHT]);
                 case creep.pos.x === closestHostileCreep.pos.x && creep.pos.y > closestHostileCreep.pos.y:
-                    FleeMove(creep, [0, -1, 1], [1, 1, 1], [BOTTOM, BOTTOM_LEFT, BOTTOM_RIGHT]);
-                    break;
+                    return FleeMove(creep, [0, -1, 1], [1, 1, 1], [BOTTOM, BOTTOM_LEFT, BOTTOM_RIGHT]);
                 case creep.pos.x === closestHostileCreep.pos.x && creep.pos.y < closestHostileCreep.pos.y:
-                    FleeMove(creep, [0, -1, 1], [-1, -1, -1], [TOP, TOP_LEFT, TOP_RIGHT]);
-                    break;
+                    return FleeMove(creep, [0, -1, 1], [-1, -1, -1], [TOP, TOP_LEFT, TOP_RIGHT]);
                 default:
                     Util.ErrorLog('ExecuteJobs', 'Flee', 'flee move error ' + creep.name);
             }
@@ -2836,12 +2806,14 @@ const ExecuteJobs = {
                     }
                 }
             }
+            let result = ERR_NO_RESULT_FOUND;
             if (bestPointer) {
-                const result = creep.move(directions[bestPointer]);
+                result = creep.move(directions[bestPointer]);
                 Util.Info('ExecuteJobs', 'FleeMove', creep.name + ' go to position ' + JSON.stringify(positions[bestPointer]) + ' orig ' + JSON.stringify(creep.pos) + " result " + result);
             } else {
                 Util.Info('ExecuteJobs', 'FleeMove', creep.name + ' could not find any viable positions ' + JSON.stringify(positions));
             }
+            return result;
         }
 
         //endregion

@@ -96,7 +96,7 @@ const Terminals = {
         }
 
         function GetEnergy(toTerminal, terminals) {
-            if (!toTerminal.store.getUsedCapacity(RESOURCE_ENERGY) && !toTerminal.room.storage.store.getUsedCapacity(RESOURCE_ENERGY)) {
+            if (!toTerminal.store.getUsedCapacity(RESOURCE_ENERGY) && toTerminal.room.storage && !toTerminal.room.storage.store.getUsedCapacity(RESOURCE_ENERGY)) {
                 let didSend = false;
                 const memRoom = Memory.MemRooms[toTerminal.pos.roomName];
                 if (toTerminal.room.controller.level === 8 || memRoom.FctrId !== '-') {
