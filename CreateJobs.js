@@ -139,6 +139,12 @@ const CreateJobs = {
                             }
                         }
                     }
+                } else if (gameRoom.controller && gameRoom.controller.reservation) { // reserved
+                    const randomCreep = Game.creeps[Object.keys(Game.creeps)[0]]; // need a random creep too get my username
+                    if (randomCreep && gameRoom.controller.reservation.username === randomCreep.owner.username) {
+                        Util.Info('CreateJobs', 'CreateObjJobs', 'reserved room ' + gameRoom.name);
+                        SourceJobs(gameRoom, jobs);
+                    }
                 }
 
                 if (!Memory.MemRooms[gameRoom.name] && Object.keys(jobs).length > 0) { // room not found and there are jobs in it - create it
@@ -317,7 +323,7 @@ const CreateJobs = {
                 const source = sources[sourceKey];
                 new RoomVisual(gameRoom.name).text('🏭', source.pos.x, source.pos.y);
                 AddJob(roomJobs, 'Src(' + source.pos.x + ',' + source.pos.y + ')' + gameRoom.name, source.id, Util.OBJECT_JOB, 'H');
-                if (gameRoom.controller.level < 4) {
+                if (gameRoom.controller && gameRoom.controller.my && gameRoom.controller.level < 4) {
                     const freeSpaces = Util.FreeSpaces(source.pos);
                     if (freeSpaces > 1) {
                         AddJob(roomJobs, 'Src1(' + source.pos.x + ',' + source.pos.y + ')' + gameRoom.name, source.id, Util.OBJECT_JOB, 'H');

@@ -169,8 +169,6 @@ module.exports.loop = function () {
 
 // TODO create resource sales
 
-// TODO test gunner creep attack logic
-
 // attack NPC strongholds
 // harvest middle rooms
 // harvest neutral rooms

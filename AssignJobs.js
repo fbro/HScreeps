@@ -49,7 +49,7 @@ const AssignJobs = {
                                     });
                                     creepFound = SpawnCreep(roomJob, availableSpawnsInRoom, roomJobKey, memRoomKey);
                                     if (!creepFound && availableSpawnsInRoom.length > 0) {
-                                        Util.Warning('AssignJobs', 'AssignOrSpawnCreeps', 'giving up assigning jobs in ' + memRoomKey + ' because of job ' + roomJobKey);
+                                        //Util.Warning('AssignJobs', 'AssignOrSpawnCreeps', 'giving up assigning jobs in ' + memRoomKey + ' because of job ' + roomJobKey);
                                         break;
                                     }
                                 }
@@ -506,19 +506,14 @@ const AssignJobs = {
                 // builder
                 case 'B':
                     switch (true) {
-                        case (energyAvailable >= 3250 && spawnLargeVersion): // energyCapacityAvailable: 12900
+                        case (energyAvailable >= 3300 && spawnLargeVersion): // energyCapacityAvailable: 12900
                             body = [
-                                WORK, WORK, WORK, WORK, WORK,
-                                WORK, WORK, WORK, WORK, WORK,
-                                WORK, WORK, WORK, WORK, WORK,
-                                CARRY, CARRY, CARRY, CARRY, CARRY,
-                                CARRY, CARRY, CARRY, CARRY, CARRY,
-                                CARRY, CARRY, CARRY, CARRY, CARRY,
-                                CARRY, CARRY,
-                                MOVE, MOVE, MOVE, MOVE, MOVE,
-                                MOVE, MOVE, MOVE, MOVE, MOVE,
-                                MOVE, MOVE, MOVE, MOVE, MOVE,
-                                MOVE, MOVE, MOVE];
+                                CARRY, CARRY,  WORK,  WORK, CARRY, CARRY,  WORK,  WORK, CARRY, CARRY,
+                                CARRY,  MOVE,  WORK,  WORK,  MOVE,  MOVE,  WORK,  WORK,  MOVE, CARRY,
+                                CARRY,  MOVE,  MOVE,  MOVE,  MOVE, CARRY,  MOVE,  MOVE,  MOVE, CARRY,
+                                CARRY,  MOVE,  WORK,  MOVE,  MOVE,  MOVE,  MOVE,  WORK,  MOVE, CARRY,
+                                CARRY, CARRY,  WORK,  WORK,  WORK,  WORK,  WORK,  WORK, CARRY, CARRY
+                            ];
                             break;
                         case (energyAvailable >= 2600 && spawnAgileVersion): // energyCapacityAvailable: 5600
                             body = [
