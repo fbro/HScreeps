@@ -380,73 +380,120 @@ const AssignJobs = {
                     switch (true) {
                         case (energyAvailable >= 2000 && spawnAgileVersion): // energyCapacityAvailable: 12900
                             body = [
-                                CARRY, MOVE, CARRY, MOVE, CARRY, MOVE, CARRY, MOVE, CARRY, MOVE,
-                                CARRY, MOVE, CARRY, MOVE, CARRY, MOVE, CARRY, MOVE, CARRY, MOVE,
-                                CARRY, MOVE, CARRY, MOVE, CARRY, MOVE, CARRY, MOVE, CARRY, MOVE,
-                                CARRY, MOVE, CARRY, MOVE, CARRY, MOVE, CARRY, MOVE, CARRY, MOVE
+                                CARRY, MOVE, CARRY, MOVE,
+                                CARRY, MOVE, CARRY, MOVE,
+                                CARRY, MOVE, CARRY, MOVE,
+                                CARRY, MOVE, CARRY, MOVE,
+                                CARRY, MOVE, CARRY, MOVE,
+                                CARRY, MOVE, CARRY, MOVE,
+                                CARRY, MOVE, CARRY, MOVE,
+                                CARRY, MOVE, CARRY, MOVE,
+                                CARRY, MOVE, CARRY, MOVE,
+                                CARRY, MOVE, CARRY, MOVE
                             ];
                             break;
                         case (energyAvailable >= 1500 && !spawnAgileVersion): // energyCapacityAvailable: 12900
                             body = [
-                                CARRY, CARRY, MOVE, CARRY, CARRY, MOVE,
-                                CARRY, CARRY, MOVE, CARRY, CARRY, MOVE,
-                                CARRY, CARRY, MOVE, CARRY, CARRY, MOVE,
-                                CARRY, CARRY, MOVE, CARRY, CARRY, MOVE,
-                                CARRY, CARRY, MOVE, CARRY, CARRY, MOVE,
+                                CARRY, CARRY, MOVE,
+                                CARRY, CARRY, MOVE,
+                                CARRY, CARRY, MOVE,
+                                CARRY, CARRY, MOVE,
+                                CARRY, CARRY, MOVE,
+                                CARRY, CARRY, MOVE,
+                                CARRY, CARRY, MOVE,
+                                CARRY, CARRY, MOVE,
+                                CARRY, CARRY, MOVE,
+                                CARRY, CARRY, MOVE
                             ];
                             break;
-                        case (energyAvailable >= 1500 && spawnAgileVersion): // energyCapacityAvailable: 5600
+                        case (energyAvailable >= 1200 && spawnAgileVersion): // energyCapacityAvailable: 5600
                             body = [
-                                CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY,
-                                MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];
+                                CARRY, MOVE, CARRY, MOVE,
+                                CARRY, MOVE, CARRY, MOVE,
+                                CARRY, MOVE, CARRY, MOVE,
+                                CARRY, MOVE, CARRY, MOVE,
+                                CARRY, MOVE, CARRY, MOVE,
+                                CARRY, MOVE, CARRY, MOVE
+                            ];
                             break;
-                        case (energyAvailable >= 1200 && !spawnAgileVersion): // energyCapacityAvailable: 5600
+                        case (energyAvailable >= 1050 && !spawnAgileVersion): // energyCapacityAvailable: 5600
                             body = [
-                                CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY,
-                                MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];
+                                CARRY, CARRY, MOVE,
+                                CARRY, CARRY, MOVE,
+                                CARRY, CARRY, MOVE,
+                                CARRY, CARRY, MOVE,
+                                CARRY, CARRY, MOVE,
+                                CARRY, CARRY, MOVE,
+                                CARRY, CARRY, MOVE
+                            ];
                             break;
-                        case (energyAvailable >= 1300 && spawnAgileVersion): // energyCapacityAvailable: 2300
+                        case (energyAvailable >= 1000 && spawnAgileVersion): // energyCapacityAvailable: 2300
                             body = [
-                                CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY,
-                                MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];
+                                CARRY, MOVE, CARRY, MOVE,
+                                CARRY, MOVE, CARRY, MOVE,
+                                CARRY, MOVE, CARRY, MOVE,
+                                CARRY, MOVE, CARRY, MOVE,
+                                CARRY, MOVE, CARRY, MOVE
+                            ];
                             break;
-                        case (energyAvailable >= 1050 && !spawnAgileVersion): // energyCapacityAvailable: 2300
+                        case (energyAvailable >= 900 && !spawnAgileVersion): // energyCapacityAvailable: 2300
                             body = [
-                                CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY,
-                                MOVE, MOVE, MOVE, MOVE, MOVE];
+                                CARRY, CARRY, MOVE,
+                                CARRY, CARRY, MOVE,
+                                CARRY, CARRY, MOVE,
+                                CARRY, CARRY, MOVE,
+                                CARRY, CARRY, MOVE,
+                                CARRY, CARRY, MOVE
+                            ];
                             break;
-                        case (energyAvailable >= 1100 && spawnAgileVersion): // energyCapacityAvailable: 1800
+                        case (energyAvailable >= 800 && spawnAgileVersion): // energyCapacityAvailable: 1800
                             body = [
-                                CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY,
-                                MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];
+                                CARRY, MOVE, CARRY, MOVE,
+                                CARRY, MOVE, CARRY, MOVE,
+                                CARRY, MOVE, CARRY, MOVE,
+                                CARRY, MOVE, CARRY, MOVE
+                            ];
                             break;
-                        case (energyAvailable >= 900 && !spawnAgileVersion): // energyCapacityAvailable: 1800
+                        case (energyAvailable >= 750 && !spawnAgileVersion): // energyCapacityAvailable: 1800
                             body = [
-                                CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY,
-                                MOVE, MOVE, MOVE, MOVE];
+                                CARRY, CARRY, MOVE,
+                                CARRY, CARRY, MOVE,
+                                CARRY, CARRY, MOVE,
+                                CARRY, CARRY, MOVE,
+                                CARRY, CARRY, MOVE
+                            ];
                             break;
-                        case (energyAvailable >= 750 && spawnAgileVersion): // energyCapacityAvailable: 1300
+                        case (energyAvailable >= 600 && spawnAgileVersion): // energyCapacityAvailable: 1300
                             body = [
-                                CARRY, CARRY, CARRY, CARRY, CARRY, CARRY,
-                                MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];
+                                CARRY, MOVE, CARRY, MOVE,
+                                CARRY, MOVE, CARRY, MOVE,
+                                CARRY, MOVE, CARRY, MOVE
+                            ];
                             break;
                         case (energyAvailable >= 600 && !spawnAgileVersion): // energyCapacityAvailable: 1300
                             body = [
-                                CARRY, CARRY, CARRY, CARRY, CARRY, CARRY,
-                                MOVE, MOVE, MOVE];
+                                CARRY, CARRY, MOVE,
+                                CARRY, CARRY, MOVE,
+                                CARRY, CARRY, MOVE,
+                                CARRY, CARRY, MOVE
+                            ];
                             break;
                         case (energyAvailable >= 400 && spawnAgileVersion): // energyCapacityAvailable: 550
                             body = [
-                                CARRY, CARRY, CARRY, CARRY,
-                                MOVE, MOVE, MOVE, MOVE];
+                                CARRY, MOVE, CARRY, MOVE,
+                                CARRY, MOVE, CARRY, MOVE
+                            ];
                             break;
                         case (energyAvailable >= 300 && !spawnAgileVersion): // energyCapacityAvailable: 550
                             body = [
-                                CARRY, CARRY, CARRY, CARRY,
-                                MOVE, MOVE];
+                                CARRY, CARRY, MOVE,
+                                CARRY, CARRY, MOVE
+                            ];
                             break;
                         case (energyAvailable >= 200 && spawnAgileVersion): // energyCapacityAvailable: 300
-                            body = [CARRY, CARRY, MOVE, MOVE];
+                            body = [
+                                CARRY, MOVE, CARRY, MOVE
+                            ];
                             break;
                         case (energyAvailable >= 150 && !spawnAgileVersion): // energyCapacityAvailable: 300
                             body = [CARRY, CARRY, MOVE];
