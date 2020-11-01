@@ -64,16 +64,7 @@ module.exports.loop = function () {
         for (const gameRoomKey in Game.rooms) {
             const gameRoom = Game.rooms[gameRoomKey];
             if (gameRoom.controller && gameRoom.controller.my && Memory.MemRooms[gameRoom.name]) {
-                Game.map.visual.text(gameRoom.controller.level, new RoomPosition(4, 5, gameRoomKey), {
-                    color: '#00ff00',
-                    fontSize: 7,
-                    opacity: 1
-                });
-                Game.map.visual.rect(new RoomPosition(0, 0, gameRoomKey), 50, 50, {
-                    stroke: '#00ff00',
-                    opacity: 0.1,
-                    strokeWidth: 1
-                });
+                MapVisualStatus(gameRoom, gameRoomKey);
                 RoomDefences.run(gameRoom);
                 if (gameRoom.controller.level >= 7) {
                     Factories.run(gameRoom, gameRoomKey);
@@ -157,6 +148,29 @@ module.exports.loop = function () {
             Util.InfoLog('Main', 'DefendFlagsCleanup', defendFlag.name);
             defendFlag.remove();
         }
+    }
+
+    function MapVisualStatus(gameRoom, roomName) {
+        //if(Memory.MemRooms[roomName]){ // TODO make visual minerals and save it in memrooms
+        //    let mineral = Memory.MemRooms[roomName].Mineral;
+        //    if(!mineral){
+        //        mineral = gameRoom.find(FIND_MINERALS, {
+        //            filter: function (mineral) {
+        //                return mineral;
+        //            }
+        //        })[0];
+        //    }
+        //}
+        Game.map.visual.text(gameRoom.controller.level, new RoomPosition(4, 5, roomName), {
+            color: '#00ff00',
+            fontSize: 7,
+            opacity: 1
+        });
+        Game.map.visual.rect(new RoomPosition(0, 0, roomName), 50, 50, {
+            stroke: '#00ff00',
+            opacity: 0.1,
+            strokeWidth: 1
+        });
     }
 };
 
