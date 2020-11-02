@@ -106,7 +106,7 @@ const RoomDefences = {
                     const isBoosted = _.find(hostileTarget.body, function (bodypart) {
                         return bodypart.boost !== undefined;
                     });
-                    if (isBoosted) {
+                    if (isBoosted && hostileTarget.owner.username !== 'Invader') {
                         Util.InfoLog('RoomDefences', 'ActivateSafemode', gameRoom.name + ' attacked from ' + hostileTarget.owner.username + ' towers ' + towers.length);
                         if (!gameRoom.controller.safeMode && !gameRoom.controller.safeModeCooldown && gameRoom.controller.safeModeAvailable > 0) {
                             const result = gameRoom.controller.activateSafeMode();

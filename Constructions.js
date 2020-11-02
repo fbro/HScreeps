@@ -4,16 +4,20 @@ const Constructions = {
 
         for (const gameRoomKey in Game.rooms) {
             const gameRoom = Game.rooms[gameRoomKey];
-            if (gameRoom.controller && gameRoom.controller.my) {
+            if (gameRoom.controller && Memory.MemRooms[gameRoomKey]) {
                 const roomTerrain = gameRoom.getTerrain();
-                //const startCpu = Game.cpu.getUsed();
-                build(gameRoom, roomTerrain);
-                //const elapsed = Game.cpu.getUsed() - startCpu;
-                //Util.Info('Constructions', '', elapsed + ' ' + gameRoom.name + ' ' + gameRoom.controller.level);
+                if (gameRoom.controller.my) {
+                    //const startCpu = Game.cpu.getUsed();
+                    Build(gameRoom, roomTerrain);
+                    //const elapsed = Game.cpu.getUsed() - startCpu;
+                    //Util.Info('Constructions', '', elapsed + ' ' + gameRoom.name + ' ' + gameRoom.controller.level);
+                } else if (Memory.MemRooms[gameRoomKey].IsReserved) {
+                    ReservedRoomBuild(gameRoom, roomTerrain);
+                }
             }
         }
 
-        function build(gameRoom, roomTerrain) {
+        function Build(gameRoom, roomTerrain) {
             const level = gameRoom.controller.level;
             if (level >= 1) {
                 const flags = gameRoom.find(FIND_FLAGS, {
@@ -74,6 +78,52 @@ const Constructions = {
                     }
                 }
                 Memory.MemRooms[gameRoom.name].Built = gameRoom.controller.level;
+            }
+        }
+
+        function ReservedRoomBuild(gameRoom, roomTerrain) { // build roads and containers in a reserved room
+            const maxMainRoomRange = 2;
+            let bestMainRoom = Memory.MemRooms[gameRoom.name].MainRoom;
+            if (!bestMainRoom) {
+                let bestDistance = Number.MAX_SAFE_INTEGER;
+                for (const memRoomKey in Memory.MemRooms) {
+                    const memRoom = Memory.MemRooms[memRoomKey];
+                    if (memRoom.RoomLevel > 0) {
+                        const distance = Util.GenerateOuterRoomPath(gameRoom.name, memRoomKey);
+                        if (bestDistance > distance && distance <= maxMainRoomRange) {
+                            bestDistance = distance;
+                            bestMainRoom = memRoomKey;
+                        }
+                    }
+                }
+            }
+            if (bestMainRoom) {
+                Memory.MemRooms[gameRoom.name].MainRoom = bestMainRoom;
+                Util.Info('Constructions', 'ReservedRoomBuild', 'bestMainRoom found ' + bestMainRoom + ' for reserved room ' + gameRoom.name);
+                const sources = gameRoom.find(FIND_SOURCES);
+                for (const sourceCount in sources) {
+                    const source = sources[sourceCount];
+                    const spawn = Game.getObjectById(Memory.MemRooms[bestMainRoom].MainSpawnId);
+                    const placedRoads = BuildRoadTo(new RoomPosition(spawn.pos.x, spawn.pos.y + 1, spawn.pos.roomName), source.pos);
+                    if (placedRoads) { // place one path at a time
+                        return;
+                    }
+                    let nearestRoad = spawn.pos.findInRange(FIND_STRUCTURES, 2, {
+                        filter: function (structure) {
+                            return structure.structureType === STRUCTURE_ROAD;
+                        }
+                    })[0];
+                    if (!nearestRoad) {
+                        nearestRoad = spawn.pos.findInRange(FIND_CONSTRUCTION_SITES, 2, {
+                            filter: function (structure) {
+                                return structure.structureType === STRUCTURE_ROAD;
+                            }
+                        })[0];
+                    }
+                    if (nearestRoad) {
+                        ConstructAroundPos(gameRoom, roomTerrain, source.pos, STRUCTURE_CONTAINER, nearestRoad);
+                    }
+                }
             }
         }
 
@@ -254,12 +304,12 @@ const Constructions = {
             if (!spawn) {
                 return;
             }
-            BuildRoadTo(gameRoom, spawn, gameRoom.controller);
+            BuildRoadTo(spawn.pos, gameRoom.controller.pos);
             if (gameRoom.storage) {
-                BuildRoadTo(gameRoom, spawn, gameRoom.storage);
+                BuildRoadTo(spawn.pos, gameRoom.storage.pos);
             }
             if (gameRoom.terminal) {
-                BuildRoadTo(gameRoom, spawn, gameRoom.terminal);
+                BuildRoadTo(spawn.pos, gameRoom.terminal.pos);
             }
             const extractor = gameRoom.find(FIND_MY_STRUCTURES, {
                 filter: function (structure) {
@@ -267,12 +317,12 @@ const Constructions = {
                 }
             })[0];
             if (extractor) {
-                BuildRoadTo(gameRoom, spawn, extractor);
+                BuildRoadTo(spawn.pos, extractor.pos);
             }
             const sources = gameRoom.find(FIND_SOURCES);
             for (const sourceCount in sources) {
                 const source = sources[sourceCount];
-                BuildRoadTo(gameRoom, spawn, source);
+                BuildRoadTo(spawn.pos, source.pos);
                 // build roads around each source
                 for (let y = source.pos.y - 1; y <= source.pos.y + 1; y++) {
                     for (let x = source.pos.x - 1; x <= source.pos.x + 1; x++) {
@@ -462,49 +512,61 @@ const Constructions = {
         }
 
         /**@return {Boolean}*/
-        function BuildRoadTo(gameRoom, fromStructure, toStructure) {
-            let donePlacingRoads = true;
-            const roadConstructions = gameRoom.find(FIND_CONSTRUCTION_SITES, {
-                filter: function (structure) {
-                    return structure.structureType === STRUCTURE_ROAD;
+        function BuildRoadTo(fromPos, toPos) {
+            let placedRoads = false;
+            let pathFinder = PathFinder.search(
+                fromPos, {'pos': toPos, 'range': 1},
+                {
+                    plainCost: 3,
+                    swampCost: 4,
+                    roomCallback: function (roomName) {
+                        let room = Game.rooms[roomName];
+                        if (!room) { // invisible room - cannot place roads there
+                            return;
+                        }
+                        let costs = new PathFinder.CostMatrix;
+                        let structuresOrConstructions = room.find(FIND_STRUCTURES);
+                        structuresOrConstructions = structuresOrConstructions.concat(room.find(FIND_CONSTRUCTION_SITES));
+                        structuresOrConstructions.forEach(function (struct) {
+                            if (struct.structureType === STRUCTURE_ROAD) {
+                                costs.set(struct.pos.x, struct.pos.y, 1);
+                            } else if (struct.structureType !== STRUCTURE_CONTAINER && (struct.structureType !== STRUCTURE_RAMPART || !struct.my)) {
+                                costs.set(struct.pos.x, struct.pos.y, 0xff);
+                            }
+                        });
+                        return costs;
+                    },
+                    maxRooms: 3,
                 }
-            });
-            const pathSteps = gameRoom.findPath(fromStructure.pos, toStructure.pos, {
-                swampCost: 5, plainCost: 4, ignoreCreeps: true, range: 1,
-                costCallback: function (roomName, costMatrix) {
-                    for (const roadConstructionCount in roadConstructions) {
-                        const roadConstruction = roadConstructions[roadConstructionCount];
-                        costMatrix.set(roadConstruction.pos.x, roadConstruction.pos.y, 1);
-                    }
-                }
-            });
-            for (const pathStepCount in pathSteps) {
-                const pathStep = pathSteps[pathStepCount];
-                const result = gameRoom.createConstructionSite(pathStep.x, pathStep.y, STRUCTURE_ROAD);
+            );
+
+            // create roads
+            for (const pathStepCount in pathFinder.path) {
+                const pathStep = pathFinder.path[pathStepCount];
+                const result = Game.rooms[pathStep.roomName].createConstructionSite(pathStep.x, pathStep.y, STRUCTURE_ROAD);
                 if (result === OK) {
-                    Util.InfoLog('Constructions', 'BuildRoadTo', 'from ' + fromStructure + ' to ' + (toStructure.structureType ? toStructure.structureType : toStructure.id) + ' ' + pathStep.x + ',' + pathStep.y + ',' + gameRoom.name);
-                } else if (result !== ERR_INVALID_TARGET) {
-                    donePlacingRoads = false;
+                    placedRoads = true;
                 }
             }
-            return donePlacingRoads;
+            Util.InfoLog('Constructions', 'BuildRoadTo', 'placedRoads ' + placedRoads + ' fromPos ' + fromPos + ' toPos ' + toPos);
+            return placedRoads;
         }
 
-        function ConstructAroundPos(gameRoom, terrain, centerPos, structureType, mainSpawn, radius = 1, isCheckered = false) {
-            let spawnPos;
-            if (!mainSpawn) {
+        function ConstructAroundPos(gameRoom, terrain, centerPos, structureType, mainStructure, radius = 1, isCheckered = false) {
+            let mainStructurePos;
+            if (!mainStructure) {
                 const constructionSpawn = gameRoom.find(FIND_CONSTRUCTION_SITES, {
                     filter: function (structure) {
                         return structure.structureType === STRUCTURE_SPAWN;
                     }
                 })[0];
                 if (constructionSpawn) {
-                    spawnPos = constructionSpawn.pos
+                    mainStructurePos = constructionSpawn.pos
                 }
             } else {
-                spawnPos = mainSpawn.pos;
+                mainStructurePos = mainStructure.pos;
             }
-            if (spawnPos) {
+            if (mainStructurePos) {
                 let bestPos;
                 let bestRange = Number.MAX_SAFE_INTEGER;
                 for (let y = centerPos.y - radius; y <= centerPos.y + radius; y++) {
@@ -517,9 +579,9 @@ const Constructions = {
                                     || lookObject.type === LOOK_CONSTRUCTION_SITES;
                             });
                             if (!hasStructure) {
-                                const range = spawnPos.findPathTo(x, y);
+                                const range = mainStructurePos.findPathTo(x, y).length;
 
-                                if (!bestPos || range < bestRange) {
+                                if (range < bestRange) {
                                     bestPos = new RoomPosition(x, y, gameRoom.name);
                                     bestRange = range;
                                 }

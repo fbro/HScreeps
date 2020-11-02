@@ -23,8 +23,8 @@ module.exports.loop = function () {
             if (Game.time % Util.GAME_TIME_MODULO_3 === 0) {
                 if (Game.time % Util.GAME_TIME_MODULO_4 === 0) {
                     CreateJobs.run();
+                        Constructions.run();// TODO move to GAME_TIME_MODULO_5
                     if (Game.time % Util.GAME_TIME_MODULO_5 === 0) {
-                        Constructions.run();
                         if (Game.time % Util.GAME_TIME_MODULO_6 === 0) {
                             Util.Info('Main', 'Controller', '--------------- main reset of memory ---------------');
 
@@ -38,6 +38,8 @@ module.exports.loop = function () {
                                 delete memRoom.ObserverId; // remove ObserverId - maybe an observer have been deleted ect.
                                 delete memRoom.Built; // remove BuiltRoads - maybe some of the road have eroded away?
                                 delete memRoom.MissingSpawn; // remove the missing spawn notification handler
+                                delete memRoom.IsReserved; // reserved room flag reset - maybe the room is not reserved anymore?
+                                delete memRoom.MainRoom; // reserved room's main room name - maybe the reserved room should have a closer main room assigned?
                                 MaxCreepsCleanup(memRoomKey, memRoom, foundCreeps);
                                 UnusedRoomsCleanup(memRoomKey, memRoom);
                                 DefendFlagsCleanup(memRoomKey);
@@ -64,7 +66,7 @@ module.exports.loop = function () {
         for (const gameRoomKey in Game.rooms) {
             const gameRoom = Game.rooms[gameRoomKey];
             if (gameRoom.controller && gameRoom.controller.my && Memory.MemRooms[gameRoom.name]) {
-                MapVisualStatus(gameRoom, gameRoomKey);
+                MapVisualStatus(gameRoom);
                 RoomDefences.run(gameRoom);
                 if (gameRoom.controller.level >= 7) {
                     Factories.run(gameRoom, gameRoomKey);
@@ -150,23 +152,38 @@ module.exports.loop = function () {
         }
     }
 
-    function MapVisualStatus(gameRoom, roomName) {
-        //if(Memory.MemRooms[roomName]){ // TODO make visual minerals and save it in memrooms
-        //    let mineral = Memory.MemRooms[roomName].Mineral;
-        //    if(!mineral){
-        //        mineral = gameRoom.find(FIND_MINERALS, {
-        //            filter: function (mineral) {
-        //                return mineral;
-        //            }
-        //        })[0];
-        //    }
-        //}
-        Game.map.visual.text(gameRoom.controller.level, new RoomPosition(4, 5, roomName), {
+    function MapVisualStatus(gameRoom) {
+        if (Memory.MemRooms[gameRoom.name]) {
+            let mineral = Memory.MemRooms[gameRoom.name].Mineral;
+            if (!mineral) {
+                mineral = gameRoom.find(FIND_MINERALS, {
+                    filter: function (mineral) {
+                        return mineral;
+                    }
+                })[0].mineralType;
+                Memory.MemRooms[gameRoom.name].Mineral = mineral;
+            }
+            const color =
+                mineral === RESOURCE_HYDROGEN ? '#ffffff' :
+                    mineral === RESOURCE_OXYGEN ? '#ffffff' :
+                        mineral === RESOURCE_UTRIUM ? '#00ffff' :
+                            mineral === RESOURCE_LEMERGIUM ? '#00ff00' :
+                                mineral === RESOURCE_KEANIUM ? '#8000ff' :
+                                    mineral === RESOURCE_ZYNTHIUM ? '#ffff00' :
+                                        mineral === RESOURCE_CATALYST ? '#ff0000' :
+                                            '#000000';
+            Game.map.visual.text(mineral, new RoomPosition(46, 5, gameRoom.name), {
+                color: color,
+                fontSize: 7,
+                opacity: 1
+            });
+        }
+        Game.map.visual.text(gameRoom.controller.level, new RoomPosition(4, 5, gameRoom.name), {
             color: '#00ff00',
             fontSize: 7,
             opacity: 1
         });
-        Game.map.visual.rect(new RoomPosition(0, 0, roomName), 50, 50, {
+        Game.map.visual.rect(new RoomPosition(0, 0, gameRoom.name), 50, 50, {
             stroke: '#00ff00',
             opacity: 0.1,
             strokeWidth: 1
@@ -182,6 +199,10 @@ module.exports.loop = function () {
 // TODO powercreeps should hook into the job memory and check if there are any free transporter jobs
 
 // TODO create resource sales
+
+// TODO use PathFinder.search flee functionality when fleeing!!
+
+// TODO make transporter job to reserved rooms
 
 // attack NPC strongholds
 // harvest middle rooms

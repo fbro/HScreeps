@@ -302,6 +302,9 @@ const CreateJobs = {
                 || Memory.MemRooms[gameFlag.pos.roomName].RoomJobs['ReserveCtrl-' + gameFlagKey + '(' + gameFlag.pos.x + ',' + gameFlag.pos.y + ')' + gameFlag.pos.roomName]
                 || (gameFlag.room.controller.reservation.ticksToEnd < 2500 && !Memory.MemRooms[gameFlag.pos.roomName].RoomJobs[gameFlagKey])) { // extra logic to try and optimize creep not being idle
                 jobs = CreateFlagJob(jobs, 'ReserveCtrl', gameFlagKey, gameFlag, 'R');
+                if(Memory.MemRooms[gameFlag.pos.roomName]){
+                    Memory.MemRooms[gameFlag.pos.roomName].IsReserved = true;
+                }
             }
             return jobs;
         }
