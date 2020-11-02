@@ -82,6 +82,9 @@ const Constructions = {
         }
 
         function ReservedRoomBuild(gameRoom, roomTerrain) { // build roads and containers in a reserved room
+            if(Memory.MemRooms[gameRoom.name].Built){
+                return;
+            }
             const maxMainRoomRange = 2;
             let bestMainRoom = Memory.MemRooms[gameRoom.name].MainRoom;
             if (!bestMainRoom) {
@@ -101,12 +104,15 @@ const Constructions = {
                 Memory.MemRooms[gameRoom.name].MainRoom = bestMainRoom;
                 Util.Info('Constructions', 'ReservedRoomBuild', 'bestMainRoom found ' + bestMainRoom + ' for reserved room ' + gameRoom.name);
                 const sources = gameRoom.find(FIND_SOURCES);
+                let builtSuccess = 0;
                 for (const sourceCount in sources) {
                     const source = sources[sourceCount];
                     const spawn = Game.getObjectById(Memory.MemRooms[bestMainRoom].MainSpawnId);
                     const placedRoads = BuildRoadTo(new RoomPosition(spawn.pos.x, spawn.pos.y + 1, spawn.pos.roomName), source.pos);
                     if (placedRoads) { // place one path at a time
                         return;
+                    } else {
+                        builtSuccess++;
                     }
                     let nearestRoad = spawn.pos.findInRange(FIND_STRUCTURES, 2, {
                         filter: function (structure) {
@@ -121,8 +127,16 @@ const Constructions = {
                         })[0];
                     }
                     if (nearestRoad) {
-                        ConstructAroundPos(gameRoom, roomTerrain, source.pos, STRUCTURE_CONTAINER, nearestRoad);
+                        if (!FindExistingStructure(source.pos, STRUCTURE_CONTAINER, 1)) {
+                            const buildResult = ConstructAroundPos(gameRoom, roomTerrain, source.pos, STRUCTURE_CONTAINER, nearestRoad);
+                            builtSuccess = builtSuccess + (buildResult === OK ? 1 : 0);
+                        }else{
+                            builtSuccess++;
+                        }
                     }
+                }
+                if (builtSuccess === sources.length * 2) {
+                    Memory.MemRooms[gameRoom.name].Built = 0;
                 }
             }
         }
@@ -575,12 +589,11 @@ const Constructions = {
                         if (terrainAtPos !== TERRAIN_MASK_WALL) {
                             const lookAtObjects = gameRoom.lookAt(x, y);
                             const hasStructure = _.find(lookAtObjects, function (lookObject) {
-                                return lookObject.type === LOOK_STRUCTURES && (structureType !== STRUCTURE_CONTAINER || lookObject.structureType !== STRUCTURE_ROAD)
-                                    || lookObject.type === LOOK_CONSTRUCTION_SITES;
+                                return (lookObject.type === LOOK_STRUCTURES || lookObject.type === LOOK_CONSTRUCTION_SITES)
+                                    && structureType !== STRUCTURE_CONTAINER && lookObject.structureType !== STRUCTURE_ROAD;
                             });
                             if (!hasStructure) {
                                 const range = mainStructurePos.findPathTo(x, y).length;
-
                                 if (range < bestRange) {
                                     bestPos = new RoomPosition(x, y, gameRoom.name);
                                     bestRange = range;

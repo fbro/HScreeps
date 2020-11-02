@@ -144,6 +144,9 @@ const CreateJobs = {
                     if (randomCreep && gameRoom.controller.reservation.username === randomCreep.owner.username) {
                         Util.Info('CreateJobs', 'CreateObjJobs', 'reserved room ' + gameRoom.name);
                         SourceJobs(gameRoom, jobs);
+                        // TODO build job
+                        // TODO repair job
+                        // TODO fetch energy job
                     }
                 }
 
