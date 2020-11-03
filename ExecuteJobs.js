@@ -371,6 +371,9 @@ const ExecuteJobs = {
                     case jobKey.startsWith('FillStrg'):
                         result = JobFillStorage(creep, roomJob);
                         break;
+                    case jobKey.startsWith('FillRsvStrg'):
+                        result = JobFillStorageReserved(creep, roomJob);
+                        break;
                     case jobKey.startsWith('ExtrMin'):
                         result = JobExtractMineral(creep, roomJob);
                         break;
@@ -941,6 +944,47 @@ const ExecuteJobs = {
             } else {
                 return 0;
             }
+        }
+
+        /**@return {int}*/
+        function JobFillStorageReserved(creep, roomJob) {
+            const result = GenericJobAction(creep, roomJob, {
+                /**@return {int}*/
+                JobStatus: function (jobObject) {
+                    if (!creep.store.getUsedCapacity()) {
+                        return SHOULD_ACT; // get resources from target
+                    } else {
+                        return SHOULD_FETCH; // place in storage
+                    }
+                },
+                /**@return {int}*/
+                Act: function (jobObject) { // get the resource
+                    return FetchResource(creep, jobObject, RESOURCE_ENERGY);
+                },
+                /**@return {int}*/
+                IsJobDone: function (jobObject) {
+                    return OK;
+                },
+                /**@return {object}
+                 * @return {undefined}*/
+                FindFetchObject: function (jobObject) {
+                    if(
+                        Memory.MemRooms[jobObject.pos.roomName]
+                        && Memory.MemRooms[jobObject.pos.roomName].MainRoom
+                        && Game.rooms[Memory.MemRooms[jobObject.pos.roomName].MainRoom]
+                        && Game.rooms[Memory.MemRooms[jobObject.pos.roomName].MainRoom].storage
+                    ){
+                        return Game.rooms[Memory.MemRooms[jobObject.pos.roomName].MainRoom].storage;
+                    }else{
+                        return undefined;
+                    }
+                },
+                /**@return {int}*/
+                Fetch: function (fetchObject, jobObject) { // deposit the resource
+                    return DepositCreepStore(creep, fetchObject, jobObject);
+                },
+            });
+            return result;
         }
 
         /**@return {int}*/

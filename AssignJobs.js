@@ -170,6 +170,9 @@ const AssignJobs = {
                         } else {
                             maxCreepsInRoom = memRoom.SourceNumber;
                         }
+                        if(memRoom.IsReserved){
+                            maxCreepsInRoom = maxCreepsInRoom * 2;
+                        }
                         break;
                     case 'H': // harvester
                         if (memRoom.SourceNumber === 0) {
@@ -297,7 +300,7 @@ const AssignJobs = {
             const availableName = GetAvailableName(roomJob.CreepType, roomJob.IsForeignRoom);
             if (bestAvailableSpawn && !bestAvailableSpawn.HasSpawned && !bestAvailableSpawn.spawning) { // the closest spawn is found
                 let spawnAgileVersion = false;
-                if (memRoomKey !== bestAvailableSpawn.pos.roomName && (!Memory.MemRooms[memRoomKey] || !Memory.MemRooms[memRoomKey].IsReserved)) {
+                if (memRoomKey !== bestAvailableSpawn.pos.roomName && (!Memory.MemRooms[memRoomKey] || !Memory.MemRooms[memRoomKey].IsReserved/*reserved rooms have roads*/)) {
                     spawnAgileVersion = true;
                 }
                 const creepBody = GetCreepBody(roomJob.CreepType, Game.rooms[bestAvailableSpawn.pos.roomName].energyAvailable, spawnLargeVersion, spawnAgileVersion);

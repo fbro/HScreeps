@@ -82,7 +82,7 @@ const Constructions = {
         }
 
         function ReservedRoomBuild(gameRoom, roomTerrain) { // build roads and containers in a reserved room
-            if(Memory.MemRooms[gameRoom.name].Built){
+            if (Memory.MemRooms[gameRoom.name].Built === 0) {
                 return;
             }
             const maxMainRoomRange = 2;
@@ -130,7 +130,7 @@ const Constructions = {
                         if (!FindExistingStructure(source.pos, STRUCTURE_CONTAINER, 1)) {
                             const buildResult = ConstructAroundPos(gameRoom, roomTerrain, source.pos, STRUCTURE_CONTAINER, nearestRoad);
                             builtSuccess = builtSuccess + (buildResult === OK ? 1 : 0);
-                        }else{
+                        } else {
                             builtSuccess++;
                         }
                     }

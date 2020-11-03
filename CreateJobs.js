@@ -139,14 +139,13 @@ const CreateJobs = {
                             }
                         }
                     }
-                } else if (gameRoom.controller && gameRoom.controller.reservation) { // reserved
-                    const randomCreep = Game.creeps[Object.keys(Game.creeps)[0]]; // need a random creep too get my username
-                    if (randomCreep && gameRoom.controller.reservation.username === randomCreep.owner.username) {
+                } else if (gameRoom.controller && gameRoom.controller.reservation) { // reserved room jobs
+                    if (gameRoom.controller.reservation.username === Util.GetUsername()) {
                         Util.Info('CreateJobs', 'CreateObjJobs', 'reserved room ' + gameRoom.name);
                         SourceJobs(gameRoom, jobs);
-                        // TODO build job
-                        // TODO repair job
-                        // TODO fetch energy job
+                        ConstructionJobs(gameRoom, jobs);
+                        RepairJobs(gameRoom, jobs);
+                        FillStorageFromReservedRoomJobs(gameRoom, jobs);
                     }
                 }
 
@@ -601,6 +600,37 @@ const CreateJobs = {
                 const ruinDrop = ruinDrops[ruinDropKey];
                 new RoomVisual(gameRoom.name).text('🏚️', ruinDrop.pos.x, ruinDrop.pos.y);
                 AddJob(roomJobs, 'FillStrg-ruin' + '(' + ruinDrop.pos.x + ',' + ruinDrop.pos.y + ')' + gameRoom.name, ruinDrop.id, Util.OBJECT_JOB, 'T');
+            }
+        }
+
+        function FillStorageFromReservedRoomJobs(gameRoom, roomJobs) {
+
+            // container
+            const containers = gameRoom.find(FIND_STRUCTURES, {
+                filter: (s) => {
+                    return s.structureType === STRUCTURE_CONTAINER;
+                }
+            });
+            for (const containerKey in containers) {
+                const container = containers[containerKey];
+                new RoomVisual(gameRoom.name).text('📦', container.pos.x, container.pos.y);
+                for (const resourceType in container.store) {
+                    if (container.store.getUsedCapacity() >= 600) {
+                        AddJob(roomJobs, 'FillRsvStrg-' + container.structureType + '(' + container.pos.x + ',' + container.pos.y + ',' + resourceType + ')' + gameRoom.name, container.id, Util.OBJECT_JOB, 'T');
+                    }
+                }
+            }
+
+            // drop
+            const resourceDrops = gameRoom.find(FIND_DROPPED_RESOURCES, {
+                filter: (drop) => {
+                    return drop.amount > 1000;
+                }
+            });
+            for (const resourceDropKey in resourceDrops) {
+                const resourceDrop = resourceDrops[resourceDropKey];
+                new RoomVisual(gameRoom.name).text('💰', resourceDrop.pos.x, resourceDrop.pos.y);
+                AddJob(roomJobs, 'FillRsvStrg-drop' + '(' + resourceDrop.pos.x + ',' + resourceDrop.pos.y + ',' + resourceDrop.resourceType + ')' + gameRoom.name, resourceDrop.id, Util.OBJECT_JOB, 'T');
             }
         }
 

@@ -406,5 +406,16 @@ const Util = {
             Memory.MemRooms[objectPosition.roomName].MissingSpawn = Game.time; // only notify once
         }
     },
+    GetUsername: function () {
+        let username = Memory.Username;
+        if (!username) {
+            const struc = _.find(Game.structures);
+            const creep = _.find(Game.creeps);
+            username = (struc ? struc.owner.username : false) || (creep ? creep.owner.username : false);
+            username = Memory.Username;
+            Util.InfoLog('Util', 'GetUsername', 'username saved ' + username);
+        }
+        return username;
+    },
 };
 module.exports = Util;

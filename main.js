@@ -204,6 +204,8 @@ module.exports.loop = function () {
 
 // TODO make transporter job to reserved rooms
 
+// TODO reserved rooms harvester should also repair!
+
 // attack NPC strongholds
 // harvest middle rooms
 // harvest neutral rooms
