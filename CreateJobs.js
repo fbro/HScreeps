@@ -141,7 +141,7 @@ const CreateJobs = {
                     }
                 } else if (gameRoom.controller && gameRoom.controller.reservation) { // reserved room jobs
                     if (gameRoom.controller.reservation.username === Util.GetUsername()) {
-                        Util.Info('CreateJobs', 'CreateObjJobs', 'reserved room ' + gameRoom.name);
+                        Util.Info('CreateJobs', 'CreateObjJobs', 'reserved room ' + gameRoom.name + ' reserved by ' + gameRoom.controller.reservation.username);
                         SourceJobs(gameRoom, jobs);
                         ConstructionJobs(gameRoom, jobs);
                         RepairJobs(gameRoom, jobs);

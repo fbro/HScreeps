@@ -412,7 +412,7 @@ const Util = {
             const struc = _.find(Game.structures);
             const creep = _.find(Game.creeps);
             username = (struc ? struc.owner.username : false) || (creep ? creep.owner.username : false);
-            username = Memory.Username;
+            Memory.Username = username;
             Util.InfoLog('Util', 'GetUsername', 'username saved ' + username);
         }
         return username;
