@@ -23,8 +23,8 @@ module.exports.loop = function () {
             if (Game.time % Util.GAME_TIME_MODULO_3 === 0) {
                 if (Game.time % Util.GAME_TIME_MODULO_4 === 0) {
                     CreateJobs.run();
-                        Constructions.run();// TODO move to GAME_TIME_MODULO_5
                     if (Game.time % Util.GAME_TIME_MODULO_5 === 0) {
+                        Constructions.run();
                         if (Game.time % Util.GAME_TIME_MODULO_6 === 0) {
                             Util.Info('Main', 'Controller', '--------------- main reset of memory ---------------');
 
@@ -204,7 +204,7 @@ module.exports.loop = function () {
 
 // TODO make transporter job to reserved rooms
 
-// TODO reserved rooms harvester should also repair!
+// TODO link at reserved room entrances
 
 // attack NPC strongholds
 // harvest middle rooms

@@ -488,7 +488,7 @@ const ExecuteJobs = {
 
         /**@return {int}*/
         function JobSource(creep, roomJob) {
-            const result = GenericJobAction(creep, roomJob, {
+            let result = GenericJobAction(creep, roomJob, {
                 /**@return {int}*/
                 JobStatus: function (jobObject) {
                     if (creep.store.getFreeCapacity() === 0 || creep.memory.FetchObjectId) {
@@ -500,10 +500,6 @@ const ExecuteJobs = {
                 /**@return {int}*/
                 Act: function (jobObject) {
                     let result = creep.harvest(jobObject);
-                    if (result === ERR_NOT_ENOUGH_RESOURCES) {
-                        //Util.Info('ExecuteJobs', 'JobSource', creep.name + ' waiting for replenish (' + jobObject.pos.x + ',' + jobObject.pos.y + ',' + jobObject.pos.roomName + ')');
-                        result = OK;
-                    }
                     return result;
                 },
                 /**@return {int}*/
@@ -542,18 +538,19 @@ const ExecuteJobs = {
                         fetchObject = FindClosestFreeStore(creep, 2);
                     }
                     if (!fetchObject && Memory.MemRooms[jobObject.room.name].MissingSpawn) {
-                        const spawnConstruction = jobObject.room.find(FIND_MY_CONSTRUCTION_SITES, { // if there is a spawn that should be built - then built it
+                        const spawnConstruction = jobObject.room.find(FIND_MY_CONSTRUCTION_SITES, { // if there is a spawn that should be built - then build it
                             filter: function (c) {
                                 return c.structureType === STRUCTURE_SPAWN;
                             }
                         })[0];
                         if (spawnConstruction) {
                             fetchObject = spawnConstruction;
-                        } else {
-                            const nearbyConstruction = creep.pos.findInRange(FIND_MY_CONSTRUCTION_SITES, 2)[0];
-                            if (nearbyConstruction) {
-                                fetchObject = nearbyConstruction;
-                            }
+                        }
+                    }
+                    if (!fetchObject) {
+                        const nearbyConstruction = creep.pos.findInRange(FIND_MY_CONSTRUCTION_SITES, 2)[0];
+                        if (nearbyConstruction) {
+                            fetchObject = nearbyConstruction;
                         }
                     }
                     if (!fetchObject) { // nothing can be found then drop
@@ -564,7 +561,7 @@ const ExecuteJobs = {
                         const link = Game.getObjectById(creep.memory.LinkId);
                         if (link && link.store.getFreeCapacity(RESOURCE_ENERGY) > 200 && isOnlyEnergy) {
                             fetchObject = link;
-                            creep.memory.ClosestFreeStoreId = fetchObject;
+                            creep.memory.ClosestFreeStoreId = fetchObject.id;
                         }
                     }
                     return fetchObject;
@@ -572,7 +569,9 @@ const ExecuteJobs = {
                 /**@return {int}*/
                 Fetch: function (fetchObject, jobObject) {
                     let result = ERR_NO_RESULT_FOUND;
-                    if (creep.store.getUsedCapacity(RESOURCE_ENERGY) > 0) {
+                    if (!jobObject.energy) {
+                        result = ERR_NOT_ENOUGH_RESOURCES;
+                    } else if (creep.store.getUsedCapacity(RESOURCE_ENERGY) > 0) {
                         if (fetchObject.progressTotal) {
                             result = creep.build(fetchObject);
                             if (result === OK && creep.store.getFreeCapacity() > (creep.getActiveBodyparts(WORK) * 5)) {
@@ -595,7 +594,22 @@ const ExecuteJobs = {
                     return result;
                 },
             });
-            if (result !== OK && result !== JOB_MOVING && result !== ERR_TIRED && result !== ERR_BUSY) {
+            if (result === ERR_NOT_ENOUGH_RESOURCES) { // repair when source is empty
+                if (!creep.store.getUsedCapacity(RESOURCE_ENERGY)) {
+                    const energyDeposit = Game.getObjectById(creep.memory.ClosestFreeStoreId);
+                    if (energyDeposit && energyDeposit.store.getUsedCapacity(RESOURCE_ENERGY)) {
+                        result = creep.withdraw(energyDeposit, RESOURCE_ENERGY);
+                    }
+                } else {
+                    const repair = creep.pos.findInRange(FIND_STRUCTURES, 2, {
+                        filter: function (c) {
+                            return c.hits < c.hitsMax;
+                        }
+                    })[0];
+                    result = creep.repair(repair);
+                }
+                result = ERR_BUSY;
+            } else if (result !== OK && result !== JOB_MOVING && result !== ERR_TIRED && result !== ERR_BUSY) {
                 Util.Warning('ExecuteJobs', 'JobSource', 'harvester result is not OK ' + result + ' ' + creep.name + '(' + creep.pos.x + ',' + creep.pos.y + ',' + creep.pos.roomName + ')');
             }
             return result;
@@ -968,14 +982,14 @@ const ExecuteJobs = {
                 /**@return {object}
                  * @return {undefined}*/
                 FindFetchObject: function (jobObject) {
-                    if(
+                    if (
                         Memory.MemRooms[jobObject.pos.roomName]
                         && Memory.MemRooms[jobObject.pos.roomName].MainRoom
                         && Game.rooms[Memory.MemRooms[jobObject.pos.roomName].MainRoom]
                         && Game.rooms[Memory.MemRooms[jobObject.pos.roomName].MainRoom].storage
-                    ){
+                    ) {
                         return Game.rooms[Memory.MemRooms[jobObject.pos.roomName].MainRoom].storage;
-                    }else{
+                    } else {
                         return undefined;
                     }
                 },
@@ -2696,9 +2710,9 @@ const ExecuteJobs = {
                             return (s.structureType === STRUCTURE_RAMPART);
                         }
                     });
-                    if(nearestRampart){
+                    if (nearestRampart) {
                         result = Move(creep, nearestRampart);
-                    }else{
+                    } else {
                         result = FleeMatrix(creep, closestHostile);
                     }
                 }
@@ -2781,7 +2795,7 @@ const ExecuteJobs = {
             return FleeMatrix(creep, closestHostileCreep);
         }
 
-        function FleeMatrix(creep, closestHostileCreep){
+        function FleeMatrix(creep, closestHostileCreep) {
             switch (true) {
                 case creep.pos.x < closestHostileCreep.pos.x && creep.pos.y < closestHostileCreep.pos.y:
                     return FleeMove(creep, [-1, 0, -1], [-1, -1, 0], [TOP_LEFT, TOP, LEFT]);

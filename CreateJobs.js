@@ -112,7 +112,7 @@ const CreateJobs = {
                 WeaveFlagJobsIntoRoomJobs(flagJobs, jobs, gameRoomKey);
 
                 if (gameRoom.controller && gameRoom.controller.my) {
-                    TagControllerJobs(gameRoom); // creates a tagController flag if controller tag is wrong
+                    TagControllerJobs(gameRoom);
                     SourceJobs(gameRoom, jobs);
                     ControllerJobs(gameRoom, jobs);
                     FillSpawnExtensionJobs(gameRoom, jobs);
@@ -141,11 +141,12 @@ const CreateJobs = {
                     }
                 } else if (gameRoom.controller && gameRoom.controller.reservation) { // reserved room jobs
                     if (gameRoom.controller.reservation.username === Util.GetUsername()) {
-                        Util.Info('CreateJobs', 'CreateObjJobs', 'reserved room ' + gameRoom.name + ' reserved by ' + gameRoom.controller.reservation.username);
+                        //Util.Info('CreateJobs', 'CreateObjJobs', 'reserved room ' + gameRoom.name + ' reserved by ' + gameRoom.controller.reservation.username);
                         SourceJobs(gameRoom, jobs);
                         ConstructionJobs(gameRoom, jobs);
                         RepairJobs(gameRoom, jobs);
                         FillStorageFromReservedRoomJobs(gameRoom, jobs);
+                        TagControllerJobs(gameRoom);
                     }
                 }
 
@@ -304,7 +305,7 @@ const CreateJobs = {
                 || Memory.MemRooms[gameFlag.pos.roomName].RoomJobs['ReserveCtrl-' + gameFlagKey + '(' + gameFlag.pos.x + ',' + gameFlag.pos.y + ')' + gameFlag.pos.roomName]
                 || (gameFlag.room.controller.reservation.ticksToEnd < 2500 && !Memory.MemRooms[gameFlag.pos.roomName].RoomJobs[gameFlagKey])) { // extra logic to try and optimize creep not being idle
                 jobs = CreateFlagJob(jobs, 'ReserveCtrl', gameFlagKey, gameFlag, 'R');
-                if(Memory.MemRooms[gameFlag.pos.roomName]){
+                if (Memory.MemRooms[gameFlag.pos.roomName]) {
                     Memory.MemRooms[gameFlag.pos.roomName].IsReserved = true;
                 }
             }
@@ -316,9 +317,17 @@ const CreateJobs = {
         //region room jobs
 
         function TagControllerJobs(gameRoom) {
-            if (!gameRoom.controller.pos.lookFor(LOOK_FLAGS)[0] && (!gameRoom.controller.sign || gameRoom.controller.sign.text !== 'Homebrewed code @ github.com/fbro/HScreeps ' + gameRoom.name)) {
-                const result = gameRoom.createFlag(gameRoom.controller.pos, 'Homebrewed code @ github.com/fbro/HScreeps ' + gameRoom.name, COLOR_ORANGE, COLOR_ORANGE);
-                Util.InfoLog('CreateJobs', 'CreateObjJobs', 'createFlag sign flag ' + gameRoom.controller.pos + ' ' + result);
+            if (gameRoom.controller) {
+                const existingTagFlag = _.find(gameRoom.controller.pos.lookFor(LOOK_FLAGS), function (f) {
+                    return f.color === COLOR_ORANGE && f.secondaryColor === COLOR_ORANGE;
+                });
+                if (!existingTagFlag) {
+                    const tag = 'Homebrewed code @ github.com/fbro/HScreeps ' + gameRoom.name;
+                    if (gameRoom.controller.sign.text !== tag || !gameRoom.controller.sign) {
+                        const result = gameRoom.createFlag(gameRoom.controller.pos, tag, COLOR_ORANGE, COLOR_ORANGE);
+                        Util.InfoLog('CreateJobs', 'TagControllerJobs', 'createFlag sign flag ' + gameRoom.controller.pos + ' ' + result);
+                    }
+                }
             }
         }
 
@@ -617,6 +626,9 @@ const CreateJobs = {
                 for (const resourceType in container.store) {
                     if (container.store.getUsedCapacity() >= 600) {
                         AddJob(roomJobs, 'FillRsvStrg-' + container.structureType + '(' + container.pos.x + ',' + container.pos.y + ',' + resourceType + ')' + gameRoom.name, container.id, Util.OBJECT_JOB, 'T');
+                        if (container.store.getUsedCapacity() === 2000) {
+                            AddJob(roomJobs, 'FillRsvStrg1-' + container.structureType + '(' + container.pos.x + ',' + container.pos.y + ',' + resourceType + ')' + gameRoom.name, container.id, Util.OBJECT_JOB, 'T');
+                        }
                     }
                 }
             }
