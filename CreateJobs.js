@@ -323,7 +323,7 @@ const CreateJobs = {
                 });
                 if (!existingTagFlag) {
                     const tag = 'Homebrewed code @ github.com/fbro/HScreeps ' + gameRoom.name;
-                    if (gameRoom.controller.sign.text !== tag || !gameRoom.controller.sign) {
+                    if (gameRoom.controller.sign && (gameRoom.controller.sign.text !== tag || !gameRoom.controller.sign)) {
                         const result = gameRoom.createFlag(gameRoom.controller.pos, tag, COLOR_ORANGE, COLOR_ORANGE);
                         Util.InfoLog('CreateJobs', 'TagControllerJobs', 'createFlag sign flag ' + gameRoom.controller.pos + ' ' + result);
                     }
@@ -686,7 +686,7 @@ const CreateJobs = {
                         High = Util.STORAGE_ENERGY_HIGH; // 600000
                         HighTransfer = Util.STORAGE_ENERGY_HIGH_TRANSFER; // 120000
                         Medium = Util.STORAGE_ENERGY_MEDIUM; // 100000
-                        MediumTransfer = Util.STORAGE_ENERGY_MEDIUM_TRANSFER; // 80000
+                        MediumTransfer = Util.STORAGE_ENERGY_MEDIUM_TRANSFER; // 30000
                         Low = Util.STORAGE_ENERGY_LOW; // 10000
                         LowTransfer = Util.STORAGE_ENERGY_LOW_TRANSFER; // 0
                     }

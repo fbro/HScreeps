@@ -202,9 +202,7 @@ module.exports.loop = function () {
 
 // TODO use PathFinder.search flee functionality when fleeing!!
 
-// TODO make transporter job to reserved rooms
-
-// TODO link at reserved room entrances
+// TODO construct link at reserved room entrances
 
 // attack NPC strongholds
 // harvest middle rooms

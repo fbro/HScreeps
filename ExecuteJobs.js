@@ -1080,14 +1080,14 @@ const ExecuteJobs = {
 
                             || storageResourceAmount === 0
 
-                            || storageResourceAmount <= Medium
-                            && terminal.store.getUsedCapacity(resourceType) >= LowTransfer
+                            || storageResourceAmount >= High
+                            && terminal.store.getUsedCapacity(resourceType) >= HighTransfer
 
                             || storageResourceAmount <= High
                             && terminal.store.getUsedCapacity(resourceType) >= MediumTransfer
 
-                            || storageResourceAmount >= High
-                            && terminal.store.getUsedCapacity(resourceType) >= HighTransfer
+                            || storageResourceAmount <= Medium
+                            && terminal.store.getUsedCapacity(resourceType) >= LowTransfer
                         ) {
                             return JOB_IS_DONE;
                         } else if (!creep.store.getUsedCapacity(resourceType)) { // fetch
