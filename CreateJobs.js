@@ -72,7 +72,8 @@ const CreateJobs = {
                     if (secColor === COLOR_GREEN) { // claimer claim
                         jobs = ClaimControllerJobs(jobs, gameFlagKey, gameFlag);
                     } else if (secColor === COLOR_YELLOW) { // claimer reserve
-                        jobs = ReserveRoomJobs(jobs, gameFlagKey, gameFlag);
+                        jobs = ReserveRoomJobs(jobs, gameFlagKey, gameFlag); // suggested name: Reserve room roomName
+                        jobs = DefendReserverRoomJobs(jobs, gameFlagKey, gameFlag);
                     } else if (secColor === COLOR_GREY) {
                         // construction of spawn
                     } else {
@@ -142,11 +143,11 @@ const CreateJobs = {
                 } else if (gameRoom.controller && gameRoom.controller.reservation) { // reserved room jobs
                     if (gameRoom.controller.reservation.username === Util.GetUsername()) {
                         //Util.Info('CreateJobs', 'CreateObjJobs', 'reserved room ' + gameRoom.name + ' reserved by ' + gameRoom.controller.reservation.username);
+                        TagControllerJobs(gameRoom);
                         SourceJobs(gameRoom, jobs);
                         ConstructionJobs(gameRoom, jobs);
                         RepairJobs(gameRoom, jobs);
                         FillStorageFromReservedRoomJobs(gameRoom, jobs);
-                        TagControllerJobs(gameRoom);
                     }
                 }
 
@@ -307,6 +308,17 @@ const CreateJobs = {
                 jobs = CreateFlagJob(jobs, 'ReserveCtrl', gameFlagKey, gameFlag, 'R');
                 if (Memory.MemRooms[gameFlag.pos.roomName]) {
                     Memory.MemRooms[gameFlag.pos.roomName].IsReserved = true;
+                }
+            }
+            return jobs;
+        }
+
+        function DefendReserverRoomJobs(jobs, gameFlagKey, gameFlag) {
+            if (gameFlag.room) {
+                const hostileCreeps = gameFlag.room.find(FIND_HOSTILE_CREEPS);
+                if (hostileCreeps.length > 0) {
+                    Util.Info('CreateJobs', 'DefendReserverRoomJobs', 'hostiles found ' + hostileCreeps + ' ' + gameFlag.pos.roomName);
+                    jobs = CreateFlagJob(jobs, 'DefRsv', gameFlagKey, gameFlag, 'W');
                 }
             }
             return jobs;

@@ -587,12 +587,20 @@ const Constructions = {
                     for (let x = isCheckered ? (((y - centerPos.y) % 2) ? centerPos.x - radius : centerPos.x) : centerPos.x - radius; x <= centerPos.x + radius; (isCheckered ? x = x + 2 : x++)) {
                         const terrainAtPos = terrain.get(x, y);
                         if (terrainAtPos !== TERRAIN_MASK_WALL) {
-                            const lookAtObjects = gameRoom.lookAt(x, y);
-                            const hasStructure = _.find(lookAtObjects, function (lookObject) {
+                            const pos = new RoomPosition(x, y, gameRoom.name);
+                            const lookAtObjects = gameRoom.lookAt(pos);
+                            let viablePos = _.find(lookAtObjects, function (lookObject) {
                                 return (lookObject.type === LOOK_STRUCTURES || lookObject.type === LOOK_CONSTRUCTION_SITES)
                                     && structureType !== STRUCTURE_CONTAINER && lookObject.structureType !== STRUCTURE_ROAD;
-                            });
-                            if (!hasStructure) {
+                            }) === undefined;
+                            if (viablePos) {
+                                viablePos = pos.findInRange(FIND_STRUCTURES, 1, {
+                                    filter: function (structure) {
+                                        return structure === STRUCTURE_CONTROLLER;
+                                    }
+                                }).length === 0; // avoid building near controllers
+                            }
+                            if (viablePos) {
                                 const range = mainStructurePos.findPathTo(x, y).length;
                                 if (range < bestRange) {
                                     bestPos = new RoomPosition(x, y, gameRoom.name);
