@@ -520,7 +520,9 @@ const ExecuteJobs = {
                             fetchObject = Game.getObjectById(creep.memory.ClosestFreeStoreId);
                             if (fetchObject) {
                                 result = creep.transfer(fetchObject, RESOURCE_ENERGY);
-
+                                if(result === OK && (fetchObject.pos.x !== creep.pos.x || fetchObject.pos.y !== creep.pos.y)){
+                                    creep.moveTo(fetchObject); // force harvester to be on top of container
+                                }
                             }
                         }
                         if (result === OK) {
@@ -999,48 +1001,6 @@ const ExecuteJobs = {
                 /**@return {int}*/
                 Fetch: function (fetchObject, jobObject) { // deposit the resource
                     return DepositCreepStore(creep, fetchObject, jobObject);
-                },
-            });
-            return result;
-        }
-
-        /**@return {int}*/
-        function JobDefendReserved(creep, roomJob) {
-            const result = GenericJobAction(creep, roomJob, {
-                /**@return {int}*/
-                JobStatus: function (jobObject) {
-                    if (!jobObject.room) {
-                        return SHOULD_ACT;
-                    } else {
-                        return SHOULD_FETCH
-                    }
-                },
-                /**@return {int}*/
-                Act: function (jobObject) { // get the resource
-                    return ERR_NOT_IN_RANGE;
-                },
-                /**@return {int}*/
-                IsJobDone: function (jobObject) {
-                    return this.JobStatus(jobObject);
-                },
-                /**@return {object}
-                 * @return {undefined}*/
-                FindFetchObject: function (jobObject) {
-                    const closestHostile = creep.pos.findClosestByPath(FIND_HOSTILE_CREEPS);
-                    if (closestHostile) {
-                        return closestHostile;
-                    } else {
-                        return jobObject;
-                    }
-                },
-                /**@return {int}*/
-                Fetch: function (fetchObject, jobObject) { // deposit the resource
-                    if (fetchObject === jobObject) {
-                        return OK;
-                    } else {
-                        Util.Info('ExecuteJobs', 'JobDefendReserved', creep.name + ' attacking hostile ' + fetchObject);
-                        return creep.attack(fetchObject);
-                    }
                 },
             });
             return result;
@@ -2173,6 +2133,52 @@ const ExecuteJobs = {
                 /**@return {int}*/
                 Fetch: function (fetchObject, jobObject) {
                     return DepositCreepStore(creep, fetchObject);
+                },
+            });
+            return result;
+        }
+
+        /**@return {int}*/
+        function JobDefendReserved(creep, roomJob) {
+            const result = GenericFlagAction(creep, roomJob, {
+                /**@return {int}*/
+                JobStatus: function (jobObject) {
+                    if (!jobObject.room) {
+                        return SHOULD_ACT;
+                    } else {
+                        return SHOULD_FETCH
+                    }
+                },
+                /**@return {int}*/
+                Act: function (jobObject) { // get the resource
+                    return ERR_NOT_IN_RANGE;
+                },
+                /**@return {int}*/
+                IsJobDone: function (jobObject) {
+                    return this.JobStatus(jobObject);
+                },
+                /**@return {object}
+                 * @return {undefined}*/
+                FindFetchObject: function (jobObject) {
+                    const closestHostile = creep.pos.findClosestByPath(FIND_HOSTILE_CREEPS);
+                    if (closestHostile) {
+                        return closestHostile;
+                    } else {
+                        return jobObject;
+                    }
+                },
+                /**@return {int}*/
+                Fetch: function (fetchObject, jobObject) { // deposit the resource
+                    if (fetchObject === jobObject) {
+                        if(creep.pos.getRangeTo(fetchObject) > 2){
+                            return ERR_NOT_IN_RANGE;
+                        }else{
+                            return OK;
+                        }
+                    } else {
+                        Util.Info('ExecuteJobs', 'JobDefendReserved', creep.name + ' attacking hostile ' + fetchObject + ' ' + creep.pos.roomName);
+                        return creep.attack(fetchObject);
+                    }
                 },
             });
             return result;

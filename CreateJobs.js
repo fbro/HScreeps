@@ -318,9 +318,11 @@ const CreateJobs = {
                 const hostileCreeps = gameFlag.room.find(FIND_HOSTILE_CREEPS);
                 if (hostileCreeps.length > 0) {
                     Util.Info('CreateJobs', 'DefendReserverRoomJobs', 'hostiles found ' + hostileCreeps + ' ' + gameFlag.pos.roomName);
-                    jobs = CreateFlagJob(jobs, 'DefRsv', gameFlagKey, gameFlag, 'W');
+                }else{
+                    return jobs;
                 }
             }
+            jobs = CreateFlagJob(jobs, 'DefRsv', gameFlagKey, gameFlag, 'W');
             return jobs;
         }
 
