@@ -128,3 +128,7 @@ for (const flagKey in flags) {
 Game.rooms[roomName].controller.unclaim();
 delete Memory.MemRooms[roomName];
 // -----------------------------------------------
+
+// get available energy in room
+const roomName = 'W43N32';
+console.log("energyCapacityAvailable " + Game.rooms[roomName].energyCapacityAvailable);

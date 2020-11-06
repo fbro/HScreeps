@@ -243,7 +243,7 @@ const AssignJobs = {
                         break;
                     }
                 }
-            } else if (roomJob.CreepType === 'B' && gameRoom.storage && gameRoom.storage.store.getUsedCapacity(RESOURCE_ENERGY) > Util.STORAGE_ENERGY_MEDIUM) { // large builders are only allowed when the room has the required energy - the drawback is that upgrade controller takes alot of energy
+            } else if (roomJob.CreepType === 'B' && gameRoom.storage && gameRoom.storage.store.getUsedCapacity(RESOURCE_ENERGY) > Util.STORAGE_ENERGY_MEDIUM) { // large builders are only allowed when the room has the required energy
                 spawnLargeVersion = true;
             }
             return spawnLargeVersion;
@@ -303,7 +303,7 @@ const AssignJobs = {
                 if (memRoomKey !== bestAvailableSpawn.pos.roomName && (!Memory.MemRooms[memRoomKey] || !Memory.MemRooms[memRoomKey].IsReserved/*reserved rooms have roads*/)) {
                     spawnAgileVersion = true;
                 }
-                const creepBody = GetCreepBody(roomJob.CreepType, Game.rooms[bestAvailableSpawn.pos.roomName].energyAvailable, spawnLargeVersion, spawnAgileVersion);
+                const creepBody = GetCreepBody(roomJob.CreepType, Game.rooms[bestAvailableSpawn.pos.roomName].energyAvailable, spawnLargeVersion, spawnAgileVersion, Game.rooms[bestAvailableSpawn.pos.roomName].controller.level);
                 const spawnResult = bestAvailableSpawn.spawnCreep(creepBody, availableName);
                 if (spawnResult === OK) {
                     bestAvailableSpawn.HasSpawned = true;
@@ -341,7 +341,7 @@ const AssignJobs = {
         }
 
         /**@return {array}*/
-        function GetCreepBody(creepType, energyAvailable, spawnLargeVersion, spawnAgileVersion) {
+        function GetCreepBody(creepType, energyAvailable, spawnLargeVersion, spawnAgileVersion, controllerLevel) {
             let body = [];
             switch (creepType) {
                 // harvester
@@ -384,6 +384,43 @@ const AssignJobs = {
                 // transporter
                 case 'T':
                     switch (true) {
+                        case (energyAvailable >= 2500 && spawnAgileVersion): // energyCapacityAvailable: 12900
+                            body = [
+                                CARRY, MOVE, CARRY, MOVE,
+                                CARRY, MOVE, CARRY, MOVE,
+                                CARRY, MOVE, CARRY, MOVE,
+                                CARRY, MOVE, CARRY, MOVE,
+                                CARRY, MOVE, CARRY, MOVE,
+                                CARRY, MOVE, CARRY, MOVE,
+                                CARRY, MOVE, CARRY, MOVE,
+                                CARRY, MOVE, CARRY, MOVE,
+                                CARRY, MOVE, CARRY, MOVE,
+                                CARRY, MOVE, CARRY, MOVE,
+                                CARRY, MOVE, CARRY, MOVE,
+                                CARRY, MOVE, CARRY, MOVE,
+                                CARRY, MOVE
+                            ];
+                            break;
+                        case (energyAvailable >= 2400 && !spawnAgileVersion): // energyCapacityAvailable: 12900
+                            body = [
+                                CARRY, CARRY, MOVE,
+                                CARRY, CARRY, MOVE,
+                                CARRY, CARRY, MOVE,
+                                CARRY, CARRY, MOVE,
+                                CARRY, CARRY, MOVE,
+                                CARRY, CARRY, MOVE,
+                                CARRY, CARRY, MOVE,
+                                CARRY, CARRY, MOVE,
+                                CARRY, CARRY, MOVE,
+                                CARRY, CARRY, MOVE,
+                                CARRY, CARRY, MOVE,
+                                CARRY, CARRY, MOVE,
+                                CARRY, CARRY, MOVE,
+                                CARRY, CARRY, MOVE,
+                                CARRY, CARRY, MOVE,
+                                CARRY, CARRY, MOVE
+                            ];
+                            break;
                         case (energyAvailable >= 2000 && spawnAgileVersion): // energyCapacityAvailable: 12900
                             body = [
                                 CARRY, MOVE, CARRY, MOVE,
@@ -521,7 +558,25 @@ const AssignJobs = {
                                 CARRY, CARRY, WORK, WORK, WORK, WORK, WORK, WORK, CARRY, CARRY
                             ];
                             break;
-                        case (energyAvailable >= 2600 && spawnAgileVersion): // energyCapacityAvailable: 5600
+                        case (energyAvailable >= 3650 && !spawnAgileVersion && controllerLevel < 8): // energyCapacityAvailable: 5600
+                            body = [
+                                WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK,
+                                WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK,
+                                WORK, WORK, WORK,
+                                CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY,
+                                MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,
+                                MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE
+                            ];
+                            break;
+                        case (energyAvailable >= 2300 && !spawnAgileVersion && controllerLevel < 8): // energyCapacityAvailable: 2300
+                            body = [
+                                WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK,
+                                WORK, WORK, WORK, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY,
+                                CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,
+                                MOVE, MOVE, MOVE
+                            ];
+                            break;
+                        case (energyAvailable >= 2000 && spawnAgileVersion): // energyCapacityAvailable: 5600
                             body = [
                                 WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK,
                                 CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY,
@@ -529,14 +584,14 @@ const AssignJobs = {
                                 MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE
                             ];
                             break;
-                        case (energyAvailable >= 2200 && !spawnAgileVersion): // energyCapacityAvailable: 5600
+                        case (energyAvailable >= 1600 && !spawnAgileVersion): // energyCapacityAvailable: 5600
                             body = [
                                 WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK,
                                 CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY,
                                 MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE
                             ];
                             break;
-                        case (energyAvailable >= 2150 && spawnAgileVersion): // energyCapacityAvailable: 2300
+                        case (energyAvailable >= 1750 && spawnAgileVersion): // energyCapacityAvailable: 2300
                             body = [
                                 WORK, WORK, WORK, WORK, WORK, WORK, WORK,
                                 CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY,
@@ -544,27 +599,27 @@ const AssignJobs = {
                                 MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE
                             ];
                             break;
-                        case (energyAvailable >= 1800 && !spawnAgileVersion): // energyCapacityAvailable: 2300
+                        case (energyAvailable >= 1400 && !spawnAgileVersion): // energyCapacityAvailable: 2300
                             body = [
                                 WORK, WORK, WORK, WORK, WORK, WORK, WORK,
                                 CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY,
                                 MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE
                             ];
                             break;
-                        case (energyAvailable >= 1700 && spawnAgileVersion): // energyCapacityAvailable: 1800
+                        case (energyAvailable >= 1500 && spawnAgileVersion): // energyCapacityAvailable: 1800
                             body = [
                                 WORK, WORK, WORK, WORK, WORK, WORK,
                                 CARRY, CARRY, CARRY, CARRY, CARRY, CARRY,
                                 MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,
                                 MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];
                             break;
-                        case (energyAvailable >= 1400 && !spawnAgileVersion): // energyCapacityAvailable: 1800
+                        case (energyAvailable >= 1200 && !spawnAgileVersion): // energyCapacityAvailable: 1800
                             body = [
                                 WORK, WORK, WORK, WORK, WORK, WORK,
                                 CARRY, CARRY, CARRY, CARRY, CARRY, CARRY,
                                 MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];
                             break;
-                        case (energyAvailable >= 1200 && spawnAgileVersion): // energyCapacityAvailable: 1300
+                        case (energyAvailable >= 1150 && spawnAgileVersion): // energyCapacityAvailable: 1300
                             body = [
                                 WORK, WORK, WORK, WORK, WORK,
                                 CARRY, CARRY, CARRY, CARRY,
