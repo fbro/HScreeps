@@ -188,7 +188,7 @@ const AssignJobs = {
                         maxCreepsInRoom = 2;
                         if (memRoom.RoomLevel < 8) {
                             maxCreepsInRoom += 2;
-                            if (memRoom.RoomLevel <= 3) {
+                            if (memRoom.RoomLevel <= 4) {
                                 maxCreepsInRoom += 1;
                             }
                         }

@@ -204,8 +204,6 @@ module.exports.loop = function () {
 
 // TODO construct link at reserved room entrances
 
-// TODO defend reserver rooms - needs testing!
-
 // attack NPC strongholds
 // harvest middle rooms
 // harvest neutral rooms

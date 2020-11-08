@@ -2,6 +2,7 @@ let Util = require('Util');
 const Terminals = {
     run: function () {
         const terminals = LoadMyTerminals();
+        let marketDealCount = 0; // shard global max of how many terminal deals one can make each tick
         TerminalActions(terminals);
 
         //region terminal actions
@@ -18,24 +19,23 @@ const Terminals = {
         }
 
         function TerminalActions(terminals) {
-            let marketDealCount = 0;
             for (const terminalKey in terminals) {
                 const terminal = terminals[terminalKey];
                 const memRoom = Memory.MemRooms[terminal.pos.roomName];
 
-                marketDealCount = GetFactoryResources(terminal, terminals, memRoom, marketDealCount); // try and get from other terminals
+                GetFactoryResources(terminal, terminals, memRoom); // try and get from other terminals
 
-                marketDealCount = GetLabResources(terminal, terminals, marketDealCount); // first try and get from other terminals then try and buy from the market
+                GetLabResources(terminal, terminals); // first try and get from other terminals then try and buy from the market
 
                 GetEnergy(terminal, terminals); // get energy from other terminals
 
-                marketDealCount = BuyResources(terminal, marketDealCount);
+                BuyResources(terminal);
 
-                marketDealCount = SendExcess(terminal, marketDealCount); // selected terminal will actively send/sell resources out
+                SendExcess(terminal); // selected terminal will actively send/sell resources out
             }
         }
 
-        function GetFactoryResources(toTerminal, terminals, memRoom, marketDealCount) {
+        function GetFactoryResources(toTerminal, terminals, memRoom) {
             if (memRoom && memRoom.FctrId && memRoom.FctrId !== '-') {
                 const factory = Game.getObjectById(memRoom.FctrId);
                 if (factory) {
@@ -47,11 +47,10 @@ const Terminals = {
                             const didSend = GetFromTerminal(amountNeeded, resourceTypeNeeded, toTerminal, terminals, GetNeededFactoryLeftoverResource(resourceTypeNeeded));
                             if (!didSend && toTerminal.store.getUsedCapacity(RESOURCE_ENERGY) >= Util.TERMINAL_TARGET_ENERGY && resourceTypeNeeded.length === 1/*only buy H, O, L, U, K, Z, X*/) { // try to buy resource
                                 if (marketDealCount >= 10 || toTerminal.cooldown || toTerminal.used) {
-                                    return marketDealCount;
+                                    return;
                                 }
                                 const didBuy = TryBuyResource(toTerminal, resourceTypeNeeded, amountNeeded);
                                 if (didBuy) {
-                                    marketDealCount++;
                                     break; // when buying on the market one can only buy once per terminal
                                 }
                             }
@@ -59,10 +58,9 @@ const Terminals = {
                     }
                 }
             }
-            return marketDealCount;
         }
 
-        function GetLabResources(toTerminal, terminals, marketDealCount) {
+        function GetLabResources(toTerminal, terminals) {
             const flags = toTerminal.room.find(FIND_FLAGS, {
                 filter: function (flag) {
                     return flag.color === COLOR_PURPLE && flag.secondaryColor === COLOR_PURPLE;
@@ -81,18 +79,16 @@ const Terminals = {
                         if (!didSend && toTerminal.store.getUsedCapacity(RESOURCE_ENERGY) >= Util.TERMINAL_TARGET_ENERGY && flagNameArray[0] === 'BUY') { // try to buy the resource
                             Util.Info('Terminal', 'GetLabResources', 'buy flagNameArray ' + flagNameArray);
                             if (marketDealCount >= 10 || toTerminal.cooldown || toTerminal.used) {
-                                return marketDealCount;
+                                return;
                             }
                             const didBuy = TryBuyResource(toTerminal, resourceTypeNeeded, amountNeeded);
                             if (didBuy) {
-                                marketDealCount++;
                                 break; // when buying on the market one can only buy once per terminal
                             }
                         }
                     }
                 }
             }
-            return marketDealCount;
         }
 
         function GetEnergy(toTerminal, terminals) {
@@ -109,36 +105,31 @@ const Terminals = {
             }
         }
 
-        function BuyResources(toTerminal, marketDealCount) {
+        function BuyResources(toTerminal) {
             if (marketDealCount >= 10 || toTerminal.cooldown || toTerminal.used) {
-                return marketDealCount;
+                return;
             }
             if (!toTerminal.store.getUsedCapacity(RESOURCE_POWER) && toTerminal.room.storage && !toTerminal.room.storage.store.getUsedCapacity(RESOURCE_POWER) && toTerminal.room.storage.store.getUsedCapacity(RESOURCE_ENERGY) >= Util.STORAGE_ENERGY_HIGH) {
                 const didBuy = TryBuyResource(toTerminal, RESOURCE_POWER, Util.TERMINAL_TARGET_RESOURCE, 5);
                 if (didBuy) {
-                    marketDealCount++;
-                    return marketDealCount;
+                    return;
                 }
             }
-            if (toTerminal.room.controller.level < 8 && Game.market.credits > 100000000 && toTerminal.store.getUsedCapacity(RESOURCE_ENERGY) < Util.TERMINAL_MAX_ENERGY) {
-                const didBuy = TryBuyResource(toTerminal, RESOURCE_ENERGY, Util.TERMINAL_MAX_ENERGY - (toTerminal.store.getUsedCapacity(RESOURCE_ENERGY) * 0.8), 0.3);
-                if (didBuy) {
-                    marketDealCount++;
-                    return marketDealCount;
-                }
-            }
-            return marketDealCount;
         }
 
-        function SendExcess(fromTerminal, marketDealCount) { // selected terminal will actively send/sell resources out
+        function SendExcess(fromTerminal) { // selected terminal will actively send/sell resources out
             for (const resourceType in fromTerminal.store) {
                 if (marketDealCount >= 10 || fromTerminal.cooldown || fromTerminal.used) {
-                    return marketDealCount;
+                    return;
                 }
                 let didSend = false;
                 // try to send energy or power to other owned terminals that needs it
                 if (resourceType === RESOURCE_ENERGY) {
-                    didSend = SendToTerminals(Util.STORAGE_ENERGY_MEDIUM_TRANSFER, resourceType, fromTerminal, terminals, Util.TERMINAL_TARGET_ENERGY);
+                    if (fromTerminal.room.storage.store.getUsedCapacity(RESOURCE_ENERGY) > Util.STORAGE_ENERGY_HIGH) { // storage is overflowing with energy
+                        didSend = SendToTerminals(Util.STORAGE_ENERGY_MEDIUM_TRANSFER, resourceType, fromTerminal, terminals, Util.TERMINAL_EMPTY_ENERGY);
+                    } else {
+                        didSend = SendToTerminals(Util.STORAGE_ENERGY_MEDIUM_TRANSFER, resourceType, fromTerminal, terminals, Util.TERMINAL_TARGET_ENERGY);
+                    }
                 } else if (resourceType === RESOURCE_POWER) {
                     didSend = SendToTerminals(Util.TERMINAL_TARGET_RESOURCE, resourceType, fromTerminal, terminals, Util.TERMINAL_TARGET_RESOURCE);
                 }
@@ -148,12 +139,10 @@ const Terminals = {
                     const amount = fromTerminal.store.getUsedCapacity(resourceType) - max;
                     const didSell = TrySellResource(fromTerminal, resourceType, amount);
                     if (didSell) {
-                        marketDealCount++;
                         break; // when selling on the market one can only sell once per terminal
                     }
                 }
             }
-            return marketDealCount;
         }
 
         //endregion
@@ -517,6 +506,7 @@ const Terminals = {
                 if (result === OK) {
                     terminal.used = true;
                     terminal.store[resourceType] = terminal.store[resourceType] + amount;
+                    marketDealCount++; // when buying on the market one can only buy once per terminal
                     return true;
                 }
             }
@@ -546,6 +536,7 @@ const Terminals = {
                 if (result === OK) {
                     terminal.used = true;
                     terminal.store[resourceType] = terminal.store[resourceType] - amount;
+                    marketDealCount++; // when selling on the market one can only sell once per terminal
                     return true;
                 }
             }
@@ -573,11 +564,7 @@ const Terminals = {
         /**@return {boolean}*/
         function IsOutdated(date1, date2 = Date.now(), millisecondsToWait = 86400000/*24h*/) {
             const elapsed = date2 - Date.parse(date1); // date1 format: "2019-06-24"
-            if (elapsed > millisecondsToWait) {
-                //Util.Info('Terminals', 'IsOutdated', 'date ' + date1 + ' elapsed ' + elapsed + ' parsed date ' + Date.parse(date1) + ' now ' + date2);
-                return true;
-            }
-            return false;
+            return elapsed > millisecondsToWait;
         }
 
         function comparePriceCheapestFirst(a, b) {
