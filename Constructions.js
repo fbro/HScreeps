@@ -50,7 +50,7 @@ const Constructions = {
                                 ConstructRampartsOn(gameRoom, roomTerrain, STRUCTURE_TOWER);
                                 if (level >= 6) {
                                     ConstructCoreBuilding(gameRoom, roomTerrain, STRUCTURE_SPAWN, mainSpawn, 0);
-                                    ConstructExtractor(gameRoom);
+                                    ConstructExtractor(gameRoom, mainSpawn);
                                     ConstructContainerAt(gameRoom, roomTerrain, mainSpawn, FIND_MINERALS);
                                     if (!gameRoom.terminal) {
                                         ConstructAtStorage(gameRoom, roomTerrain, STRUCTURE_TERMINAL, mainSpawn);
@@ -102,7 +102,7 @@ const Constructions = {
             }
             if (bestMainRoom) {
                 Memory.MemRooms[gameRoom.name].MainRoom = bestMainRoom;
-                Util.Info('Constructions', 'ReservedRoomBuild', 'bestMainRoom found ' + bestMainRoom + ' for reserved room ' + gameRoom.name);
+                Util.InfoLog('Constructions', 'ReservedRoomBuild', 'bestMainRoom found ' + bestMainRoom + ' for reserved room ' + gameRoom.name);
                 const sources = gameRoom.find(FIND_SOURCES);
                 let builtSuccess = 0;
                 for (const sourceCount in sources) {
@@ -114,13 +114,13 @@ const Constructions = {
                     } else {
                         builtSuccess++;
                     }
-                    let nearestRoad = spawn.pos.findInRange(FIND_STRUCTURES, 2, {
+                    let nearestRoad = source.pos.findInRange(FIND_STRUCTURES, 2, {
                         filter: function (structure) {
                             return structure.structureType === STRUCTURE_ROAD;
                         }
                     })[0];
                     if (!nearestRoad) {
-                        nearestRoad = spawn.pos.findInRange(FIND_CONSTRUCTION_SITES, 2, {
+                        nearestRoad = source.pos.findInRange(FIND_CONSTRUCTION_SITES, 2, {
                             filter: function (structure) {
                                 return structure.structureType === STRUCTURE_ROAD;
                             }
