@@ -132,3 +132,12 @@ delete Memory.MemRooms[roomName];
 // get available energy in room
 const roomName = 'W43N32';
 console.log("energyCapacityAvailable " + Game.rooms[roomName].energyCapacityAvailable);
+
+console.log("COMMODITIES " + JSON.stringify(COMMODITIES[RESOURCE_ALLOY]));
+
+const commodity = COMMODITIES[RESOURCE_ALLOY];
+console.log("commodity " + JSON.stringify(commodity));
+for(const component in commodity.components){
+    console.log("component " + JSON.stringify(component));
+    console.log("component " + JSON.stringify(commodity.components[component]));
+}
