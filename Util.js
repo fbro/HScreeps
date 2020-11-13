@@ -164,6 +164,9 @@ const Util = {
         if (Memory.Paths[to] && Memory.Paths[to][from]) {
             shouldCalculate = false;
         }
+        if(shouldCalculate && Game.map.getRoomLinearDistance(to, from) > 15/*creep should not move that much!*/){
+            return -1; // do not calculate this route!
+        }
         if (shouldCalculate) { // Use `findRoute` to calculate a high-level plan for this path,
             // prioritizing highways and owned rooms
             const route = Game.map.findRoute(from, to, {
@@ -187,7 +190,8 @@ const Util = {
             }
             let lastRoom = from;
             if (route === ERR_NO_PATH) {
-                //Util.Warning('Util', 'GenerateOuterRoomPath', 'Path can not be found! from ' + from + ' to ' + to);
+                Util.Warning('Util', 'GenerateOuterRoomPath', 'Path can not be found! from ' + from + ' to ' + to);
+                return -1;
             } else {
                 for (const roomInRouteKey in route) {
                     const roomInRoute = route[roomInRouteKey];
@@ -206,6 +210,11 @@ const Util = {
                 length++;
                 if (pointer === to) {
                     hasFoundDestination = true;
+                }
+                if(length > 50){
+                    Util.ErrorLog('Util', 'GenerateOuterRoomPath', 'old path error! length ' + length + ' from ' + from + ' to ' + to + ' deleting path! paths ' + JSON.stringify(Memory.Paths[to]));
+                    delete Memory.Paths[to];
+                    return -1; // do not calculate this route!
                 }
             }
             //Util.Info('Util', 'GenerateOuterRoomPath', 'calculated old path length ' + length + ' from ' + from + ' to ' + to);

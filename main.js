@@ -204,6 +204,8 @@ module.exports.loop = function () {
 
 // TODO construct link at reserved room entrances
 
+// TODO power harvesting first come first serve rule
+
 // attack NPC strongholds
 // harvest middle rooms
 // harvest neutral rooms

@@ -520,7 +520,7 @@ const ExecuteJobs = {
                             fetchObject = Game.getObjectById(creep.memory.ClosestFreeStoreId);
                             if (fetchObject) {
                                 result = creep.transfer(fetchObject, RESOURCE_ENERGY);
-                                if(result === OK && (fetchObject.pos.x !== creep.pos.x || fetchObject.pos.y !== creep.pos.y)){
+                                if (result === OK && (fetchObject.pos.x !== creep.pos.x || fetchObject.pos.y !== creep.pos.y)) {
                                     creep.moveTo(fetchObject); // force harvester to be on top of container
                                 }
                             }
@@ -2170,9 +2170,9 @@ const ExecuteJobs = {
                 /**@return {int}*/
                 Fetch: function (fetchObject, jobObject) { // deposit the resource
                     if (fetchObject === jobObject) {
-                        if(creep.pos.getRangeTo(fetchObject) > 2){
+                        if (creep.pos.getRangeTo(fetchObject) > 2) {
                             return ERR_NOT_IN_RANGE;
-                        }else{
+                        } else {
                             return OK;
                         }
                     } else {
@@ -2960,9 +2960,11 @@ const ExecuteJobs = {
                     }
                 }
                 if (result === ERR_NO_RESULT_FOUND) { // calculate path
-                    Util.GenerateOuterRoomPath(to.roomName, from.roomName); // saves result in Memory.Paths
-                    getInnerRoomPath(to, creep);
-                    result = creep.moveByPath(creep.memory.CachedPath);
+                    const length = Util.GenerateOuterRoomPath(to.roomName, from.roomName); // saves result in Memory.Paths
+                    if (length !== -1) {
+                        getInnerRoomPath(to, creep);
+                        result = creep.moveByPath(creep.memory.CachedPath);
+                    }
                 }
             }
             result = MoveAnalysis(to, from, creep, result, obj);

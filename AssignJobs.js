@@ -102,7 +102,7 @@ const AssignJobs = {
                     const idleCreep = idleCreeps[idleCreepCounter];
                     if (idleCreep.name.startsWith(roomJob.CreepType)) {
                         const distance = Util.GenerateOuterRoomPath(memRoomKey, idleCreep.pos.roomName);
-                        if (bestDistance > distance && distance <= maxRoomRange) {
+                        if (distance !== -1 && bestDistance > distance && distance <= maxRoomRange) {
                             bestDistance = distance;
                             nearestCreep = idleCreep;
                             bestIdleCreepCounter = idleCreepCounter;
@@ -272,7 +272,7 @@ const AssignJobs = {
                         }
                     } else { // no spawn in room - look in other rooms
                         const distance = Util.GenerateOuterRoomPath(memRoomKey, availableSpawn.pos.roomName);
-                        if (distance <= timeToLiveMaxRoomRange) { // spawn cannot be too far away
+                        if (distance !== -1 && distance <= timeToLiveMaxRoomRange) { // spawn cannot be too far away
                             let energyAvailableModifier = 0;
                             if (!availableSpawn.room.storage || availableSpawn.room.storage.store.getUsedCapacity(RESOURCE_ENERGY) < Util.STORAGE_ENERGY_LOW) {
                                 energyAvailableModifier++;
@@ -549,23 +549,15 @@ const AssignJobs = {
                 // builder
                 case 'B':
                     switch (true) {
-                        case (energyAvailable >= 3300 && spawnLargeVersion): // energyCapacityAvailable: 12900
+                        case (energyAvailable >= 3500 && !spawnAgileVersion && (spawnLargeVersion || controllerLevel < 8)): // energyCapacityAvailable: 5600
                             body = [
-                                CARRY, CARRY, WORK, WORK, CARRY, CARRY, WORK, WORK, CARRY, CARRY,
-                                CARRY, MOVE, WORK, WORK, MOVE, MOVE, WORK, WORK, MOVE, CARRY,
-                                CARRY, MOVE, MOVE, MOVE, MOVE, CARRY, MOVE, MOVE, MOVE, CARRY,
-                                CARRY, MOVE, WORK, MOVE, MOVE, MOVE, MOVE, WORK, MOVE, CARRY,
-                                CARRY, CARRY, WORK, WORK, WORK, WORK, WORK, WORK, CARRY, CARRY
-                            ];
-                            break;
-                        case (energyAvailable >= 3650 && !spawnAgileVersion && controllerLevel < 8): // energyCapacityAvailable: 5600
-                            body = [
-                                WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK,
-                                WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK,
-                                WORK, WORK, WORK,
-                                CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY,
-                                MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,
-                                MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE
+                                // WORK 20, CARRY 13, MOVE 17
+                                // 2000, 650, 850 = 3500
+                                CARRY,  MOVE,  WORK,  WORK, CARRY, CARRY,  WORK,  WORK,  MOVE,  MOVE,
+                                 MOVE,  MOVE,  WORK,  WORK, CARRY, CARRY,  WORK,  WORK,  MOVE,  MOVE,
+                                 MOVE,  MOVE,  MOVE,  MOVE,  WORK,  WORK,  MOVE,  MOVE,  MOVE,  MOVE,
+                                 MOVE,  MOVE,  WORK,  WORK, CARRY, CARRY,  WORK,  WORK,  MOVE,  MOVE,
+                                CARRY,  MOVE,  WORK,  WORK,  WORK,  WORK,  WORK,  WORK,  MOVE, CARRY,
                             ];
                             break;
                         case (energyAvailable >= 2300 && !spawnAgileVersion && controllerLevel < 8): // energyCapacityAvailable: 2300
@@ -576,7 +568,7 @@ const AssignJobs = {
                                 MOVE, MOVE, MOVE
                             ];
                             break;
-                        case (energyAvailable >= 2000 && spawnAgileVersion): // energyCapacityAvailable: 5600
+                        case (energyAvailable >= 2000 && spawnAgileVersion): // energyCapacityAvailable: 2300
                             body = [
                                 WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK,
                                 CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY,
@@ -584,7 +576,7 @@ const AssignJobs = {
                                 MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE
                             ];
                             break;
-                        case (energyAvailable >= 1600 && !spawnAgileVersion): // energyCapacityAvailable: 5600
+                        case (energyAvailable >= 1600 && !spawnAgileVersion): // energyCapacityAvailable: 2300
                             body = [
                                 WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK,
                                 CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY,

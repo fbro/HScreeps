@@ -93,7 +93,7 @@ const Constructions = {
                     const memRoom = Memory.MemRooms[memRoomKey];
                     if (memRoom.RoomLevel > 0) {
                         const distance = Util.GenerateOuterRoomPath(gameRoom.name, memRoomKey);
-                        if (bestDistance > distance && distance <= maxMainRoomRange) {
+                        if (distance !== -1 && bestDistance > distance && distance <= maxMainRoomRange) {
                             bestDistance = distance;
                             bestMainRoom = memRoomKey;
                         }

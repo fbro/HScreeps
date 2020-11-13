@@ -610,7 +610,7 @@ const CreateJobs = {
             for (const tombstoneDropKey in tombstoneDrops) {
                 const tombstoneDrop = tombstoneDrops[tombstoneDropKey];
                 new RoomVisual(gameRoom.name).text('⚰', tombstoneDrop.pos.x, tombstoneDrop.pos.y);
-                AddJob(roomJobs, 'FillStrg-tomb' + '(' + tombstoneDrop.pos.x + ',' + tombstoneDrop.pos.y + ')' + gameRoom.name, tombstoneDrop.id, Util.OBJECT_JOB, 'T');
+                AddJob(roomJobs, 'FillStrg-tomb' + '(' + tombstoneDrop.pos.x + ',' + tombstoneDrop.pos.y + ',' + FindMostAbundantResourceInStore(tombstoneDrop.store) + ')' + gameRoom.name, tombstoneDrop.id, Util.OBJECT_JOB, 'T');
             }
 
             // ruin
@@ -622,8 +622,20 @@ const CreateJobs = {
             for (const ruinDropKey in ruinDrops) {
                 const ruinDrop = ruinDrops[ruinDropKey];
                 new RoomVisual(gameRoom.name).text('🏚️', ruinDrop.pos.x, ruinDrop.pos.y);
-                AddJob(roomJobs, 'FillStrg-ruin' + '(' + ruinDrop.pos.x + ',' + ruinDrop.pos.y + ')' + gameRoom.name, ruinDrop.id, Util.OBJECT_JOB, 'T');
+                AddJob(roomJobs, 'FillStrg-ruin' + '(' + ruinDrop.pos.x + ',' + ruinDrop.pos.y + ',' + FindMostAbundantResourceInStore(ruinDrop.store) + ')' + gameRoom.name, ruinDrop.id, Util.OBJECT_JOB, 'T');
             }
+        }
+
+        function FindMostAbundantResourceInStore(store){
+            let mostAbundantResourceType;
+            let largestAmount = 0;
+            for(const resourceType in store){
+                if(store[resourceType] > largestAmount){
+                    mostAbundantResourceType = resourceType;
+                    largestAmount = store[resourceType];
+                }
+            }
+            return mostAbundantResourceType;
         }
 
         function FillStorageFromReservedRoomJobs(gameRoom, roomJobs) {
