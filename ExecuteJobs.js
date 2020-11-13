@@ -2161,7 +2161,7 @@ const ExecuteJobs = {
                  * @return {undefined}*/
                 FindFetchObject: function (jobObject) {
                     const closestHostile = creep.pos.findClosestByPath(FIND_HOSTILE_CREEPS);
-                    if (closestHostile) {
+                    if (closestHostile && (closestHostile.pos.getRangeTo(creep.pos) < 6 || creep.room.controller && creep.room.controller.my)) {
                         return closestHostile;
                     } else {
                         return jobObject;
@@ -2177,7 +2177,7 @@ const ExecuteJobs = {
                         }
                     } else {
                         Util.Info('ExecuteJobs', 'JobDefendReserved', creep.name + ' attacking hostile ' + fetchObject + ' ' + creep.pos.roomName);
-                        return creep.attack(fetchObject);
+                        return creep.rangedAttack(fetchObject);
                     }
                 },
             });

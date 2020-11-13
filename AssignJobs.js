@@ -553,10 +553,10 @@ const AssignJobs = {
                             body = [
                                 // WORK 20, CARRY 13, MOVE 17
                                 // 2000, 650, 850 = 3500
-                                CARRY,  MOVE,  WORK,  WORK, CARRY, CARRY,  WORK,  WORK,  MOVE,  MOVE,
-                                 MOVE,  MOVE,  WORK,  WORK, CARRY, CARRY,  WORK,  WORK,  MOVE,  MOVE,
+                                CARRY,  WORK, CARRY,  WORK, CARRY, CARRY,  WORK, CARRY,  WORK,  MOVE,
+                                 MOVE,  WORK,  WORK,  WORK, CARRY, CARRY,  WORK,  WORK,  WORK,  MOVE,
                                  MOVE,  MOVE,  MOVE,  MOVE,  WORK,  WORK,  MOVE,  MOVE,  MOVE,  MOVE,
-                                 MOVE,  MOVE,  WORK,  WORK, CARRY, CARRY,  WORK,  WORK,  MOVE,  MOVE,
+                                 MOVE,  MOVE,  WORK,  MOVE,  MOVE,  MOVE,  MOVE,  WORK,  MOVE,  MOVE,
                                 CARRY,  MOVE,  WORK,  WORK,  WORK,  WORK,  WORK,  WORK,  MOVE, CARRY,
                             ];
                             break;

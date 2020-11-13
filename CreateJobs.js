@@ -322,7 +322,7 @@ const CreateJobs = {
                     return jobs;
                 }
             }
-            jobs = CreateFlagJob(jobs, 'DefRsv', gameFlagKey, gameFlag, 'W');
+            jobs = CreateFlagJob(jobs, 'DefRsv', gameFlagKey, gameFlag, 'G');
             return jobs;
         }
 
