@@ -2221,19 +2221,11 @@ const ExecuteJobs = {
         /**@return {int}*/
         function GenericFlagAction(creep, roomJob, actionFunctions) {
             const flagObj = Game.flags[roomJob.JobId];
-            if (creep.memory.FleeCounter) { // ignore hostiles - move on
-                if (creep.memory.FleeCounter > 0) {
-                    creep.memory.FleeCounter--;
-                } else {
-                    delete creep.memory.FleeCounter;
-                }
-            } else {
-                const nearbyHostileCreeps = creep.pos.findInRange(FIND_HOSTILE_CREEPS, 7);
-                if (nearbyHostileCreeps.length > 0) {
-                    const hostileActionResult = CreepHostileAction(creep, nearbyHostileCreeps);
-                    if (hostileActionResult !== CREEP_IGNORED_HOSTILE) {
-                        return OK;
-                    }
+            const nearbyHostileCreeps = creep.pos.findInRange(FIND_HOSTILE_CREEPS, 7);
+            if (nearbyHostileCreeps.length > 0) {
+                const hostileActionResult = CreepHostileAction(creep, nearbyHostileCreeps, roomJob);
+                if (hostileActionResult !== CREEP_IGNORED_HOSTILE) {
+                    return OK;
                 }
             }
             return GenericAction(creep, roomJob, actionFunctions, flagObj);
@@ -2647,67 +2639,101 @@ const ExecuteJobs = {
         //region hostilities functions
 
         /**@return {number}*/
-        function CreepHostileAction(creep, hostileCreeps) {
-            // when any nearby hostiles in the room have been seen
-            // decides if the battle is winnable - CREEP_IGNORED_HOSTILE, CREEP_ATTACKED_HOSTILE or CREEP_FLED_HOSTILE
+        function CreepHostileAction(creep, hostileCreeps, roomJob) {
+            switch (roomJob.CreepType) {
+                case 'G':
+                    return GunnerHostileAction(creep, hostileCreeps); // TODO
+                case 'W':
+                    return WarriorHostileAction(creep, hostileCreeps); // TODO flee functionality?
+                case 'H':
+                    return HealerHostileAction(creep, hostileCreeps);
+                default: // civilians
+                    return CivilianHostileAction(creep, hostileCreeps);
+            }
+        }
+
+        function GunnerHostileAction(creep, hostileCreeps) {
+
+        }
+
+        function WarriorHostileAction(creep, hostileCreeps) {
+            let hostileCreep;
+            let result = ERR_NO_RESULT_FOUND;
+
+            // ATTACK, RANGED_ATTACK
+            const nearbyHostileCreepsWithAttack = _.filter(hostileCreeps, function (hostileCreep) {
+                return hostileCreep.getActiveBodyparts(ATTACK)
+                    || hostileCreep.getActiveBodyparts(RANGED_ATTACK);
+            });
+            if (nearbyHostileCreepsWithAttack.length > 0) {
+                hostileCreep = creep.pos.findClosestByPath(nearbyHostileCreepsWithAttack);
+                result = creep.attack(hostileCreep);
+            }
+
+            // HEAL
+            if (!hostileCreep) {
+                const nearbyHostileCreepsWithHeal = _.filter(hostileCreeps, function (hostileCreep) {
+                    return hostileCreep.getActiveBodyparts(HEAL);
+                });
+                if (nearbyHostileCreepsWithHeal.length > 0) {
+                    hostileCreep = creep.pos.findClosestByPath(nearbyHostileCreepsWithHeal);
+                    result = creep.attack(hostileCreep);
+                }
+            }
+
+            // other
+            if (!hostileCreep) {
+                hostileCreep = creep.pos.findClosestByPath(hostileCreeps);
+                result = creep.attack(hostileCreep);
+            }
+
+            if (hostileCreep) {
+                Move(creep, hostileCreep);
+            }
+        }
+
+        function HealerHostileAction(creep, hostileCreeps) {
+            const closestDamagedCreeps = creep.pos.findInRange(FIND_MY_CREEPS, 6, {
+                filter: function (c) {
+                    return c.hits < c.hitsMax;
+                }
+            });
+            if (closestDamagedCreeps.length > 0) {
+                const closestDamagedCreep = creep.pos.findClosestByPath(closestDamagedCreeps);
+                let result = creep.heal(closestDamagedCreep);
+                if (result === ERR_NOT_IN_RANGE) {
+                    result = creep.rangedHeal(closestDamagedCreep);
+                    Move(creep, closestDamagedCreep);
+                }
+                if (result !== OK) {
+                    creep.heal(creep);
+                }
+                return CREEP_ATTACKED_HOSTILE;
+            }
+
+            const nearbyHostileCreepsWithAttack = _.filter(hostileCreeps, function (hostileCreep) {
+                return hostileCreep.getActiveBodyparts(ATTACK) && hostileCreep.pos.inRangeTo(creep, 2)
+                    || hostileCreep.getActiveBodyparts(RANGED_ATTACK) && hostileCreep.pos.inRangeTo(creep, 3);
+            });
+            if (nearbyHostileCreepsWithAttack.length > 0) {
+                Flee(creep, nearbyHostileCreepsWithAttack);
+                creep.heal(creep);
+                return CREEP_FLED_HOSTILE;
+            }
+
+            creep.heal(creep);
+            return CREEP_IGNORED_HOSTILE;
+        }
+
+        function CivilianHostileAction(creep, hostileCreeps) {
             const hostileCreepsWithAttack = _.filter(hostileCreeps, function (hostileCreep) {
                 return hostileCreep.getActiveBodyparts(ATTACK) || hostileCreep.getActiveBodyparts(RANGED_ATTACK);
             });
-            if (hostileCreepsWithAttack.length === 0 && (creep.getActiveBodyparts(ATTACK) || creep.getActiveBodyparts(RANGED_ATTACK))) {
-                if (creep.room.controller && creep.room.controller.my) {
-                    for (const hostileCreepKey in hostileCreeps) {
-                        const hostileCreep = hostileCreeps[hostileCreepKey];
-                        if (creep.getActiveBodyparts(RANGED_ATTACK) || creep.getActiveBodyparts(ATTACK)) {
-                            AttackHostileCreep(creep, null, null, hostileCreeps);
-                            Util.Info('ExecuteJobs', 'CreepHostileAction', 'harmless hostile - attack ' + creep.name + ' ' + creep.pos.roomName + ' hostile: ' + hostileCreep.name + ' ' + hostileCreep.owner.username);
-                            return CREEP_ATTACKED_HOSTILE; // no threat but can attack it - just do it
-                        }
-                    }
-                }
-                return CREEP_IGNORED_HOSTILE;
-            } else if (hostileCreepsWithAttack.length === 0) {
-                //Util.Info('ExecuteJobs', 'CreepHostileAction', 'no hostiles with ATK - ' + creep.name + ' will ignore it in ' + creep.pos.roomName);
-                return CREEP_IGNORED_HOSTILE;
-            }
-
-            const hostileCreepsWithHeal = _.filter(hostileCreeps, function (hostileCreep) {
-                return hostileCreep.getActiveBodyparts(HEAL)
-            });
-            const friendlyCreeps = creep.pos.findInRange(FIND_MY_CREEPS, 6);
-            const friendlyCreepsWithAttack = _.filter(friendlyCreeps, function (friendlyCreep) {
-                return friendlyCreep.getActiveBodyparts(ATTACK) || friendlyCreep.getActiveBodyparts(RANGED_ATTACK)
-            });
-            const friendlyCreepsWithHeal = _.filter(friendlyCreeps, function (friendlyCreep) {
-                return friendlyCreep.getActiveBodyparts(HEAL)
-            });
-            const hostileAttackNum = hostileCreepsWithAttack.length;
-            const hostileHealNum = hostileCreepsWithHeal.length;
-            let friendlyAttackNum = friendlyCreepsWithAttack.length;
-            let friendlyHealNum = friendlyCreepsWithHeal.length;
-
-            if (creep.getActiveBodyparts(ATTACK) || creep.getActiveBodyparts(RANGED_ATTACK)) {
-                friendlyAttackNum++;
-            } else if (creep.getActiveBodyparts(HEAL)) {
-                friendlyHealNum++;
-            }
-
-            if (friendlyAttackNum === 0 || friendlyAttackNum + friendlyHealNum <= hostileAttackNum + hostileHealNum) { // outnumbered
+            if (hostileCreepsWithAttack.length > 0) {
                 Flee(creep, hostileCreepsWithAttack);
-                Util.Info('ExecuteJobs', 'CreepHostileAction', 'overwhelming hostiles - flee ' + creep.name + ' ' + creep.pos.roomName);
-                creep.memory.FleeCounter = 50;
-                return CREEP_FLED_HOSTILE; // always flee
-            } else if (friendlyAttackNum + friendlyHealNum > hostileAttackNum + hostileHealNum) {
-                if (creep.getActiveBodyparts(HEAL)) {
-                    HealAtHostileCreep(creep, friendlyCreepsWithAttack, friendlyCreepsWithHeal, friendlyCreeps);
-                } else {
-                    AttackHostileCreep(creep, hostileCreepsWithAttack, hostileCreepsWithHeal);
-                }
-                Util.Info('ExecuteJobs', 'CreepHostileAction', 'confident - attack ' + creep.name + ' ' + creep.pos.roomName);
-                return CREEP_ATTACKED_HOSTILE; // confident that we can win this fight
-            } else {
-                Util.ErrorLog('ExecuteJobs', 'CreepHostileAction', 'no action against hostile error ' + creep.name + ' ' + creep.pos.roomName);
-                return CREEP_IGNORED_HOSTILE;
+                return CREEP_FLED_HOSTILE;
             }
+            return CREEP_IGNORED_HOSTILE;
         }
 
         /**@return {int}*/
@@ -2774,58 +2800,10 @@ const ExecuteJobs = {
             return result;
         }
 
-        /**@return {int}*/
-        function HealAtHostileCreep(creep, friendlyCreepsWithAttack, friendlyCreepsWithHeal, friendlyCreeps = null) {
-            let closestFriendly;
-            let closestFriendlyRange = Number.MAX_SAFE_INTEGER;
-            if (friendlyCreepsWithHeal && friendlyCreepsWithHeal.length > 0) {
-                for (const friendlyCreepKey in friendlyCreepsWithHeal) {
-                    const friendlyCreep = friendlyCreepsWithHeal[friendlyCreepKey];
-                    let friendlyRange = creep.pos.getRangeTo(friendlyCreep.pos);
-                    friendlyRange = (friendlyRange - ((friendlyCreep.hitsMax - friendlyCreep.hits) / 200));
-                    if (friendlyCreep.hits < friendlyCreep.hitsMax && friendlyRange < closestFriendlyRange) {
-                        closestFriendly = friendlyCreep;
-                        closestFriendlyRange = friendlyRange;
-                    }
-                }
-            }
-            if (friendlyCreepsWithAttack && friendlyCreepsWithAttack.length > 0) {
-                for (const friendlyCreepKey in friendlyCreepsWithAttack) {
-                    const friendlyCreep = friendlyCreepsWithAttack[friendlyCreepKey];
-                    let friendlyRange = creep.pos.getRangeTo(friendlyCreep.pos);
-                    friendlyRange = (friendlyRange - ((friendlyCreep.hitsMax - friendlyCreep.hits) / 200));
-                    if (friendlyCreep.hits < friendlyCreep.hitsMax && friendlyRange < closestFriendlyRange) {
-                        closestFriendly = friendlyCreep;
-                        closestFriendlyRange = friendlyRange;
-                    }
-                }
-            }
-            if (!closestFriendly && friendlyCreeps && friendlyCreeps.length > 0) {
-                for (const friendlyCreepKey in friendlyCreeps) {
-                    const friendlyCreep = friendlyCreeps[friendlyCreepKey];
-                    let friendlyRange = creep.pos.getRangeTo(friendlyCreep.pos);
-                    friendlyRange = (friendlyRange - ((friendlyCreep.hitsMax - friendlyCreep.hits) / 200));
-                    if (friendlyCreep.hits < friendlyCreep.hitsMax && friendlyRange < closestFriendlyRange) {
-                        closestFriendly = friendlyCreep;
-                        closestFriendlyRange = friendlyRange;
-                    }
-                }
-            }
-            if (!closestFriendly) {
-                Util.Info('ExecuteJobs', 'HealAtHostileCreep', 'no damaged friendlies found ' + creep.name + ' ' + creep.pos.roomName);
-                return OK;
-            }
-            let result = creep.heal(closestFriendly);
-            if (result === ERR_NOT_IN_RANGE) {
-                result = creep.rangedHeal(closestFriendly);
-                result = Move(creep, closestFriendly);
-            }
-            return result;
-        }
-
         function Flee(creep, hostileCreepsToFleeFrom) {
             // when this function is called we know that we should flee
             // TODO creep should find an exit away from the hostiles, right now it just flees in the opposite direction
+            // TODO use PathFinder.search flee functionality when fleeing!!
             let closestHostileCreep = hostileCreepsToFleeFrom[0];
             const closesHostileRange = Number.MAX_SAFE_INTEGER;
             for (const hostileCreepKey in hostileCreepsToFleeFrom) {
