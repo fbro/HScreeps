@@ -151,7 +151,7 @@ const ExecuteJobs = {
             const hostileCreeps = gameCreep.room.find(FIND_HOSTILE_CREEPS);
             if (hostileCreeps[0]) {
                 const hostileCreep = hostileCreeps[0];
-                Util.Info('ExecuteJobs', 'ExecuteRoomJobs', 'idle ' + gameCreep.name + ' found ' + hostileCreeps.length + ' hostile creeps! targeting ' + hostileCreep + ' attack');
+                Util.Info('ExecuteJobs', 'ExecuteRoomJobs', 'idle ' + gameCreep.name + ' found ' + hostileCreeps.length + ' hostile creeps! targeting ' + hostileCreep + ' attack in ' + gameCreep.pos.roomName);
                 gameCreep.say('ATK ' + hostileCreep.pos.x + ',' + hostileCreep.pos.y);
                 result = gameCreep.attack(hostileCreep);
                 if (result === ERR_NOT_IN_RANGE) {
@@ -167,7 +167,7 @@ const ExecuteJobs = {
             const hostileCreeps = gameCreep.room.find(FIND_HOSTILE_CREEPS);
             if (hostileCreeps[0]) {
                 const hostileCreep = hostileCreeps[0];
-                Util.Info('ExecuteJobs', 'ExecuteRoomJobs', 'idle ' + gameCreep.name + ' found ' + hostileCreeps.length + ' hostile creeps! targeting ' + hostileCreep + ' ranged attack');
+                Util.Info('ExecuteJobs', 'ExecuteRoomJobs', 'idle ' + gameCreep.name + ' found ' + hostileCreeps.length + ' hostile creeps! targeting ' + hostileCreep + ' ranged attack in ' + gameCreep.pos.roomName);
                 gameCreep.say('RATK ' + hostileCreep.pos.x + ',' + hostileCreep.pos.y);
                 result = gameCreep.rangedAttack(hostileCreep);
                 if (result === ERR_NOT_IN_RANGE) {
@@ -227,7 +227,7 @@ const ExecuteJobs = {
                 closestOwnedRoom = gameCreep.memory.MoveHome;
             }
 
-            if (closestOwnedRoom && (closestOwnedRoom !== gameCreep.pos.roomName || gameCreep.pos.getRangeTo(Game.rooms[closestOwnedRoom].controller) > 4)) {
+            if (Game.rooms[closestOwnedRoom] && closestOwnedRoom && (closestOwnedRoom !== gameCreep.pos.roomName || gameCreep.pos.getRangeTo(Game.rooms[closestOwnedRoom].controller) > 4)) {
                 result = Move(gameCreep, Game.rooms[closestOwnedRoom].controller);
                 gameCreep.say('🏠🏃');
             } else {
@@ -2658,9 +2658,9 @@ const ExecuteJobs = {
 
             if (hostileCreep) {
                 creep.rangedAttack(hostileCreep);
-                if(hostileCreep.getActiveBodyparts(ATTACK) && creep.getRangeTo(hostileCreep) <= 2){
+                if(hostileCreep.getActiveBodyparts(ATTACK) && creep.pos.getRangeTo(hostileCreep) <= 2){
                     Flee(creep, hostileCreep);
-                }else if(creep.getRangeTo(hostileCreep) > 3){
+                }else if(creep.pos.getRangeTo(hostileCreep) > 3){
                     Move(creep, hostileCreep);
                 }
                 return CREEP_ATTACKED_HOSTILE;

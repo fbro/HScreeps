@@ -2,18 +2,17 @@ let Util = require('Util');
 const Constructions = {
     run: function () {
 
-        for (const gameRoomKey in Game.rooms) {
-            const gameRoom = Game.rooms[gameRoomKey];
-            if (gameRoom.controller && Memory.MemRooms[gameRoomKey]) {
+        for (const memRoomKey in Memory.MemRooms) {
+            const gameRoom = Game.rooms[memRoomKey];
+
+            if (gameRoom && gameRoom.controller && gameRoom.controller.my) {
                 const roomTerrain = gameRoom.getTerrain();
-                if (gameRoom.controller.my) {
-                    //const startCpu = Game.cpu.getUsed();
-                    Build(gameRoom, roomTerrain);
-                    //const elapsed = Game.cpu.getUsed() - startCpu;
-                    //Util.Info('Constructions', '', elapsed + ' ' + gameRoom.name + ' ' + gameRoom.controller.level);
-                } else if (Memory.MemRooms[gameRoomKey].IsReserved) {
-                    ReservedRoomBuild(gameRoom, roomTerrain);
-                }
+                //const startCpu = Game.cpu.getUsed();
+                Build(gameRoom, roomTerrain);
+                //const elapsed = Game.cpu.getUsed() - startCpu;
+                //Util.Info('Constructions', '', elapsed + ' ' + gameRoom.name + ' ' + gameRoom.controller.level);
+            } else if (Memory.MemRooms[memRoomKey].IsReserved) {
+                ReservedRoomBuild(gameRoom, memRoomKey);
             }
         }
 
@@ -81,18 +80,29 @@ const Constructions = {
             }
         }
 
-        function ReservedRoomBuild(gameRoom, roomTerrain) { // build roads and containers in a reserved room
-            if (Memory.MemRooms[gameRoom.name].Built === 0) {
+        function ReservedRoomBuild(gameRoom, gameRoomKey) { // build roads and containers in a reserved room
+            if (Memory.MemRooms[gameRoomKey].MainRoom && !Memory.MemRooms[Memory.MemRooms[gameRoomKey].MainRoom]) { // main room is gone!
+                for (const flagKey in Game.flags) {
+                    const flag = Game.flags[flagKey];
+                    if (flag.pos.roomName === gameRoomKey) {
+                        Util.InfoLog('Constructions', 'ReservedRoomBuild', 'reserved room ' + gameRoomKey + ' lost its main room ' + Memory.MemRooms[gameRoomKey].MainRoom + ', removing reserved room and flag ' + flag.name);
+                        flag.remove();
+                    }
+                }
+                delete Memory.MemRooms[gameRoomKey];
+                return;
+            }
+            if (Memory.MemRooms[gameRoomKey].Built === 0) {
                 return;
             }
             const maxMainRoomRange = 2;
-            let bestMainRoom = Memory.MemRooms[gameRoom.name].MainRoom;
+            let bestMainRoom = Memory.MemRooms[gameRoomKey].MainRoom;
             if (!bestMainRoom) {
                 let bestDistance = Number.MAX_SAFE_INTEGER;
                 for (const memRoomKey in Memory.MemRooms) {
                     const memRoom = Memory.MemRooms[memRoomKey];
                     if (memRoom.RoomLevel > 0) {
-                        const distance = Util.GenerateOuterRoomPath(gameRoom.name, memRoomKey);
+                        const distance = Util.GenerateOuterRoomPath(gameRoomKey, memRoomKey);
                         if (distance !== -1 && bestDistance > distance && distance <= maxMainRoomRange) {
                             bestDistance = distance;
                             bestMainRoom = memRoomKey;
@@ -100,11 +110,12 @@ const Constructions = {
                     }
                 }
             }
-            if (bestMainRoom) {
-                Memory.MemRooms[gameRoom.name].MainRoom = bestMainRoom;
-                Util.InfoLog('Constructions', 'ReservedRoomBuild', 'bestMainRoom found ' + bestMainRoom + ' for reserved room ' + gameRoom.name);
+            if (bestMainRoom && gameRoom) {
+                Memory.MemRooms[gameRoomKey].MainRoom = bestMainRoom;
+                Util.InfoLog('Constructions', 'ReservedRoomBuild', 'bestMainRoom found ' + bestMainRoom + ' for reserved room ' + gameRoomKey);
                 const sources = gameRoom.find(FIND_SOURCES);
                 let builtSuccess = 0;
+                const roomTerrain = gameRoom.getTerrain();
                 for (const sourceCount in sources) {
                     const source = sources[sourceCount];
                     const spawn = Game.getObjectById(Memory.MemRooms[bestMainRoom].MainSpawnId);
@@ -136,7 +147,7 @@ const Constructions = {
                     }
                 }
                 if (builtSuccess === sources.length * 2) {
-                    Memory.MemRooms[gameRoom.name].Built = 0;
+                    Memory.MemRooms[gameRoomKey].Built = 0;
                 }
             }
         }

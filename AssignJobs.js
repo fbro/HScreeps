@@ -48,10 +48,10 @@ const AssignJobs = {
                                         return spawn && spawn.room.name === memRoomKey;
                                     });
                                     creepFound = SpawnCreep(roomJob, availableSpawnsInRoom, roomJobKey, memRoomKey);
-                                    if (!creepFound && availableSpawnsInRoom.length > 0) {
-                                        //Util.Warning('AssignJobs', 'AssignOrSpawnCreeps', 'giving up assigning jobs in ' + memRoomKey + ' because of job ' + roomJobKey);
-                                        break;
-                                    }
+                                    //if (!creepFound && availableSpawnsInRoom.length > 0) {
+                                    //    Util.Warning('AssignJobs', 'AssignOrSpawnCreeps', 'giving up assigning jobs in ' + memRoomKey + ' because of job ' + roomJobKey);
+                                    //    break;
+                                    //}
                                 }
                             }
                         }

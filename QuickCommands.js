@@ -37,11 +37,11 @@ for (const flagKey in Game.flags) {
         flag.remove()
     }
 }
-// remove all flags
+
+// check all flags
 for (const flagKey in Game.flags) {
     const flag = Game.flags[flagKey];
     console.log(flagKey + ' ' + JSON.stringify(flag));
-    flag.remove();
 }
 
 
@@ -108,7 +108,7 @@ Game.creeps['H1'].move(LEFT);
 
 // -----------------------------------------------
 // abandon room script:
-const roomName = 'W49N48';
+const roomName = 'W52N27';
 const structures = Game.rooms[roomName].find(FIND_STRUCTURES);
 const constructions = Game.rooms[roomName].find(FIND_CONSTRUCTION_SITES);
 const myCreeps = Game.rooms[roomName].find(FIND_MY_CREEPS);

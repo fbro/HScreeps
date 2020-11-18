@@ -373,7 +373,7 @@ const CreateJobs = {
             ) {
                 AddJob(roomJobs, 'Ctrl1(' + gameRoom.controller.pos.x + ',' + gameRoom.controller.pos.y + ')' + gameRoom.name, gameRoom.controller.id, Util.OBJECT_JOB, 'B');
                 AddJob(roomJobs, 'Ctrl2(' + gameRoom.controller.pos.x + ',' + gameRoom.controller.pos.y + ')' + gameRoom.name, gameRoom.controller.id, Util.OBJECT_JOB, 'B');
-                if (gameRoom.controller.level <= 4 || (gameRoom.storage.store.getUsedCapacity(RESOURCE_ENERGY) > Util.STORAGE_ENERGY_HIGH && gameRoom.controller.level < 8)) {
+                if (gameRoom.controller.level <= 4 || (gameRoom.storage && gameRoom.storage.store.getUsedCapacity(RESOURCE_ENERGY) > Util.STORAGE_ENERGY_HIGH && gameRoom.controller.level < 8)) {
                     AddJob(roomJobs, 'Ctrl3(' + gameRoom.controller.pos.x + ',' + gameRoom.controller.pos.y + ')' + gameRoom.name, gameRoom.controller.id, Util.OBJECT_JOB, 'B');
                 }
             }
