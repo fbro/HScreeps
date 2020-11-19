@@ -170,7 +170,7 @@ const AssignJobs = {
                         } else {
                             maxCreepsInRoom = memRoom.SourceNumber;
                         }
-                        if(memRoom.IsReserved){
+                        if (memRoom.IsReserved) {
                             maxCreepsInRoom = maxCreepsInRoom * 2;
                         }
                         break;
@@ -553,11 +553,11 @@ const AssignJobs = {
                             body = [
                                 // WORK 20, CARRY 13, MOVE 17
                                 // 2000, 650, 850 = 3500
-                                CARRY,  WORK, CARRY,  WORK, CARRY, CARRY,  WORK, CARRY,  WORK,  MOVE,
-                                 MOVE,  WORK,  WORK,  WORK, CARRY, CARRY,  WORK,  WORK,  WORK,  MOVE,
-                                 MOVE,  MOVE,  MOVE,  MOVE,  WORK,  WORK,  MOVE,  MOVE,  MOVE,  MOVE,
-                                 MOVE,  MOVE,  WORK,  MOVE,  MOVE,  MOVE,  MOVE,  WORK,  MOVE,  MOVE,
-                                CARRY,  MOVE,  WORK,  WORK,  WORK,  WORK,  WORK,  WORK,  MOVE, CARRY,
+                                CARRY, WORK, CARRY, WORK, CARRY, CARRY, WORK, CARRY, WORK, MOVE,
+                                MOVE, WORK, WORK, WORK, CARRY, CARRY, WORK, WORK, WORK, MOVE,
+                                MOVE, MOVE, MOVE, MOVE, WORK, WORK, MOVE, MOVE, MOVE, MOVE,
+                                MOVE, MOVE, WORK, MOVE, MOVE, MOVE, MOVE, WORK, MOVE, MOVE,
+                                CARRY, MOVE, WORK, WORK, WORK, WORK, WORK, WORK, MOVE, CARRY,
                             ];
                             break;
                         case (energyAvailable >= 2300 && !spawnAgileVersion && controllerLevel < 8): // energyCapacityAvailable: 2300

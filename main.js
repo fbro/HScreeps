@@ -23,8 +23,8 @@ module.exports.loop = function () {
             if (Game.time % Util.GAME_TIME_MODULO_3 === 0) {
                 if (Game.time % Util.GAME_TIME_MODULO_4 === 0) {
                     CreateJobs.run();
-                        Constructions.run();
                     if (Game.time % Util.GAME_TIME_MODULO_5 === 0) {
+                        Constructions.run();
                         if (Game.time % Util.GAME_TIME_MODULO_6 === 0) {
                             Util.Info('Main', 'Controller', '--------------- main reset of memory ---------------');
 
@@ -66,7 +66,6 @@ module.exports.loop = function () {
         for (const gameRoomKey in Game.rooms) {
             const gameRoom = Game.rooms[gameRoomKey];
             if (gameRoom.controller && gameRoom.controller.my && Memory.MemRooms[gameRoom.name]) {
-                MapVisualStatus(gameRoom);
                 RoomDefences.run(gameRoom);
                 if (gameRoom.controller.level >= 7) {
                     Factories.run(gameRoom, gameRoomKey);
@@ -78,6 +77,7 @@ module.exports.loop = function () {
             }
         }
         PowerCreeps.run();
+        MapVisualStatus();
     }
 
     function MaxCreepsCleanup(memRoomKey, memRoom, foundCreeps) {
@@ -152,42 +152,74 @@ module.exports.loop = function () {
         }
     }
 
-    function MapVisualStatus(gameRoom) {
-        if (Memory.MemRooms[gameRoom.name]) {
-            let mineral = Memory.MemRooms[gameRoom.name].Mineral;
-            if (!mineral) {
-                mineral = gameRoom.find(FIND_MINERALS, {
-                    filter: function (mineral) {
-                        return mineral;
+    function MapVisualStatus() {
+        for (const memRoomKey in Memory.MemRooms) {
+            const memRoom = Memory.MemRooms[memRoomKey];
+
+            if (memRoom) {
+                // show reserved rooms link
+                if (memRoom.IsReserved && memRoom.MainRoom) {
+                    const flag = Game.flags["Reserve room " + memRoomKey];
+                    if (flag && Memory.MemRooms[memRoom.MainRoom] && Memory.MemRooms[memRoom.MainRoom].MainSpawnId) {
+                        Game.map.visual.line(Game.getObjectById(Memory.MemRooms[memRoom.MainRoom].MainSpawnId).pos, flag.pos, {
+                            color: '#ffff00',
+                            width: 1
+                        });
                     }
-                })[0].mineralType;
-                Memory.MemRooms[gameRoom.name].Mineral = mineral;
+                }
+                // show mineral
+                let mineral = memRoom.Mineral;
+                if (!mineral) {
+                    const gameRoom = Game.rooms[memRoomKey];
+                    if (gameRoom) {
+                        mineral = gameRoom.find(FIND_MINERALS, {
+                            filter: function (mineral) {
+                                return mineral;
+                            }
+                        })[0].mineralType;
+                        memRoom.Mineral = mineral;
+                    }
+                }
+                if (mineral) {
+                    const color =
+                        mineral === RESOURCE_HYDROGEN ? '#ffffff' :
+                            mineral === RESOURCE_OXYGEN ? '#ffffff' :
+                                mineral === RESOURCE_UTRIUM ? '#00ffff' :
+                                    mineral === RESOURCE_LEMERGIUM ? '#00ff00' :
+                                        mineral === RESOURCE_KEANIUM ? '#8000ff' :
+                                            mineral === RESOURCE_ZYNTHIUM ? '#ffff00' :
+                                                mineral === RESOURCE_CATALYST ? '#ff0000' :
+                                                    '#000000';
+                    Game.map.visual.text(mineral, new RoomPosition(46, 5, memRoomKey), {
+                        color: color,
+                        fontSize: 7,
+                        opacity: 1
+                    });
+                }
+
+                // show room level and indicator
+                Game.map.visual.text(memRoom.RoomLevel, new RoomPosition(4, 5, memRoomKey), {
+                    color: memRoom.RoomLevel > 0 ? '#00ff00' : memRoom.RoomLevel === 0 ? '#ffff00' : '#ff0000',
+                    fontSize: 7,
+                    opacity: 1
+                });
+                Game.map.visual.rect(new RoomPosition(0, 0, memRoomKey), 50, 50, {
+                    stroke: memRoom.RoomLevel > 0 ? '#00ff00' : memRoom.RoomLevel === 0 ? '#ffff00' : '#ff0000',
+                    opacity: 0.1,
+                    strokeWidth: 1
+                });
             }
-            const color =
-                mineral === RESOURCE_HYDROGEN ? '#ffffff' :
-                    mineral === RESOURCE_OXYGEN ? '#ffffff' :
-                        mineral === RESOURCE_UTRIUM ? '#00ffff' :
-                            mineral === RESOURCE_LEMERGIUM ? '#00ff00' :
-                                mineral === RESOURCE_KEANIUM ? '#8000ff' :
-                                    mineral === RESOURCE_ZYNTHIUM ? '#ffff00' :
-                                        mineral === RESOURCE_CATALYST ? '#ff0000' :
-                                            '#000000';
-            Game.map.visual.text(mineral, new RoomPosition(46, 5, gameRoom.name), {
-                color: color,
-                fontSize: 7,
-                opacity: 1
+        }
+
+        // show flag dots
+        for (const flagKey in Game.flags) {
+            const flag = Game.flags[flagKey];
+            Game.map.visual.circle(flag.pos, {
+                radius: 5,
+                fill: Util.GetColorCodeFromColor(flag.color),
+                stroke: Util.GetColorCodeFromColor(flag.secondaryColor)
             });
         }
-        Game.map.visual.text(gameRoom.controller.level, new RoomPosition(4, 5, gameRoom.name), {
-            color: '#00ff00',
-            fontSize: 7,
-            opacity: 1
-        });
-        Game.map.visual.rect(new RoomPosition(0, 0, gameRoom.name), 50, 50, {
-            stroke: '#00ff00',
-            opacity: 0.1,
-            strokeWidth: 1
-        });
     }
 };
 

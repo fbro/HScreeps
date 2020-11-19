@@ -239,6 +239,7 @@ const Util = {
             Memory.MemRooms[objectPosition.roomName].MissingSpawn = Game.time; // only notify once
         }
     },
+
     GetUsername: function () {
         let username = Memory.Username;
         if (!username) {
@@ -249,6 +250,31 @@ const Util = {
             Util.InfoLog('Util', 'GetUsername', 'username saved ' + username);
         }
         return username;
+    },
+
+    GetColorCodeFromColor: function (flagColor) {
+        switch (flagColor) {
+            case COLOR_RED:
+                return '#ff0000';
+            case COLOR_PURPLE:
+                return '#ff00ff';
+            case COLOR_BLUE:
+                return '#0000ff';
+            case COLOR_CYAN:
+                return '#00ffff';
+            case COLOR_GREEN:
+                return '#00ff00';
+            case COLOR_YELLOW:
+                return '#ffff00';
+            case COLOR_ORANGE:
+                return '#ff8000';
+            case COLOR_BROWN:
+                return '#804000';
+            case COLOR_GREY:
+                return '#808080';
+            case COLOR_WHITE:
+                return '#ffffff';
+        }
     },
 };
 module.exports = Util;
