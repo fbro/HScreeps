@@ -507,7 +507,7 @@ const ExecuteJobs = {
                 },
                 /**@return {int}*/
                 IsJobDone: function (jobObject) {
-                    if (creep.store.getFreeCapacity() <= creep.getActiveBodyparts(WORK)) { // predict that creep will be full and make a transfer that wont stop the harvesting flow
+                    if (creep.store.getFreeCapacity() <= creep.getActiveBodyparts(WORK) * HARVEST_POWER) { // predict that creep will be full and make a transfer that wont stop the harvesting flow
                         let fetchObject;
                         let result = ERR_NO_RESULT_FOUND;
                         if (creep.memory.LinkId) {
@@ -579,11 +579,10 @@ const ExecuteJobs = {
                     } else if (creep.store.getUsedCapacity(RESOURCE_ENERGY) > 0) {
                         if (fetchObject.progressTotal) {
                             result = creep.build(fetchObject);
-                            if (result === OK && creep.store.getFreeCapacity() > (creep.getActiveBodyparts(WORK) * 5)) {
+                            if (result === OK && creep.store.getFreeCapacity() > (creep.getActiveBodyparts(WORK) * BUILD_POWER)) {
                                 result = ERR_BUSY; // keep building
                             }
-                        }
-                        if (fetchObject === 'DROP') {
+                        } else if (fetchObject === 'DROP') {
                             for (const resourceType in creep.store) {
                                 if (creep.store.getUsedCapacity(resourceType) > 0) {
                                     result = creep.drop(resourceType);
@@ -740,7 +739,7 @@ const ExecuteJobs = {
                 },
                 /**@return {int}*/
                 IsJobDone: function (jobObject) {
-                    const newHits = jobObject.hits + (creep.getActiveBodyparts(WORK) * 100);
+                    const newHits = jobObject.hits + (creep.getActiveBodyparts(WORK) * REPAIR_POWER);
                     if (newHits >= jobObject.hitsMax
                         || ((jobObject.structureType === STRUCTURE_WALL || jobObject.structureType === STRUCTURE_RAMPART)
                             && (newHits >= Util.RAMPART_WALL_HITS_U_LVL5 && jobObject.room.controller.level < 5
@@ -2658,9 +2657,9 @@ const ExecuteJobs = {
 
             if (hostileCreep) {
                 creep.rangedAttack(hostileCreep);
-                if(hostileCreep.getActiveBodyparts(ATTACK) && creep.pos.getRangeTo(hostileCreep) <= 2){
+                if (hostileCreep.getActiveBodyparts(ATTACK) && creep.pos.getRangeTo(hostileCreep) <= 2) {
                     Flee(creep, hostileCreep);
-                }else if(creep.pos.getRangeTo(hostileCreep) > 3){
+                } else if (creep.pos.getRangeTo(hostileCreep) > 3) {
                     Move(creep, hostileCreep);
                 }
                 return CREEP_ATTACKED_HOSTILE;
@@ -2682,7 +2681,7 @@ const ExecuteJobs = {
             }
         }
 
-        function FindClosestHostileCreep(creep, hostileCreeps){
+        function FindClosestHostileCreep(creep, hostileCreeps) {
             // ATTACK, RANGED_ATTACK
             let hostileCreep;
             const nearbyHostileCreepsWithAttack = _.filter(hostileCreeps, function (hostileCreep) {
@@ -2756,15 +2755,12 @@ const ExecuteJobs = {
             return CREEP_IGNORED_HOSTILE;
         }
 
-        function Flee(creep, hostileCreepsToFleeFrom) {
-            // when this function is called we know that we should flee
-            // TODO creep should find an exit away from the hostiles, right now it just flees in the opposite direction
-            // TODO use PathFinder.search flee functionality when fleeing!!
-            let closestHostileCreep = hostileCreepsToFleeFrom[0];
+        function Flee(creep, hostiles) {
+            let closestHostileCreep = hostiles[0];
             const closesHostileRange = Number.MAX_SAFE_INTEGER;
-            for (const hostileCreepKey in hostileCreepsToFleeFrom) {
-                const hostileCreep = hostileCreepsToFleeFrom[hostileCreepKey];
-                if (hostileCreep.pos.getRangeTo(creep.pos) < closesHostileRange) {
+            for (const hostileCreepKey in hostiles) {
+                const hostileCreep = hostiles[hostileCreepKey];
+                if (hostileCreep && hostileCreep.pos.getRangeTo(creep.pos) < closesHostileRange) {
                     closestHostileCreep = hostileCreep;
                 }
             }
@@ -2777,86 +2773,13 @@ const ExecuteJobs = {
             if (creep.getActiveBodyparts(RANGED_ATTACK) > 0) {
                 creep.rangedAttack(closestHostileCreep);
             }
-            return FleeMatrix(creep, closestHostileCreep);
-        }
-
-        function FleeMatrix(creep, closestHostileCreep) {
-            switch (true) {
-                case creep.pos.x < closestHostileCreep.pos.x && creep.pos.y < closestHostileCreep.pos.y:
-                    return FleeMove(creep, [-1, 0, -1], [-1, -1, 0], [TOP_LEFT, TOP, LEFT]);
-                case creep.pos.x > closestHostileCreep.pos.x && creep.pos.y < closestHostileCreep.pos.y:
-                    return FleeMove(creep, [1, 0, 1], [-1, -1, 0], [TOP_RIGHT, TOP, RIGHT]);
-                case creep.pos.x > closestHostileCreep.pos.x && creep.pos.y > closestHostileCreep.pos.y:
-                    return FleeMove(creep, [1, 0, 1], [1, 1, 0], [BOTTOM_RIGHT, BOTTOM, RIGHT]);
-                case creep.pos.x < closestHostileCreep.pos.x && creep.pos.y > closestHostileCreep.pos.y:
-                    return FleeMove(creep, [-1, 0, -1], [1, 1, 0], [BOTTOM_LEFT, BOTTOM, LEFT]);
-                case creep.pos.x < closestHostileCreep.pos.x && creep.pos.y === closestHostileCreep.pos.y:
-                    return FleeMove(creep, [-1, -1, -1], [0, 1, -1], [LEFT, BOTTOM_LEFT, TOP_LEFT]);
-                case creep.pos.x > closestHostileCreep.pos.x && creep.pos.y === closestHostileCreep.pos.y:
-                    return FleeMove(creep, [1, 1, 1], [0, 1, -1], [RIGHT, BOTTOM_RIGHT, TOP_RIGHT]);
-                case creep.pos.x === closestHostileCreep.pos.x && creep.pos.y > closestHostileCreep.pos.y:
-                    return FleeMove(creep, [0, -1, 1], [1, 1, 1], [BOTTOM, BOTTOM_LEFT, BOTTOM_RIGHT]);
-                case creep.pos.x === closestHostileCreep.pos.x && creep.pos.y < closestHostileCreep.pos.y:
-                    return FleeMove(creep, [0, -1, 1], [-1, -1, -1], [TOP, TOP_LEFT, TOP_RIGHT]);
-                default:
-                    Util.ErrorLog('ExecuteJobs', 'Flee', 'flee move error ' + creep.name);
+            const hostilePositions = [];
+            for (const hostileKey in hostiles) {
+                hostilePositions.push(hostiles[hostileKey].pos);
             }
-        }
-
-        function FleeMove(creep, Xs, Ys, directions) {
-            let positions = [];
-            let bestPointer;
-            let bestPointHasRoad = false;
-            let bestPointHasCreep = false;
-            for (const count in directions) {
-                let newX = (creep.pos.x + Xs[count]);
-                let newY = (creep.pos.y + Ys[count]);
-                if (newX <= 0 || newX >= 49 || newY <= 0 || newY >= 49) {
-                    positions.push({'newX': newX, 'newY': newY});
-                    //Util.Info('ExecuteJobs', 'FleeMove', 'border reached ' + newX + ',' + newY);
-                } else {
-                    const fleeToPos = new RoomPosition(newX, newY, creep.pos.roomName);
-                    const look = fleeToPos.look();
-                    let terrainOnPosition;
-                    let isRoadOnPosition = false;
-                    let structureTypeOnPosition;
-                    let creepOnPosition;
-                    for (const lookCount in look) {
-                        if (look[lookCount].type === LOOK_TERRAIN) {
-                            terrainOnPosition = look[lookCount].terrain;
-                        } else if (look[lookCount].type === LOOK_STRUCTURES) {
-                            if (look[lookCount].structure.structureType === STRUCTURE_ROAD) {
-                                isRoadOnPosition = true;
-                            } else if (look[lookCount].structure.structureType !== STRUCTURE_CONTAINER) {
-                                structureTypeOnPosition = look[lookCount].structure.structureType;
-                            }
-                        } else if (look[lookCount].type === LOOK_CREEPS) {
-                            creepOnPosition = look[lookCount].creep.name;
-                        }
-                    }
-                    positions.push({
-                        "fleeToPos": fleeToPos,
-                        "terrain": terrainOnPosition,
-                        "hasRoad": isRoadOnPosition,
-                        "structureType": structureTypeOnPosition,
-                        "creep": creepOnPosition
-                    });
-                    //Util.Info('ExecuteJobs', 'FleeMove', 'obj ' + fleeToPos.x + ',' + fleeToPos.y + ' ' + terrainOnPosition + ' ' + structureTypeOnPosition + ' ' + creepOnPosition);
-                    if (!positions[count].structureType && (!bestPointer && positions[count].terrain === 'swamp' && positions[count].terrain === 'plain' || positions[count].terrain === 'plain' && !bestPointHasRoad && !bestPointHasCreep)) {
-                        bestPointer = count;
-                        bestPointHasRoad = positions[count].hasRoad;
-                        bestPointHasCreep = positions[count].creep;
-                    }
-                }
-            }
-            let result = ERR_NO_RESULT_FOUND;
-            if (bestPointer) {
-                result = creep.move(directions[bestPointer]);
-                Util.Info('ExecuteJobs', 'FleeMove', creep.name + ' go to position ' + JSON.stringify(positions[bestPointer]) + ' orig ' + JSON.stringify(creep.pos) + " result " + result);
-            } else {
-                Util.Info('ExecuteJobs', 'FleeMove', creep.name + ' could not find any viable positions ' + JSON.stringify(positions));
-            }
-            return result;
+            const fleePath = PathFinder.search(creep.pos, hostilePositions, {flee: true});
+            let pos = fleePath.path[0];
+            return creep.move(creep.pos.getDirectionTo(pos));
         }
 
         //endregion

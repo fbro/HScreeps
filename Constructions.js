@@ -348,18 +348,6 @@ const Constructions = {
             for (const sourceCount in sources) {
                 const source = sources[sourceCount];
                 BuildRoadTo(spawn.pos, source.pos);
-                // build roads around each source
-                for (let y = source.pos.y - 1; y <= source.pos.y + 1; y++) {
-                    for (let x = source.pos.x - 1; x <= source.pos.x + 1; x++) {
-                        const terrainAtPos = roomTerrain.get(x, y);
-                        if (terrainAtPos !== TERRAIN_MASK_WALL && (y !== source.pos.y || x !== source.pos.x)) {
-                            const result = gameRoom.createConstructionSite(x, y, STRUCTURE_ROAD);
-                            if (result === OK) {
-                                Util.InfoLog('Constructions', 'ConstructRoads', 'around source ' + x + ',' + y + ',' + gameRoom.name);
-                            }
-                        }
-                    }
-                }
             }
             Util.Info('Constructions', 'ConstructRoads', gameRoom.name);
         }
@@ -453,7 +441,7 @@ const Constructions = {
         }
 
         function ConstructPerimeter(gameRoom, mainSpawn) {
-            if (!mainSpawn || Memory.MemRooms[gameRoom.name].Built && Memory.MemRooms[gameRoom.name].Built === gameRoom.controller.level) {
+            if (!mainSpawn || Memory.MemRooms[gameRoom.name].Built/*only build perimiter when a reset occurs*/) {
                 return;
             }
             let coreStructures = gameRoom.find(FIND_MY_STRUCTURES, {

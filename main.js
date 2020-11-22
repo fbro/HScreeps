@@ -215,9 +215,11 @@ module.exports.loop = function () {
         for (const flagKey in Game.flags) {
             const flag = Game.flags[flagKey];
             Game.map.visual.circle(flag.pos, {
-                radius: 5,
+                radius: 2,
                 fill: Util.GetColorCodeFromColor(flag.color),
-                stroke: Util.GetColorCodeFromColor(flag.secondaryColor)
+                opacity: 1,
+                stroke: Util.GetColorCodeFromColor(flag.secondaryColor),
+                strokeWidth: 1
             });
         }
     }
@@ -231,8 +233,6 @@ module.exports.loop = function () {
 // TODO powercreeps should hook into the job memory and check if there are any free transporter jobs
 
 // TODO create resource sales
-
-// TODO use PathFinder.search flee functionality when fleeing!!
 
 // TODO construct link at reserved room entrances
 

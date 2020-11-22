@@ -156,6 +156,7 @@ const Util = {
         return (parsed[1] % 10 === 0) || (parsed[2] % 10 === 0);
     },
 
+    /**@return {number}*/
     GenerateOuterRoomPath: function (to, from) { // return length - saves path in Memory
         if (!Memory.Paths) {
             Memory.Paths = {};
@@ -243,15 +244,16 @@ const Util = {
     GetUsername: function () {
         let username = Memory.Username;
         if (!username) {
-            const struc = _.find(Game.structures);
+            const structure = _.find(Game.structures);
             const creep = _.find(Game.creeps);
-            username = (struc ? struc.owner.username : false) || (creep ? creep.owner.username : false);
+            username = (structure ? structure.owner.username : false) || (creep ? creep.owner.username : false);
             Memory.Username = username;
             Util.InfoLog('Util', 'GetUsername', 'username saved ' + username);
         }
         return username;
     },
 
+    /**@return {string}*/
     GetColorCodeFromColor: function (flagColor) {
         switch (flagColor) {
             case COLOR_RED:
