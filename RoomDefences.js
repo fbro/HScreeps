@@ -65,7 +65,7 @@ const RoomDefences = {
                         ||
                         ((structure.structureType === STRUCTURE_RAMPART
                             || structure.structureType === STRUCTURE_WALL)
-                            && structure.hits < Util.RAMPART_WALL_HITS_U_LVL5);
+                            && structure.hits < 1000);
                 }
             });
 

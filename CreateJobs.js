@@ -318,7 +318,7 @@ const CreateJobs = {
                 const hostileCreeps = gameFlag.room.find(FIND_HOSTILE_CREEPS);
                 if (hostileCreeps.length > 0) {
                     Util.Info('CreateJobs', 'DefendReserverRoomJobs', 'hostiles found ' + hostileCreeps + ' ' + gameFlag.pos.roomName);
-                }else{
+                } else {
                     return jobs;
                 }
             }
@@ -409,12 +409,7 @@ const CreateJobs = {
                         &&
                         (
                             (
-                                (s.structureType === STRUCTURE_RAMPART || s.structureType === STRUCTURE_WALL)
-                                && (gameRoom.controller.level < 5 && s.hits < Util.RAMPART_WALL_HITS_U_LVL5_REPAIR
-                                    || gameRoom.controller.level >= 5 && gameRoom.controller.level < 8 && s.hits < Util.RAMPART_WALL_HITS_U_LVL8_REPAIR
-                                    || gameRoom.controller.level === 8 && (s.hits < Util.RAMPART_WALL_HITS_LVL8_REPAIR || gameRoom.storage && gameRoom.storage.store.getUsedCapacity(RESOURCE_ENERGY) > Util.RAMPART_WALL_MAX_HITS_WHEN_STORAGE_ENERGY))
-                                ||
-                                s.structureType === STRUCTURE_ROAD && s.hits < s.hitsMax / 2
+                                s.structureType === STRUCTURE_ROAD && s.hits < s.hitsMax / 2 || Util.ShouldRepairFortification(s)
                             )
                             ||
                             (
@@ -626,11 +621,11 @@ const CreateJobs = {
             }
         }
 
-        function FindMostAbundantResourceInStore(store){
+        function FindMostAbundantResourceInStore(store) {
             let mostAbundantResourceType;
             let largestAmount = 0;
-            for(const resourceType in store){
-                if(store[resourceType] > largestAmount){
+            for (const resourceType in store) {
+                if (store[resourceType] > largestAmount) {
                     mostAbundantResourceType = resourceType;
                     largestAmount = store[resourceType];
                 }

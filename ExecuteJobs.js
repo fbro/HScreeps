@@ -739,12 +739,11 @@ const ExecuteJobs = {
                 },
                 /**@return {int}*/
                 IsJobDone: function (jobObject) {
-                    const newHits = jobObject.hits + (creep.getActiveBodyparts(WORK) * REPAIR_POWER);
-                    if (newHits >= jobObject.hitsMax
-                        || ((jobObject.structureType === STRUCTURE_WALL || jobObject.structureType === STRUCTURE_RAMPART)
-                            && (newHits >= Util.RAMPART_WALL_HITS_U_LVL5 && jobObject.room.controller.level < 5
-                                || newHits >= Util.RAMPART_WALL_HITS_U_LVL8 && jobObject.room.controller.level >= 5 && jobObject.room.controller.level < 8
-                                || newHits >= Util.RAMPART_WALL_HITS_LVL8 && jobObject.room.controller.level === 8 && (!jobObject.room.storage || jobObject.room.storage && jobObject.room.storage.store.getUsedCapacity(RESOURCE_ENERGY) < Util.RAMPART_WALL_MAX_HITS_WHEN_STORAGE_ENERGY)))) {
+                    const calculatedHits = jobObject.hits + (creep.getActiveBodyparts(WORK) * REPAIR_POWER);
+                    if (calculatedHits >= jobObject.hitsMax
+                        ||
+                        Util.ShouldRepairFortification(jobObject, calculatedHits)
+                    ) {
                         // predict that the creep will be done
                         return JOB_IS_DONE;
                     } else {
@@ -1469,7 +1468,11 @@ const ExecuteJobs = {
                 },
                 /**@return {int}*/
                 Fetch: function (fetchObject, jobObject) {
-                    return creep.reserveController(fetchObject);
+                    let result = creep.reserveController(fetchObject);
+                    if (result === ERR_INVALID_TARGET) {
+                        result = creep.attackController(fetchObject);
+                    }
+                    return result
                 },
             });
             return result;
@@ -2163,6 +2166,10 @@ const ExecuteJobs = {
                     if (closestHostile && (closestHostile.pos.getRangeTo(creep.pos) < 6 || creep.room.controller && creep.room.controller.my)) {
                         return closestHostile;
                     } else {
+                        const closestHostileStructure = creep.pos.findClosestByPath(FIND_HOSTILE_STRUCTURES);
+                        if (closestHostileStructure) {
+                            return closestHostileStructure;
+                        }
                         return jobObject;
                     }
                 },
@@ -2760,7 +2767,7 @@ const ExecuteJobs = {
             const closesHostileRange = Number.MAX_SAFE_INTEGER;
             for (const hostileCreepKey in hostiles) {
                 const hostileCreep = hostiles[hostileCreepKey];
-                if (hostileCreep && hostileCreep.pos.getRangeTo(creep.pos) < closesHostileRange) {
+                if (hostileCreep && hostileCreep.pos && hostileCreep.pos.getRangeTo(creep.pos) < closesHostileRange) {
                     closestHostileCreep = hostileCreep;
                 }
             }

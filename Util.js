@@ -38,13 +38,6 @@ const Util = {
     GENERATE_TRANSPORTER_WHEN_POWERBANK_HITS_UNDER: 250000, // used in JobAttackPowerBank to determine when powerbank hit is low when to generate transporter jobs
 
     DO_EXTRACTING_WHEN_STORAGE_UNDER_MINERAL: 200000, // stop extracting mineral when one has more than this
-    RAMPART_WALL_MAX_HITS_WHEN_STORAGE_ENERGY: 300000, // when storage energy is over this value then go crazy with upgrading ramparts and walls
-    RAMPART_WALL_HITS_U_LVL5: 1000,
-    RAMPART_WALL_HITS_U_LVL5_REPAIR: 500,
-    RAMPART_WALL_HITS_U_LVL8: 100000,
-    RAMPART_WALL_HITS_U_LVL8_REPAIR: 70000,
-    RAMPART_WALL_HITS_LVL8: 2000000,
-    RAMPART_WALL_HITS_LVL8_REPAIR: 1700000,
 
     // Game.time % modulo value below - stack expensive ticks on top of each other
     GAME_TIME_MODULO_1: 2,
@@ -165,7 +158,7 @@ const Util = {
         if (Memory.Paths[to] && Memory.Paths[to][from]) {
             shouldCalculate = false;
         }
-        if(shouldCalculate && Game.map.getRoomLinearDistance(to, from) > 15/*creep should not move that much!*/){
+        if (shouldCalculate && Game.map.getRoomLinearDistance(to, from) > 15/*creep should not move that much!*/) {
             return -1; // do not calculate this route!
         }
         if (shouldCalculate) { // Use `findRoute` to calculate a high-level plan for this path,
@@ -212,7 +205,7 @@ const Util = {
                 if (pointer === to) {
                     hasFoundDestination = true;
                 }
-                if(length > 50){
+                if (length > 50) {
                     Util.ErrorLog('Util', 'GenerateOuterRoomPath', 'old path error! length ' + length + ' from ' + from + ' to ' + to + ' deleting path! paths ' + JSON.stringify(Memory.Paths[to]));
                     delete Memory.Paths[to];
                     return -1; // do not calculate this route!
@@ -278,5 +271,48 @@ const Util = {
                 return '#ffffff';
         }
     },
+
+    /**@return {boolean}*/
+    ShouldRepairFortification: function (fortification, calculatedHits) {
+        if (!fortification || !fortification.room) {
+            return false;
+        }
+        const hits = calculatedHits ? calculatedHits : fortification.hits;
+        const roomLevel = fortification.room.controller.level;
+        return (fortification.structureType === STRUCTURE_RAMPART || fortification.structureType === STRUCTURE_WALL) &&
+            (
+                // badly damaged
+                roomLevel === 1 && hits < 500 ||
+                roomLevel === 2 && hits < 1000 ||
+                roomLevel === 3 && hits < 2000 ||
+                roomLevel === 4 && hits < 4000 ||
+                roomLevel === 5 && hits < 8000 ||
+                roomLevel === 6 && hits < 16000 ||
+                roomLevel === 7 && hits < 32000 ||
+                roomLevel === 8 && hits < 64000 ||
+
+                // rich with energy
+                fortification.room.storage && fortification.room.storage.store.getUsedCapacity(RESOURCE_ENERGY) > Util.STORAGE_ENERGY_MEDIUM &&
+                (
+                    roomLevel === 4 && hits < 40000 ||
+                    roomLevel === 5 && hits < 80000 ||
+                    roomLevel === 6 && hits < 160000 ||
+                    roomLevel === 7 && hits < 320000 ||
+                    roomLevel === 8 && hits < 640000
+                ) ||
+
+                // very rich with energy
+                fortification.room.storage && fortification.room.storage.store.getUsedCapacity(RESOURCE_ENERGY) > Util.STORAGE_ENERGY_HIGH &&
+                (
+                    roomLevel === 4 && hits < 400000 ||
+                    roomLevel === 5 && hits < 800000 ||
+                    roomLevel === 6 && hits < 1600000 ||
+                    roomLevel === 7 && hits < 3200000 ||
+                    roomLevel === 8 && hits < fortification.hitsMax
+                )
+            );
+
+    },
+
 };
 module.exports = Util;
