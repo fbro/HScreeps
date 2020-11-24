@@ -161,10 +161,13 @@ module.exports.loop = function () {
                 if (memRoom.IsReserved && memRoom.MainRoom) {
                     const flag = Game.flags["Reserve room " + memRoomKey];
                     if (flag && Memory.MemRooms[memRoom.MainRoom] && Memory.MemRooms[memRoom.MainRoom].MainSpawnId) {
-                        Game.map.visual.line(Game.getObjectById(Memory.MemRooms[memRoom.MainRoom].MainSpawnId).pos, flag.pos, {
-                            color: '#ffff00',
-                            width: 1
-                        });
+                        const spawn = Game.getObjectById(Memory.MemRooms[memRoom.MainRoom].MainSpawnId);
+                        if(spawn) {
+                            Game.map.visual.line(spawn.pos, flag.pos, {
+                                color: '#ffff00',
+                                width: 1
+                            });
+                        }
                     }
                 }
                 // show mineral

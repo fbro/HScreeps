@@ -119,6 +119,9 @@ const Constructions = {
                 for (const sourceCount in sources) {
                     const source = sources[sourceCount];
                     const spawn = Game.getObjectById(Memory.MemRooms[bestMainRoom].MainSpawnId);
+                    if (!spawn) {
+                        return;
+                    }
                     const placedRoads = BuildRoadTo(new RoomPosition(spawn.pos.x, spawn.pos.y + 1, spawn.pos.roomName), source.pos);
                     if (placedRoads) { // place one path at a time
                         return;
