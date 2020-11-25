@@ -564,7 +564,7 @@ const ExecuteJobs = {
                         creep.memory.LinkId = fetchObject.id
                     } else if (creep.memory.LinkId && fetchObject.structureType !== STRUCTURE_LINK) { // if fetchObject is not link and a link is saved in memory then take that instead
                         const link = Game.getObjectById(creep.memory.LinkId);
-                        if (link && link.store.getFreeCapacity(RESOURCE_ENERGY) > 200 && isOnlyEnergy) {
+                        if (link && link.store && link.store.getFreeCapacity(RESOURCE_ENERGY) > 200 && isOnlyEnergy) {
                             fetchObject = link;
                             creep.memory.ClosestFreeStoreId = fetchObject.id;
                         }
