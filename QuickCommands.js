@@ -108,7 +108,7 @@ Game.creeps['H1'].move(LEFT);
 
 // -----------------------------------------------
 // abandon room script:
-const roomName = 'W39N19';
+const roomName = 'W34N41';
 const structures = Game.rooms[roomName].find(FIND_STRUCTURES);
 const constructions = Game.rooms[roomName].find(FIND_CONSTRUCTION_SITES);
 const myCreeps = Game.rooms[roomName].find(FIND_MY_CREEPS);

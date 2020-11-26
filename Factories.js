@@ -50,9 +50,13 @@ const Factories = {
                     if (result === OK) return;
                     result = Produce(factory, RESOURCE_REDUCTANT, Util.FACTORY_TARGET_RESOURCE);
                     if (result === OK) return;
+                    result = Produce(factory, RESOURCE_WIRE, Util.FACTORY_TARGET_RESOURCE);
+                    if (result === OK) return;
                     result = Produce(factory, RESOURCE_CELL, Util.FACTORY_TARGET_RESOURCE);
                     if (result === OK) return;
                     result = Produce(factory, RESOURCE_ALLOY, Util.FACTORY_TARGET_RESOURCE);
+                    if (result === OK) return;
+                    result = Produce(factory, RESOURCE_CONDENSATE, Util.FACTORY_TARGET_RESOURCE);
                     if (result === OK) return;
                     if (factory.room.storage.store.getUsedCapacity(RESOURCE_ENERGY) >= Util.STORAGE_ENERGY_MEDIUM) {
                         result = Produce(factory, RESOURCE_BATTERY, Util.FACTORY_TARGET_RESOURCE);
@@ -81,7 +85,7 @@ const Factories = {
                         }
                     }
                     const result = factory.produce(resToProduceName);
-                    Util.Info('Factories', 'Produce', 'lvl ' + (!factory.level ? 0 : factory.level) + ' ' + factory.pos.roomName + ' producing ' + resToProduceName + ' ' + factory.store.getUsedCapacity(resToProduceName) + ' max ' + resToProduceMaxAmount + ' result ' + result);
+                    Util.Info('Factories', 'Produce', 'lvl ' + (factory.level ? factory.level : 0) + ' ' + factory.pos.roomName + ' producing ' + resToProduceName + ' ' + factory.store.getUsedCapacity(resToProduceName) + ' max ' + resToProduceMaxAmount + ' result ' + result);
                     return result;
                 }
             }

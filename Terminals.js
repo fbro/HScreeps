@@ -438,7 +438,7 @@ const Terminals = {
                 case RESOURCE_BIOMASS     : // deposit
                 case RESOURCE_CELL        : // factory lvl 0
                 case RESOURCE_PHLEGM      : // factory lvl 1
-                // sell RESOURCE_TISSUE        factory lvl 2
+                case RESOURCE_TISSUE      : // factory lvl 2
                 case RESOURCE_MUSCLE      : // factory lvl 3
                 case RESOURCE_ORGANOID    : // factory lvl 4
 
@@ -447,7 +447,7 @@ const Terminals = {
                 case RESOURCE_ALLOY       : // factory lvl 0
                 case RESOURCE_TUBE        : // factory lvl 1
                 case RESOURCE_FIXTURES    : // factory lvl 2
-                // sell RESOURCE_FRAME         factory lvl 3
+                case RESOURCE_FRAME       : // factory lvl 3
                 case RESOURCE_HYDRAULICS  : // factory lvl 4
 
                 // Mystical
@@ -474,9 +474,9 @@ const Terminals = {
                 case RESOURCE_CATALYZED_GHODIUM_ACID:
                     return Number.MAX_SAFE_INTEGER;
 
-                case RESOURCE_TISSUE : // factory lvl 2
-                case RESOURCE_FRAME  : // factory lvl 3
-                    return 0;
+                // sell this resource
+
+                    //return 0;
 
                 default :
                     return Util.TERMINAL_MAX_RESOURCE;
