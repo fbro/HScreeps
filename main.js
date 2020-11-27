@@ -208,8 +208,9 @@ module.exports.loop = function () {
                 });
                 Game.map.visual.rect(new RoomPosition(0, 0, memRoomKey), 50, 50, {
                     stroke: memRoom.RoomLevel > 0 ? '#00ff00' : memRoom.RoomLevel === 0 ? '#ffff00' : '#ff0000',
-                    opacity: 0.1,
-                    strokeWidth: 1
+                    opacity: 1,
+                    strokeWidth: 1,
+                    fill: 'transparent',
                 });
             }
         }

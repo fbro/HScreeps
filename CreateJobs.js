@@ -30,7 +30,7 @@ const CreateJobs = {
                     } else if (secColor === COLOR_YELLOW) { // scout at pos
                         jobs = CreateFlagJob(jobs, 'ScoutPos', gameFlagKey, gameFlag, 'S');
                     } else if (secColor === COLOR_RED) { // flag to be placed on an observer that enables it to scan for power banks and deposits
-                        // observers handle this flag
+                        // observers handle this flag - recommended flag name: Observer roomName
                     } else if (secColor === COLOR_PURPLE) { // flag that observers create and put on found power banks and deletes again when deadline is reached
                         jobs = PowerBankJobs(jobs, gameFlagKey, gameFlag);
                     } else if (secColor === COLOR_GREY) { // flag that is created for each transporter that should fetch the power

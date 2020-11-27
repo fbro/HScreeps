@@ -63,10 +63,11 @@ const Observers = {
                         }
                         modLat = Math.abs(modLat) - 1;
                     }
-                    if (modLon % 10 === 0 || modLat % 10 === 0) { // only neutral empty rooms that divIde living sectors on the map
+                    if (modLon % 10 === 0 || modLat % 10 === 0) { // only neutral empty rooms that divide living sectors on the map
                         const newScan = modLonQ + modLon + modLatQ + modLat;
-                        if (Memory.MemRooms[observerRoomKey].MapScan[newScan] === 's' || !Memory.MemRooms[observerRoomKey].MapScan[newScan]) {
+                        if (modLat <= 60 && modLon <= 60 && Memory.MemRooms[observerRoomKey].MapScan[newScan] === 's' || !Memory.MemRooms[observerRoomKey].MapScan[newScan]) {
                             Memory.MemRooms[observerRoomKey].MapScan[newScan] = '?';
+                            Game.map.visual.circle(new RoomPosition(25,25, newScan), {fill: 'transparent', radius: 25, opacity: 1, stroke: '#000000', strokeWidth: 1});
                         }
                         numOfScansFound++;
                     }
@@ -88,6 +89,7 @@ const Observers = {
                 } else if (hasScanned && scanStatus === '?') {
                     numOfScansLeft++;
                 } else if (scanStatus === 's' && Game.rooms[roomKey]) { // check in rooms that where scanned last tick
+                    Game.map.visual.circle(new RoomPosition(25,25, roomKey), {fill: 'transparent', radius: 40, opacity: 1, stroke: '#00ffff', strokeWidth: 1});
                     const walls = Game.rooms[roomKey].find(FIND_STRUCTURES, { // if any walls are present the rooms resources might be walled off - better to just ignore the room!
                         filter: function (s) {
                             return s.structureType === STRUCTURE_WALL;
