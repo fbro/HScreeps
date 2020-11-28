@@ -82,6 +82,7 @@ const Observers = {
             for (const roomKey in observerRoom.MapScan) {
                 let scanStatus = observerRoom.MapScan[roomKey];
                 if (!hasScanned && scanStatus === '?') { // make a scan
+                    Game.map.visual.circle(new RoomPosition(25,25, roomKey), {fill: 'transparent', radius: 20, opacity: 1, stroke: '#00ffff', strokeWidth: 0.5});
                     observer.observeRoom(roomKey);
                     hasScanned = true;
                     observerRoom.MapScan[roomKey] = 's';

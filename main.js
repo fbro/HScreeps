@@ -175,12 +175,15 @@ module.exports.loop = function () {
                 if (!mineral) {
                     const gameRoom = Game.rooms[memRoomKey];
                     if (gameRoom) {
-                        mineral = gameRoom.find(FIND_MINERALS, {
+                        const minerals = gameRoom.find(FIND_MINERALS, {
                             filter: function (mineral) {
                                 return mineral;
                             }
-                        })[0].mineralType;
-                        memRoom.Mineral = mineral;
+                        });
+                        if(minerals[0]){
+                            mineral = minerals[0].mineralType;
+                            memRoom.Mineral = mineral;
+                        }
                     }
                 }
                 if (mineral) {
