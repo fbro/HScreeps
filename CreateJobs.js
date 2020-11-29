@@ -804,6 +804,7 @@ const CreateJobs = {
                             roomJobs = TryAddFillFactoryJob(gameRoom, factory, roomJobs, RESOURCE_REDUCTANT);
                         }
                     }
+                    // TODO add electronic and spiritual resources to level 5 for all four resource types
                 }
             }
             return roomJobs;

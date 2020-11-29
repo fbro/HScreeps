@@ -193,27 +193,27 @@ const Terminals = {
             switch (factory.level) { // factory level
                 case undefined:
                     switch (true) {
-                        case(IsProductionChain(factory, RESOURCE_METAL, RESOURCE_ALLOY, RESOURCE_METAL)): // Mechanical chain
+                        case(Util.IsProductionChain(factory, RESOURCE_METAL, RESOURCE_ALLOY, RESOURCE_METAL)): // Mechanical chain
                             resourceTypesNeeded.push(RESOURCE_ZYNTHIUM);
                             resourceTypesNeeded.push(RESOURCE_METAL);
                             resourceTypesNeeded.push(RESOURCE_UTRIUM);
                             resourceTypesNeeded.push(RESOURCE_OXYGEN);
                             resourceTypesNeeded.push(RESOURCE_HYDROGEN);
                             break;
-                        case(IsProductionChain(factory, RESOURCE_BIOMASS, RESOURCE_CELL, RESOURCE_BIOMASS)): // Biological chain
+                        case(Util.IsProductionChain(factory, RESOURCE_BIOMASS, RESOURCE_CELL, RESOURCE_BIOMASS)): // Biological chain
                             resourceTypesNeeded.push(RESOURCE_LEMERGIUM);
                             resourceTypesNeeded.push(RESOURCE_BIOMASS);
                             resourceTypesNeeded.push(RESOURCE_OXYGEN);
                             resourceTypesNeeded.push(RESOURCE_HYDROGEN);
                             resourceTypesNeeded.push(RESOURCE_ZYNTHIUM);
                             break;
-                        case(IsProductionChain(factory, RESOURCE_SILICON, RESOURCE_WIRE, RESOURCE_SILICON)): // Electronical chain
+                        case(Util.IsProductionChain(factory, RESOURCE_SILICON, RESOURCE_WIRE, RESOURCE_SILICON)): // Electronical chain
                             resourceTypesNeeded.push(RESOURCE_UTRIUM);
                             resourceTypesNeeded.push(RESOURCE_SILICON);
                             resourceTypesNeeded.push(RESOURCE_OXYGEN);
                             resourceTypesNeeded.push(RESOURCE_HYDROGEN);
                             break;
-                        case(IsProductionChain(factory, RESOURCE_MIST, RESOURCE_CONDENSATE, RESOURCE_MIST)): // Mystical chain
+                        case(Util.IsProductionChain(factory, RESOURCE_MIST, RESOURCE_CONDENSATE, RESOURCE_MIST)): // Mystical chain
                             resourceTypesNeeded.push(RESOURCE_KEANIUM);
                             resourceTypesNeeded.push(RESOURCE_MIST);
                             resourceTypesNeeded.push(RESOURCE_HYDROGEN);
@@ -223,22 +223,22 @@ const Terminals = {
                     break;
                 case(1):
                     switch (true) {
-                        case(IsProductionChain(factory, RESOURCE_ALLOY, RESOURCE_TUBE, RESOURCE_METAL)): // Mechanical chain
+                        case(Util.IsProductionChain(factory, RESOURCE_ALLOY, RESOURCE_TUBE, RESOURCE_METAL)): // Mechanical chain
                             resourceTypesNeeded.push(RESOURCE_ALLOY);
                             resourceTypesNeeded.push(RESOURCE_ZYNTHIUM_BAR);
                             resourceTypesNeeded.push(RESOURCE_UTRIUM_BAR);
                             break;
-                        case(IsProductionChain(factory, RESOURCE_CELL, RESOURCE_PHLEGM, RESOURCE_BIOMASS)): // Biological chain
+                        case(Util.IsProductionChain(factory, RESOURCE_CELL, RESOURCE_PHLEGM, RESOURCE_BIOMASS)): // Biological chain
                             resourceTypesNeeded.push(RESOURCE_CELL);
                             resourceTypesNeeded.push(RESOURCE_OXIDANT);
                             resourceTypesNeeded.push(RESOURCE_LEMERGIUM_BAR);
                             break;
-                        case(IsProductionChain(factory, RESOURCE_WIRE, RESOURCE_SWITCH, RESOURCE_SILICON)): // Electronical chain
+                        case(Util.IsProductionChain(factory, RESOURCE_WIRE, RESOURCE_SWITCH, RESOURCE_SILICON)): // Electronical chain
                             resourceTypesNeeded.push(RESOURCE_WIRE);
                             resourceTypesNeeded.push(RESOURCE_OXIDANT);
                             resourceTypesNeeded.push(RESOURCE_UTRIUM_BAR);
                             break;
-                        case(IsProductionChain(factory, RESOURCE_CONDENSATE, RESOURCE_CONCENTRATE, RESOURCE_MIST)): // Mystical chain
+                        case(Util.IsProductionChain(factory, RESOURCE_CONDENSATE, RESOURCE_CONCENTRATE, RESOURCE_MIST)): // Mystical chain
                             resourceTypesNeeded.push(RESOURCE_CONDENSATE);
                             resourceTypesNeeded.push(RESOURCE_KEANIUM_BAR);
                             resourceTypesNeeded.push(RESOURCE_REDUCTANT);
@@ -247,22 +247,22 @@ const Terminals = {
                     break;
                 case(2):
                     switch (true) {
-                        case(IsProductionChain(factory, RESOURCE_ALLOY, RESOURCE_FIXTURES, RESOURCE_METAL)): // Mechanical chain
+                        case(Util.IsProductionChain(factory, RESOURCE_ALLOY, RESOURCE_FIXTURES, RESOURCE_METAL)): // Mechanical chain
                             resourceTypesNeeded.push(RESOURCE_COMPOSITE);
                             resourceTypesNeeded.push(RESOURCE_ALLOY);
                             resourceTypesNeeded.push(RESOURCE_OXIDANT);
                             break;
-                        case(IsProductionChain(factory, RESOURCE_PHLEGM, RESOURCE_TISSUE, RESOURCE_BIOMASS)): // Biological chain
+                        case(Util.IsProductionChain(factory, RESOURCE_PHLEGM, RESOURCE_TISSUE, RESOURCE_BIOMASS)): // Biological chain
                             resourceTypesNeeded.push(RESOURCE_PHLEGM);
                             resourceTypesNeeded.push(RESOURCE_CELL);
                             resourceTypesNeeded.push(RESOURCE_REDUCTANT);
                             break;
-                        case(IsProductionChain(factory, RESOURCE_SWITCH, RESOURCE_TRANSISTOR, RESOURCE_SILICON)): // Electronical chain
+                        case(Util.IsProductionChain(factory, RESOURCE_SWITCH, RESOURCE_TRANSISTOR, RESOURCE_SILICON)): // Electronical chain
                             resourceTypesNeeded.push(RESOURCE_SWITCH);
                             resourceTypesNeeded.push(RESOURCE_WIRE);
                             resourceTypesNeeded.push(RESOURCE_REDUCTANT);
                             break;
-                        case(IsProductionChain(factory, RESOURCE_CONCENTRATE, RESOURCE_EXTRACT, RESOURCE_MIST)): // Mystical chain
+                        case(Util.IsProductionChain(factory, RESOURCE_CONCENTRATE, RESOURCE_EXTRACT, RESOURCE_MIST)): // Mystical chain
                             resourceTypesNeeded.push(RESOURCE_CONCENTRATE);
                             resourceTypesNeeded.push(RESOURCE_CONDENSATE);
                             resourceTypesNeeded.push(RESOURCE_OXIDANT);
@@ -271,25 +271,25 @@ const Terminals = {
                     break;
                 case(3):
                     switch (true) {
-                        case(IsProductionChain(factory, RESOURCE_FIXTURES, RESOURCE_FRAME, RESOURCE_METAL)): // Mechanical chain
+                        case(Util.IsProductionChain(factory, RESOURCE_FIXTURES, RESOURCE_FRAME, RESOURCE_METAL)): // Mechanical chain
                             resourceTypesNeeded.push(RESOURCE_FIXTURES);
                             resourceTypesNeeded.push(RESOURCE_TUBE);
                             resourceTypesNeeded.push(RESOURCE_REDUCTANT);
                             resourceTypesNeeded.push(RESOURCE_ZYNTHIUM_BAR);
                             break;
-                        case(IsProductionChain(factory, RESOURCE_TISSUE, RESOURCE_MUSCLE, RESOURCE_BIOMASS)): // Biological chain
+                        case(Util.IsProductionChain(factory, RESOURCE_TISSUE, RESOURCE_MUSCLE, RESOURCE_BIOMASS)): // Biological chain
                             resourceTypesNeeded.push(RESOURCE_TISSUE);
                             resourceTypesNeeded.push(RESOURCE_PHLEGM);
                             resourceTypesNeeded.push(RESOURCE_ZYNTHIUM_BAR);
                             resourceTypesNeeded.push(RESOURCE_REDUCTANT);
                             break;
-                        case(IsProductionChain(factory, RESOURCE_TRANSISTOR, RESOURCE_MICROCHIP, RESOURCE_SILICON)): // Electronical chain
+                        case(Util.IsProductionChain(factory, RESOURCE_TRANSISTOR, RESOURCE_MICROCHIP, RESOURCE_SILICON)): // Electronical chain
                             resourceTypesNeeded.push(RESOURCE_TRANSISTOR);
                             resourceTypesNeeded.push(RESOURCE_COMPOSITE); // not added in lower factory yet!
                             resourceTypesNeeded.push(RESOURCE_WIRE);
                             resourceTypesNeeded.push(RESOURCE_PURIFIER); // not added in lower factory yet!
                             break;
-                        case(IsProductionChain(factory, RESOURCE_EXTRACT, RESOURCE_SPIRIT, RESOURCE_MIST)): // Mystical chain
+                        case(Util.IsProductionChain(factory, RESOURCE_EXTRACT, RESOURCE_SPIRIT, RESOURCE_MIST)): // Mystical chain
                             resourceTypesNeeded.push(RESOURCE_EXTRACT);
                             resourceTypesNeeded.push(RESOURCE_CONCENTRATE);
                             resourceTypesNeeded.push(RESOURCE_REDUCTANT);
@@ -299,25 +299,25 @@ const Terminals = {
                     break;
                 case(4):
                     switch (true) {
-                        case(IsProductionChain(factory, RESOURCE_FIXTURES, RESOURCE_HYDRAULICS, RESOURCE_METAL)): // Mechanical chain
+                        case(Util.IsProductionChain(factory, RESOURCE_FIXTURES, RESOURCE_HYDRAULICS, RESOURCE_METAL)): // Mechanical chain
                             resourceTypesNeeded.push(RESOURCE_LIQUID); // not added in lower factory yet!
                             resourceTypesNeeded.push(RESOURCE_FIXTURES);
                             resourceTypesNeeded.push(RESOURCE_TUBE);
                             resourceTypesNeeded.push(RESOURCE_PURIFIER); // not added in lower factory yet!
                             break;
-                        case(IsProductionChain(factory, RESOURCE_MUSCLE, RESOURCE_ORGANOID, RESOURCE_BIOMASS)): // Biological chain
+                        case(Util.IsProductionChain(factory, RESOURCE_MUSCLE, RESOURCE_ORGANOID, RESOURCE_BIOMASS)): // Biological chain
                             resourceTypesNeeded.push(RESOURCE_MUSCLE);
                             resourceTypesNeeded.push(RESOURCE_TISSUE);
                             resourceTypesNeeded.push(RESOURCE_PURIFIER); // not added in lower factory yet!
                             resourceTypesNeeded.push(RESOURCE_OXIDANT);
                             break;
-                        case(IsProductionChain(factory, RESOURCE_MICROCHIP, RESOURCE_CIRCUIT, RESOURCE_SILICON)): // Electronical chain
+                        case(Util.IsProductionChain(factory, RESOURCE_MICROCHIP, RESOURCE_CIRCUIT, RESOURCE_SILICON)): // Electronical chain
                             resourceTypesNeeded.push(RESOURCE_MICROCHIP);
                             resourceTypesNeeded.push(RESOURCE_TRANSISTOR);
                             resourceTypesNeeded.push(RESOURCE_SWITCH);
                             resourceTypesNeeded.push(RESOURCE_OXIDANT);
                             break;
-                        case(IsProductionChain(factory, RESOURCE_SPIRIT, RESOURCE_EMANATION, RESOURCE_MIST)): // Mystical chain
+                        case(Util.IsProductionChain(factory, RESOURCE_SPIRIT, RESOURCE_EMANATION, RESOURCE_MIST)): // Mystical chain
                             resourceTypesNeeded.push(RESOURCE_SPIRIT);
                             resourceTypesNeeded.push(RESOURCE_EXTRACT);
                             resourceTypesNeeded.push(RESOURCE_CONCENTRATE);
@@ -327,25 +327,25 @@ const Terminals = {
                     break;
                 case(5):
                     switch (true) {
-                        case(IsProductionChain(factory, RESOURCE_HYDRAULICS, RESOURCE_MACHINE, RESOURCE_METAL)): // Mechanical chain
+                        case(Util.IsProductionChain(factory, RESOURCE_HYDRAULICS, RESOURCE_MACHINE, RESOURCE_METAL)): // Mechanical chain
                             resourceTypesNeeded.push(RESOURCE_HYDRAULICS);
                             resourceTypesNeeded.push(RESOURCE_FRAME);
                             resourceTypesNeeded.push(RESOURCE_FIXTURES);
                             resourceTypesNeeded.push(RESOURCE_TUBE);
                             break;
-                        case(IsProductionChain(factory, RESOURCE_ORGANOID, RESOURCE_ORGANISM, RESOURCE_BIOMASS)): // Biological chain
+                        case(Util.IsProductionChain(factory, RESOURCE_ORGANOID, RESOURCE_ORGANISM, RESOURCE_BIOMASS)): // Biological chain
                             resourceTypesNeeded.push(RESOURCE_ORGANOID);
                             resourceTypesNeeded.push(RESOURCE_LIQUID); // not added in lower factory yet!
                             resourceTypesNeeded.push(RESOURCE_TISSUE);
                             resourceTypesNeeded.push(RESOURCE_CELL);
                             break;
-                        case(IsProductionChain(factory, RESOURCE_CIRCUIT, RESOURCE_DEVICE, RESOURCE_SILICON)): // Electronical chain
+                        case(Util.IsProductionChain(factory, RESOURCE_CIRCUIT, RESOURCE_DEVICE, RESOURCE_SILICON)): // Electronical chain
                             resourceTypesNeeded.push(RESOURCE_CIRCUIT);
                             resourceTypesNeeded.push(RESOURCE_MICROCHIP);
                             resourceTypesNeeded.push(RESOURCE_CRYSTAL); // not added in lower factory yet!
                             resourceTypesNeeded.push(RESOURCE_GHODIUM_MELT); // not added in lower factory yet!
                             break;
-                        case(IsProductionChain(factory, RESOURCE_EMANATION, RESOURCE_ESSENCE, RESOURCE_MIST)): // Mystical chain
+                        case(Util.IsProductionChain(factory, RESOURCE_EMANATION, RESOURCE_ESSENCE, RESOURCE_MIST)): // Mystical chain
                             resourceTypesNeeded.push(RESOURCE_EMANATION);
                             resourceTypesNeeded.push(RESOURCE_SPIRIT);
                             resourceTypesNeeded.push(RESOURCE_CRYSTAL); // not added in lower factory yet!
@@ -355,20 +355,6 @@ const Terminals = {
                     break;
             }
             return resourceTypesNeeded;
-        }
-
-        /**@return {boolean}*/
-        function IsProductionChain(factory, resourceTypeNeeded, resourceTypeProduced, resourceBasic) {
-            return factory.room.storage.store.getUsedCapacity(resourceTypeNeeded) > 0
-                || factory.room.storage.store.getUsedCapacity(resourceTypeProduced) > 0
-                || factory.room.storage.store.getUsedCapacity(resourceBasic) > 0
-                || factory.room.terminal.store.getUsedCapacity(resourceTypeNeeded) > 0
-                || factory.room.terminal.store.getUsedCapacity(resourceTypeProduced) > 0
-                || factory.room.terminal.store.getUsedCapacity(resourceBasic) > 0
-                || factory.store.getUsedCapacity(resourceTypeNeeded) > 0
-                || factory.store.getUsedCapacity(resourceTypeProduced) > 0
-                || factory.store.getUsedCapacity(resourceBasic) > 0;
-
         }
 
         /**@return {number}*/

@@ -273,24 +273,14 @@ const Util = {
     },
 
     /**@return {boolean}*/
-    ShouldRepairFortification: function (fortification, calculatedHits) {
+    ShouldRepairFortification: function (fortification) {
         if (!fortification || !fortification.room) {
             return false;
         }
-        const hits = calculatedHits ? calculatedHits : fortification.hits;
+        const hits = fortification.hits;
         const roomLevel = fortification.room.controller.level;
         return (fortification.structureType === STRUCTURE_RAMPART || fortification.structureType === STRUCTURE_WALL) &&
             (
-                // badly damaged
-                roomLevel === 1 && hits < 500 ||
-                roomLevel === 2 && hits < 1000 ||
-                roomLevel === 3 && hits < 2000 ||
-                roomLevel === 4 && hits < 4000 ||
-                roomLevel === 5 && hits < 8000 ||
-                roomLevel === 6 && hits < 16000 ||
-                roomLevel === 7 && hits < 32000 ||
-                roomLevel === 8 && hits < 64000 ||
-
                 // rich with energy
                 fortification.room.storage && fortification.room.storage.store.getUsedCapacity(RESOURCE_ENERGY) > Util.STORAGE_ENERGY_MEDIUM &&
                 (
@@ -309,9 +299,31 @@ const Util = {
                     roomLevel === 6 && hits < 1600000 ||
                     roomLevel === 7 && hits < 3200000 ||
                     roomLevel === 8 && hits < fortification.hitsMax
-                )
-            );
+                ) ||
 
+                // badly damaged
+                roomLevel === 1 && hits < 500 ||
+                roomLevel === 2 && hits < 1000 ||
+                roomLevel === 3 && hits < 2000 ||
+                roomLevel === 4 && hits < 4000 ||
+                roomLevel === 5 && hits < 8000 ||
+                roomLevel === 6 && hits < 16000 ||
+                roomLevel === 7 && hits < 32000 ||
+                roomLevel === 8 && hits < 64000
+            );
+    },
+
+    /**@return {boolean}*/
+    IsProductionChain: function (factory, resourceTypeNeeded, resourceTypeProduced, resourceBasic) {
+        return factory.room.storage.store.getUsedCapacity(resourceTypeNeeded) > 0
+            || factory.room.storage.store.getUsedCapacity(resourceTypeProduced) > 0
+            || factory.room.storage.store.getUsedCapacity(resourceBasic) > 0
+            || factory.room.terminal.store.getUsedCapacity(resourceTypeNeeded) > 0
+            || factory.room.terminal.store.getUsedCapacity(resourceTypeProduced) > 0
+            || factory.room.terminal.store.getUsedCapacity(resourceBasic) > 0
+            || factory.store.getUsedCapacity(resourceTypeNeeded) > 0
+            || factory.store.getUsedCapacity(resourceTypeProduced) > 0
+            || factory.store.getUsedCapacity(resourceBasic) > 0;
     },
 
 };

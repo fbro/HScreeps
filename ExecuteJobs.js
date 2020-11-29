@@ -740,10 +740,7 @@ const ExecuteJobs = {
                 /**@return {int}*/
                 IsJobDone: function (jobObject) {
                     const calculatedHits = jobObject.hits + (creep.getActiveBodyparts(WORK) * REPAIR_POWER);
-                    if (calculatedHits >= jobObject.hitsMax
-                        ||
-                        !Util.ShouldRepairFortification(jobObject, calculatedHits)
-                    ) {
+                    if (calculatedHits >= jobObject.hitsMax) {
                         // predict that the creep will be done
                         return JOB_IS_DONE;
                     } else {
