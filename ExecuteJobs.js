@@ -2662,7 +2662,7 @@ const ExecuteJobs = {
             if (hostileCreep) {
                 creep.rangedAttack(hostileCreep);
                 if (hostileCreep.getActiveBodyparts(ATTACK) && creep.pos.getRangeTo(hostileCreep) <= 2) {
-                    Flee(creep, hostileCreep);
+                    Flee(creep, hostileCreeps);
                 } else if (creep.pos.getRangeTo(hostileCreep) > 3) {
                     Move(creep, hostileCreep);
                 }

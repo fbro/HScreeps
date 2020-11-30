@@ -256,7 +256,7 @@ const AssignJobs = {
             let minEnergyCapacityNeeded = 300;
             if (roomJob.CreepType === 'C' || roomJob.CreepType === 'R') { //  creep with CLAIM body parts
                 minEnergyCapacityNeeded = 650;
-                timeToLiveMaxRoomRange = 12; // 600 time to live / 50 max room tiles
+                timeToLiveMaxRoomRange = 13; // 600 time to live / 50 max room tiles
                 Util.Info('AssignJobs', 'FindBestSpawn', 'availableSpawnsInRoom ' + availableSpawnsInRoom + ' bestDistance ' + bestDistance + ' memRoomKey ' + memRoomKey);
             }
             for (const availableSpawnCounter in Game.spawns) { // find closest spawn
@@ -291,6 +291,9 @@ const AssignJobs = {
                         }
                     }
                 }
+            }
+            if (roomJob.CreepType === 'C' || roomJob.CreepType === 'R') {
+                Util.Info('AssignJobs', 'FindBestSpawn', 'CreepType ' + roomJob.CreepType + ' bestAvailableSpawn found ' + bestAvailableSpawn + ' memRoomKey ' + memRoomKey);
             }
             return bestAvailableSpawn;
         }
