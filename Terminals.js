@@ -126,9 +126,9 @@ const Terminals = {
                 // try to send energy or power to other owned terminals that needs it
                 if (resourceType === RESOURCE_ENERGY) {
                     if (fromTerminal.room.storage.store.getUsedCapacity(RESOURCE_ENERGY) > Util.STORAGE_ENERGY_HIGH) { // storage is overflowing with energy
-                        didSend = SendToTerminals(Util.STORAGE_ENERGY_MEDIUM_TRANSFER, resourceType, fromTerminal, terminals, Util.TERMINAL_EMPTY_ENERGY);
+                        didSend = SendToTerminals(Util.TERMINAL_TARGET_ENERGY, resourceType, fromTerminal, terminals, Util.TERMINAL_EMPTY_ENERGY);
                     } else {
-                        didSend = SendToTerminals(Util.STORAGE_ENERGY_MEDIUM_TRANSFER, resourceType, fromTerminal, terminals, Util.TERMINAL_TARGET_ENERGY);
+                        didSend = SendToTerminals(Util.TERMINAL_TARGET_ENERGY, resourceType, fromTerminal, terminals, Util.TERMINAL_TARGET_ENERGY);
                     }
                 } else if (resourceType === RESOURCE_POWER) {
                     didSend = SendToTerminals(Util.TERMINAL_TARGET_RESOURCE, resourceType, fromTerminal, terminals, Util.TERMINAL_TARGET_RESOURCE);
@@ -180,6 +180,7 @@ const Terminals = {
                         }
                         didSend = TrySendResource(amountToSend, resourceTypeToSend, fromTerminal, toTerminal);
                         if (didSend) {
+                            Util.InfoLog('Terminals', 'SendToTerminals', 'amountToSend ' + amountToSend + ' resourceType ' + resourceTypeToSend + ' from ' + fromTerminal.pos.roomName + ' to ' + toTerminal.pos.roomName);
                             break;
                         }
                     }

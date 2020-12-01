@@ -115,7 +115,7 @@ const Factories = {
         function Produce(factory, resToProduce, resToProduceMaxAmount) {
             if (factory.store.getUsedCapacity(resToProduce) < resToProduceMaxAmount) {
                 const commodity = COMMODITIES[resToProduce];
-                if (factory.level === undefined || factory.level === commodity.level) {
+                if (commodity.level === undefined || factory.level === commodity.level) {
                     for (const component in commodity.components) {
                         if (factory.store.getUsedCapacity(component) < commodity.components[component]) {
                             return -1;

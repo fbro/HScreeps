@@ -760,59 +760,119 @@ const CreateJobs = {
                         && factory.store.getUsedCapacity(RESOURCE_BATTERY) > 0) { // energy is needed!
                         AddJob(roomJobs, 'FillFctr(' + RESOURCE_BATTERY + ')' + gameRoom.name, factory.id, Util.OBJECT_JOB, 'T');
                     }
-
-                    // Biological chain
-                    if (gameRoom.storage.store.getUsedCapacity(RESOURCE_BIOMASS) > 0
-                        || gameRoom.terminal.store.getUsedCapacity(RESOURCE_BIOMASS) > 0
-                        || factory.store.getUsedCapacity(RESOURCE_BIOMASS) > 0
-                        || factory.store.getUsedCapacity(RESOURCE_CELL) > 0) {
-                        roomJobs = TryAddFillFactoryJob(gameRoom, factory, roomJobs, RESOURCE_BIOMASS);
-                        roomJobs = TryAddFillFactoryJob(gameRoom, factory, roomJobs, RESOURCE_LEMERGIUM);
-                        roomJobs = TryAddFillFactoryJob(gameRoom, factory, roomJobs, RESOURCE_LEMERGIUM_BAR);
-                        roomJobs = TryAddFillFactoryJob(gameRoom, factory, roomJobs, RESOURCE_OXYGEN);
-                        roomJobs = TryAddFillFactoryJob(gameRoom, factory, roomJobs, RESOURCE_HYDROGEN);
-                        if (factory.level === 1) { // level 1 specific
-                            roomJobs = TryAddFillFactoryJob(gameRoom, factory, roomJobs, RESOURCE_CELL);
-                            roomJobs = TryAddFillFactoryJob(gameRoom, factory, roomJobs, RESOURCE_OXIDANT);
-                        } else if (factory.level === 2) { // level 2 specific
-                            roomJobs = TryAddFillFactoryJob(gameRoom, factory, roomJobs, RESOURCE_PHLEGM);
-                            roomJobs = TryAddFillFactoryJob(gameRoom, factory, roomJobs, RESOURCE_CELL);
-                            roomJobs = TryAddFillFactoryJob(gameRoom, factory, roomJobs, RESOURCE_REDUCTANT);
-                        }
-                    }
                     // Mechanical chain
-                    else if (gameRoom.storage.store.getUsedCapacity(RESOURCE_METAL) > 0
-                        || gameRoom.terminal.store.getUsedCapacity(RESOURCE_METAL) > 0
-                        || factory.store.getUsedCapacity(RESOURCE_METAL) > 0
-                        || factory.store.getUsedCapacity(RESOURCE_ALLOY) > 0) {
-                        roomJobs = TryAddFillFactoryJob(gameRoom, factory, roomJobs, RESOURCE_METAL);
-                        roomJobs = TryAddFillFactoryJob(gameRoom, factory, roomJobs, RESOURCE_ZYNTHIUM);
-                        roomJobs = TryAddFillFactoryJob(gameRoom, factory, roomJobs, RESOURCE_ZYNTHIUM_BAR);
-                        roomJobs = TryAddFillFactoryJob(gameRoom, factory, roomJobs, RESOURCE_OXYGEN);
-                        roomJobs = TryAddFillFactoryJob(gameRoom, factory, roomJobs, RESOURCE_UTRIUM);
-                        roomJobs = TryAddFillFactoryJob(gameRoom, factory, roomJobs, RESOURCE_HYDROGEN);
-                        if (factory.level === 1) { // level 1 specific
-                            roomJobs = TryAddFillFactoryJob(gameRoom, factory, roomJobs, RESOURCE_ALLOY);
-                            roomJobs = TryAddFillFactoryJob(gameRoom, factory, roomJobs, RESOURCE_UTRIUM_BAR);
-                        } else if (factory.level === 2) { // level 2 specific
-                            roomJobs = TryAddFillFactoryJob(gameRoom, factory, roomJobs, RESOURCE_ALLOY);
-                            roomJobs = TryAddFillFactoryJob(gameRoom, factory, roomJobs, RESOURCE_OXIDANT);
-                            roomJobs = TryAddFillFactoryJob(gameRoom, factory, roomJobs, RESOURCE_COMPOSITE); // used for lvl 2 FIXTURES
-                        } else if (factory.level === 3) { // level 3 specific
-                            roomJobs = TryAddFillFactoryJob(gameRoom, factory, roomJobs, RESOURCE_FIXTURES);
-                            roomJobs = TryAddFillFactoryJob(gameRoom, factory, roomJobs, RESOURCE_TUBE);
-                            roomJobs = TryAddFillFactoryJob(gameRoom, factory, roomJobs, RESOURCE_REDUCTANT);
+                    if (Util.IsProductionChain(factory, RESOURCE_METAL, RESOURCE_ALLOY, RESOURCE_METAL)) {
+                        roomJobs = TryAddFillFactoryWithCommodityIngredientsJobs(factory, RESOURCE_ZYNTHIUM_BAR, roomJobs);
+                        roomJobs = TryAddFillFactoryWithCommodityIngredientsJobs(factory, RESOURCE_ALLOY, roomJobs);
+
+                        roomJobs = TryAddFillFactoryWithCommodityIngredientsJobs(factory, RESOURCE_OXIDANT, roomJobs);
+                        roomJobs = TryAddFillFactoryWithCommodityIngredientsJobs(factory, RESOURCE_REDUCTANT, roomJobs);
+                        roomJobs = TryAddFillFactoryWithCommodityIngredientsJobs(factory, RESOURCE_PURIFIER, roomJobs);
+                        roomJobs = TryAddFillFactoryWithCommodityIngredientsJobs(factory, RESOURCE_UTRIUM_BAR, roomJobs);
+                        roomJobs = TryAddFillFactoryWithCommodityIngredientsJobs(factory, RESOURCE_GHODIUM_MELT, roomJobs);
+
+                        if (factory.level === 1) {
+                            roomJobs = TryAddFillFactoryWithCommodityIngredientsJobs(factory, RESOURCE_TUBE, roomJobs);
+                            roomJobs = TryAddFillFactoryWithCommodityIngredientsJobs(factory, RESOURCE_COMPOSITE, roomJobs);
+                        } else if (factory.level === 2) {
+                            roomJobs = TryAddFillFactoryWithCommodityIngredientsJobs(factory, RESOURCE_FIXTURES, roomJobs);
+                        } else if (factory.level === 3) {
+                            roomJobs = TryAddFillFactoryWithCommodityIngredientsJobs(factory, RESOURCE_FRAME, roomJobs);
+                            roomJobs = TryAddFillFactoryWithCommodityIngredientsJobs(factory, RESOURCE_LIQUID, roomJobs);
+                        } else if (factory.level === 4) {
+                            roomJobs = TryAddFillFactoryWithCommodityIngredientsJobs(factory, RESOURCE_HYDRAULICS, roomJobs);
+                        } else if (factory.level === 5) {
+                            roomJobs = TryAddFillFactoryWithCommodityIngredientsJobs(factory, RESOURCE_MACHINE, roomJobs);
                         }
                     }
-                    // TODO add electronic and spiritual resources to level 5 for all four resource types
+                    // Biological chain
+                    else if (Util.IsProductionChain(factory, RESOURCE_BIOMASS, RESOURCE_CELL, RESOURCE_BIOMASS)) {
+                        roomJobs = TryAddFillFactoryWithCommodityIngredientsJobs(factory, RESOURCE_LEMERGIUM_BAR, roomJobs);
+                        roomJobs = TryAddFillFactoryWithCommodityIngredientsJobs(factory, RESOURCE_CELL, roomJobs);
+
+                        roomJobs = TryAddFillFactoryWithCommodityIngredientsJobs(factory, RESOURCE_OXIDANT, roomJobs);
+                        roomJobs = TryAddFillFactoryWithCommodityIngredientsJobs(factory, RESOURCE_REDUCTANT, roomJobs);
+                        roomJobs = TryAddFillFactoryWithCommodityIngredientsJobs(factory, RESOURCE_ZYNTHIUM_BAR, roomJobs);
+                        roomJobs = TryAddFillFactoryWithCommodityIngredientsJobs(factory, RESOURCE_GHODIUM_MELT, roomJobs);
+                        roomJobs = TryAddFillFactoryWithCommodityIngredientsJobs(factory, RESOURCE_PURIFIER, roomJobs);
+
+                        if (factory.level === 1) {
+                            roomJobs = TryAddFillFactoryWithCommodityIngredientsJobs(factory, RESOURCE_PHLEGM, roomJobs);
+                        } else if (factory.level === 2) {
+                            roomJobs = TryAddFillFactoryWithCommodityIngredientsJobs(factory, RESOURCE_TISSUE, roomJobs);
+                        } else if (factory.level === 3) {
+                            roomJobs = TryAddFillFactoryWithCommodityIngredientsJobs(factory, RESOURCE_MUSCLE, roomJobs);
+                            roomJobs = TryAddFillFactoryWithCommodityIngredientsJobs(factory, RESOURCE_LIQUID, roomJobs);
+                        } else if (factory.level === 4) {
+                            roomJobs = TryAddFillFactoryWithCommodityIngredientsJobs(factory, RESOURCE_ORGANOID, roomJobs);
+                        } else if (factory.level === 5) {
+                            roomJobs = TryAddFillFactoryWithCommodityIngredientsJobs(factory, RESOURCE_ORGANISM, roomJobs);
+                        }
+                    }
+                    // Electronical chain
+                    else if (Util.IsProductionChain(factory, RESOURCE_SILICON, RESOURCE_WIRE, RESOURCE_SILICON)) {
+                        roomJobs = TryAddFillFactoryWithCommodityIngredientsJobs(factory, RESOURCE_UTRIUM_BAR, roomJobs);
+                        roomJobs = TryAddFillFactoryWithCommodityIngredientsJobs(factory, RESOURCE_WIRE, roomJobs);
+
+                        roomJobs = TryAddFillFactoryWithCommodityIngredientsJobs(factory, RESOURCE_OXIDANT, roomJobs);
+                        roomJobs = TryAddFillFactoryWithCommodityIngredientsJobs(factory, RESOURCE_REDUCTANT, roomJobs);
+                        roomJobs = TryAddFillFactoryWithCommodityIngredientsJobs(factory, RESOURCE_ZYNTHIUM_BAR, roomJobs);
+                        roomJobs = TryAddFillFactoryWithCommodityIngredientsJobs(factory, RESOURCE_PURIFIER, roomJobs);
+                        roomJobs = TryAddFillFactoryWithCommodityIngredientsJobs(factory, RESOURCE_GHODIUM_MELT, roomJobs);
+                        roomJobs = TryAddFillFactoryWithCommodityIngredientsJobs(factory, RESOURCE_LEMERGIUM_BAR, roomJobs);
+                        roomJobs = TryAddFillFactoryWithCommodityIngredientsJobs(factory, RESOURCE_KEANIUM_BAR, roomJobs);
+
+                        if (factory.level === 1) {
+                            roomJobs = TryAddFillFactoryWithCommodityIngredientsJobs(factory, RESOURCE_SWITCH, roomJobs);
+                            roomJobs = TryAddFillFactoryWithCommodityIngredientsJobs(factory, RESOURCE_COMPOSITE, roomJobs);
+                        } else if (factory.level === 2) {
+                            roomJobs = TryAddFillFactoryWithCommodityIngredientsJobs(factory, RESOURCE_TRANSISTOR, roomJobs);
+                            roomJobs = TryAddFillFactoryWithCommodityIngredientsJobs(factory, RESOURCE_CRYSTAL, roomJobs);
+                        } else if (factory.level === 3) {
+                            roomJobs = TryAddFillFactoryWithCommodityIngredientsJobs(factory, RESOURCE_MICROCHIP, roomJobs);
+                        } else if (factory.level === 4) {
+                            roomJobs = TryAddFillFactoryWithCommodityIngredientsJobs(factory, RESOURCE_CIRCUIT, roomJobs);
+                        } else if (factory.level === 5) {
+                            roomJobs = TryAddFillFactoryWithCommodityIngredientsJobs(factory, RESOURCE_DEVICE, roomJobs);
+                        }
+                    }
+                    // Mystical chain
+                    else if (Util.IsProductionChain(factory, RESOURCE_MIST, RESOURCE_CONDENSATE, RESOURCE_MIST)) {
+                        roomJobs = TryAddFillFactoryWithCommodityIngredientsJobs(factory, RESOURCE_KEANIUM_BAR, roomJobs);
+                        roomJobs = TryAddFillFactoryWithCommodityIngredientsJobs(factory, RESOURCE_CONDENSATE, roomJobs);
+
+                        roomJobs = TryAddFillFactoryWithCommodityIngredientsJobs(factory, RESOURCE_OXIDANT, roomJobs);
+                        roomJobs = TryAddFillFactoryWithCommodityIngredientsJobs(factory, RESOURCE_REDUCTANT, roomJobs);
+                        roomJobs = TryAddFillFactoryWithCommodityIngredientsJobs(factory, RESOURCE_PURIFIER, roomJobs);
+                        roomJobs = TryAddFillFactoryWithCommodityIngredientsJobs(factory, RESOURCE_GHODIUM_MELT, roomJobs);
+                        roomJobs = TryAddFillFactoryWithCommodityIngredientsJobs(factory, RESOURCE_LEMERGIUM_BAR, roomJobs);
+
+                        if (factory.level === 1) {
+                            roomJobs = TryAddFillFactoryWithCommodityIngredientsJobs(factory, RESOURCE_CONCENTRATE, roomJobs);
+                        } else if (factory.level === 2) {
+                            roomJobs = TryAddFillFactoryWithCommodityIngredientsJobs(factory, RESOURCE_EXTRACT, roomJobs);
+                            roomJobs = TryAddFillFactoryWithCommodityIngredientsJobs(factory, RESOURCE_CRYSTAL, roomJobs);
+                        } else if (factory.level === 3) {
+                            roomJobs = TryAddFillFactoryWithCommodityIngredientsJobs(factory, RESOURCE_SPIRIT, roomJobs);
+                        } else if (factory.level === 4) {
+                            roomJobs = TryAddFillFactoryWithCommodityIngredientsJobs(factory, RESOURCE_EMANATION, roomJobs);
+                        } else if (factory.level === 5) {
+                            roomJobs = TryAddFillFactoryWithCommodityIngredientsJobs(factory, RESOURCE_ESSENCE, roomJobs);
+                        }
+                    }
                 }
             }
             return roomJobs;
         }
 
-        function TryAddFillFactoryJob(gameRoom, factory, roomJobs, resource) {
-            if (factory.store.getUsedCapacity(resource) < Util.FACTORY_TARGET_RESOURCE && (gameRoom.storage.store.getUsedCapacity(resource) > 0 || gameRoom.terminal.store.getUsedCapacity(resource) > 0)) {
-                roomJobs = AddJob(roomJobs, 'FillFctr(' + resource + ')' + gameRoom.name, factory.id, Util.OBJECT_JOB, 'T');
+        function TryAddFillFactoryWithCommodityIngredientsJobs(factory, resToProduce, roomJobs) {
+            const commodity = COMMODITIES[resToProduce];
+            if (commodity.level === undefined || factory.level === commodity.level) {
+                for (const component in commodity.components) {
+                    if (component !== RESOURCE_ENERGY && factory.store.getUsedCapacity(component) < Util.FACTORY_TARGET_RESOURCE && (factory.room.storage.store.getUsedCapacity(component) > 0 || factory.room.terminal.store.getUsedCapacity(component) > 0)) {
+                        roomJobs = AddJob(roomJobs, 'FillFctr(' + component + ')' + factory.room.name, factory.id, Util.OBJECT_JOB, 'T');
+                    }
+                }
             }
             return roomJobs;
         }
