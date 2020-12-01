@@ -875,7 +875,7 @@ const AssignJobs = {
         function GetAvailableName(creepType, isForeignRoom) {
             let availableCount = 1;
             while (true) {
-                if (Memory.creeps[creepType + availableCount]) {
+                if (Memory.creeps && Memory.creeps[creepType + availableCount]) {
                     availableCount++;
                 } else {
                     break; // name is free
