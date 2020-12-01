@@ -408,9 +408,7 @@ const CreateJobs = {
                         s.hits < s.hitsMax / 1.5 // health at 75%
                         &&
                         (
-                            (
-                                s.structureType === STRUCTURE_ROAD && s.hits < s.hitsMax / 2 || Util.ShouldRepairFortification(s)
-                            )
+                            (s.structureType === STRUCTURE_ROAD && s.hits < s.hitsMax / 2 || Util.ShouldRepairFortification(s))
                             ||
                             (
                                 s.structureType !== STRUCTURE_RAMPART &&

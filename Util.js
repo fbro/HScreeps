@@ -273,43 +273,44 @@ const Util = {
     },
 
     /**@return {boolean}*/
-    ShouldRepairFortification: function (fortification) {
+    ShouldRepairFortification: function (fortification, calculatedHits, isRepairing = false) {
         if (!fortification || !fortification.room) {
             return false;
         }
-        const hits = fortification.hits;
+        const hits = calculatedHits ? calculatedHits : fortification.hits;
         const roomLevel = fortification.room.controller.level;
+        const repairMod = isRepairing ? 2 : 1;
         return (fortification.structureType === STRUCTURE_RAMPART || fortification.structureType === STRUCTURE_WALL) &&
             (
                 // rich with energy
                 fortification.room.storage && fortification.room.storage.store.getUsedCapacity(RESOURCE_ENERGY) > Util.STORAGE_ENERGY_MEDIUM &&
                 (
-                    roomLevel === 4 && hits < 40000 ||
-                    roomLevel === 5 && hits < 80000 ||
-                    roomLevel === 6 && hits < 160000 ||
-                    roomLevel === 7 && hits < 320000 ||
-                    roomLevel === 8 && hits < 640000
+                    roomLevel === 4 && hits < 40000 * repairMod||
+                    roomLevel === 5 && hits < 80000 * repairMod||
+                    roomLevel === 6 && hits < 160000 * repairMod||
+                    roomLevel === 7 && hits < 320000 * repairMod||
+                    roomLevel === 8 && hits < 640000 * repairMod
                 ) ||
 
                 // very rich with energy
                 fortification.room.storage && fortification.room.storage.store.getUsedCapacity(RESOURCE_ENERGY) > Util.STORAGE_ENERGY_HIGH &&
                 (
-                    roomLevel === 4 && hits < 400000 ||
-                    roomLevel === 5 && hits < 800000 ||
-                    roomLevel === 6 && hits < 1600000 ||
-                    roomLevel === 7 && hits < 3200000 ||
+                    roomLevel === 4 && hits < 400000 * repairMod||
+                    roomLevel === 5 && hits < 800000 * repairMod||
+                    roomLevel === 6 && hits < 1600000 * repairMod||
+                    roomLevel === 7 && hits < 3200000 * repairMod||
                     roomLevel === 8 && hits < fortification.hitsMax
                 ) ||
 
                 // badly damaged
-                roomLevel === 1 && hits < 500 ||
-                roomLevel === 2 && hits < 1000 ||
-                roomLevel === 3 && hits < 2000 ||
-                roomLevel === 4 && hits < 4000 ||
-                roomLevel === 5 && hits < 8000 ||
-                roomLevel === 6 && hits < 16000 ||
-                roomLevel === 7 && hits < 32000 ||
-                roomLevel === 8 && hits < 64000
+                roomLevel === 1 && hits < 500 * repairMod||
+                roomLevel === 2 && hits < 1000 * repairMod||
+                roomLevel === 3 && hits < 2000 * repairMod||
+                roomLevel === 4 && hits < 4000 * repairMod||
+                roomLevel === 5 && hits < 8000 * repairMod||
+                roomLevel === 6 && hits < 16000 * repairMod||
+                roomLevel === 7 && hits < 32000 * repairMod||
+                roomLevel === 8 && hits < 64000 * repairMod
             );
     },
 

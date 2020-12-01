@@ -459,6 +459,8 @@ const Terminals = {
                 case RESOURCE_HYDROXIDE:
                 case RESOURCE_GHODIUM_ACID:
                 case RESOURCE_CATALYZED_GHODIUM_ACID:
+
+                case RESOURCE_BATTERY:
                     return Number.MAX_SAFE_INTEGER;
 
                 // sell this resource
