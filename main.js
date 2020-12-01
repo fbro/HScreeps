@@ -57,7 +57,7 @@ module.exports.loop = function () {
                 AssignJobs.run();
             }
             Labs.run();
-            if (Game.cpu.bucket >= 8000) {
+            if (Game.cpu.bucket >= 8000 && Game.shard.name !== 'shardSeason') {
                 //Util.Info('Main', 'Controller', 'Game.cpu.bucket ' + Game.cpu.bucket + ' generatePixel');
                 Game.cpu.generatePixel();
             }
