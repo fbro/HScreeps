@@ -754,8 +754,8 @@ const CreateJobs = {
                         AddJob(roomJobs, 'FillFctr(' + RESOURCE_ENERGY + ')' + gameRoom.name, factory.id, Util.OBJECT_JOB, 'T');
                     }
                     if (gameRoom.storage.store.getUsedCapacity(RESOURCE_ENERGY) <= Util.STORAGE_ENERGY_LOW
-                        && gameRoom.terminal.store.getUsedCapacity(RESOURCE_ENERGY) <= Util.TERMINAL_TARGET_ENERGY
-                        && factory.store.getUsedCapacity(RESOURCE_BATTERY) > 0) { // energy is needed!
+                        && gameRoom.terminal.store.getUsedCapacity(RESOURCE_ENERGY) <= Util.TERMINAL_TARGET_ENERGY) { // energy is needed!
+                        new RoomVisual(gameRoom.name).text('🔋', factory.pos.x, factory.pos.y);
                         AddJob(roomJobs, 'FillFctr(' + RESOURCE_BATTERY + ')' + gameRoom.name, factory.id, Util.OBJECT_JOB, 'T');
                     }
                     // Mechanical chain

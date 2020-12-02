@@ -2350,13 +2350,13 @@ const ExecuteJobs = {
                     } else if (resourceSupplies[i].structureType === STRUCTURE_LINK) { // prefer links over other stores
                         distance -= 3;
                     } else if (!resourceSupplies[i].structureType) { // drop, tombstone or ruin is more important to pick up
-                        distance -= 5;
+                        distance -= 4;
                         if (resourceSupplies[i].store && resourceSupplies[i].store.getUsedCapacity(resourceToFetch) > 1000 || resourceSupplies[i].amount > 1000) {
-                            distance -= 10; // try and favor stores and drops that has way more of the resource
+                            distance -= 2; // try and favor stores and drops that has way more of the resource
                         }
                     }
                     if (resourceSupplies[i].store && resourceSupplies[i].store.getUsedCapacity(resourceToFetch) > 500 || resourceSupplies[i].amount > 500) {
-                        distance -= 5; // try and favor stores that has more of the resource
+                        distance -= 3; // try and favor stores that has more of the resource
                     }
                     if (distance < bestDistance) {
                         resourceSupply = resourceSupplies[i];

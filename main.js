@@ -26,29 +26,7 @@ module.exports.loop = function () {
                     if (Game.time % Util.GAME_TIME_MODULO_5 === 0) {
                         Constructions.run();
                         if (Game.time % Util.GAME_TIME_MODULO_6 === 0) {
-                            Util.Info('Main', 'Controller', '--------------- main reset of memory ---------------');
-
-                            const foundCreeps = {};
-                            for (const memRoomKey in Memory.MemRooms) {
-                                const memRoom = Memory.MemRooms[memRoomKey];
-                                delete memRoom.Links; // remove links - maybe the buildings have been deleted ect.
-                                delete memRoom.FctrId; // remove FctrId - maybe the buildings have been deleted ect.
-                                delete memRoom.PowerSpawnId; // remove PowerSpawnId - maybe the buildings have been deleted ect.
-                                delete memRoom.TowerIds; // remove TowerIds - maybe a tower have been deleted ect.
-                                delete memRoom.ObserverId; // remove ObserverId - maybe an observer have been deleted ect.
-                                delete memRoom.Built; // remove BuiltRoads - maybe some of the road have eroded away?
-                                delete memRoom.MissingSpawn; // remove the missing spawn notification handler
-                                delete memRoom.IsReserved; // reserved room flag reset - maybe the room is not reserved anymore?
-                                delete memRoom.MainRoom; // reserved room's main room name - maybe the reserved room should have a closer main room assigned?
-                                MaxCreepsCleanup(memRoomKey, memRoom, foundCreeps);
-                                UnusedRoomsCleanup(memRoomKey, memRoom);
-                                DefendFlagsCleanup(memRoomKey);
-                            }
-                            if (Game.time % Util.GAME_TIME_MODULO_7 === 0) { // approx every 3 days
-                                delete Memory.Paths; // remove Paths to make room for new paths
-                                delete Memory.InfoLog;
-                                Util.InfoLog('Main', 'Controller', 'reset memory logs ' + Game.time);
-                            }
+                            Cleanup();
                         }
                     }
                 }
@@ -78,6 +56,32 @@ module.exports.loop = function () {
         }
         PowerCreeps.run();
         MapVisualStatus();
+    }
+
+    function Cleanup(){
+        Util.Info('Main', 'Controller', '--------------- main reset of memory ---------------');
+
+        const foundCreeps = {};
+        for (const memRoomKey in Memory.MemRooms) {
+            const memRoom = Memory.MemRooms[memRoomKey];
+            delete memRoom.Links; // remove links - maybe the buildings have been deleted ect.
+            delete memRoom.FctrId; // remove FctrId - maybe the buildings have been deleted ect.
+            delete memRoom.PowerSpawnId; // remove PowerSpawnId - maybe the buildings have been deleted ect.
+            delete memRoom.TowerIds; // remove TowerIds - maybe a tower have been deleted ect.
+            delete memRoom.ObserverId; // remove ObserverId - maybe an observer have been deleted ect.
+            delete memRoom.Built; // remove BuiltRoads - maybe some of the road have eroded away?
+            delete memRoom.MissingSpawn; // remove the missing spawn notification handler
+            delete memRoom.IsReserved; // reserved room flag reset - maybe the room is not reserved anymore?
+            delete memRoom.MainRoom; // reserved room's main room name - maybe the reserved room should have a closer main room assigned?
+            MaxCreepsCleanup(memRoomKey, memRoom, foundCreeps);
+            UnusedRoomsCleanup(memRoomKey, memRoom);
+            DefendFlagsCleanup(memRoomKey);
+        }
+        if (Game.time % Util.GAME_TIME_MODULO_7 === 0) { // approx every 3 days
+            delete Memory.Paths; // remove Paths to make room for new paths
+            delete Memory.InfoLog;
+            Util.InfoLog('Main', 'Controller', 'reset memory logs ' + Game.time);
+        }
     }
 
     function MaxCreepsCleanup(memRoomKey, memRoom, foundCreeps) {
