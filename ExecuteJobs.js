@@ -2661,7 +2661,7 @@ const ExecuteJobs = {
 
             if (hostileCreep) {
                 creep.rangedAttack(hostileCreep);
-                if (hostileCreep.getActiveBodyparts(ATTACK) && creep.pos.getRangeTo(hostileCreep) <= 2) {
+                if (hostileCreep.getActiveBodyparts(ATTACK) && creep.pos.getRangeTo(hostileCreep) <= 3) {
                     Flee(creep, hostileCreeps);
                 } else if (creep.pos.getRangeTo(hostileCreep) > 3) {
                     Move(creep, hostileCreep);
@@ -2760,7 +2760,7 @@ const ExecuteJobs = {
         }
 
         function Flee(creep, hostiles) {
-            let closestHostileCreep = hostiles[0];
+            let closestHostileCreep;
             const closesHostileRange = Number.MAX_SAFE_INTEGER;
             for (const hostileCreepKey in hostiles) {
                 const hostileCreep = hostiles[hostileCreepKey];
@@ -2777,13 +2777,14 @@ const ExecuteJobs = {
             if (creep.getActiveBodyparts(RANGED_ATTACK) > 0) {
                 creep.rangedAttack(closestHostileCreep);
             }
-            const hostilePositions = [];
-            for (const hostileKey in hostiles) {
-                hostilePositions.push(hostiles[hostileKey].pos);
-            }
-            const fleePath = PathFinder.search(creep.pos, hostilePositions, {flee: true});
+            let goals = _.map(hostiles, function(h) {
+                return { pos: h.pos, range: 3 };
+            });
+            const fleePath = PathFinder.search(creep.pos, goals, {flee: true});
             let pos = fleePath.path[0];
-            return creep.move(creep.pos.getDirectionTo(pos));
+            const result = creep.move(creep.pos.getDirectionTo(pos));
+            Util.Info('ExecuteJobs', 'Flee', result + ' pos ' + pos + ' ' + creep.name + ' fleePath ' + JSON.stringify(fleePath) + ' goals ' + JSON.stringify(goals));
+            return result;
         }
 
         //endregion

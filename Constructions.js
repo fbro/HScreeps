@@ -122,7 +122,7 @@ const Constructions = {
                     if (!spawn) {
                         return;
                     }
-                    const placedRoads = BuildRoadTo(new RoomPosition(spawn.pos.x, spawn.pos.y + 1, spawn.pos.roomName), source.pos);
+                    const placedRoads = BuildRoadTo(new RoomPosition(spawn.pos.x, spawn.pos.y + 1, spawn.pos.roomName), source.pos, true);
                     if (placedRoads) { // place one path at a time
                         return;
                     } else {
@@ -528,7 +528,7 @@ const Constructions = {
         }
 
         /**@return {Boolean}*/
-        function BuildRoadTo(fromPos, toPos) {
+        function BuildRoadTo(fromPos, toPos, isRemote = false) {
             let placedRoads = false;
             let pathFinder = PathFinder.search(
                 fromPos, {'pos': toPos, 'range': 1},
@@ -552,7 +552,7 @@ const Constructions = {
                         });
                         return costs;
                     },
-                    maxRooms: 3,
+                    maxRooms: isRemote ? 3 : 1,
                 }
             );
 
