@@ -544,6 +544,7 @@ const Terminals = {
                     fromTerminal.used = true;
                     fromTerminal.store[resourceType] = fromTerminal.store[resourceType] - amount;
                     toTerminal.store[resourceType] = toTerminal.store[resourceType] + amount;
+                    Game.map.visual.line(toTerminal.pos, fromTerminal.pos, {color: '#ff0000', lineStyle: 'dashed'});
                     return true;
                 }
             }

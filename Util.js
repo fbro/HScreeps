@@ -1,7 +1,7 @@
 const Util = {
 
     TERMINAL_TARGET_RESOURCE: 3000, // if over target - terminal should send to another owned room that has under the target
-    TERMINAL_TARGET_ENERGY: 50000,
+    TERMINAL_TARGET_ENERGY: 30000,
     TERMINAL_EMPTY_RESOURCE: 20000, // if terminal has over TERMINAL_EMPTY_RESOURCE then it must try and empty it to storage
     TERMINAL_EMPTY_ENERGY: 200000,
 
@@ -16,7 +16,7 @@ const Util = {
     STORAGE_ENERGY_HIGH: 600000,
     STORAGE_ENERGY_HIGH_TRANSFER: 120000,
     STORAGE_ENERGY_MEDIUM: 100000,
-    STORAGE_ENERGY_MEDIUM_TRANSFER: 30000,
+    STORAGE_ENERGY_MEDIUM_TRANSFER: 50000,
     STORAGE_ENERGY_LOW: 10000, // abort transfer when storage is lower than this
     STORAGE_ENERGY_LOW_TRANSFER: 0,
 
