@@ -38,7 +38,7 @@ const Terminals = {
         function GetFactoryResources(toTerminal, terminals, memRoom) {
             if (memRoom && memRoom.FctrId && memRoom.FctrId !== '-') {
                 const factory = Game.getObjectById(memRoom.FctrId);
-                if (factory) {
+                if (factory && toTerminal.store.getUsedCapacity(RESOURCE_ENERGY) >= Util.STORAGE_ENERGY_LOW) {
                     const resourceTypesNeeded = GetListOfFactoryResources(factory);
                     for (const resourceNeedKey in resourceTypesNeeded) {
                         const resourceTypeNeeded = resourceTypesNeeded[resourceNeedKey];
