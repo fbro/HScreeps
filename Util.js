@@ -272,6 +272,40 @@ const Util = {
         }
     },
 
+    /**@return {string}*/
+    GetColorCodeFromResource: function (resourceType) {
+        switch (resourceType) {
+            case RESOURCE_CATALYST:
+            case RESOURCE_PURIFIER:
+                return '#ff0000';
+            case RESOURCE_POWER:
+                return '#740000';
+            case RESOURCE_KEANIUM:
+            case RESOURCE_KEANIUM_BAR:
+                return '#8000ff';
+            case RESOURCE_UTRIUM:
+            case RESOURCE_UTRIUM_BAR:
+                return '#00ffff';
+            case RESOURCE_LEMERGIUM:
+            case RESOURCE_LEMERGIUM_BAR:
+                return '#00ff00';
+            case RESOURCE_ZYNTHIUM:
+            case RESOURCE_ZYNTHIUM_BAR:
+                return '#ffff00';
+            case RESOURCE_ENERGY:
+            case RESOURCE_BATTERY:
+                return '#898900';
+            case RESOURCE_HYDROGEN:
+            case RESOURCE_REDUCTANT:
+                return '#acacac';
+            case RESOURCE_OXYGEN:
+            case RESOURCE_OXIDANT:
+                return '#ffffff';
+            default:
+                return '#000000';
+        }
+    },
+
     /**@return {boolean}*/
     ShouldRepairFortification: function (fortification, calculatedHits, isRepairing = false) {
         if (!fortification || !fortification.room) {

@@ -67,7 +67,7 @@ const Observers = {
                         const newScan = modLonQ + modLon + modLatQ + modLat;
                         if (modLat <= 60 && modLon <= 60 && Memory.MemRooms[observerRoomKey].MapScan[newScan] === 's' || !Memory.MemRooms[observerRoomKey].MapScan[newScan]) {
                             Memory.MemRooms[observerRoomKey].MapScan[newScan] = '?';
-                            Game.map.visual.circle(new RoomPosition(25,25, newScan), {fill: 'transparent', radius: 25, opacity: 1, stroke: '#000000', strokeWidth: 1});
+                            Game.map.visual.circle(new RoomPosition(25,25, newScan), {fill: 'transparent', radius: 25, opacity: 1, stroke: '#000000', strokeWidth: 3});
                         }
                         numOfScansFound++;
                     }

@@ -758,16 +758,16 @@ const CreateJobs = {
                         new RoomVisual(gameRoom.name).text('🔋', factory.pos.x, factory.pos.y);
                         AddJob(roomJobs, 'FillFctr(' + RESOURCE_BATTERY + ')' + gameRoom.name, factory.id, Util.OBJECT_JOB, 'T');
                     }
+                    roomJobs = TryAddFillFactoryWithCommodityIngredientsJobs(factory, RESOURCE_OXIDANT, roomJobs);
+                    roomJobs = TryAddFillFactoryWithCommodityIngredientsJobs(factory, RESOURCE_REDUCTANT, roomJobs);
+                    roomJobs = TryAddFillFactoryWithCommodityIngredientsJobs(factory, RESOURCE_PURIFIER, roomJobs);
+                    roomJobs = TryAddFillFactoryWithCommodityIngredientsJobs(factory, RESOURCE_GHODIUM_MELT, roomJobs);
+
                     // Mechanical chain
                     if (Util.IsProductionChain(factory, RESOURCE_METAL, RESOURCE_ALLOY, RESOURCE_METAL)) {
                         roomJobs = TryAddFillFactoryWithCommodityIngredientsJobs(factory, RESOURCE_ZYNTHIUM_BAR, roomJobs);
                         roomJobs = TryAddFillFactoryWithCommodityIngredientsJobs(factory, RESOURCE_ALLOY, roomJobs);
-
-                        roomJobs = TryAddFillFactoryWithCommodityIngredientsJobs(factory, RESOURCE_OXIDANT, roomJobs);
-                        roomJobs = TryAddFillFactoryWithCommodityIngredientsJobs(factory, RESOURCE_REDUCTANT, roomJobs);
-                        roomJobs = TryAddFillFactoryWithCommodityIngredientsJobs(factory, RESOURCE_PURIFIER, roomJobs);
                         roomJobs = TryAddFillFactoryWithCommodityIngredientsJobs(factory, RESOURCE_UTRIUM_BAR, roomJobs);
-                        roomJobs = TryAddFillFactoryWithCommodityIngredientsJobs(factory, RESOURCE_GHODIUM_MELT, roomJobs);
 
                         if (factory.level === 1) {
                             roomJobs = TryAddFillFactoryWithCommodityIngredientsJobs(factory, RESOURCE_TUBE, roomJobs);
@@ -787,12 +787,7 @@ const CreateJobs = {
                     else if (Util.IsProductionChain(factory, RESOURCE_BIOMASS, RESOURCE_CELL, RESOURCE_BIOMASS)) {
                         roomJobs = TryAddFillFactoryWithCommodityIngredientsJobs(factory, RESOURCE_LEMERGIUM_BAR, roomJobs);
                         roomJobs = TryAddFillFactoryWithCommodityIngredientsJobs(factory, RESOURCE_CELL, roomJobs);
-
-                        roomJobs = TryAddFillFactoryWithCommodityIngredientsJobs(factory, RESOURCE_OXIDANT, roomJobs);
-                        roomJobs = TryAddFillFactoryWithCommodityIngredientsJobs(factory, RESOURCE_REDUCTANT, roomJobs);
                         roomJobs = TryAddFillFactoryWithCommodityIngredientsJobs(factory, RESOURCE_ZYNTHIUM_BAR, roomJobs);
-                        roomJobs = TryAddFillFactoryWithCommodityIngredientsJobs(factory, RESOURCE_GHODIUM_MELT, roomJobs);
-                        roomJobs = TryAddFillFactoryWithCommodityIngredientsJobs(factory, RESOURCE_PURIFIER, roomJobs);
 
                         if (factory.level === 1) {
                             roomJobs = TryAddFillFactoryWithCommodityIngredientsJobs(factory, RESOURCE_PHLEGM, roomJobs);
@@ -811,12 +806,7 @@ const CreateJobs = {
                     else if (Util.IsProductionChain(factory, RESOURCE_SILICON, RESOURCE_WIRE, RESOURCE_SILICON)) {
                         roomJobs = TryAddFillFactoryWithCommodityIngredientsJobs(factory, RESOURCE_UTRIUM_BAR, roomJobs);
                         roomJobs = TryAddFillFactoryWithCommodityIngredientsJobs(factory, RESOURCE_WIRE, roomJobs);
-
-                        roomJobs = TryAddFillFactoryWithCommodityIngredientsJobs(factory, RESOURCE_OXIDANT, roomJobs);
-                        roomJobs = TryAddFillFactoryWithCommodityIngredientsJobs(factory, RESOURCE_REDUCTANT, roomJobs);
                         roomJobs = TryAddFillFactoryWithCommodityIngredientsJobs(factory, RESOURCE_ZYNTHIUM_BAR, roomJobs);
-                        roomJobs = TryAddFillFactoryWithCommodityIngredientsJobs(factory, RESOURCE_PURIFIER, roomJobs);
-                        roomJobs = TryAddFillFactoryWithCommodityIngredientsJobs(factory, RESOURCE_GHODIUM_MELT, roomJobs);
                         roomJobs = TryAddFillFactoryWithCommodityIngredientsJobs(factory, RESOURCE_LEMERGIUM_BAR, roomJobs);
                         roomJobs = TryAddFillFactoryWithCommodityIngredientsJobs(factory, RESOURCE_KEANIUM_BAR, roomJobs);
 
@@ -838,11 +828,6 @@ const CreateJobs = {
                     else if (Util.IsProductionChain(factory, RESOURCE_MIST, RESOURCE_CONDENSATE, RESOURCE_MIST)) {
                         roomJobs = TryAddFillFactoryWithCommodityIngredientsJobs(factory, RESOURCE_KEANIUM_BAR, roomJobs);
                         roomJobs = TryAddFillFactoryWithCommodityIngredientsJobs(factory, RESOURCE_CONDENSATE, roomJobs);
-
-                        roomJobs = TryAddFillFactoryWithCommodityIngredientsJobs(factory, RESOURCE_OXIDANT, roomJobs);
-                        roomJobs = TryAddFillFactoryWithCommodityIngredientsJobs(factory, RESOURCE_REDUCTANT, roomJobs);
-                        roomJobs = TryAddFillFactoryWithCommodityIngredientsJobs(factory, RESOURCE_PURIFIER, roomJobs);
-                        roomJobs = TryAddFillFactoryWithCommodityIngredientsJobs(factory, RESOURCE_GHODIUM_MELT, roomJobs);
                         roomJobs = TryAddFillFactoryWithCommodityIngredientsJobs(factory, RESOURCE_LEMERGIUM_BAR, roomJobs);
 
                         if (factory.level === 1) {

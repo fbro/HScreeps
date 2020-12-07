@@ -152,7 +152,7 @@ const Terminals = {
         /**@return {boolean}*/
         function GetFromTerminal(amountNeeded, resourceTypeNeeded, toTerminal, terminals, minFromTerminalAmount) {
             let didSend = false;
-            for (const fromTerminalKey in terminals) { // try to get resource from other terminal
+            for (const fromTerminalKey in terminals) { // try to get resource from an other terminals
                 const fromTerminal = terminals[fromTerminalKey];
                 if (fromTerminal.store.getUsedCapacity(resourceTypeNeeded) > minFromTerminalAmount) {
                     didSend = TrySendResource(amountNeeded, resourceTypeNeeded, fromTerminal, toTerminal);
@@ -180,7 +180,6 @@ const Terminals = {
                         }
                         didSend = TrySendResource(amountToSend, resourceTypeToSend, fromTerminal, toTerminal);
                         if (didSend) {
-                            Util.InfoLog('Terminals', 'SendToTerminals', 'amountToSend ' + amountToSend + ' resourceType ' + resourceTypeToSend + ' from ' + fromTerminal.pos.roomName + ' to ' + toTerminal.pos.roomName);
                             break;
                         }
                     }
@@ -191,171 +190,129 @@ const Terminals = {
 
         function GetListOfFactoryResources(factory) {
             const resourceTypesNeeded = [];
-            switch (factory.level) { // factory level
-                case undefined:
-                    switch (true) {
-                        case(Util.IsProductionChain(factory, RESOURCE_METAL, RESOURCE_ALLOY, RESOURCE_METAL)): // Mechanical chain
-                            resourceTypesNeeded.push(RESOURCE_ZYNTHIUM);
-                            resourceTypesNeeded.push(RESOURCE_METAL);
-                            resourceTypesNeeded.push(RESOURCE_UTRIUM);
-                            resourceTypesNeeded.push(RESOURCE_OXYGEN);
-                            resourceTypesNeeded.push(RESOURCE_HYDROGEN);
-                            break;
-                        case(Util.IsProductionChain(factory, RESOURCE_BIOMASS, RESOURCE_CELL, RESOURCE_BIOMASS)): // Biological chain
-                            resourceTypesNeeded.push(RESOURCE_LEMERGIUM);
-                            resourceTypesNeeded.push(RESOURCE_BIOMASS);
-                            resourceTypesNeeded.push(RESOURCE_OXYGEN);
-                            resourceTypesNeeded.push(RESOURCE_HYDROGEN);
-                            resourceTypesNeeded.push(RESOURCE_ZYNTHIUM);
-                            break;
-                        case(Util.IsProductionChain(factory, RESOURCE_SILICON, RESOURCE_WIRE, RESOURCE_SILICON)): // Electronical chain
-                            resourceTypesNeeded.push(RESOURCE_UTRIUM);
-                            resourceTypesNeeded.push(RESOURCE_SILICON);
-                            resourceTypesNeeded.push(RESOURCE_OXYGEN);
-                            resourceTypesNeeded.push(RESOURCE_HYDROGEN);
-                            break;
-                        case(Util.IsProductionChain(factory, RESOURCE_MIST, RESOURCE_CONDENSATE, RESOURCE_MIST)): // Mystical chain
-                            resourceTypesNeeded.push(RESOURCE_KEANIUM);
-                            resourceTypesNeeded.push(RESOURCE_MIST);
-                            resourceTypesNeeded.push(RESOURCE_HYDROGEN);
-                            resourceTypesNeeded.push(RESOURCE_OXYGEN);
-                            break;
-                    }
+
+            AddCommodityIngredients(resourceTypesNeeded, factory, RESOURCE_ALLOY);
+            AddCommodityIngredients(resourceTypesNeeded, factory, RESOURCE_CELL);
+            AddCommodityIngredients(resourceTypesNeeded, factory, RESOURCE_WIRE);
+            AddCommodityIngredients(resourceTypesNeeded, factory, RESOURCE_CONDENSATE);
+            AddCommodityIngredients(resourceTypesNeeded, factory, RESOURCE_OXIDANT);
+            AddCommodityIngredients(resourceTypesNeeded, factory, RESOURCE_REDUCTANT);
+            AddCommodityIngredients(resourceTypesNeeded, factory, RESOURCE_PURIFIER);
+            AddCommodityIngredients(resourceTypesNeeded, factory, RESOURCE_GHODIUM_MELT);
+
+            switch (true) {
+                case(Util.IsProductionChain(factory, RESOURCE_ALLOY, RESOURCE_TUBE, RESOURCE_METAL)): // Mechanical chain
+                    AddCommodityIngredients(resourceTypesNeeded, factory, RESOURCE_ZYNTHIUM_BAR);
+                    AddCommodityIngredients(resourceTypesNeeded, factory, RESOURCE_UTRIUM_BAR);
                     break;
+                case(Util.IsProductionChain(factory, RESOURCE_CELL, RESOURCE_PHLEGM, RESOURCE_BIOMASS)): // Biological chain
+                    AddCommodityIngredients(resourceTypesNeeded, factory, RESOURCE_LEMERGIUM_BAR);
+                    AddCommodityIngredients(resourceTypesNeeded, factory, RESOURCE_ZYNTHIUM_BAR);
+                    break;
+                case(Util.IsProductionChain(factory, RESOURCE_WIRE, RESOURCE_SWITCH, RESOURCE_SILICON)): // Electronical chain
+                    AddCommodityIngredients(resourceTypesNeeded, factory, RESOURCE_UTRIUM_BAR);
+                    AddCommodityIngredients(resourceTypesNeeded, factory, RESOURCE_ZYNTHIUM_BAR);
+                    AddCommodityIngredients(resourceTypesNeeded, factory, RESOURCE_LEMERGIUM_BAR);
+                    AddCommodityIngredients(resourceTypesNeeded, factory, RESOURCE_KEANIUM_BAR);
+                    break;
+                case(Util.IsProductionChain(factory, RESOURCE_CONDENSATE, RESOURCE_CONCENTRATE, RESOURCE_MIST)): // Mystical chain
+                    AddCommodityIngredients(resourceTypesNeeded, factory, RESOURCE_KEANIUM_BAR);
+                    AddCommodityIngredients(resourceTypesNeeded, factory, RESOURCE_LEMERGIUM_BAR);
+                    break;
+            }
+
+            switch (factory.level) { // factory level
                 case(1):
                     switch (true) {
                         case(Util.IsProductionChain(factory, RESOURCE_ALLOY, RESOURCE_TUBE, RESOURCE_METAL)): // Mechanical chain
-                            resourceTypesNeeded.push(RESOURCE_ALLOY);
-                            resourceTypesNeeded.push(RESOURCE_ZYNTHIUM_BAR);
-                            resourceTypesNeeded.push(RESOURCE_UTRIUM_BAR);
+                            AddCommodityIngredients(resourceTypesNeeded, factory, RESOURCE_TUBE);
                             break;
                         case(Util.IsProductionChain(factory, RESOURCE_CELL, RESOURCE_PHLEGM, RESOURCE_BIOMASS)): // Biological chain
-                            resourceTypesNeeded.push(RESOURCE_CELL);
-                            resourceTypesNeeded.push(RESOURCE_OXIDANT);
-                            resourceTypesNeeded.push(RESOURCE_LEMERGIUM_BAR);
+                            AddCommodityIngredients(resourceTypesNeeded, factory, RESOURCE_PHLEGM);
                             break;
                         case(Util.IsProductionChain(factory, RESOURCE_WIRE, RESOURCE_SWITCH, RESOURCE_SILICON)): // Electronical chain
-                            resourceTypesNeeded.push(RESOURCE_WIRE);
-                            resourceTypesNeeded.push(RESOURCE_OXIDANT);
-                            resourceTypesNeeded.push(RESOURCE_UTRIUM_BAR);
+                            AddCommodityIngredients(resourceTypesNeeded, factory, RESOURCE_SWITCH);
                             break;
                         case(Util.IsProductionChain(factory, RESOURCE_CONDENSATE, RESOURCE_CONCENTRATE, RESOURCE_MIST)): // Mystical chain
-                            resourceTypesNeeded.push(RESOURCE_CONDENSATE);
-                            resourceTypesNeeded.push(RESOURCE_KEANIUM_BAR);
-                            resourceTypesNeeded.push(RESOURCE_REDUCTANT);
+                            AddCommodityIngredients(resourceTypesNeeded, factory, RESOURCE_CONCENTRATE);
                             break;
                     }
                     break;
                 case(2):
                     switch (true) {
                         case(Util.IsProductionChain(factory, RESOURCE_ALLOY, RESOURCE_FIXTURES, RESOURCE_METAL)): // Mechanical chain
-                            resourceTypesNeeded.push(RESOURCE_COMPOSITE);
-                            resourceTypesNeeded.push(RESOURCE_ALLOY);
-                            resourceTypesNeeded.push(RESOURCE_OXIDANT);
+                            AddCommodityIngredients(resourceTypesNeeded, factory, RESOURCE_FIXTURES);
                             break;
                         case(Util.IsProductionChain(factory, RESOURCE_PHLEGM, RESOURCE_TISSUE, RESOURCE_BIOMASS)): // Biological chain
-                            resourceTypesNeeded.push(RESOURCE_PHLEGM);
-                            resourceTypesNeeded.push(RESOURCE_CELL);
-                            resourceTypesNeeded.push(RESOURCE_REDUCTANT);
+                            AddCommodityIngredients(resourceTypesNeeded, factory, RESOURCE_TISSUE);
                             break;
                         case(Util.IsProductionChain(factory, RESOURCE_SWITCH, RESOURCE_TRANSISTOR, RESOURCE_SILICON)): // Electronical chain
-                            resourceTypesNeeded.push(RESOURCE_SWITCH);
-                            resourceTypesNeeded.push(RESOURCE_WIRE);
-                            resourceTypesNeeded.push(RESOURCE_REDUCTANT);
+                            AddCommodityIngredients(resourceTypesNeeded, factory, RESOURCE_TRANSISTOR);
                             break;
                         case(Util.IsProductionChain(factory, RESOURCE_CONCENTRATE, RESOURCE_EXTRACT, RESOURCE_MIST)): // Mystical chain
-                            resourceTypesNeeded.push(RESOURCE_CONCENTRATE);
-                            resourceTypesNeeded.push(RESOURCE_CONDENSATE);
-                            resourceTypesNeeded.push(RESOURCE_OXIDANT);
+                            AddCommodityIngredients(resourceTypesNeeded, factory, RESOURCE_EXTRACT);
                             break;
                     }
                     break;
                 case(3):
                     switch (true) {
                         case(Util.IsProductionChain(factory, RESOURCE_FIXTURES, RESOURCE_FRAME, RESOURCE_METAL)): // Mechanical chain
-                            resourceTypesNeeded.push(RESOURCE_FIXTURES);
-                            resourceTypesNeeded.push(RESOURCE_TUBE);
-                            resourceTypesNeeded.push(RESOURCE_REDUCTANT);
-                            resourceTypesNeeded.push(RESOURCE_ZYNTHIUM_BAR);
+                            AddCommodityIngredients(resourceTypesNeeded, factory, RESOURCE_FRAME);
                             break;
                         case(Util.IsProductionChain(factory, RESOURCE_TISSUE, RESOURCE_MUSCLE, RESOURCE_BIOMASS)): // Biological chain
-                            resourceTypesNeeded.push(RESOURCE_TISSUE);
-                            resourceTypesNeeded.push(RESOURCE_PHLEGM);
-                            resourceTypesNeeded.push(RESOURCE_ZYNTHIUM_BAR);
-                            resourceTypesNeeded.push(RESOURCE_REDUCTANT);
+                            AddCommodityIngredients(resourceTypesNeeded, factory, RESOURCE_MUSCLE);
                             break;
                         case(Util.IsProductionChain(factory, RESOURCE_TRANSISTOR, RESOURCE_MICROCHIP, RESOURCE_SILICON)): // Electronical chain
-                            resourceTypesNeeded.push(RESOURCE_TRANSISTOR);
-                            resourceTypesNeeded.push(RESOURCE_COMPOSITE); // not added in lower factory yet!
-                            resourceTypesNeeded.push(RESOURCE_WIRE);
-                            resourceTypesNeeded.push(RESOURCE_PURIFIER); // not added in lower factory yet!
+                            AddCommodityIngredients(resourceTypesNeeded, factory, RESOURCE_MICROCHIP);
                             break;
                         case(Util.IsProductionChain(factory, RESOURCE_EXTRACT, RESOURCE_SPIRIT, RESOURCE_MIST)): // Mystical chain
-                            resourceTypesNeeded.push(RESOURCE_EXTRACT);
-                            resourceTypesNeeded.push(RESOURCE_CONCENTRATE);
-                            resourceTypesNeeded.push(RESOURCE_REDUCTANT);
-                            resourceTypesNeeded.push(RESOURCE_PURIFIER); // not added in lower factory yet!
+                            AddCommodityIngredients(resourceTypesNeeded, factory, RESOURCE_SPIRIT);
                             break;
                     }
                     break;
                 case(4):
                     switch (true) {
                         case(Util.IsProductionChain(factory, RESOURCE_FIXTURES, RESOURCE_HYDRAULICS, RESOURCE_METAL)): // Mechanical chain
-                            resourceTypesNeeded.push(RESOURCE_LIQUID); // not added in lower factory yet!
-                            resourceTypesNeeded.push(RESOURCE_FIXTURES);
-                            resourceTypesNeeded.push(RESOURCE_TUBE);
-                            resourceTypesNeeded.push(RESOURCE_PURIFIER); // not added in lower factory yet!
+                            AddCommodityIngredients(resourceTypesNeeded, factory, RESOURCE_HYDRAULICS);
                             break;
                         case(Util.IsProductionChain(factory, RESOURCE_MUSCLE, RESOURCE_ORGANOID, RESOURCE_BIOMASS)): // Biological chain
-                            resourceTypesNeeded.push(RESOURCE_MUSCLE);
-                            resourceTypesNeeded.push(RESOURCE_TISSUE);
-                            resourceTypesNeeded.push(RESOURCE_PURIFIER); // not added in lower factory yet!
-                            resourceTypesNeeded.push(RESOURCE_OXIDANT);
+                            AddCommodityIngredients(resourceTypesNeeded, factory, RESOURCE_ORGANOID);
                             break;
                         case(Util.IsProductionChain(factory, RESOURCE_MICROCHIP, RESOURCE_CIRCUIT, RESOURCE_SILICON)): // Electronical chain
-                            resourceTypesNeeded.push(RESOURCE_MICROCHIP);
-                            resourceTypesNeeded.push(RESOURCE_TRANSISTOR);
-                            resourceTypesNeeded.push(RESOURCE_SWITCH);
-                            resourceTypesNeeded.push(RESOURCE_OXIDANT);
+                            AddCommodityIngredients(resourceTypesNeeded, factory, RESOURCE_CIRCUIT);
                             break;
                         case(Util.IsProductionChain(factory, RESOURCE_SPIRIT, RESOURCE_EMANATION, RESOURCE_MIST)): // Mystical chain
-                            resourceTypesNeeded.push(RESOURCE_SPIRIT);
-                            resourceTypesNeeded.push(RESOURCE_EXTRACT);
-                            resourceTypesNeeded.push(RESOURCE_CONCENTRATE);
-                            resourceTypesNeeded.push(RESOURCE_KEANIUM_BAR);
+                            AddCommodityIngredients(resourceTypesNeeded, factory, RESOURCE_EMANATION);
                             break;
                     }
                     break;
                 case(5):
                     switch (true) {
                         case(Util.IsProductionChain(factory, RESOURCE_HYDRAULICS, RESOURCE_MACHINE, RESOURCE_METAL)): // Mechanical chain
-                            resourceTypesNeeded.push(RESOURCE_HYDRAULICS);
-                            resourceTypesNeeded.push(RESOURCE_FRAME);
-                            resourceTypesNeeded.push(RESOURCE_FIXTURES);
-                            resourceTypesNeeded.push(RESOURCE_TUBE);
+                            AddCommodityIngredients(resourceTypesNeeded, factory, RESOURCE_MACHINE);
                             break;
                         case(Util.IsProductionChain(factory, RESOURCE_ORGANOID, RESOURCE_ORGANISM, RESOURCE_BIOMASS)): // Biological chain
-                            resourceTypesNeeded.push(RESOURCE_ORGANOID);
-                            resourceTypesNeeded.push(RESOURCE_LIQUID); // not added in lower factory yet!
-                            resourceTypesNeeded.push(RESOURCE_TISSUE);
-                            resourceTypesNeeded.push(RESOURCE_CELL);
+                            AddCommodityIngredients(resourceTypesNeeded, factory, RESOURCE_ORGANISM);
                             break;
                         case(Util.IsProductionChain(factory, RESOURCE_CIRCUIT, RESOURCE_DEVICE, RESOURCE_SILICON)): // Electronical chain
-                            resourceTypesNeeded.push(RESOURCE_CIRCUIT);
-                            resourceTypesNeeded.push(RESOURCE_MICROCHIP);
-                            resourceTypesNeeded.push(RESOURCE_CRYSTAL); // not added in lower factory yet!
-                            resourceTypesNeeded.push(RESOURCE_GHODIUM_MELT); // not added in lower factory yet!
+                            AddCommodityIngredients(resourceTypesNeeded, factory, RESOURCE_DEVICE);
                             break;
                         case(Util.IsProductionChain(factory, RESOURCE_EMANATION, RESOURCE_ESSENCE, RESOURCE_MIST)): // Mystical chain
-                            resourceTypesNeeded.push(RESOURCE_EMANATION);
-                            resourceTypesNeeded.push(RESOURCE_SPIRIT);
-                            resourceTypesNeeded.push(RESOURCE_CRYSTAL); // not added in lower factory yet!
-                            resourceTypesNeeded.push(RESOURCE_GHODIUM_MELT); // not added in lower factory yet!
+                            AddCommodityIngredients(resourceTypesNeeded, factory, RESOURCE_ESSENCE);
                             break;
                     }
                     break;
             }
             return resourceTypesNeeded;
+        }
+
+        function AddCommodityIngredients(resourceTypesNeeded, factory, resToProduce) {
+            const commodity = COMMODITIES[resToProduce];
+            for (const component in commodity.components) {
+                if (component !== RESOURCE_ENERGY && (factory.store.getUsedCapacity(component) >= Util.FACTORY_TARGET_RESOURCE || !factory.store.getUsedCapacity(component))) {
+                    resourceTypesNeeded.push(component);
+                }
+            }
         }
 
         /**@return {number}*/
@@ -465,7 +422,7 @@ const Terminals = {
 
                 // sell this resource
 
-                    //return 0;
+                //return 0;
 
                 default :
                     return Util.TERMINAL_MAX_RESOURCE;
@@ -496,6 +453,7 @@ const Terminals = {
                     terminal.used = true;
                     terminal.store[resourceType] = terminal.store[resourceType] + amount;
                     marketDealCount++; // when buying on the market one can only buy once per terminal
+                    VisualTransaction(resourceType, terminal.pos, new RoomPosition(25, 25, order.roomName), 'dashed');
                     return true;
                 }
             }
@@ -526,6 +484,7 @@ const Terminals = {
                     terminal.used = true;
                     terminal.store[resourceType] = terminal.store[resourceType] - amount;
                     marketDealCount++; // when selling on the market one can only sell once per terminal
+                    VisualTransaction(resourceType, new RoomPosition(25, 25, order.roomName), terminal.pos, 'dotted');
                     return true;
                 }
             }
@@ -544,7 +503,7 @@ const Terminals = {
                     fromTerminal.used = true;
                     fromTerminal.store[resourceType] = fromTerminal.store[resourceType] - amount;
                     toTerminal.store[resourceType] = toTerminal.store[resourceType] + amount;
-                    Game.map.visual.line(toTerminal.pos, fromTerminal.pos, {width: 2, color: (resourceType === RESOURCE_ENERGY ? '#ffff00' : resourceType === RESOURCE_POWER ? '#ff0000' : '#ffffff'), opacity: 1});
+                    VisualTransaction(resourceType, toTerminal.pos, fromTerminal.pos);
                     return true;
                 }
             }
@@ -575,6 +534,19 @@ const Terminals = {
                 return 1;
             }
             return 0;
+        }
+
+        function VisualTransaction(resourceType, toPos, fromPos, linestyle = undefined) {
+            const color = Util.GetColorCodeFromResource(resourceType);
+            Game.map.visual.line(toPos, fromPos, {width: 2, color: color, opacity: 1, linestyle: linestyle});
+            Game.map.visual.circle(toPos, {radius: 6, fill: color, opacity: 1, stroke: color, strokeWidth: 2});
+            Game.map.visual.circle(fromPos, {
+                radius: 6,
+                fill: 'transparent',
+                opacity: 1,
+                stroke: color,
+                strokeWidth: 2
+            });
         }
 
         //endregion

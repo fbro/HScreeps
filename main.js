@@ -191,15 +191,7 @@ module.exports.loop = function () {
                     }
                 }
                 if (mineral) {
-                    const color =
-                        mineral === RESOURCE_HYDROGEN ? '#ffffff' :
-                            mineral === RESOURCE_OXYGEN ? '#ffffff' :
-                                mineral === RESOURCE_UTRIUM ? '#00ffff' :
-                                    mineral === RESOURCE_LEMERGIUM ? '#00ff00' :
-                                        mineral === RESOURCE_KEANIUM ? '#8000ff' :
-                                            mineral === RESOURCE_ZYNTHIUM ? '#ffff00' :
-                                                mineral === RESOURCE_CATALYST ? '#ff0000' :
-                                                    '#000000';
+                    const color = Util.GetColorCodeFromResource(mineral);
                     Game.map.visual.text(mineral, new RoomPosition(46, 5, memRoomKey), {
                         color: color,
                         fontSize: 7,
