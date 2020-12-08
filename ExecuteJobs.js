@@ -444,6 +444,9 @@ const ExecuteJobs = {
                     case jobKey.startsWith('DefRsv'):
                         result = JobDefendReserved(creep, roomJob);
                         break;
+                    case jobKey.startsWith('Dig'):
+                        result = JobDig(creep, roomJob); // TODO dig job
+                        break;
                     default:
                         Util.ErrorLog('ExecuteJobs', 'JobAction', 'flag type job not found ' + jobKey + ' ' + creep.name);
                 }
@@ -2185,6 +2188,11 @@ const ExecuteJobs = {
                 },
             });
             return result;
+        }
+
+        /**@return {int}*/
+        function JobDig(creep, roomJob){
+            // TODO dig job
         }
 
         //endregion

@@ -85,6 +85,12 @@ const CreateJobs = {
                     } else {
                         notFound = true;
                     }
+                } else if (color === COLOR_BROWN) { // special creep actions
+                    if (secColor === COLOR_YELLOW) { // dig
+                        jobs = CreateFlagJob(jobs, 'Dig', gameFlagKey, gameFlag, 'B');
+                    } else {
+                        notFound = true;
+                    }
                 } else {
                     notFound = true;
                 }
