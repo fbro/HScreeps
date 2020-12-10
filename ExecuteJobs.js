@@ -2199,6 +2199,7 @@ const ExecuteJobs = {
 
         //region helper functions
 
+        /**@return {string}*/
         function FindAndRemoveMaxCreeps(jobRoomName, creepName) {
             const creepType = creepName.substring(0, 1);
             if (Memory.MemRooms[jobRoomName]

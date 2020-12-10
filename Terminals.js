@@ -53,6 +53,8 @@ const Terminals = {
                                 if (didBuy) {
                                     break; // when buying on the market one can only buy once per terminal
                                 }
+                            }else if(didSend){
+                                Util.Info('Terminals', 'GetFactoryResources', 'didSend ' + didSend + ' resourceTypeNeeded ' + resourceTypeNeeded + ' amountNeeded ' + amountNeeded + ' toTerminal ' + toTerminal + ' GetNeededFactoryLeftoverResource ' + GetNeededFactoryLeftoverResource(resourceTypeNeeded));
                             }
                         }
                     }
@@ -341,20 +343,21 @@ const Terminals = {
                 case RESOURCE_EXTRACT     : // factory lvl 2
                 case RESOURCE_SPIRIT      : // factory lvl 3
                 case RESOURCE_EMANATION   : // factory lvl 4
+                    return 0;
 
                 // Common higher commodities
-                case RESOURCE_COMPOSITE   : // factory lvl 1
-                case RESOURCE_CRYSTAL     : // factory lvl 2
-                case RESOURCE_LIQUID      : // factory lvl 3
+                //case RESOURCE_COMPOSITE   : // factory lvl 1
+                //case RESOURCE_CRYSTAL     : // factory lvl 2
+                //case RESOURCE_LIQUID      : // factory lvl 3
 
                 // Compressed commodities
-                case RESOURCE_ZYNTHIUM_BAR  : // factory lvl 0
-                case RESOURCE_LEMERGIUM_BAR : // factory lvl 0
-                case RESOURCE_UTRIUM_BAR    : // factory lvl 0
-                case RESOURCE_KEANIUM_BAR   : // factory lvl 0
-                case RESOURCE_REDUCTANT     : // factory lvl 0
-                case RESOURCE_OXIDANT       : // factory lvl 0
-                    return 0;
+                //case RESOURCE_ZYNTHIUM_BAR  : // factory lvl 0
+                //case RESOURCE_LEMERGIUM_BAR : // factory lvl 0
+                //case RESOURCE_UTRIUM_BAR    : // factory lvl 0
+                //case RESOURCE_KEANIUM_BAR   : // factory lvl 0
+                //case RESOURCE_REDUCTANT     : // factory lvl 0
+                //case RESOURCE_OXIDANT       : // factory lvl 0
+
                 default :
                     return Util.TERMINAL_TARGET_RESOURCE;
             }

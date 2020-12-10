@@ -307,13 +307,13 @@ const Util = {
     },
 
     /**@return {boolean}*/
-    ShouldRepairFortification: function (fortification, calculatedHits, isRepairing = false) {
+    ShouldRepairFortification: function (fortification, calculatedHits = undefined, isRepairing = false, isTower = false) {
         if (!fortification || !fortification.room) {
             return false;
         }
         const hits = calculatedHits ? calculatedHits : fortification.hits;
         const roomLevel = fortification.room.controller.level;
-        const repairMod = isRepairing ? 2 : 1;
+        const repairMod = isRepairing ? 2 : isTower ? 0.01 : 1;
         return (fortification.structureType === STRUCTURE_RAMPART || fortification.structureType === STRUCTURE_WALL) &&
             (
                 // rich with energy

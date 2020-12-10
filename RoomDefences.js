@@ -63,17 +63,16 @@ const RoomDefences = {
                         && structure.structureType !== STRUCTURE_WALL
                         && structure.structureType !== STRUCTURE_RAMPART)
                         ||
-                        ((structure.structureType === STRUCTURE_RAMPART
-                            || structure.structureType === STRUCTURE_WALL)
-                            && structure.hits < 500);
+                        Util.ShouldRepairFortification(structure, undefined, false, true);
                 }
             });
 
             if (damagedStructures.length > 0) {
                 for (let i = 0; i < towers.length; i++) {
-                    if (towers[i].store.getUsedCapacity(RESOURCE_ENERGY) > 700) {
-                        const val = ((i + 1) % damagedStructures.length);
-                        towers[i].repair(damagedStructures[val]);
+                    const tower = towers[i];
+                    if (tower.store.getUsedCapacity(RESOURCE_ENERGY) > 700) {
+                        const closestDamagedStructure = tower.pos.findClosestByRange(damagedStructures);
+                        tower.repair(closestDamagedStructure);
                     }
                 }
                 return true;
@@ -91,7 +90,9 @@ const RoomDefences = {
             if (hostileTargets.length > 0) {
                 ActivateDefensiveMeasures(gameRoom, hostileTargets, towers);
                 for (let i = 0; i < towers.length; i++) {
-                    towers[i].attack(hostileTargets[((i + 1) % hostileTargets.length)]);
+                    const tower = towers[i];
+                    const closestHostileTarget = tower.pos.findClosestByRange(hostileTargets);
+                    tower.attack(closestHostileTarget);
                 }
                 return true;
             }
@@ -173,7 +174,9 @@ const RoomDefences = {
             }
             if (damagedCreeps.length > 0) {
                 for (let i = 0; i < towers.length; i++) {
-                    towers[i].heal(damagedCreeps[((i + 1) % damagedCreeps.length)]);
+                    const tower = towers[i];
+                    const closestDamagedCreep = tower.pos.findClosestByRange(damagedCreeps);
+                    tower.heal(closestDamagedCreep);
                 }
                 return true;
             }
