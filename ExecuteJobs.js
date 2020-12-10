@@ -2193,6 +2193,89 @@ const ExecuteJobs = {
         /**@return {int}*/
         function JobDig(creep, roomJob){
             // TODO dig job
+            const result = GenericFlagAction(creep, roomJob, {
+                /**@return {int}*/
+                JobStatus: function (jobObject) {
+                    if (!creep.store.getUsedCapacity() && creep.ticksToLive < 400) {
+                        creep.suicide();
+                        return JOB_IS_DONE;
+                    } else if (!jobObject.room) {
+                        return SHOULD_FETCH;
+                    } else {
+                        return SHOULD_ACT;
+                    }
+                },
+                /**@return {int}*/
+                Act: function (jobObject) {
+                    if(!jobObject.memory.DigPath){
+                        const scoreCollector = jobObject.room.find(FIND_SCORE_COLLECTORS)[0];
+                        let path = PathFinder.search(
+                            creep.pos, {pos: scoreCollector.pos, range: 0},
+                            {
+                                plainCost: 1,
+                                swampCost: 2,
+                                roomCallback: function(roomName) {
+                                    let room = Game.rooms[roomName];
+                                    let costs = new PathFinder.CostMatrix;
+                                    room.find(FIND_STRUCTURES).forEach(function(struct) {
+                                        if (struct.structureType === STRUCTURE_WALL) {
+                                            costs.set(struct.pos.x, struct.pos.y, struct.hits);
+                                        }
+                                    });
+                                    return costs;
+                                },
+                            }
+                        );
+                        const digPath = [];
+                        path.path.forEach(function(pos) {
+                            const structures = pos.lookFor(LOOK_STRUCTURES);
+                            if (structures.length && structures[0].structureType === STRUCTURE_WALL) {
+                                digPath.push({wallId: structures[0].id, pos: pos});
+                            }
+                        });
+                        jobObject.memory.DigPath = digPath;
+                    }
+                    // TODO!
+                    let deposit;
+                    if (creep.memory.DepositId) {
+                        deposit = Game.getObjectById(creep.memory.DepositId);
+                    }
+                    if (!deposit) {
+                        deposit = jobObject.pos.lookFor(LOOK_DEPOSITS)[0];
+                        if (deposit) {
+                            creep.memory.DepositId = deposit.id;
+                        } else {
+                            Util.ErrorLog('ExecuteJobs', 'JobHarvestDeposit', creep.name + ' no deposit found removed deposit flag in ' + jobObject.pos.roomName);
+                            jobObject.remove();
+                        }
+                    }
+                    if (deposit && deposit.cooldown === 0) {
+                        return creep.harvest(deposit)
+                    } else if (deposit && deposit.lastCooldown >= Util.DEPOSIT_MAX_LAST_COOLDOWN) {
+                        Util.InfoLog('ExecuteJobs', 'JobHarvestDeposit', creep.name + ' removed deposit in ' + jobObject.pos.roomName + ' lastCooldown ' + deposit.lastCooldown);
+                        jobObject.remove();
+                        return JOB_IS_DONE;
+                    } else if (deposit && deposit.cooldown > 0) {
+                        return ERR_BUSY;
+                    } else {
+                        return JOB_IS_DONE;
+                    }
+                },
+                /**@return {int}*/
+                IsJobDone: function (jobObject) {
+                    return this.JobStatus(jobObject);
+                },
+                /**@return {object}
+                 * @return {undefined}*/
+                FindFetchObject: function (jobObject) {
+                    return jobObject;
+                },
+                /**@return {int}*/
+                Fetch: function (fetchObject, jobObject) {
+                    return ERR_NOT_IN_RANGE;
+                },
+            });
+            return result;
         }
 
         //endregion
