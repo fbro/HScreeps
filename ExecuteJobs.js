@@ -2192,7 +2192,7 @@ const ExecuteJobs = {
 
         /**@return {int}*/
         function JobDig(creep, roomJob){
-            // TODO dig job
+            // TODO dig job - test it
             const result = GenericFlagAction(creep, roomJob, {
                 /**@return {int}*/
                 JobStatus: function (jobObject) {
@@ -2207,7 +2207,8 @@ const ExecuteJobs = {
                 },
                 /**@return {int}*/
                 Act: function (jobObject) {
-                    if(!jobObject.memory.DigPath){
+                    const walls = [];
+                    if(!jobObject.memory.WallIds){
                         const scoreCollector = jobObject.room.find(FIND_SCORE_COLLECTORS)[0];
                         let path = PathFinder.search(
                             creep.pos, {pos: scoreCollector.pos, range: 0},
@@ -2226,40 +2227,27 @@ const ExecuteJobs = {
                                 },
                             }
                         );
-                        const digPath = [];
+                        const wallIds = [];
                         path.path.forEach(function(pos) {
                             const structures = pos.lookFor(LOOK_STRUCTURES);
                             if (structures.length && structures[0].structureType === STRUCTURE_WALL) {
-                                digPath.push({wallId: structures[0].id, pos: pos});
+                                wallIds.push(structures[0].id);
+                                walls.push(structures[0]);
                             }
                         });
-                        jobObject.memory.DigPath = digPath;
-                    }
-                    // TODO!
-                    let deposit;
-                    if (creep.memory.DepositId) {
-                        deposit = Game.getObjectById(creep.memory.DepositId);
-                    }
-                    if (!deposit) {
-                        deposit = jobObject.pos.lookFor(LOOK_DEPOSITS)[0];
-                        if (deposit) {
-                            creep.memory.DepositId = deposit.id;
-                        } else {
-                            Util.ErrorLog('ExecuteJobs', 'JobHarvestDeposit', creep.name + ' no deposit found removed deposit flag in ' + jobObject.pos.roomName);
-                            jobObject.remove();
+                        jobObject.memory.WallIds = wallIds;
+                    }else{
+                        Util.Info('ExecuteJobs', 'JobDig', creep.name + ' load walls from ids ' + jobObject.memory.WallIds);
+                        for(const key in jobObject.memory.WallIds){
+                            const wall = Game.getObjectById(jobObject.memory.WallIds[key]);
+                            if(wall){
+                                walls.push(wall);
+                            }
                         }
                     }
-                    if (deposit && deposit.cooldown === 0) {
-                        return creep.harvest(deposit)
-                    } else if (deposit && deposit.lastCooldown >= Util.DEPOSIT_MAX_LAST_COOLDOWN) {
-                        Util.InfoLog('ExecuteJobs', 'JobHarvestDeposit', creep.name + ' removed deposit in ' + jobObject.pos.roomName + ' lastCooldown ' + deposit.lastCooldown);
-                        jobObject.remove();
-                        return JOB_IS_DONE;
-                    } else if (deposit && deposit.cooldown > 0) {
-                        return ERR_BUSY;
-                    } else {
-                        return JOB_IS_DONE;
-                    }
+                    const wall = walls.pop(); // TODO should be the last wall added - the outermost wall...
+                    Util.Info('ExecuteJobs', 'JobDig', creep.name + ' dismantling wall ' + wall);
+                    return creep.dismantle(wall);
                 },
                 /**@return {int}*/
                 IsJobDone: function (jobObject) {
