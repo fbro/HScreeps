@@ -2199,38 +2199,55 @@ const ExecuteJobs = {
                         creep.suicide();
                         return JOB_IS_DONE;
                     } else if (!jobObject.room) {
-                        return SHOULD_FETCH;
-                    } else {
                         return SHOULD_ACT;
+                    } else {
+                        return SHOULD_FETCH;
                     }
                 },
                 /**@return {int}*/
                 Act: function (jobObject) {
+                    return ERR_NOT_IN_RANGE;
+                },
+                /**@return {int}*/
+                IsJobDone: function (jobObject) {
+                    return this.JobStatus(jobObject);
+                },
+                /**@return {object}
+                 * @return {undefined}*/
+                FindFetchObject: function (jobObject) {
                     const walls = [];
                     if (!jobObject.memory.WallIds) {
                         const scoreCollector = jobObject.room.find(FIND_SCORE_COLLECTORS)[0];
                         let path = PathFinder.search(
-                            creep.pos, {pos: scoreCollector.pos, range: 0},
+                            scoreCollector.pos, {pos: creep.pos, range: 0},
                             {
                                 roomCallback: function (roomName) {
                                     let room = Game.rooms[roomName];
+                                    if (!room || roomName !== jobObject.pos.roomName) {
+                                        Util.Warning('ExecuteJobs', 'JobDig', creep.name + ' room not found ' + room);
+                                        return;
+                                    }
                                     let costs = new PathFinder.CostMatrix;
                                     room.find(FIND_STRUCTURES).forEach(function (struct) {
                                         if (struct.structureType === STRUCTURE_WALL) {
-                                            costs.set(struct.pos.x, struct.pos.y, struct.hits);
+                                            //Util.Info('ExecuteJobs', 'JobDig', 'costs.set ' + struct.pos.x + ',' + struct.pos.y + ',' + struct.hits / 1000000);
+                                            costs.set(struct.pos.x, struct.pos.y, struct.hits / 1000000);
                                         }
                                     });
                                     return costs;
                                 },
+                                maxRooms: 1,
                             }
                         );
                         const wallIds = [];
+                        Util.InfoLog('ExecuteJobs', 'JobDig', creep.pos.roomName + ' ' + creep.name + ' path generated ' + JSON.stringify(path));
                         path.path.forEach(function (pos) {
                             const structures = pos.lookFor(LOOK_STRUCTURES);
                             if (structures.length && structures[0].structureType === STRUCTURE_WALL) {
+                                Util.Info('ExecuteJobs', 'JobDig', creep.pos.roomName + ' ' + creep.name + ' structures ' + JSON.stringify(structures));
                                 wallIds.push(structures[0].id);
                                 walls.push(structures[0]);
-                                jobObject.room.text("🧱", structures[0].pos);
+                                jobObject.room.visual.text("🧱", structures[0].pos);
                             }
                         });
                         jobObject.memory.WallIds = wallIds;
@@ -2240,27 +2257,29 @@ const ExecuteJobs = {
                         for (const key in jobObject.memory.WallIds) {
                             const wall = Game.getObjectById(jobObject.memory.WallIds[key]);
                             if (wall) {
-                                wall.room.text("🧱", wall.pos);
+                                wall.room.visual.text("🧱", wall.pos);
                                 walls.push(wall);
                             }
                         }
                     }
-                    const wall = walls.pop();
-                    Util.Info('ExecuteJobs', 'JobDig', creep.name + ' dismantling wall ' + wall);
-                    return creep.dismantle(wall);
-                },
-                /**@return {int}*/
-                IsJobDone: function (jobObject) {
-                    return this.JobStatus(jobObject);
-                },
-                /**@return {object}
-                 * @return {undefined}*/
-                FindFetchObject: function (jobObject) {
-                    return jobObject;
+                    if(!walls.length){
+                        Util.InfoLog('ExecuteJobs', 'JobDig', creep.pos.roomName + ' ' + creep.name + ' no walls found ' + JSON.stringify(walls));
+                        return;
+                    }
+                    return walls.pop();
                 },
                 /**@return {int}*/
                 Fetch: function (fetchObject, jobObject) {
-                    return ERR_NOT_IN_RANGE;
+                    if (!fetchObject) {
+                        Util.Warning('ExecuteJobs', 'JobDig', creep.name + ' wall not found ' + JSON.stringify(fetchObject));
+                        delete jobObject.memory.WallIds;
+                        return OK;
+                    }
+                    let result = creep.dismantle(fetchObject);
+                    if(result === OK){
+                        result = ERR_BUSY;
+                    }
+                    return result;
                 },
             });
             return result;

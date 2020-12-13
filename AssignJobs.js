@@ -146,7 +146,7 @@ const AssignJobs = {
                         maxLinearDistance = Number.MAX_SAFE_INTEGER;
                     }
                 } else {
-                    Util.Info('AssignJobs', 'SpawnCreep', 'job in room, invisible room ' + roomJobKey);
+                    //Util.Info('AssignJobs', 'SpawnCreep', 'job in room, invisible room ' + roomJobKey);
                     maxLinearDistance = Number.MAX_SAFE_INTEGER;
                 }
                 const bestAvailableSpawn = FindBestSpawn(availableSpawnsInRoom, maxLinearDistance, roomJob, memRoomKey);
