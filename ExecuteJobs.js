@@ -2230,6 +2230,7 @@ const ExecuteJobs = {
                             if (structures.length && structures[0].structureType === STRUCTURE_WALL) {
                                 wallIds.push(structures[0].id);
                                 walls.push(structures[0]);
+                                jobObject.room.text("🧱", structures[0].pos);
                             }
                         });
                         jobObject.memory.WallIds = wallIds;
@@ -2239,6 +2240,7 @@ const ExecuteJobs = {
                         for (const key in jobObject.memory.WallIds) {
                             const wall = Game.getObjectById(jobObject.memory.WallIds[key]);
                             if (wall) {
+                                wall.room.text("🧱", wall.pos);
                                 walls.push(wall);
                             }
                         }
