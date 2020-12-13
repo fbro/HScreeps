@@ -2191,7 +2191,7 @@ const ExecuteJobs = {
         }
 
         /**@return {int}*/
-        function JobDig(creep, roomJob){
+        function JobDig(creep, roomJob) {
             // TODO dig job - test it
             const result = GenericFlagAction(creep, roomJob, {
                 /**@return {int}*/
@@ -2208,17 +2208,17 @@ const ExecuteJobs = {
                 /**@return {int}*/
                 Act: function (jobObject) {
                     const walls = [];
-                    if(!jobObject.memory.WallIds){
+                    if (!jobObject.memory.WallIds) {
                         const scoreCollector = jobObject.room.find(FIND_SCORE_COLLECTORS)[0];
                         let path = PathFinder.search(
                             creep.pos, {pos: scoreCollector.pos, range: 0},
                             {
                                 plainCost: 1,
                                 swampCost: 2,
-                                roomCallback: function(roomName) {
+                                roomCallback: function (roomName) {
                                     let room = Game.rooms[roomName];
                                     let costs = new PathFinder.CostMatrix;
-                                    room.find(FIND_STRUCTURES).forEach(function(struct) {
+                                    room.find(FIND_STRUCTURES).forEach(function (struct) {
                                         if (struct.structureType === STRUCTURE_WALL) {
                                             costs.set(struct.pos.x, struct.pos.y, struct.hits);
                                         }
@@ -2228,7 +2228,7 @@ const ExecuteJobs = {
                             }
                         );
                         const wallIds = [];
-                        path.path.forEach(function(pos) {
+                        path.path.forEach(function (pos) {
                             const structures = pos.lookFor(LOOK_STRUCTURES);
                             if (structures.length && structures[0].structureType === STRUCTURE_WALL) {
                                 wallIds.push(structures[0].id);
@@ -2236,11 +2236,12 @@ const ExecuteJobs = {
                             }
                         });
                         jobObject.memory.WallIds = wallIds;
-                    }else{
-                        Util.Info('ExecuteJobs', 'JobDig', creep.name + ' load walls from ids ' + jobObject.memory.WallIds);
-                        for(const key in jobObject.memory.WallIds){
+                        Util.InfoLog('ExecuteJobs', 'JobDig', creep.pos.roomName + ' ' + creep.name + ' found walls ' + JSON.stringify(walls));
+                    } else {
+                        Util.Info('ExecuteJobs', 'JobDig', creep.pos.roomName + ' ' + creep.name + ' load walls from ids ' + jobObject.memory.WallIds);
+                        for (const key in jobObject.memory.WallIds) {
                             const wall = Game.getObjectById(jobObject.memory.WallIds[key]);
-                            if(wall){
+                            if (wall) {
                                 walls.push(wall);
                             }
                         }
@@ -2857,8 +2858,8 @@ const ExecuteJobs = {
             if (creep.getActiveBodyparts(RANGED_ATTACK) > 0) {
                 creep.rangedAttack(closestHostileCreep);
             }
-            let goals = _.map(hostiles, function(h) {
-                return { pos: h.pos, range: 3 };
+            let goals = _.map(hostiles, function (h) {
+                return {pos: h.pos, range: 3};
             });
             const fleePath = PathFinder.search(creep.pos, goals, {flee: true});
             let pos = fleePath.path[0];
