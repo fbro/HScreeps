@@ -445,7 +445,7 @@ const ExecuteJobs = {
                         result = JobDefendReserved(creep, roomJob);
                         break;
                     case jobKey.startsWith('Dig'):
-                        result = JobDig(creep, roomJob); // TODO dig job
+                        result = JobDig(creep, roomJob);
                         break;
                     default:
                         Util.ErrorLog('ExecuteJobs', 'JobAction', 'flag type job not found ' + jobKey + ' ' + creep.name);
@@ -2192,7 +2192,6 @@ const ExecuteJobs = {
 
         /**@return {int}*/
         function JobDig(creep, roomJob) {
-            // TODO dig job - test it
             const result = GenericFlagAction(creep, roomJob, {
                 /**@return {int}*/
                 JobStatus: function (jobObject) {
@@ -2213,8 +2212,6 @@ const ExecuteJobs = {
                         let path = PathFinder.search(
                             creep.pos, {pos: scoreCollector.pos, range: 0},
                             {
-                                plainCost: 1,
-                                swampCost: 2,
                                 roomCallback: function (roomName) {
                                     let room = Game.rooms[roomName];
                                     let costs = new PathFinder.CostMatrix;
@@ -2246,7 +2243,7 @@ const ExecuteJobs = {
                             }
                         }
                     }
-                    const wall = walls.pop(); // TODO should be the last wall added - the outermost wall...
+                    const wall = walls.pop();
                     Util.Info('ExecuteJobs', 'JobDig', creep.name + ' dismantling wall ' + wall);
                     return creep.dismantle(wall);
                 },
