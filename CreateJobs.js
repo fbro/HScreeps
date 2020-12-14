@@ -87,7 +87,7 @@ const CreateJobs = {
                     }
                 } else if (color === COLOR_BROWN) { // special creep actions
                     if (secColor === COLOR_YELLOW) { // dig
-                        jobs = CreateFlagJob(jobs, 'Dig', gameFlagKey, gameFlag, 'B');
+                        jobs = DigJobs(jobs, gameFlagKey, gameFlag);
                     } else {
                         notFound = true;
                     }
@@ -329,6 +329,27 @@ const CreateJobs = {
                 }
             }
             jobs = CreateFlagJob(jobs, 'DefRsv', gameFlagKey, gameFlag, 'G');
+            return jobs;
+        }
+
+        function DigJobs(jobs, gameFlagKey, gameFlag) {
+            if (gameFlag.room) {
+                const hostileCreeps = gameFlag.room.find(FIND_HOSTILE_CREEPS);
+                if (hostileCreeps.length > 0) {
+                    Util.Info('CreateJobs', 'DigJobs', 'hostiles found ' + hostileCreeps + ' ' + gameFlag.pos.roomName);
+                    jobs = CreateFlagJob(jobs, 'DefRsv', gameFlagKey, gameFlag, 'G');
+                }
+                const droppedEnergy = gameFlag.room.find(FIND_DROPPED_RESOURCES, {
+                    filter: (drop) => {
+                        return drop.resourceType === RESOURCE_ENERGY && drop.amount >= 500;
+                    }
+                })[0];
+                if(droppedEnergy){
+                    Util.Info('CreateJobs', 'DigJobs', droppedEnergy.amount + ' dropped energy found ' + droppedEnergy.pos + ' ' + gameFlag.pos.roomName);
+                    jobs = CreateFlagJob(jobs, 'FetchDrop', gameFlagKey, gameFlag, 'T');
+                }
+            }
+            jobs = CreateFlagJob(jobs, 'Dig', gameFlagKey, gameFlag, 'B');
             return jobs;
         }
 

@@ -447,6 +447,9 @@ const ExecuteJobs = {
                     case jobKey.startsWith('Dig'):
                         result = JobDig(creep, roomJob);
                         break;
+                    case jobKey.startsWith('FetchDrop'):
+                        result = JobFetchDroppedResource(creep, roomJob);
+                        break;
                     default:
                         Util.ErrorLog('ExecuteJobs', 'JobAction', 'flag type job not found ' + jobKey + ' ' + creep.name);
                 }
@@ -2262,7 +2265,7 @@ const ExecuteJobs = {
                             }
                         }
                     }
-                    if(!walls.length){
+                    if (!walls.length) {
                         Util.InfoLog('ExecuteJobs', 'JobDig', creep.pos.roomName + ' ' + creep.name + ' no walls found ' + JSON.stringify(walls));
                         return;
                     }
@@ -2276,10 +2279,55 @@ const ExecuteJobs = {
                         return OK;
                     }
                     let result = creep.dismantle(fetchObject);
-                    if(result === OK){
+                    if (result === OK) {
                         result = ERR_BUSY;
                     }
                     return result;
+                },
+            });
+            return result;
+        }
+
+        /**@return {int}*/
+        function JobFetchDroppedResource(creep, roomJob) {
+            // get resource from a room until no more dropped resources are found in that room
+            let droppedResource;
+            let result = GenericFlagAction(creep, roomJob, {
+                /**@return {int}*/
+                JobStatus: function (jobObject) {
+                    if (creep.store.getUsedCapacity() > 0 && creep.pos.roomName !== jobObject.pos.roomName) {
+                        return SHOULD_FETCH;
+                    } else if (creep.store.getFreeCapacity() > 0) {
+                        if (jobObject.room) {
+                            droppedResource = jobObject.pos.findClosestByPath(FIND_DROPPED_RESOURCES);
+                            if (!droppedResource) {
+                                return JOB_IS_DONE; // nothing dropped anymore - job is done
+                            }
+                        }
+                        return SHOULD_ACT;
+                    } else {
+                        return SHOULD_FETCH;
+                    }
+                },
+                /**@return {int}*/
+                Act: function (jobObject) {
+                    if (!jobObject.room) {
+                        return ERR_NOT_IN_RANGE;
+                    }
+                    return creep.pickup(droppedResource);
+                },
+                /**@return {int}*/
+                IsJobDone: function (jobObject) {
+                    return this.JobStatus(jobObject);
+                },
+                /**@return {object}
+                 * @return {undefined}*/
+                FindFetchObject: function (jobObject) {
+                    return FindClosestFreeStore(creep);
+                },
+                /**@return {int}*/
+                Fetch: function (fetchObject, jobObject) {
+                    return DepositCreepStore(creep, fetchObject);
                 },
             });
             return result;
