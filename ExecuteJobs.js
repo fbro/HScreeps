@@ -2466,6 +2466,9 @@ const ExecuteJobs = {
          * @return {undefined}*/
         function FindClosestResourceInRoom(creep, room, resourceToFetch, jobObject) {
             let resourceSupply = undefined;
+            if(!room){
+                return;
+            }
             if (creep.memory.ResourceSupply) {
                 resourceSupply = Game.getObjectById(creep.memory.ResourceSupply);// closest link then container then droppedRes then storage
                 // if the saved resourceSupply does not have any energy then remove it to make way for a new search
