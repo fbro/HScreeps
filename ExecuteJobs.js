@@ -2289,7 +2289,7 @@ const ExecuteJobs = {
         }
 
         /**@return {int}*/
-        function JobFetchDroppedResource(creep, roomJob) { // TODO test!
+        function JobFetchDroppedResource(creep, roomJob) {
             // get resource from a room until no more dropped resources are found in that room
             let droppedResource = creep.memory.DroppedResId ? Game.getObjectById(creep.memory.DroppedResId) : undefined;
             let result = GenericFlagAction(creep, roomJob, {
@@ -2306,23 +2306,19 @@ const ExecuteJobs = {
                                 }
                             }
                             if (!droppedResource) {
-                                Util.InfoLog('ExecuteJobs', creep.name + ' JobFetchDroppedResource', 'drop gone');
                                 return JOB_IS_DONE; // nothing dropped anymore - job is done
                             }
                         }
                         return SHOULD_ACT;
                     } else {
-                        Util.Info('ExecuteJobs', 'JobFetchDroppedResource', creep.name + ' fetch');
                         return SHOULD_FETCH;
                     }
                 },
                 /**@return {int}*/
                 Act: function (jobObject) {
                     if (!jobObject.room || creep.pos.roomName !== jobObject.room.name) {
-                        Util.Info('ExecuteJobs', 'JobFetchDroppedResource', creep.name + ' moving to room');
                         return ERR_NOT_IN_RANGE;
                     }
-                    Util.InfoLog('ExecuteJobs', 'JobFetchDroppedResource', creep.name + ' picking up ' + JSON.stringify(droppedResource));
                     return creep.pickup(droppedResource);
                 },
                 /**@return {int}*/

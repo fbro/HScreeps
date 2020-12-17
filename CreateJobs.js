@@ -373,7 +373,7 @@ const CreateJobs = {
                 });
                 if (!existingTagFlag) {
                     const tag = 'Homebrewed code @ github.com/fbro/HScreeps ' + gameRoom.name;
-                    if (gameRoom.controller.sign && (gameRoom.controller.sign.text !== tag || !gameRoom.controller.sign) && gameRoom.controller.sign.text !== SIGN_PLANNED_AREA) {
+                    if (!gameRoom.controller.sign || gameRoom.controller.sign.text !== tag && gameRoom.controller.sign.text !== SIGN_PLANNED_AREA) {
                         const result = gameRoom.createFlag(gameRoom.controller.pos, tag, COLOR_ORANGE, COLOR_ORANGE);
                         Util.InfoLog('CreateJobs', 'TagControllerJobs', 'createFlag sign flag ' + gameRoom.controller.pos + ' ' + result);
                     }
