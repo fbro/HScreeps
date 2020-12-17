@@ -2179,7 +2179,7 @@ const ExecuteJobs = {
                 /**@return {int}*/
                 Fetch: function (fetchObject, jobObject) { // deposit the resource
                     if (fetchObject === jobObject) {
-                        if (creep.pos.getRangeTo(fetchObject) > 2) {
+                        if (creep.pos.getRangeTo(fetchObject) > 6) {
                             return ERR_NOT_IN_RANGE;
                         } else {
                             return OK;
@@ -2289,31 +2289,40 @@ const ExecuteJobs = {
         }
 
         /**@return {int}*/
-        function JobFetchDroppedResource(creep, roomJob) {
+        function JobFetchDroppedResource(creep, roomJob) { // TODO test!
             // get resource from a room until no more dropped resources are found in that room
-            let droppedResource;
+            let droppedResource = creep.memory.DroppedResId ? Game.getObjectById(creep.memory.DroppedResId) : undefined;
             let result = GenericFlagAction(creep, roomJob, {
                 /**@return {int}*/
                 JobStatus: function (jobObject) {
                     if (creep.store.getUsedCapacity() > 0 && creep.pos.roomName !== jobObject.pos.roomName) {
                         return SHOULD_FETCH;
                     } else if (creep.store.getFreeCapacity() > 0) {
-                        if (jobObject.room) {
-                            droppedResource = jobObject.pos.findClosestByPath(FIND_DROPPED_RESOURCES);
+                        if (jobObject.room && creep.pos.roomName === jobObject.room.name) {
                             if (!droppedResource) {
+                                droppedResource = creep.pos.findClosestByPath(FIND_DROPPED_RESOURCES);
+                                if (droppedResource) {
+                                    creep.memory.DroppedResId = droppedResource.id;
+                                }
+                            }
+                            if (!droppedResource) {
+                                Util.InfoLog('ExecuteJobs', creep.name + ' JobFetchDroppedResource', 'drop gone');
                                 return JOB_IS_DONE; // nothing dropped anymore - job is done
                             }
                         }
                         return SHOULD_ACT;
                     } else {
+                        Util.Info('ExecuteJobs', 'JobFetchDroppedResource', creep.name + ' fetch');
                         return SHOULD_FETCH;
                     }
                 },
                 /**@return {int}*/
                 Act: function (jobObject) {
-                    if (!jobObject.room) {
+                    if (!jobObject.room || creep.pos.roomName !== jobObject.room.name) {
+                        Util.Info('ExecuteJobs', 'JobFetchDroppedResource', creep.name + ' moving to room');
                         return ERR_NOT_IN_RANGE;
                     }
+                    Util.InfoLog('ExecuteJobs', 'JobFetchDroppedResource', creep.name + ' picking up ' + JSON.stringify(droppedResource));
                     return creep.pickup(droppedResource);
                 },
                 /**@return {int}*/
@@ -2371,7 +2380,16 @@ const ExecuteJobs = {
         /**@return {int}*/
         function GenericFlagAction(creep, roomJob, actionFunctions) {
             const flagObj = Game.flags[roomJob.JobId];
-            const nearbyHostileCreeps = creep.pos.findInRange(FIND_HOSTILE_CREEPS, 7);
+            const nearbyHostileCreeps = creep.pos.findInRange(FIND_HOSTILE_CREEPS, 7, {
+                filter: (hostile) => {
+                    Util.GetAllies().forEach(function (ally) {
+                        if (ally === hostile.owner.username) {
+                            return true;
+                        }
+                    });
+                    return false;
+                }
+            });
             if (nearbyHostileCreeps.length > 0) {
                 const hostileActionResult = CreepHostileAction(creep, nearbyHostileCreeps, roomJob);
                 if (hostileActionResult !== CREEP_IGNORED_HOSTILE) {

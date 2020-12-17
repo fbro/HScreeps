@@ -361,5 +361,9 @@ const Util = {
             || factory.store.getUsedCapacity(resourceBasic) > 0;
     },
 
+    GetAllies: function (){
+        return ['SystemParadox'];
+    },
+
 };
 module.exports = Util;
