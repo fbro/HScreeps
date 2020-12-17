@@ -283,6 +283,10 @@ const AssignJobs = {
                             if (availableSpawn.HasSpawned || availableSpawn.spawning) {
                                 energyAvailableModifier++;
                             }
+                            if(Memory.MemRooms[memRoomKey] && Memory.MemRooms[memRoomKey].MainRoom && Memory.MemRooms[memRoomKey].MainRoom !== availableSpawn.room.name){ // harvester rooms should prioritize their main room!
+                                //Util.Info('AssignJobs', 'FindBestSpawn', 'not harvester room!: in ' + memRoomKey + ' added to energyAvailableModifier spawn ' + availableSpawn.room.name);
+                                energyAvailableModifier += 3;
+                            }
                             if ((energyAvailableModifier + distance) < bestDistance && energyAvailableModifier !== Number.MAX_SAFE_INTEGER) {
                                 bestDistance = energyAvailableModifier + distance;
                                 bestAvailableSpawn = availableSpawn;
