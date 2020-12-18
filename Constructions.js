@@ -311,18 +311,10 @@ const Constructions = {
             const spawns = [];
             for (const structureCount in structures) {
                 const structure = structures[structureCount];
-                if (roomTerrain.get(structure.pos.x + 1, structure.pos.y) !== TERRAIN_MASK_WALL) {
-                    gameRoom.createConstructionSite(structure.pos.x + 1, structure.pos.y, STRUCTURE_ROAD);
-                }
-                if (roomTerrain.get(structure.pos.x - 1, structure.pos.y) !== TERRAIN_MASK_WALL) {
-                    gameRoom.createConstructionSite(structure.pos.x - 1, structure.pos.y, STRUCTURE_ROAD);
-                }
-                if (roomTerrain.get(structure.pos.x, structure.pos.y + 1) !== TERRAIN_MASK_WALL) {
-                    gameRoom.createConstructionSite(structure.pos.x, structure.pos.y + 1, STRUCTURE_ROAD);
-                }
-                if (roomTerrain.get(structure.pos.x, structure.pos.y - 1) !== TERRAIN_MASK_WALL) {
-                    gameRoom.createConstructionSite(structure.pos.x, structure.pos.y - 1, STRUCTURE_ROAD);
-                }
+                ConstructRoad(gameRoom, roomTerrain, structure, 1, 0);
+                ConstructRoad(gameRoom, roomTerrain, structure, -1, 0);
+                ConstructRoad(gameRoom, roomTerrain, structure, 0, 1);
+                ConstructRoad(gameRoom, roomTerrain, structure, 0, -1);
                 if (structure.structureType === STRUCTURE_SPAWN) {
                     spawns.push(structure);
                 }
@@ -514,6 +506,15 @@ const Constructions = {
         //endregion
 
         //region helper functions
+
+        function ConstructRoad(gameRoom, roomTerrain, structure, modX, modY) {
+            const x = structure.pos.x + modX;
+            const y = structure.pos.y + modY;
+            if (roomTerrain.get(x, y) !== TERRAIN_MASK_WALL
+            && !gameRoom.lookForAt(LOOK_STRUCTURES, x, y).length) {
+                gameRoom.createConstructionSite(x, y, STRUCTURE_ROAD);
+            }
+        }
 
         function FindExistingStructure(targetPos, structureType, radius) {
             let structure = targetPos.findInRange(FIND_STRUCTURES, radius, {
