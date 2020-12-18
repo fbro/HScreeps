@@ -2306,25 +2306,24 @@ const ExecuteJobs = {
                                 }
                             }
                             if (!droppedResource) {
-                                Util.InfoLog('ExecuteJobs', creep.name + ' JobFetchDroppedResource', 'drop gone');
                                 return JOB_IS_DONE; // nothing dropped anymore - job is done
                             }
                         }
                         return SHOULD_ACT;
                     } else {
-                        Util.Info('ExecuteJobs', 'JobFetchDroppedResource', creep.name + ' fetch');
                         return SHOULD_FETCH;
                     }
                 },
                 /**@return {int}*/
                 Act: function (jobObject) {
                     if (!jobObject.room || creep.pos.roomName !== jobObject.room.name) {
-                        Util.Info('ExecuteJobs', 'JobFetchDroppedResource', creep.name + ' moving to room');
                         return ERR_NOT_IN_RANGE;
                     }
-                    Util.InfoLog('ExecuteJobs', 'JobFetchDroppedResource', creep.name + ' picking up ' + JSON.stringify(droppedResource));
-                    jobObject = droppedResource; // TODO test
-                    return creep.pickup(droppedResource);
+                    let result = creep.pickup(droppedResource);
+                    if(result === ERR_NOT_IN_RANGE){
+                        result = Move(creep, droppedResource);
+                    }
+                    return result;
                 },
                 /**@return {int}*/
                 IsJobDone: function (jobObject) {
