@@ -154,9 +154,13 @@ const Terminals = {
         /**@return {boolean}*/
         function GetFromTerminal(amountNeeded, resourceTypeNeeded, toTerminal, terminals, minFromTerminalAmount) {
             let didSend = false;
-            for (const fromTerminalKey in terminals) { // try to get resource from an other terminals
+            for (const fromTerminalKey in terminals) { // try to get resource from another terminal
                 const fromTerminal = terminals[fromTerminalKey];
                 if (fromTerminal.store.getUsedCapacity(resourceTypeNeeded) > minFromTerminalAmount) {
+                    const avalableToSend = fromTerminal.store.getUsedCapacity(resourceTypeNeeded) - minFromTerminalAmount;
+                    if(avalableToSend < amountNeeded){
+                        amountNeeded = avalableToSend;
+                    }
                     didSend = TrySendResource(amountNeeded, resourceTypeNeeded, fromTerminal, toTerminal);
                     if (didSend) {
                         break;

@@ -707,7 +707,7 @@ const CreateJobs = {
                     return s.mineralAmount > 0;
                 }
             })[0];
-            if (mineral && gameRoom.storage && (gameRoom.storage.store.getUsedCapacity(RESOURCE_ENERGY) > Util.STORAGE_ENERGY_MEDIUM/*do not extract minerals when low on storage energy*/ && gameRoom.storage.store.getUsedCapacity(mineral.mineralType) < Util.DO_EXTRACTING_WHEN_STORAGE_UNDER_MINERAL
+            if (mineral && gameRoom.storage && (gameRoom.storage.store.getUsedCapacity(RESOURCE_ENERGY) > Util.STORAGE_ENERGY_LOW/*do not extract minerals when low on storage energy*/ && gameRoom.storage.store.getUsedCapacity(mineral.mineralType) < Util.DO_EXTRACTING_WHEN_STORAGE_UNDER_MINERAL
                 || gameRoom.find(FIND_MY_CREEPS, {
                     filter: (c) => {
                         return c.name.startsWith('E');
