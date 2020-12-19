@@ -490,8 +490,13 @@ const Constructions = {
                 for (let e = 0; e < 50; e++) {
                     row = row + " " + (map[i][e] < 10 ? "0" + map[i][e] : map[i][e]);
                     if (map[i][e] !== 0 && map[i][e] < 5) {
-                        const buildPos = new RoomPosition(i, e, gameRoom.name);
-                        buildPos.createConstructionSite(STRUCTURE_RAMPART);
+                        const structures = gameRoom.lookForAt(LOOK_STRUCTURES, i, e);
+                        if (!structures.length || !_.find(structures, function (structure) {
+                            return structure.structureType !== STRUCTURE_ROAD;
+                        })) {
+                            const buildPos = new RoomPosition(i, e, gameRoom.name);
+                            buildPos.createConstructionSite(STRUCTURE_RAMPART);
+                        }
                     }
                 }
                 console.log(row);
@@ -511,7 +516,7 @@ const Constructions = {
             const x = structure.pos.x + modX;
             const y = structure.pos.y + modY;
             if (roomTerrain.get(x, y) !== TERRAIN_MASK_WALL
-            && !gameRoom.lookForAt(LOOK_STRUCTURES, x, y).length) {
+                && !gameRoom.lookForAt(LOOK_STRUCTURES, x, y).length) {
                 gameRoom.createConstructionSite(x, y, STRUCTURE_ROAD);
             }
         }
