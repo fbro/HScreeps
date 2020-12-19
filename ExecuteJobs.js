@@ -2185,7 +2185,7 @@ const ExecuteJobs = {
                             return OK;
                         }
                     } else {
-                        Util.Info('ExecuteJobs', 'JobDefendReserved', creep.name + ' attacking hostile ' + fetchObject + ' ' + creep.pos.roomName);
+                        //Util.Info('ExecuteJobs', 'JobDefendReserved', creep.name + ' attacking hostile ' + fetchObject + ' ' + creep.pos.roomName);
                         return creep.rangedAttack(fetchObject);
                     }
                 },
