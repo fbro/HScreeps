@@ -36,7 +36,7 @@ const CreateJobs = {
                     } else if (secColor === COLOR_GREY) { // flag that is created for each transporter that should fetch the power
                         jobs = CreateFlagJob(jobs, 'TrnsprtP', gameFlagKey, gameFlag, 'T');
                     } else if (secColor === COLOR_CYAN) { // flag that observers create and put on deposits and deletes again when deadline is reached
-                        jobs = CreateFlagJob(jobs, 'HrvstDpst', gameFlagKey, gameFlag, 'D');
+                        jobs = CreateFlagJob(jobs, 'HrvstDpst', gameFlagKey, gameFlag, 'B');
                     } else if (secColor === COLOR_BROWN) { // transporter move to pos - used when one wants to enter a portal
                         jobs = CreateFlagJob(jobs, 'TransPos', gameFlagKey, gameFlag, 'T', true);
                     } else if (secColor === COLOR_BLUE) { // harvester move to pos - used when one wants to enter a portal
@@ -358,7 +358,7 @@ const CreateJobs = {
                     jobs = CreateFlagJob(jobs, 'FetchDrop', gameFlagKey, gameFlag, 'T');
                 }
             }
-            jobs = CreateFlagJob(jobs, 'Dig', gameFlagKey, gameFlag, 'B');
+            jobs = CreateFlagJob(jobs, 'Dig', gameFlagKey, gameFlag, 'D');
             return jobs;
         }
 

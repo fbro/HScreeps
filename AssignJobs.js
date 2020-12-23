@@ -19,7 +19,7 @@ const AssignJobs = {
         * [W] warrior           ATTACK and MOVE
         * [G] gunner            RANGED_ATTACK and MOVE - needs clever attack pattern to avoid creeps with ATTACK body parts
         * [M] medic             HEAL
-        * [D] distantHarvester  equal WORK and MOVE
+        * [D] digger            equal WORK and MOVE
         * [L] lifter            50 MOVE - lifts other creeps TODO
         */
 
@@ -283,7 +283,7 @@ const AssignJobs = {
                             if (availableSpawn.HasSpawned || availableSpawn.spawning) {
                                 energyAvailableModifier++;
                             }
-                            if(Memory.MemRooms[memRoomKey] && Memory.MemRooms[memRoomKey].MainRoom && Memory.MemRooms[memRoomKey].MainRoom !== availableSpawn.room.name){ // harvester rooms should prioritize their main room!
+                            if (Memory.MemRooms[memRoomKey] && Memory.MemRooms[memRoomKey].MainRoom && Memory.MemRooms[memRoomKey].MainRoom !== availableSpawn.room.name) { // harvester rooms should prioritize their main room!
                                 //Util.Info('AssignJobs', 'FindBestSpawn', 'not harvester room!: in ' + memRoomKey + ' added to energyAvailableModifier spawn ' + availableSpawn.room.name);
                                 energyAvailableModifier += 3;
                             }
@@ -556,7 +556,20 @@ const AssignJobs = {
                 // builder
                 case 'B':
                     switch (true) {
-                        case (energyAvailable >= 3500 && !spawnAgileVersion && (spawnLargeVersion || controllerLevel < 8)): // energyCapacityAvailable: 5600
+                        case (energyAvailable >= 3150 && spawnAgileVersion && spawnLargeVersion): // energyCapacityAvailable: 5600
+                            body = [
+                                // WORK 13, CARRY 12, MOVE 25
+                                // 1300, 600, 1250 = 3150
+                                CARRY, CARRY, MOVE, CARRY, CARRY, MOVE, CARRY, CARRY, MOVE,
+                                CARRY, CARRY, MOVE, CARRY, CARRY, MOVE, CARRY, CARRY, MOVE,
+                                MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,
+                                MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,
+                                MOVE,
+                                WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK,
+                                WORK, WORK, WORK, WORK
+                            ];
+                            break;
+                        case (energyAvailable >= 3500 && !spawnAgileVersion && spawnLargeVersion): // energyCapacityAvailable: 5600
                             body = [
                                 // WORK 20, CARRY 13, MOVE 17
                                 // 2000, 650, 850 = 3500
@@ -648,7 +661,12 @@ const AssignJobs = {
                 case 'E':
                     switch (true) {
                         case (energyAvailable >= 2200): // energyCapacityAvailable: 12900
-                            body = [WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];
+                            body = [
+                                WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK,
+                                WORK, WORK, WORK, WORK, WORK, WORK, WORK,
+                                CARRY,
+                                MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE
+                            ];
                             break;
                         case (energyAvailable >= 2050): // energyCapacityAvailable: 5600
                             body = [WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, WORK, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE];
@@ -850,16 +868,18 @@ const AssignJobs = {
                             break;
                     }
                     break;
-                // distant harvester
+                // digger
                 case 'D':
                     switch (true) {
-                        case (energyAvailable >= 3500): // energyCapacityAvailable: 12900
+                        case (energyAvailable >= 3750): // energyCapacityAvailable: 12900
                             body = [
+                                // WORK 25, MOVE 25
                                 WORK, WORK, WORK, WORK, WORK,
                                 WORK, WORK, WORK, WORK, WORK,
                                 WORK, WORK, WORK, WORK, WORK,
                                 WORK, WORK, WORK, WORK, WORK,
-                                CARRY, CARRY, CARRY, CARRY, CARRY,
+                                WORK, WORK, WORK, WORK, WORK,
+
                                 MOVE, MOVE, MOVE, MOVE, MOVE,
                                 MOVE, MOVE, MOVE, MOVE, MOVE,
                                 MOVE, MOVE, MOVE, MOVE, MOVE,
