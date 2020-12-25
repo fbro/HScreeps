@@ -88,6 +88,8 @@ const CreateJobs = {
                 } else if (color === COLOR_BROWN) { // special creep actions
                     if (secColor === COLOR_YELLOW) { // dig
                         jobs = DigJobs(jobs, gameFlagKey, gameFlag);
+                    } else if (secColor === COLOR_WHITE) { // score flag TODO
+                        // place RESOURCE_SCORE in score container at flag
                     } else {
                         notFound = true;
                     }
@@ -117,7 +119,7 @@ const CreateJobs = {
                 let jobs = {};
 
                 WeaveFlagJobsIntoRoomJobs(flagJobs, jobs, gameRoomKey);
-
+                ScoreContainerJobs(gameRoom, jobs); // season job
                 if (gameRoom.controller && gameRoom.controller.my) {
                     TagControllerJobs(gameRoom);
                     SourceJobs(gameRoom, jobs);
@@ -365,6 +367,21 @@ const CreateJobs = {
         //endregion
 
         //region room jobs
+
+        function ScoreContainerJobs(gameRoom, roomJobs){
+            if(Game.shard.name !== 'shardSeason'){
+                return;
+            }
+            const scoreContainers = gameRoom.find(FIND_SCORE_CONTAINERS, {
+                filter: (i) => i.store[RESOURCE_SCORE] > 200
+            });
+            if(scoreContainers.length){
+                const scoreContainer = scoreContainers[0];
+                Util.Info('CreateJobs', 'ScoreContainerJobs', scoreContainer.pos.x + ', ' + scoreContainer.pos.y + ', ' + gameRoom.name + ' amount ' + scoreContainer.store[RESOURCE_SCORE]);
+                new RoomVisual(gameRoom.name).text('💯', scoreContainer.pos.x, scoreContainer.pos.y);
+                AddJob(roomJobs, 'FillStrg-' + '(' + scoreContainer.pos.x + ',' + scoreContainer.pos.y + ',' + RESOURCE_SCORE + ')' + gameRoom.name, scoreContainer.id, Util.OBJECT_JOB, 'T');
+            }
+        }
 
         function TagControllerJobs(gameRoom) {
             if (gameRoom.controller) {
