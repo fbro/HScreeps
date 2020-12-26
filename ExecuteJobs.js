@@ -2262,6 +2262,9 @@ const ExecuteJobs = {
                             if (wall) {
                                 wall.room.visual.text("🧱", wall.pos);
                                 walls.push(wall);
+                            }else{
+                                Util.InfoLog('ExecuteJobs', 'JobDig', 'wall ' + jobObject.memory.WallIds[key] + ' gone');
+                                delete jobObject.memory.WallIds[key];
                             }
                         }
                     }
@@ -2274,9 +2277,10 @@ const ExecuteJobs = {
                 /**@return {int}*/
                 Fetch: function (fetchObject, jobObject) {
                     if (!fetchObject) {
-                        Util.Warning('ExecuteJobs', 'JobDig', creep.name + ' wall not found ' + JSON.stringify(fetchObject));
-                        delete jobObject.memory.WallIds;
-                        return OK;
+                        Util.Warning('ExecuteJobs', 'JobDig', creep.name + 'no walls found ' + JSON.stringify(jobObject));
+                        jobObject.room.createFlag(jobObject.pos.x, jobObject.pos.y, 'Score container ' + jobObject.pos.roomName, COLOR_BROWN, COLOR_WHITE);
+                        jobObject.remove();
+                        return JOB_IS_DONE;
                     }
                     let result = creep.dismantle(fetchObject);
                     if (result === OK) {
