@@ -486,7 +486,7 @@ const Terminals = {
                     amount = order.remainingAmount; // cannot sell more resources than this
                 }
                 const result = Game.market.deal(order.id, amount, terminal.pos.roomName);
-                Util.Info('Terminals', 'TrySellResource', amount + ' ' + resourceType + ' from ' + terminal.pos.roomName + ' to ' + order.roomName + ' result ' + result + ' remaining ' + order.remainingAmount + ' price ' + order.price + ' sum ' + order.price * amount + ' terminal ' + terminal.store.getUsedCapacity(resourceType));
+                Util.Info('Terminals', 'TrySellResource', amount + ' ' + resourceType + ' from ' + terminal.pos.roomName + ' to ' + order.roomName + ' result ' + result + ' remainingAmount ' + order.remainingAmount + ' price ' + order.price + ' price sum ' + order.price * amount + ' terminal ' + resourceType + ' ' + terminal.store.getUsedCapacity(resourceType) + ' terminal energy ' + terminal.store.getUsedCapacity(RESOURCE_ENERGY));
                 if (result === OK) {
                     terminal.used = true;
                     terminal.store[resourceType] = terminal.store[resourceType] - amount;

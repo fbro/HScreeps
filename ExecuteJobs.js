@@ -2262,7 +2262,7 @@ const ExecuteJobs = {
                             if (wall) {
                                 wall.room.visual.text("🧱", wall.pos);
                                 walls.push(wall);
-                            }else{
+                            } else {
                                 Util.InfoLog('ExecuteJobs', 'JobDig', 'wall ' + jobObject.memory.WallIds[key] + ' gone');
                                 delete jobObject.memory.WallIds[key];
                             }
@@ -2277,8 +2277,21 @@ const ExecuteJobs = {
                 /**@return {int}*/
                 Fetch: function (fetchObject, jobObject) {
                     if (!fetchObject) {
-                        Util.Warning('ExecuteJobs', 'JobDig', creep.name + 'no walls found ' + JSON.stringify(jobObject));
-                        jobObject.room.createFlag(jobObject.pos.x, jobObject.pos.y, 'Score container ' + jobObject.pos.roomName, COLOR_BROWN, COLOR_WHITE);
+                        Util.InfoLog('ExecuteJobs', 'JobDig', creep.name + 'no walls found ' + JSON.stringify(jobObject) + ' removing dig flag and placing ScoreContainer flag');
+                        let bestDistance = Number.MAX_SAFE_INTEGER;
+                        let bestRoom;
+                        for (const roomKey in Game.rooms) {
+                            const room = Game.rooms[roomKey];
+                            if (room.name && room.storage && Memory.MemRooms[roomKey] && Memory.MemRooms[roomKey].RoomLevel > 5) {
+                                const distance = Util.GenerateOuterRoomPath(room.name, jobObject.pos.roomName);
+                                if (distance < bestDistance) {
+                                    bestDistance = distance;
+                                    bestRoom = room.name;
+                                }
+                            }
+                        }
+                        jobObject.room.createFlag(jobObject.pos.x, jobObject.pos.y, 'ScoreContainer ' + jobObject.pos.roomName + ' ' + bestRoom, COLOR_BROWN, COLOR_WHITE);
+                        Util.InfoLog('ExecuteJobs', 'JobDig', 'created  ScoreContainer flag: ScoreContainer ' + jobObject.pos.roomName + ' ' + bestRoom + ' ' + COLOR_BROWN + ' ' + COLOR_WHITE);
                         jobObject.remove();
                         return JOB_IS_DONE;
                     }
@@ -2324,7 +2337,7 @@ const ExecuteJobs = {
                         return ERR_NOT_IN_RANGE;
                     }
                     let result = creep.pickup(droppedResource);
-                    if(result === ERR_NOT_IN_RANGE){
+                    if (result === ERR_NOT_IN_RANGE) {
                         result = Move(creep, droppedResource);
                     }
                     return result;
@@ -2474,7 +2487,7 @@ const ExecuteJobs = {
          * @return {undefined}*/
         function FindClosestResourceInRoom(creep, room, resourceToFetch, jobObject) {
             let resourceSupply = undefined;
-            if(!room){
+            if (!room) {
                 return;
             }
             if (creep.memory.ResourceSupply) {
