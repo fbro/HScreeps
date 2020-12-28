@@ -38,14 +38,14 @@ const Terminals = {
         function GetFactoryResources(toTerminal, terminals, memRoom) {
             if (memRoom && memRoom.FctrId && memRoom.FctrId !== '-') {
                 const factory = Game.getObjectById(memRoom.FctrId);
-                if (factory && toTerminal.store.getUsedCapacity(RESOURCE_ENERGY) >= Util.STORAGE_ENERGY_LOW) {
+                if (factory && toTerminal.store.getUsedCapacity(RESOURCE_ENERGY) >= Util.TERMINAL_LOW_ENERGY) {
                     const resourceTypesNeeded = GetListOfFactoryResources(factory);
                     for (const resourceNeedKey in resourceTypesNeeded) {
                         const resourceTypeNeeded = resourceTypesNeeded[resourceNeedKey];
                         const amountNeeded = Util.TERMINAL_TARGET_RESOURCE - toTerminal.store.getUsedCapacity(resourceTypeNeeded);
                         if (amountNeeded > Util.TERMINAL_BUFFER) {
                             const didSend = GetFromTerminal(amountNeeded, resourceTypeNeeded, toTerminal, terminals, GetNeededFactoryLeftoverResource(resourceTypeNeeded));
-                            if (!didSend && toTerminal.store.getUsedCapacity(RESOURCE_ENERGY) >= Util.TERMINAL_TARGET_ENERGY && resourceTypeNeeded.length === 1/*only buy H, O, L, U, K, Z, X*/) { // try to buy resource
+                            if (!didSend && toTerminal.store.getUsedCapacity(RESOURCE_ENERGY) >= Util.TERMINAL_LOW_ENERGY && resourceTypeNeeded.length === 1/*only buy H, O, L, U, K, Z, X, G*/) { // try to buy resource
                                 if (marketDealCount >= 10 || toTerminal.cooldown || toTerminal.used) {
                                     return;
                                 }
@@ -54,7 +54,7 @@ const Terminals = {
                                     break; // when buying on the market one can only buy once per terminal
                                 }
                             }else if(didSend){
-                                Util.Info('Terminals', 'GetFactoryResources', 'didSend ' + didSend + ' resourceTypeNeeded ' + resourceTypeNeeded + ' amountNeeded ' + amountNeeded + ' toTerminal ' + toTerminal + ' GetNeededFactoryLeftoverResource ' + GetNeededFactoryLeftoverResource(resourceTypeNeeded));
+                                Util.Info('Terminals', 'GetFactoryResources', 'didSend ' + didSend + ' ' + resourceTypeNeeded + ' amountNeeded ' + amountNeeded + ' toTerminal ' + toTerminal.pos.roomName + ' GetNeededFactoryLeftoverResource ' + GetNeededFactoryLeftoverResource(resourceTypeNeeded));
                             }
                         }
                     }
@@ -79,14 +79,16 @@ const Terminals = {
                     if (amountNeeded > Util.TERMINAL_BUFFER) {
                         const didSend = GetFromTerminal(amountNeeded, resourceTypeNeeded, toTerminal, terminals, Util.TERMINAL_TARGET_RESOURCE);
                         if (!didSend && toTerminal.store.getUsedCapacity(RESOURCE_ENERGY) >= Util.TERMINAL_TARGET_ENERGY && flagNameArray[0] === 'BUY') { // try to buy the resource
-                            Util.Info('Terminal', 'GetLabResources', 'buy flagNameArray ' + flagNameArray);
                             if (marketDealCount >= 10 || toTerminal.cooldown || toTerminal.used) {
                                 return;
                             }
+                            Util.Info('Terminal', 'GetLabResources', 'buy flagNameArray ' + flagNameArray);
                             const didBuy = TryBuyResource(toTerminal, resourceTypeNeeded, amountNeeded);
                             if (didBuy) {
                                 break; // when buying on the market one can only buy once per terminal
                             }
+                        }else if(didSend){
+                            Util.Info('Terminals', 'GetLabResources', 'didSend ' + didSend + ' ' + resourceTypeNeeded + ' amountNeeded ' + amountNeeded + ' toTerminal ' + toTerminal.pos.roomName);
                         }
                     }
                 }
@@ -96,14 +98,19 @@ const Terminals = {
         function GetEnergy(toTerminal, terminals) {
             if (!toTerminal.store.getUsedCapacity(RESOURCE_ENERGY) && toTerminal.room.storage && !toTerminal.room.storage.store.getUsedCapacity(RESOURCE_ENERGY)) {
                 let didSend = false;
+                let resource = RESOURCE_BATTERY;
                 const memRoom = Memory.MemRooms[toTerminal.pos.roomName];
                 if (toTerminal.room.controller.level === 8 || memRoom.FctrId !== '-') {
-                    didSend = GetFromTerminal(Util.TERMINAL_TARGET_RESOURCE, RESOURCE_BATTERY, toTerminal, terminals, Util.TERMINAL_TARGET_RESOURCE);
+                    didSend = GetFromTerminal(Util.TERMINAL_TARGET_RESOURCE, resource, toTerminal, terminals, Util.TERMINAL_TARGET_RESOURCE);
                 }
                 if (!didSend) {
-                    didSend = GetFromTerminal(Util.STORAGE_ENERGY_LOW, RESOURCE_ENERGY, toTerminal, terminals, Util.TERMINAL_TARGET_ENERGY);
+                    resource = RESOURCE_ENERGY; // try with energy
+                    didSend = GetFromTerminal(Util.STORAGE_ENERGY_LOW, resource, toTerminal, terminals, Util.TERMINAL_TARGET_ENERGY);
                 }
 
+                if(didSend){
+                    Util.Info('Terminals', 'GetEnergy', 'didSend ' + didSend + ' ' + resource + ' toTerminal ' + toTerminal.pos.roomName);
+                }
             }
         }
 
@@ -121,7 +128,7 @@ const Terminals = {
 
         function SendExcess(fromTerminal) { // selected terminal will actively send/sell resources out
             for (const resourceType in fromTerminal.store) {
-                if (marketDealCount >= 10 || fromTerminal.cooldown || fromTerminal.used) {
+                if (marketDealCount >= 10 || fromTerminal.cooldown || fromTerminal.used || fromTerminal.store.getUsedCapacity(RESOURCE_ENERGY) < Util.TERMINAL_LOW_ENERGY) {
                     return;
                 }
                 let didSend = false;
@@ -141,8 +148,11 @@ const Terminals = {
                     const amount = fromTerminal.store.getUsedCapacity(resourceType) - max;
                     const didSell = TrySellResource(fromTerminal, resourceType, amount);
                     if (didSell) {
+                        Util.Info('Terminals', 'SendExcess', 'didSell ' + didSell + ' ' + resourceType + ' amount ' + amount + ' fromTerminal ' + fromTerminal.pos.roomName);
                         break; // when selling on the market one can only sell once per terminal
                     }
+                }else if(didSend){
+                    Util.Info('Terminals', 'SendExcess', 'didSend ' + didSend + ' ' + resourceType + ' fromTerminal ' + fromTerminal.pos.roomName);
                 }
             }
         }
@@ -315,10 +325,11 @@ const Terminals = {
         function AddCommodityIngredients(resourceTypesNeeded, factory, resToProduce) {
             const commodity = COMMODITIES[resToProduce];
             for (const component in commodity.components) {
-                if (component !== RESOURCE_ENERGY && (factory.store.getUsedCapacity(component) >= Util.FACTORY_TARGET_RESOURCE || !factory.store.getUsedCapacity(component))) {
+                if (component !== RESOURCE_ENERGY && (factory.store.getUsedCapacity(component) < Util.FACTORY_TARGET_RESOURCE || !factory.store.getUsedCapacity(component))) {
                     resourceTypesNeeded.push(component);
                 }
             }
+            return resourceTypesNeeded;
         }
 
         /**@return {number}*/

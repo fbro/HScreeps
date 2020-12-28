@@ -1,7 +1,8 @@
 const Util = {
 
     TERMINAL_TARGET_RESOURCE: 3000, // if over target - terminal should send to another owned room that has under the target
-    TERMINAL_TARGET_ENERGY: 30000,
+    TERMINAL_TARGET_ENERGY: 50000, // if this value is not equal to STORAGE_ENERGY_MEDIUM_TRANSFER then one might see two creeps battling with inserting and withdrawing energy from the terminal
+    TERMINAL_LOW_ENERGY: 3000, // if under low energy then one cannot send resources to other
     TERMINAL_EMPTY_RESOURCE: 20000, // if terminal has over TERMINAL_EMPTY_RESOURCE then it must try and empty it to storage
     TERMINAL_EMPTY_ENERGY: 200000,
 

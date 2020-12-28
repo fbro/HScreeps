@@ -2798,7 +2798,7 @@ const ExecuteJobs = {
                     });
                 }
                 if (!closestFreeStore && maxMoveRange === 0) { // closestFreeStore still not found - look in nearest room for a storage that is free
-                    Util.Info('ExecuteJobs', 'FindClosestFreeStore', 'not found, looking in other rooms for a storage');
+                    Util.Info('ExecuteJobs', 'FindClosestFreeStore', creep.name + ' free store not found, looking in other rooms for a storage');
                     let closestRoom;
                     let closestRoomRange = Number.MAX_SAFE_INTEGER;
                     for (const gameRoomKey in Game.rooms) {
