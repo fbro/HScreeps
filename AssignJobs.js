@@ -898,14 +898,22 @@ const AssignJobs = {
         /**@return {string}*/
         function GetAvailableName(creepType, isForeignRoom) {
             let availableCount = 1;
+            if (isForeignRoom) {
+                while (true) {
+                    if (Memory.creeps && Memory.creeps[creepType + availableCount + '_' + Game.time]) {
+                        availableCount++;
+                    } else {
+                        return creepType + availableCount + '_' + Game.time; // name is free
+                    }
+                }
+            }
             while (true) {
                 if (Memory.creeps && Memory.creeps[creepType + availableCount]) {
                     availableCount++;
                 } else {
-                    break; // name is free
+                    return creepType + availableCount; // name is free
                 }
             }
-            return creepType + (isForeignRoom ? Game.shard.name.substring(5, 6) * 1000 + availableCount : availableCount);
         }
     }
 };
