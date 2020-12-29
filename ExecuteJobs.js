@@ -447,6 +447,9 @@ const ExecuteJobs = {
                     case jobKey.startsWith('Dig'):
                         result = JobDig(creep, roomJob);
                         break;
+                    case jobKey.startsWith('GetRes'):
+                        result = JobGetResourceToStore(creep, roomJob);
+                        break;
                     case jobKey.startsWith('FetchDrop'):
                         result = JobFetchDroppedResource(creep, roomJob);
                         break;
@@ -2270,14 +2273,14 @@ const ExecuteJobs = {
                     }
                     if (!walls.length) {
                         Util.InfoLog('ExecuteJobs', 'JobDig', creep.pos.roomName + ' ' + creep.name + ' no walls found ' + JSON.stringify(walls));
-                        return;
+                        return jobObject;
                     }
                     return walls.pop();
                 },
                 /**@return {int}*/
                 Fetch: function (fetchObject, jobObject) {
-                    if (!fetchObject) {
-                        Util.InfoLog('ExecuteJobs', 'JobDig', creep.name + 'no walls found ' + JSON.stringify(jobObject) + ' removing dig flag and placing ScoreContainer flag');
+                    if (fetchObject === jobObject) {
+                        Util.InfoLog('ExecuteJobs', 'JobDig', creep.name + ' no walls found ' + JSON.stringify(jobObject) + ' removing dig flag and placing ScoreContainer flag');
                         let bestDistance = Number.MAX_SAFE_INTEGER;
                         let bestRoom;
                         for (const roomKey in Game.rooms) {
@@ -2300,6 +2303,65 @@ const ExecuteJobs = {
                         result = ERR_BUSY;
                     }
                     return result;
+                },
+            });
+            return result;
+        }
+
+        /**@return {int}*/
+        function JobGetResourceToStore(creep, roomJob) {
+            // remember to set flags .memory.ResourceType and .memory.FindType
+            const result = GenericFlagAction(creep, roomJob, {
+                /**@return {int}*/
+                JobStatus: function (jobObject) {
+                    if (creep.store.getUsedCapacity(jobObject.memory.ResourceType) > 0) {
+                        return SHOULD_ACT;
+                    } else {
+                        return SHOULD_FETCH;
+                    }
+                },
+                /**@return {int}*/
+                Act: function (jobObject) {
+                    if (jobObject.room && creep.pos.roomName === jobObject.room.name) {
+                        const structure = jobObject.pos.findInRange(jobObject.memory.FindType, 0)[0];
+                        const result = creep.transfer(structure, jobObject.memory.ResourceType);
+                        Util.Info('ExecuteJobs', 'JobGetResourceToStore', jobObject.memory.FindType + ' ' + JSON.stringify(structure) + ' ' + result + ' ' + jobObject.memory.ResourceType);
+                        return result;
+                    } else {
+                        return ERR_NOT_IN_RANGE;
+                    }
+                },
+                /**@return {int}*/
+                IsJobDone: function (jobObject) {
+                    return this.JobStatus(jobObject);
+                },
+                /**@return {object}
+                 * @return {undefined}*/
+                FindFetchObject: function (jobObject) {
+                    const nearestRoomName = jobObject.name.split(/[ ]+/).filter(function (e) {
+                        return e;
+                    })[2];
+                    if (Game.rooms[nearestRoomName] && Game.rooms[nearestRoomName].storage && Game.rooms[nearestRoomName].storage.store.getUsedCapacity(RESOURCE_SCORE) > 0) {
+                        return Game.rooms[nearestRoomName].storage;
+                    }
+
+                    let bestStorage;
+                    let bestDistance = Number.MAX_SAFE_INTEGER;
+                    for (const gameRoomName in Game.rooms) {
+                        const gameRoom = Game.rooms[gameRoomName];
+                        if (gameRoom.controller && gameRoom.controller.my && gameRoom.storage && gameRoom.storage.store.getUsedCapacity(RESOURCE_SCORE) > 0) {
+                            const distance = Util.GenerateOuterRoomPath(gameRoom.name, jobObject.pos.roomName);
+                            if (distance < bestDistance) {
+                                bestDistance = distance;
+                                bestStorage = gameRoom.storage;
+                            }
+                        }
+                    }
+                    return bestStorage;
+                },
+                /**@return {int}*/
+                Fetch: function (fetchObject, jobObject) {
+                    return creep.withdraw(fetchObject, RESOURCE_SCORE);
                 },
             });
             return result;

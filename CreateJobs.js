@@ -88,8 +88,9 @@ const CreateJobs = {
                 } else if (color === COLOR_BROWN) { // special creep actions
                     if (secColor === COLOR_YELLOW) { // dig
                         jobs = DigJobs(jobs, gameFlagKey, gameFlag);
-                    } else if (secColor === COLOR_WHITE) { // score flag TODO
+                    } else if (secColor === COLOR_WHITE) { // score flag
                         // place RESOURCE_SCORE in score container at flag
+                        jobs = ScoreCollectorJobs(jobs, gameFlagKey, gameFlag);
                     } else {
                         notFound = true;
                     }
@@ -361,6 +362,15 @@ const CreateJobs = {
                 }
             }
             jobs = CreateFlagJob(jobs, 'Dig', gameFlagKey, gameFlag, 'D');
+            return jobs;
+        }
+
+        function ScoreCollectorJobs(jobs, gameFlagKey, gameFlag){
+            jobs = CreateFlagJob(jobs, 'GetRes', gameFlagKey, gameFlag, 'T');
+            if (!gameFlag.memory.ResourceType) {
+                gameFlag.memory.ResourceType = RESOURCE_SCORE;
+                gameFlag.memory.FindType = FIND_SCORE_COLLECTORS;
+            }
             return jobs;
         }
 
