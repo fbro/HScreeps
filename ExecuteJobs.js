@@ -2355,6 +2355,12 @@ const ExecuteJobs = {
                                 bestDistance = distance;
                                 bestStorage = gameRoom.storage;
                             }
+                        } else if (gameRoom.controller && gameRoom.controller.my && gameRoom.terminal && gameRoom.terminal.store.getUsedCapacity(RESOURCE_SCORE) > 0) {
+                            const distance = Util.GenerateOuterRoomPath(gameRoom.name, jobObject.pos.roomName);
+                            if (distance < bestDistance) {
+                                bestDistance = distance;
+                                bestStorage = gameRoom.terminal;
+                            }
                         }
                     }
                     return bestStorage;
