@@ -261,7 +261,6 @@ const CreateJobs = {
 
         function ClaimControllerJobs(jobs, gameFlagKey, gameFlag) {
             jobs = CreateFlagJob(jobs, 'ClaimCtrl', gameFlagKey, gameFlag, 'C');
-            Util.MissingSpawnNotification(gameFlag.pos);
             return jobs;
         }
 

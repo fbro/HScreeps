@@ -217,24 +217,6 @@ const Util = {
         }
     },
 
-    MissingSpawnNotification: function (objectPosition) {
-        if (Memory.MemRooms[objectPosition.roomName] && Memory.MemRooms[objectPosition.roomName].MissingSpawn !== Game.time) {
-            const constructSpawnFlag = _.filter(Game.flags, function (flag) {
-                return flag.pos.roomName === objectPosition.roomName && flag.color === COLOR_GREEN && flag.secondaryColor === COLOR_GREY;
-            })[0];
-            if (!constructSpawnFlag) {
-                new RoomVisual(objectPosition.roomName).text('NO SPAWN!', objectPosition.x, objectPosition.y);
-                Util.Warning('Util', 'MissingSpawnNotification', objectPosition.roomName + ' no spawn flag found, add flag with primary color green and secondary color grey');
-                Game.map.visual.text('NO SPAWN FLAG!', new RoomPosition(25, 25, objectPosition.roomName), {
-                    color: '#ff0000',
-                    fontSize: 10,
-                    opacity: 1
-                });
-            }
-            Memory.MemRooms[objectPosition.roomName].MissingSpawn = Game.time; // only notify once
-        }
-    },
-
     GetUsername: function () {
         let username = Memory.Username;
         if (!username) {

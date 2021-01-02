@@ -58,7 +58,7 @@ module.exports.loop = function () {
         MapVisualStatus();
     }
 
-    function Cleanup(){
+    function Cleanup() {
         Util.Info('Main', 'Controller', '--------------- main reset of memory ---------------');
 
         const foundCreeps = {};
@@ -70,7 +70,6 @@ module.exports.loop = function () {
             delete memRoom.TowerIds; // remove TowerIds - maybe a tower have been deleted ect.
             delete memRoom.ObserverId; // remove ObserverId - maybe an observer have been deleted ect.
             delete memRoom.Built; // remove BuiltRoads - maybe some of the road have eroded away?
-            delete memRoom.MissingSpawn; // remove the missing spawn notification handler
             delete memRoom.IsReserved; // reserved room flag reset - maybe the room is not reserved anymore?
             delete memRoom.MainRoom; // reserved room's main room name - maybe the reserved room should have a closer main room assigned?
             MaxCreepsCleanup(memRoomKey, memRoom, foundCreeps);
@@ -166,7 +165,7 @@ module.exports.loop = function () {
                     const flag = Game.flags["Reserve room " + memRoomKey];
                     if (flag && Memory.MemRooms[memRoom.MainRoom] && Memory.MemRooms[memRoom.MainRoom].MainSpawnId) {
                         const spawn = Game.getObjectById(Memory.MemRooms[memRoom.MainRoom].MainSpawnId);
-                        if(spawn) {
+                        if (spawn) {
                             Game.map.visual.line(spawn.pos, flag.pos, {
                                 color: '#ffff00',
                                 width: 1
@@ -174,39 +173,70 @@ module.exports.loop = function () {
                         }
                     }
                 }
-                // show mineral
-                let mineral = memRoom.Mineral;
-                if (!mineral) {
-                    const gameRoom = Game.rooms[memRoomKey];
-                    if (gameRoom) {
-                        const minerals = gameRoom.find(FIND_MINERALS, {
-                            filter: function (mineral) {
-                                return mineral;
+
+                const gameRoom = Game.rooms[memRoomKey];
+                if (gameRoom) {
+
+                    // missing spawn warning
+                    if (gameRoom.controller && gameRoom.controller.level > 0) {
+                        if (!memRoom.MainSpawnId) {
+                            const constructSpawnFlag = _.filter(Game.flags, function (flag) {
+                                return flag.pos.roomName === memRoomKey && flag.color === COLOR_GREEN && flag.secondaryColor === COLOR_GREY;
+                            })[0];
+                            if (!constructSpawnFlag) {
+                                new RoomVisual(memRoomKey).text('NO SPAWN!', 25, 25);
+                                Util.Warning('main', 'MapVisualStatus', memRoomKey + ' no spawn flag found!, add flag with green and grey');
+                                Game.map.visual.text('NO SPAWN FLAG!', new RoomPosition(25, 25, memRoomKey), {
+                                    color: '#ff0000',
+                                    fontSize: 20,
+                                    opacity: 1
+                                });
                             }
-                        });
-                        if(minerals[0]){
-                            mineral = minerals[0].mineralType;
-                            memRoom.Mineral = mineral;
+                        } else if (Game.time % Util.GAME_TIME_MODULO_4 === 0) {
+                            const mainSpawn = Game.getObjectById(memRoom.MainSpawnId);
+                            if (!mainSpawn) {
+                                delete memRoom.MainSpawnId;
+                                Util.InfoLog('main', 'MapVisualStatus', memRoomKey + ' main spawn have been destroyed!');
+                                Game.notify('main spawn have been destroyed ' + memRoomKey + ' shard ' + Game.shard.name + ' time ' + Game.time, 0);
+                            }
+                        }
+
+                        // show mineral
+                        let mineral = memRoom.Mineral;
+                        if (!mineral) {
+                            const minerals = gameRoom.find(FIND_MINERALS, {
+                                filter: function (mineral) {
+                                    return mineral;
+                                }
+                            });
+                            if (minerals[0]) {
+                                mineral = minerals[0].mineralType;
+                                memRoom.Mineral = mineral;
+                            }
+                        } else {
+                            const color = Util.GetColorCodeFromResource(mineral);
+                            Game.map.visual.text(mineral, new RoomPosition(46, 5, memRoomKey), {
+                                color: color,
+                                fontSize: 7,
+                                opacity: 1
+                            });
                         }
                     }
                 }
-                if (mineral) {
-                    const color = Util.GetColorCodeFromResource(mineral);
-                    Game.map.visual.text(mineral, new RoomPosition(46, 5, memRoomKey), {
-                        color: color,
-                        fontSize: 7,
-                        opacity: 1
-                    });
-                }
 
                 // show room level and indicator
-                Game.map.visual.text(memRoom.RoomLevel, new RoomPosition(4, 5, memRoomKey), {
-                    color: memRoom.RoomLevel > 0 ? '#00ff00' : memRoom.RoomLevel === 0 ? '#ffff00' : '#ff0000',
+                const roomLevelText = memRoom.RoomLevel > 0 ? memRoom.RoomLevel : memRoom.RoomLevel === 0 ? 'Reserved' : '';
+                const roomLevelX = memRoom.RoomLevel === 0 ? 17 : 4;
+                const roomLevelY = 5;
+                const roomLevelColor = memRoom.RoomLevel > 0 ? '#00ff00' : memRoom.RoomLevel === 0 ? '#ffff00' : '#ff0000';
+
+                Game.map.visual.text(roomLevelText, new RoomPosition(roomLevelX, roomLevelY, memRoomKey), {
+                    color: roomLevelColor,
                     fontSize: 7,
                     opacity: 1
                 });
                 Game.map.visual.rect(new RoomPosition(0, 0, memRoomKey), 50, 50, {
-                    stroke: memRoom.RoomLevel > 0 ? '#00ff00' : memRoom.RoomLevel === 0 ? '#ffff00' : '#ff0000',
+                    stroke: roomLevelColor,
                     opacity: 1,
                     strokeWidth: 1,
                     fill: 'transparent',

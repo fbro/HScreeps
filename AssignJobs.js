@@ -133,7 +133,6 @@ const AssignJobs = {
                             if (availableSpawnsInRoom.length === 0) { // no spawn in my room
                                 //Util.Info('AssignJobs', 'SpawnCreep', 'job in room has no spawns ' + roomJobKey);
                                 maxLinearDistance = Number.MAX_SAFE_INTEGER;
-                                Util.MissingSpawnNotification(gameRoom.controller.pos);
                             } else {
                                 spawnLargeVersion = ShouldSpawnLargeVersion(gameRoom, roomJob);
                             }

@@ -46,7 +46,7 @@ for (const flagKey in Game.flags) {
 }
 
 
-console.log(Game.rooms['E35S29'].controller.owner);
+console.log(Game.rooms['E4N21'].controller.level);
 
 Game.creeps['M1'].move(LEFT)
 
@@ -109,7 +109,7 @@ Game.creeps['H1'].move(LEFT);
 
 // -----------------------------------------------
 // abandon room script:
-const roomName = 'E19N25';
+const roomName = 'E7N31';
 const structures = Game.rooms[roomName].find(FIND_STRUCTURES);
 const constructions = Game.rooms[roomName].find(FIND_CONSTRUCTION_SITES);
 const myCreeps = Game.rooms[roomName].find(FIND_MY_CREEPS);
