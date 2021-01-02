@@ -23,7 +23,10 @@ console.log('Game.time: ' + Game.time);
 console.log(JSON.stringify(Game.powerCreeps['Hulmir']));
 
 // terminal send
-Game.getObjectById('5d7ed54c708ec13c439c0193').send(RESOURCE_BIOMASS, 3000, 'E28S29');
+const terminal = Game.getObjectById('5fd7b5b2797b78e6a25dd32c');
+const result = terminal.send(RESOURCE_LEMERGIUM, 500, 'E18N28', 'from Hulmir');
+console.log('terminal sent result' + result + ' ' + terminal.pos);
+
 Game.market.deal('5e00325c7072b2051bcdb880', 4000, 'E29S31');
 console.log(JSON.stringify(Game.rooms['E29S31'].controller.owner));
 
