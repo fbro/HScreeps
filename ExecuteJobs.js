@@ -1505,7 +1505,7 @@ const ExecuteJobs = {
                 },
                 /**@return {object} @return {undefined}*/
                 FindFetchObject: function (jobObject) {
-                    const hostileCreep = creep.pos.findClosestByPath(FIND_HOSTILE_CREEPS);
+                    const hostileCreep = Util.FindNearestHostileCreep(creep, 50);
                     if (hostileCreep && (hostileCreep.pos.getRangeTo(creep.pos) < 6 || creep.room.controller && creep.room.controller.my)) {
                         return hostileCreep;
                     } else {
@@ -1524,7 +1524,7 @@ const ExecuteJobs = {
                 },
                 /**@return {int}*/
                 Fetch: function (fetchObject, jobObject) {
-                    if (jobObject !== fetchObject) { // hostileCreep or hostileStructure
+                    if (jobObject !== fetchObject && fetchObject.pos.roomName === creep.pos.roomName) { // hostileCreep or hostileStructure
                         if (fetchObject.structureType === STRUCTURE_PORTAL) {
                             Util.InfoLog('ExecuteJobs', 'JobGuardPosition', 'entering portal! ' + fetchObject.pos.roomName);
                             return ERR_NOT_IN_RANGE;
@@ -1561,8 +1561,8 @@ const ExecuteJobs = {
                 },
                 /**@return {object} @return {undefined}*/
                 FindFetchObject: function (jobObject) {
-                    const hostileCreep = creep.pos.findClosestByPath(FIND_HOSTILE_CREEPS);
-                    if (hostileCreep && (hostileCreep.pos.getRangeTo(creep.pos) < 6 || creep.room.controller && creep.room.controller.my)) {
+                    const hostileCreep = Util.FindNearestHostileCreep(creep, 50);
+                    if (hostileCreep && (hostileCreep.pos.getRangeTo(creep.pos) < 10 || creep.room.controller && creep.room.controller.my)) {
                         return hostileCreep;
                     } else {
                         if (jobObject) {
@@ -1576,7 +1576,7 @@ const ExecuteJobs = {
                 },
                 /**@return {int}*/
                 Fetch: function (fetchObject, jobObject) {
-                    if (jobObject !== fetchObject) { // hostileCreep or structure
+                    if (jobObject !== fetchObject && fetchObject.pos.roomName === creep.pos.roomName) { // hostileCreep or structure
                         let result = creep.rangedAttack(fetchObject);
                         if (result === OK && creep.pos.getRangeTo(fetchObject) > 1) {
                             return ERR_NOT_IN_RANGE; // always try and move closer to the structure it is attacking
@@ -1626,7 +1626,7 @@ const ExecuteJobs = {
                 },
                 /**@return {int}*/
                 Fetch: function (fetchObject, jobObject) {
-                    if (jobObject !== fetchObject) { // woundedCreep
+                    if (jobObject !== fetchObject && fetchObject.pos.roomName === creep.pos.roomName) { // woundedCreep
                         if (Math.abs(creep.pos.x - fetchObject.pos.x) > 1 || Math.abs(creep.pos.y - fetchObject.pos.y) > 1) {
                             creep.heal(fetchObject);
                             return ERR_NOT_IN_RANGE;
@@ -2465,16 +2465,7 @@ const ExecuteJobs = {
         /**@return {int}*/
         function GenericFlagAction(creep, roomJob, actionFunctions) {
             const flagObj = Game.flags[roomJob.JobId];
-            const nearbyHostileCreeps = creep.pos.findInRange(FIND_HOSTILE_CREEPS, 7, {
-                filter: (hostile) => {
-                    Util.GetAllies().forEach(function (ally) {
-                        if (ally === hostile.owner.username) {
-                            return true;
-                        }
-                    });
-                    return false;
-                }
-            });
+            const nearbyHostileCreeps = Util.FindHostileCreeps(creep, 7);
             if (nearbyHostileCreeps.length > 0) {
                 const hostileActionResult = CreepHostileAction(creep, nearbyHostileCreeps, roomJob);
                 if (hostileActionResult !== CREEP_IGNORED_HOSTILE) {

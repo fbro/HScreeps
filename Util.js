@@ -302,31 +302,31 @@ const Util = {
                 // rich with energy
                 fortification.room.storage && fortification.room.storage.store.getUsedCapacity(RESOURCE_ENERGY) > Util.STORAGE_ENERGY_MEDIUM &&
                 (
-                    roomLevel === 4 && hits < 40000 * repairMod||
-                    roomLevel === 5 && hits < 80000 * repairMod||
-                    roomLevel === 6 && hits < 160000 * repairMod||
-                    roomLevel === 7 && hits < 320000 * repairMod||
+                    roomLevel === 4 && hits < 40000 * repairMod ||
+                    roomLevel === 5 && hits < 80000 * repairMod ||
+                    roomLevel === 6 && hits < 160000 * repairMod ||
+                    roomLevel === 7 && hits < 320000 * repairMod ||
                     roomLevel === 8 && hits < 640000 * repairMod
                 ) ||
 
                 // very rich with energy
                 fortification.room.storage && fortification.room.storage.store.getUsedCapacity(RESOURCE_ENERGY) > Util.STORAGE_ENERGY_HIGH &&
                 (
-                    roomLevel === 4 && hits < 400000 * repairMod||
-                    roomLevel === 5 && hits < 800000 * repairMod||
-                    roomLevel === 6 && hits < 1600000 * repairMod||
-                    roomLevel === 7 && hits < 3200000 * repairMod||
+                    roomLevel === 4 && hits < 400000 * repairMod ||
+                    roomLevel === 5 && hits < 800000 * repairMod ||
+                    roomLevel === 6 && hits < 1600000 * repairMod ||
+                    roomLevel === 7 && hits < 3200000 * repairMod ||
                     roomLevel === 8 && hits < fortification.hitsMax
                 ) ||
 
                 // badly damaged
-                roomLevel === 1 && hits < 500 * repairMod||
-                roomLevel === 2 && hits < 1000 * repairMod||
-                roomLevel === 3 && hits < 2000 * repairMod||
-                roomLevel === 4 && hits < 4000 * repairMod||
-                roomLevel === 5 && hits < 8000 * repairMod||
-                roomLevel === 6 && hits < 16000 * repairMod||
-                roomLevel === 7 && hits < 32000 * repairMod||
+                roomLevel === 1 && hits < 500 * repairMod ||
+                roomLevel === 2 && hits < 1000 * repairMod ||
+                roomLevel === 3 && hits < 2000 * repairMod ||
+                roomLevel === 4 && hits < 4000 * repairMod ||
+                roomLevel === 5 && hits < 8000 * repairMod ||
+                roomLevel === 6 && hits < 16000 * repairMod ||
+                roomLevel === 7 && hits < 32000 * repairMod ||
                 roomLevel === 8 && hits < 64000 * repairMod
             );
     },
@@ -344,8 +344,44 @@ const Util = {
             || factory.store.getUsedCapacity(resourceBasic) > 0;
     },
 
-    GetAllies: function (){
+    GetAllies: function () {
         return ['SystemParadox'];
+    },
+
+    /**@return {array}*/
+    FindHostileCreeps: function (roomObject, range = 50) {
+        return roomObject.pos.findInRange(FIND_HOSTILE_CREEPS, range, {
+            filter: (hostile) => {
+                Util.GetAllies().forEach(function (ally) {
+                    if (ally === hostile.owner.username) {
+                        return true;
+                    }
+                });
+                return false;
+            }
+        });
+    },
+
+    /**@return {object} @return {undefined}
+     * @return {undefined}*/
+    FindNearestHostileCreep: function (roomObject, range = 50) {
+        const hostileCreeps = Util.FindHostileCreeps(roomObject, range);
+        if(!hostileCreeps.length){
+            return undefined;
+        }
+
+        let bestRange = Number.MAX_SAFE_INTEGER;
+        let closestHostile;
+
+        for (const hostileCreepKey in hostileCreeps) {
+            const hostileCreep = hostileCreeps[hostileCreepKey];
+            const range = hostileCreep.pos.getRangeTo(roomObject);
+            if(range < bestRange){
+                bestRange = range;
+                closestHostile = hostileCreep;
+            }
+        }
+        return closestHostile;
     },
 
 };

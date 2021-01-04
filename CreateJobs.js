@@ -336,16 +336,7 @@ const CreateJobs = {
 
         function DigJobs(jobs, gameFlagKey, gameFlag) {
             if (gameFlag.room) {
-                const hostileCreeps = gameFlag.room.find(FIND_HOSTILE_CREEPS, {
-                    filter: (hostile) => {
-                        Util.GetAllies().forEach(function (ally) {
-                            if (ally === hostile.owner.username) {
-                                return true;
-                            }
-                        });
-                        return false;
-                    }
-                });
+                const hostileCreeps = Util.FindHostileCreeps(gameFlag);
                 if (hostileCreeps.length > 0) {
                     Util.Info('CreateJobs', 'DigJobs', 'hostiles found ' + hostileCreeps + ' ' + gameFlag.pos.roomName);
                     jobs = CreateFlagJob(jobs, 'DefRsv', gameFlagKey, gameFlag, 'G');
