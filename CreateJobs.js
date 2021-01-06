@@ -457,19 +457,7 @@ const CreateJobs = {
         function RepairJobs(gameRoom, roomJobs) {
             const repairs = gameRoom.find(FIND_STRUCTURES, {
                 filter: (s) => {
-                    return (
-                        s.hits < s.hitsMax / 1.5 // health at 75%
-                        &&
-                        (
-                            (s.structureType === STRUCTURE_ROAD && s.hits < s.hitsMax / 2 || Util.ShouldRepairFortification(s))
-                            ||
-                            (
-                                s.structureType !== STRUCTURE_RAMPART &&
-                                s.structureType !== STRUCTURE_WALL &&
-                                s.structureType !== STRUCTURE_ROAD
-                            )
-                        )
-                    );
+                    return Util.ShouldRepairStructure(s);
                 }
             });
             for (const repairKey in repairs) {

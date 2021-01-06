@@ -59,11 +59,7 @@ const RoomDefences = {
         function EmergencyRepair(towers) {
             const damagedStructures = gameRoom.find(FIND_STRUCTURES, {
                 filter: function (structure) {
-                    return (structure.hits < structure.hitsMax / 4
-                        && structure.structureType !== STRUCTURE_WALL
-                        && structure.structureType !== STRUCTURE_RAMPART)
-                        ||
-                        Util.ShouldRepairFortification(structure, undefined, false, true);
+                    return Util.ShouldRepairStructure(structure, undefined, false, true);
                 }
             });
 

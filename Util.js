@@ -290,45 +290,57 @@ const Util = {
     },
 
     /**@return {boolean}*/
-    ShouldRepairFortification: function (fortification, calculatedHits = undefined, isRepairing = false, isTower = false) {
-        if (!fortification || !fortification.room) {
+    ShouldRepairStructure: function (structure, calculatedHits = undefined, isRepairing = false, isTower = false) {
+        if (!structure || !structure.room) {
             return false;
         }
-        const hits = calculatedHits ? calculatedHits : fortification.hits;
-        const roomLevel = fortification.room.controller.level;
+        const hits = calculatedHits ? calculatedHits : structure.hits;
+        const roomLevel = structure.room.controller.level;
         const repairMod = isRepairing ? 2 : isTower ? 0.01 : 1;
-        return (fortification.structureType === STRUCTURE_RAMPART || fortification.structureType === STRUCTURE_WALL) &&
-            (
-                // rich with energy
-                fortification.room.storage && fortification.room.storage.store.getUsedCapacity(RESOURCE_ENERGY) > Util.STORAGE_ENERGY_MEDIUM &&
-                (
-                    roomLevel === 4 && hits < 40000 * repairMod ||
-                    roomLevel === 5 && hits < 80000 * repairMod ||
-                    roomLevel === 6 && hits < 160000 * repairMod ||
-                    roomLevel === 7 && hits < 320000 * repairMod ||
-                    roomLevel === 8 && hits < 640000 * repairMod
-                ) ||
+        if (hits < structure.hitsMax) {
+            if (structure.structureType === STRUCTURE_RAMPART) {
+                if (isRepairing || hits < structure.hitsMax / 2) {
+                    return true;
+                }
+            } else if (structure.structureType === STRUCTURE_RAMPART || structure.structureType === STRUCTURE_WALL) {
+                if (
+                    // rich with energy
+                    structure.room.storage && structure.room.storage.store.getUsedCapacity(RESOURCE_ENERGY) > Util.STORAGE_ENERGY_MEDIUM &&
+                    (
+                        roomLevel === 4 && hits < 40000 * repairMod ||
+                        roomLevel === 5 && hits < 80000 * repairMod ||
+                        roomLevel === 6 && hits < 160000 * repairMod ||
+                        roomLevel === 7 && hits < 320000 * repairMod ||
+                        roomLevel === 8 && hits < 640000 * repairMod
+                    ) ||
 
-                // very rich with energy
-                fortification.room.storage && fortification.room.storage.store.getUsedCapacity(RESOURCE_ENERGY) > Util.STORAGE_ENERGY_HIGH &&
-                (
-                    roomLevel === 4 && hits < 400000 * repairMod ||
-                    roomLevel === 5 && hits < 800000 * repairMod ||
-                    roomLevel === 6 && hits < 1600000 * repairMod ||
-                    roomLevel === 7 && hits < 3200000 * repairMod ||
-                    roomLevel === 8 && hits < fortification.hitsMax
-                ) ||
+                    // very rich with energy
+                    structure.room.storage && structure.room.storage.store.getUsedCapacity(RESOURCE_ENERGY) > Util.STORAGE_ENERGY_HIGH &&
+                    (
+                        roomLevel === 4 && hits < 400000 * repairMod ||
+                        roomLevel === 5 && hits < 800000 * repairMod ||
+                        roomLevel === 6 && hits < 1600000 * repairMod ||
+                        roomLevel === 7 && hits < 3200000 * repairMod ||
+                        roomLevel === 8 && hits < structure.hitsMax
+                    ) ||
 
-                // badly damaged
-                roomLevel === 1 && hits < 500 * repairMod ||
-                roomLevel === 2 && hits < 1000 * repairMod ||
-                roomLevel === 3 && hits < 2000 * repairMod ||
-                roomLevel === 4 && hits < 4000 * repairMod ||
-                roomLevel === 5 && hits < 8000 * repairMod ||
-                roomLevel === 6 && hits < 16000 * repairMod ||
-                roomLevel === 7 && hits < 32000 * repairMod ||
-                roomLevel === 8 && hits < 64000 * repairMod
-            );
+                    // badly damaged
+                    roomLevel === 1 && hits < 500 * repairMod ||
+                    roomLevel === 2 && hits < 1000 * repairMod ||
+                    roomLevel === 3 && hits < 2000 * repairMod ||
+                    roomLevel === 4 && hits < 4000 * repairMod ||
+                    roomLevel === 5 && hits < 8000 * repairMod ||
+                    roomLevel === 6 && hits < 16000 * repairMod ||
+                    roomLevel === 7 && hits < 32000 * repairMod ||
+                    roomLevel === 8 && hits < 64000 * repairMod
+                ) {
+                    return true;
+                }
+            } else {
+                return true;
+            }
+        }
+        return false;
     },
 
     /**@return {boolean}*/
@@ -366,7 +378,7 @@ const Util = {
      * @return {undefined}*/
     FindNearestHostileCreep: function (roomObject, range = 50) {
         const hostileCreeps = Util.FindHostileCreeps(roomObject, range);
-        if(!hostileCreeps.length){
+        if (!hostileCreeps.length) {
             return undefined;
         }
 
@@ -376,7 +388,7 @@ const Util = {
         for (const hostileCreepKey in hostileCreeps) {
             const hostileCreep = hostileCreeps[hostileCreepKey];
             const range = hostileCreep.pos.getRangeTo(roomObject);
-            if(range < bestRange){
+            if (range < bestRange) {
                 bestRange = range;
                 closestHostile = hostileCreep;
             }

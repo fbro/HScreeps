@@ -291,8 +291,7 @@ const ExecuteJobs = {
             } else if (gameCreep.name.startsWith('H') || gameCreep.name.startsWith('B') || gameCreep.name.startsWith('D')) { // repair on the road
                 const toRepair = gameCreep.pos.findInRange(FIND_STRUCTURES, 2, {
                     filter: (structure) => {
-                        return (structure.structureType !== STRUCTURE_WALL
-                            && structure.structureType !== STRUCTURE_RAMPART) && structure.hits < structure.hitsMax;
+                        return Util.ShouldRepairStructure(structure, undefined, true);
                     }
                 })[0];
                 if (toRepair) { // repair on the road
@@ -749,7 +748,7 @@ const ExecuteJobs = {
                 /**@return {int}*/
                 IsJobDone: function (jobObject) {
                     const calculatedHits = jobObject.hits + (creep.getActiveBodyparts(WORK) * REPAIR_POWER);
-                    if (calculatedHits >= jobObject.hitsMax || !Util.ShouldRepairFortification(jobObject, calculatedHits, true)) {
+                    if (!Util.ShouldRepairStructure(jobObject, calculatedHits, true)) {
                         // predict that the creep will be done
                         return JOB_IS_DONE;
                     } else {

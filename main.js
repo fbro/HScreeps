@@ -238,7 +238,7 @@ module.exports.loop = function () {
                 Game.map.visual.rect(new RoomPosition(0, 0, memRoomKey), 50, 50, {
                     stroke: roomLevelColor,
                     opacity: 1,
-                    strokeWidth: 1,
+                    strokeWidth: 0.5,
                     fill: 'transparent',
                 });
             }
