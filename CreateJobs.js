@@ -155,7 +155,7 @@ const CreateJobs = {
                         TagControllerJobs(gameRoom);
                         SourceJobs(gameRoom, jobs);
                         ConstructionJobs(gameRoom, jobs);
-                        RepairJobs(gameRoom, jobs);
+                        RepairJobs(gameRoom, jobs, STRUCTURE_CONTAINER);
                         FillStorageFromReservedRoomJobs(gameRoom, jobs);
                     }
                 }
@@ -454,10 +454,10 @@ const CreateJobs = {
             }
         }
 
-        function RepairJobs(gameRoom, roomJobs) {
+        function RepairJobs(gameRoom, roomJobs, specificStructure = undefined) {
             const repairs = gameRoom.find(FIND_STRUCTURES, {
                 filter: (s) => {
-                    return Util.ShouldRepairStructure(s);
+                    return specificStructure ? s.structureType === specificStructure && Util.ShouldRepairStructure(s): Util.ShouldRepairStructure(s);
                 }
             });
             for (const repairKey in repairs) {

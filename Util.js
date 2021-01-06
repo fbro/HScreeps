@@ -295,7 +295,7 @@ const Util = {
             return false;
         }
         const hits = calculatedHits ? calculatedHits : structure.hits;
-        const roomLevel = structure.room.controller.level;
+        const roomLevel = structure.room.controller ? structure.room.controller.level : 0;
         const repairMod = isRepairing ? 2 : isTower ? 0.01 : 1;
         if (hits < structure.hitsMax) {
             if (structure.structureType === STRUCTURE_RAMPART) {
