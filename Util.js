@@ -298,7 +298,7 @@ const Util = {
         const roomLevel = structure.room.controller ? structure.room.controller.level : 0;
         const repairMod = isRepairing ? 2 : isTower ? 0.01 : 1;
         if (hits < structure.hitsMax) {
-            if (structure.structureType === STRUCTURE_RAMPART) {
+            if (structure.structureType === STRUCTURE_ROAD) {
                 if (isRepairing || hits < structure.hitsMax / 2) {
                     return true;
                 }
