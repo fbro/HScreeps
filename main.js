@@ -35,10 +35,7 @@ module.exports.loop = function () {
                 AssignJobs.run();
             }
             Labs.run();
-            if (Game.cpu.bucket === 10000 && Game.shard.name !== 'shardSeason') {
-                //Util.Info('Main', 'Controller', 'Game.cpu.bucket ' + Game.cpu.bucket + ' generatePixel');
-                Game.cpu.generatePixel();
-            }
+            GeneratePixel();
         }
         ExecuteJobs.run();
         for (const gameRoomKey in Game.rooms) {
@@ -254,6 +251,13 @@ module.exports.loop = function () {
                 stroke: Util.GetColorCodeFromColor(flag.secondaryColor),
                 strokeWidth: 1
             });
+        }
+    }
+
+    function GeneratePixel(){
+        if (Game.cpu.bucket === 10000 && Game.shard.name !== 'shardSeason') {
+            const result = Game.cpu.generatePixel();
+            Util.Info('Main', 'GeneratePixel', 'result ' + result + ' Game.cpu.bucket ' + Game.cpu.bucket + ' generating 1 pixel');
         }
     }
 };
