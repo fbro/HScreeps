@@ -565,9 +565,11 @@ const Constructions = {
             // create roads
             for (const pathStepCount in pathFinder.path) {
                 const pathStep = pathFinder.path[pathStepCount];
-                const result = Game.rooms[pathStep.roomName].createConstructionSite(pathStep.x, pathStep.y, STRUCTURE_ROAD);
-                if (result === OK) {
-                    placedRoads = true;
+                if(Game.rooms[pathStep.roomName]){
+                    const result = Game.rooms[pathStep.roomName].createConstructionSite(pathStep.x, pathStep.y, STRUCTURE_ROAD);
+                    if (result === OK) {
+                        placedRoads = true;
+                    }
                 }
             }
             Util.InfoLog('Constructions', 'BuildRoadTo', 'placedRoads ' + placedRoads + ' fromPos ' + fromPos + ' toPos ' + toPos);
