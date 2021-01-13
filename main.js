@@ -14,7 +14,7 @@ let Constructions = require('Constructions');
 
 module.exports.loop = function () {
     Controller();
-
+console.log(JSON.stringify(Game.shard));
     function Controller() {
         if (!Memory.MemRooms) {
             Memory.MemRooms = {};
@@ -255,9 +255,9 @@ module.exports.loop = function () {
     }
 
     function GeneratePixel(){
-        if (Game.cpu.bucket === 10000 && Game.shard.name !== 'shardSeason') {
+        if (Game.cpu.bucket === 10000 && Game.shard.name !== 'shardSeason' && Game.shard.name !== 'shard3') {
             const result = Game.cpu.generatePixel();
-            Util.Info('Main', 'GeneratePixel', 'result ' + result + ' Game.cpu.bucket ' + Game.cpu.bucket + ' generating 1 pixel');
+            Util.Info('Main', 'GeneratePixel', 'result ' + result + ' Game.cpu.bucket ' + Game.cpu.bucket + ' generating 1 pixel on ' + Game.shard.name);
         }
     }
 };

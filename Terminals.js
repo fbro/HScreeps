@@ -425,6 +425,17 @@ const Terminals = {
                 case RESOURCE_CRYSTAL     : // factory lvl 2
                 case RESOURCE_LIQUID      : // factory lvl 3
 
+                // Compressed resource should not be sold
+                case RESOURCE_LEMERGIUM_BAR:
+                case RESOURCE_KEANIUM_BAR:
+                case RESOURCE_UTRIUM_BAR:
+                case RESOURCE_ZYNTHIUM_BAR:
+                case RESOURCE_REDUCTANT:
+                case RESOURCE_OXIDANT:
+                case RESOURCE_BATTERY:
+                case RESOURCE_GHODIUM_MELT:
+                case RESOURCE_PURIFIER:
+
                 // lab resources
                 case RESOURCE_CATALYST:
                 case RESOURCE_ZYNTHIUM_KEANITE:
@@ -435,7 +446,6 @@ const Terminals = {
                 case RESOURCE_GHODIUM_ACID:
                 case RESOURCE_CATALYZED_GHODIUM_ACID:
 
-                case RESOURCE_BATTERY:
                     return Number.MAX_SAFE_INTEGER;
 
                 // sell this resource
