@@ -14,7 +14,7 @@ let Constructions = require('Constructions');
 
 module.exports.loop = function () {
     Controller();
-console.log(JSON.stringify(Game.shard));
+
     function Controller() {
         if (!Memory.MemRooms) {
             Memory.MemRooms = {};
