@@ -325,7 +325,7 @@ const Terminals = {
         function AddCommodityIngredients(resourceTypesNeeded, factory, resToProduce) {
             const commodity = COMMODITIES[resToProduce];
             for (const component in commodity.components) {
-                if (component !== RESOURCE_ENERGY && (factory.store.getUsedCapacity(component) < Util.FACTORY_TARGET_RESOURCE || !factory.store.getUsedCapacity(component))) {
+                if (component !== RESOURCE_ENERGY && (factory.store.getUsedCapacity(component) + factory.room.terminal.store.getUsedCapacity(component) < Util.FACTORY_TARGET_RESOURCE || !factory.store.getUsedCapacity(component))) { // TODO
                     resourceTypesNeeded.push(component);
                 }
             }

@@ -355,7 +355,7 @@ const CreateJobs = {
             return jobs;
         }
 
-        function ScoreCollectorJobs(jobs, gameFlagKey, gameFlag){
+        function ScoreCollectorJobs(jobs, gameFlagKey, gameFlag) {
             jobs = CreateFlagJob(jobs, 'GetRes', gameFlagKey, gameFlag, 'T');
             if (!gameFlag.memory.ResourceType) {
                 gameFlag.memory.ResourceType = RESOURCE_SCORE;
@@ -368,14 +368,14 @@ const CreateJobs = {
 
         //region room jobs
 
-        function ScoreContainerJobs(gameRoom, roomJobs){
-            if(Game.shard.name !== 'shardSeason'){
+        function ScoreContainerJobs(gameRoom, roomJobs) {
+            if (Game.shard.name !== 'shardSeason') {
                 return;
             }
             const scoreContainers = gameRoom.find(FIND_SCORE_CONTAINERS, {
                 filter: (i) => i.store[RESOURCE_SCORE] > 200
             });
-            if(scoreContainers.length){
+            if (scoreContainers.length) {
                 const scoreContainer = scoreContainers[0];
                 Util.Info('CreateJobs', 'ScoreContainerJobs', scoreContainer.pos.x + ', ' + scoreContainer.pos.y + ', ' + gameRoom.name + ' amount ' + scoreContainer.store[RESOURCE_SCORE]);
                 new RoomVisual(gameRoom.name).text('💯', scoreContainer.pos.x, scoreContainer.pos.y);
@@ -457,7 +457,7 @@ const CreateJobs = {
         function RepairJobs(gameRoom, roomJobs, specificStructure = undefined) {
             const repairs = gameRoom.find(FIND_STRUCTURES, {
                 filter: (s) => {
-                    return specificStructure ? s.structureType === specificStructure && Util.ShouldRepairStructure(s): Util.ShouldRepairStructure(s);
+                    return specificStructure ? s.structureType === specificStructure && Util.ShouldRepairStructure(s) : Util.ShouldRepairStructure(s);
                 }
             });
             for (const repairKey in repairs) {
@@ -560,9 +560,10 @@ const CreateJobs = {
                 if (factory) {
                     for (const resourceType in factory.store) {
                         const amount = factory.store.getUsedCapacity(resourceType);
-                        if (gameRoom.storage.store.getUsedCapacity(resourceType) < Util.STORAGE_MEDIUM
-                            && gameRoom.terminal.store.getUsedCapacity(resourceType) < Util.STORAGE_MEDIUM_TRANSFER
-                            && (
+                        if ( // only withdraw commodities that one should sell or other factories need
+                            gameRoom.storage.store.getUsedCapacity(resourceType) < Util.STORAGE_MEDIUM &&
+                            gameRoom.terminal.store.getUsedCapacity(resourceType) < Util.STORAGE_MEDIUM_TRANSFER &&
+                            (
                                 (resourceType === RESOURCE_LEMERGIUM_BAR
                                     || resourceType === RESOURCE_ZYNTHIUM_BAR
                                     || resourceType === RESOURCE_UTRIUM_BAR
