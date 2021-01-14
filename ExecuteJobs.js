@@ -1647,15 +1647,8 @@ const ExecuteJobs = {
             const result = GenericFlagAction(creep, roomJob, {
                 /**@return {int}*/
                 JobStatus: function (jobObject) {
-                    if (!creep.memory.HealthCheck) {
-                        if (creep.ticksToLive > 1000 || (creep.name.startsWith('C') || creep.name.startsWith('R')) && creep.ticksToLive > 550) {
-                            creep.memory.HealthCheck = true;
-                        } else {
-                            Util.Info('ExecuteJobs', 'JobMoveToPosition', creep.name + ' committed suicide ticksToLive ' + creep.ticksToLive);
-                            new RoomVisual(creep.pos.roomName).text("💀", creep.pos);
-                            creep.suicide();
-                            return OK;
-                        }
+                    if (!HealthCheck(creep)) {
+                        return OK;
                     }
                     if (!jobObject.room) {
                         return SHOULD_ACT;
@@ -1992,6 +1985,9 @@ const ExecuteJobs = {
             let result = GenericFlagAction(creep, roomJob, {
                 /**@return {int}*/
                 JobStatus: function (jobObject) {
+                    if (!HealthCheck(creep)) {
+                        return OK;
+                    }
                     if (!jobObject) {
                         if (creep.store.getUsedCapacity() > 0) {
                             return SHOULD_FETCH;
@@ -2006,15 +2002,6 @@ const ExecuteJobs = {
                 },
                 /**@return {int}*/
                 Act: function (jobObject) {
-                    if (!creep.memory.HealthCheck) {
-                        if (creep.ticksToLive > 1000) {
-                            creep.memory.HealthCheck = true;
-                        } else {
-                            Util.Info('ExecuteJobs', 'JobTransportPowerBank', creep.name + ' committed suicide ticksToLive ' + creep.ticksToLive);
-                            creep.suicide();
-                            return OK;
-                        }
-                    }
                     if (!jobObject.room) { // invisible
                         return ERR_NOT_IN_RANGE;
                     }
@@ -2313,6 +2300,9 @@ const ExecuteJobs = {
             const result = GenericFlagAction(creep, roomJob, {
                 /**@return {int}*/
                 JobStatus: function (jobObject) {
+                    if (!HealthCheck(creep)) {
+                        return OK;
+                    }
                     if (creep.store.getUsedCapacity(jobObject.memory.ResourceType) > 0) {
                         return SHOULD_ACT;
                     } else {
@@ -2379,6 +2369,9 @@ const ExecuteJobs = {
             let result = GenericFlagAction(creep, roomJob, {
                 /**@return {int}*/
                 JobStatus: function (jobObject) {
+                    if (!HealthCheck(creep)) {
+                        return OK;
+                    }
                     if (creep.store.getUsedCapacity() > 0 && creep.pos.roomName !== jobObject.pos.roomName) {
                         return SHOULD_FETCH;
                     } else if (creep.store.getFreeCapacity() > 0) {
@@ -2429,6 +2422,21 @@ const ExecuteJobs = {
         //endregion
 
         //region helper functions
+
+        /**@return {boolean}*/
+        function HealthCheck(creep) {
+            if (!creep.memory.HealthCheck) {
+                if (creep.ticksToLive > 1000 || (creep.name.startsWith('C') || creep.name.startsWith('R')) && creep.ticksToLive > 550) {
+                    creep.memory.HealthCheck = true;
+                    return true;
+                } else {
+                    Util.Info('ExecuteJobs', 'HealthCheck', creep.name + ' committed suicide ticksToLive ' + creep.ticksToLive);
+                    new RoomVisual(creep.pos.roomName).text("💀", creep.pos);
+                    creep.suicide();
+                    return false;
+                }
+            }
+        }
 
         /**@return {string}*/
         function FindAndRemoveMaxCreeps(jobRoomName, creepName) {
