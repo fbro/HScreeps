@@ -1504,7 +1504,7 @@ const ExecuteJobs = {
                 },
                 /**@return {object} @return {undefined}*/
                 FindFetchObject: function (jobObject) {
-                    const hostileCreep = Util.FindNearestHostileCreep(creep, 50);
+                    const hostileCreep = Util.FindNearestHostileCreep(creep);
                     if (hostileCreep && (hostileCreep.pos.getRangeTo(creep.pos) < 6 || creep.room.controller && creep.room.controller.my)) {
                         return hostileCreep;
                     } else {
@@ -1560,7 +1560,7 @@ const ExecuteJobs = {
                 },
                 /**@return {object} @return {undefined}*/
                 FindFetchObject: function (jobObject) {
-                    const hostileCreep = Util.FindNearestHostileCreep(creep, 50);
+                    const hostileCreep = Util.FindNearestHostileCreep(creep);
                     if (hostileCreep && (hostileCreep.pos.getRangeTo(creep.pos) < 10 || creep.room.controller && creep.room.controller.my)) {
                         return hostileCreep;
                     } else {

@@ -366,10 +366,10 @@ const Util = {
             filter: (hostile) => {
                 Util.GetAllies().forEach(function (ally) {
                     if (ally === hostile.owner.username) {
-                        return true;
+                        return false;
                     }
                 });
-                return false;
+                return true;
             }
         });
     },
