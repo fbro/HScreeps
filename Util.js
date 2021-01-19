@@ -151,7 +151,7 @@ const Util = {
     },
 
     /**@return {number}*/
-    GenerateOuterRoomPath: function (to, from) { // return length - saves path in Memory
+    GenerateOuterRoomPath: function (to, from, useHighwayPreference = true) { // return length - saves path in Memory
         if (!Memory.Paths) {
             Memory.Paths = {};
         }
@@ -166,10 +166,10 @@ const Util = {
             // prioritizing highways and owned rooms
             const route = Game.map.findRoute(from, to, {
                 routeCallback(roomName) {
-                    const isHighway = Util.IsHighway(roomName);
+                    const isHighway = useHighwayPreference ? Util.IsHighway(roomName) : false;
                     let isMyRoom = false;
                     if (Game.rooms[roomName] && Game.rooms[roomName].controller) {
-                        if (Game.rooms[roomName].controller.my) {
+                        if (Game.rooms[roomName].controller.my || Game.rooms[roomName].controller.reservation.username === Memory.Username) {
                             isMyRoom = true;
                         }
                     }
@@ -362,16 +362,19 @@ const Util = {
 
     /**@return {array}*/
     FindHostileCreeps: function (roomObject, range = 50) {
-        return roomObject.pos.findInRange(FIND_HOSTILE_CREEPS, range, {
+        const hostiles = roomObject.pos.findInRange(FIND_HOSTILE_CREEPS, range, {
             filter: (hostile) => {
-                Util.GetAllies().forEach(function (ally) {
-                    if (ally === hostile.owner.username) {
+                for (const allyKey in Util.GetAllies()) {
+                    if (Util.GetAllies()[allyKey] === hostile.owner.username) {
+                        //Util.Info('Util', 'FindHostileCreeps', 'ally ' + Util.GetAllies()[allyKey] + ' hostile ' + hostile.owner.username + ' is not hostile');
                         return false;
                     }
-                });
+                }
+                //Util.Info('Util', 'FindHostileCreeps', 'hostile ' + hostile.owner.username + ' is hostile');
                 return true;
             }
         });
+        return hostiles;
     },
 
     /**@return {object} @return {undefined}

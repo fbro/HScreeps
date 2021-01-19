@@ -1561,7 +1561,7 @@ const ExecuteJobs = {
                 /**@return {object} @return {undefined}*/
                 FindFetchObject: function (jobObject) {
                     const hostileCreep = Util.FindNearestHostileCreep(creep);
-                    if (hostileCreep && (hostileCreep.pos.getRangeTo(creep.pos) < 10 || creep.room.controller && creep.room.controller.my)) {
+                    if (hostileCreep && (hostileCreep.pos.getRangeTo(creep.pos) < 20 || creep.room.controller && creep.room.controller.my)) {
                         return hostileCreep;
                     } else {
                         if (jobObject) {
@@ -1648,7 +1648,7 @@ const ExecuteJobs = {
                 /**@return {int}*/
                 JobStatus: function (jobObject) {
                     if (!HealthCheck(creep)) {
-                        return OK;
+                        return JOB_IS_DONE;
                     }
                     if (!jobObject.room) {
                         return SHOULD_ACT;
@@ -1986,7 +1986,7 @@ const ExecuteJobs = {
                 /**@return {int}*/
                 JobStatus: function (jobObject) {
                     if (!HealthCheck(creep)) {
-                        return OK;
+                        return JOB_IS_DONE;
                     }
                     if (!jobObject) {
                         if (creep.store.getUsedCapacity() > 0) {
@@ -2301,7 +2301,7 @@ const ExecuteJobs = {
                 /**@return {int}*/
                 JobStatus: function (jobObject) {
                     if (!HealthCheck(creep)) {
-                        return OK;
+                        return JOB_IS_DONE;
                     }
                     if (creep.store.getUsedCapacity(jobObject.memory.ResourceType) > 0) {
                         return SHOULD_ACT;
@@ -2314,7 +2314,6 @@ const ExecuteJobs = {
                     if (jobObject.room && creep.pos.roomName === jobObject.room.name) {
                         const structure = jobObject.pos.findInRange(jobObject.memory.FindType, 0)[0];
                         const result = creep.transfer(structure, jobObject.memory.ResourceType);
-                        Util.Info('ExecuteJobs', 'JobGetResourceToStore', jobObject.memory.FindType + ' ' + JSON.stringify(structure) + ' ' + result + ' ' + jobObject.memory.ResourceType);
                         return result;
                     } else {
                         return ERR_NOT_IN_RANGE;
@@ -2356,9 +2355,11 @@ const ExecuteJobs = {
                 },
                 /**@return {int}*/
                 Fetch: function (fetchObject, jobObject) {
-                    return creep.withdraw(fetchObject, RESOURCE_SCORE);
+                    return creep.withdraw(fetchObject, jobObject.memory.ResourceType);
                 },
             });
+            if (creep.memory.JobName && creep.memory.JobName.startsWith('GetRes')) {
+            }
             return result;
         }
 
@@ -2370,7 +2371,7 @@ const ExecuteJobs = {
                 /**@return {int}*/
                 JobStatus: function (jobObject) {
                     if (!HealthCheck(creep)) {
-                        return OK;
+                        return JOB_IS_DONE;
                     }
                     if (creep.store.getUsedCapacity() > 0 && creep.pos.roomName !== jobObject.pos.roomName) {
                         return SHOULD_FETCH;
@@ -2436,6 +2437,7 @@ const ExecuteJobs = {
                     return false;
                 }
             }
+            return true;
         }
 
         /**@return {string}*/
@@ -2472,9 +2474,9 @@ const ExecuteJobs = {
         /**@return {int}*/
         function GenericFlagAction(creep, roomJob, actionFunctions) {
             const flagObj = Game.flags[roomJob.JobId];
-            const nearbyHostileCreeps = Util.FindHostileCreeps(creep, 7);
+            const nearbyHostileCreeps = Util.FindHostileCreeps(creep, 7); // TODO healer may try and flee when it should heal!
             if (nearbyHostileCreeps.length > 0) {
-                const hostileActionResult = CreepHostileAction(creep, nearbyHostileCreeps, roomJob);
+                const hostileActionResult = CreepHostileAction(creep, nearbyHostileCreeps, roomJob); // TODO gunner does not pursue correct - and does not flee correctly!
                 if (hostileActionResult !== CREEP_IGNORED_HOSTILE) {
                     return OK;
                 }
@@ -2490,7 +2492,6 @@ const ExecuteJobs = {
             } else {
                 let jobStatus = actionFunctions.JobStatus(targetObj);
                 let didAct = false; // handle specific usecase where a creep has done an action and then immediately after that tries to do a similar action nearby when fetching
-
                 if (jobStatus === SHOULD_ACT) { // act
                     result = actionFunctions.Act(targetObj);
                     if (result === ERR_NOT_IN_RANGE) {
@@ -3045,8 +3046,8 @@ const ExecuteJobs = {
         /**@return {int}*/
         function Move(creep, obj, fill = 'transparent', stroke = '#fff', lineStyle = 'dashed', strokeWidth = .15, opacity = .3) {
             let result = ERR_NO_RESULT_FOUND;
-            let from = creep.pos;
-            let to = obj.pos;
+            const from = creep.pos;
+            const to = obj.pos;
             if (from.roomName === to.roomName || creep.memory.onlyMoveTo) {
                 const opts = {
                     //reusePath: 5, // default

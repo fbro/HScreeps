@@ -95,14 +95,14 @@ const Constructions = {
             if (Memory.MemRooms[gameRoomKey].Built === 0) {
                 return;
             }
-            const maxMainRoomRange = 2;
+            const maxMainRoomRange = 3;
             let bestMainRoom = Memory.MemRooms[gameRoomKey].MainRoom;
             if (!bestMainRoom) {
                 let bestDistance = Number.MAX_SAFE_INTEGER;
                 for (const memRoomKey in Memory.MemRooms) {
                     const memRoom = Memory.MemRooms[memRoomKey];
                     if (memRoom.RoomLevel > 0) {
-                        const distance = Util.GenerateOuterRoomPath(gameRoomKey, memRoomKey);
+                        const distance = Util.GenerateOuterRoomPath(gameRoomKey, memRoomKey, false);
                         if (distance !== -1 && bestDistance > distance && distance <= maxMainRoomRange) {
                             bestDistance = distance;
                             bestMainRoom = memRoomKey;
@@ -152,6 +152,8 @@ const Constructions = {
                 if (builtSuccess === sources.length * 2) {
                     Memory.MemRooms[gameRoomKey].Built = 0;
                 }
+            }else{
+                Util.InfoLog('Constructions', 'ReservedRoomBuild', 'bestMainRoom not found! room ' + gameRoomKey);
             }
         }
 
@@ -558,7 +560,7 @@ const Constructions = {
                         });
                         return costs;
                     },
-                    maxRooms: isRemote ? 3 : 1,
+                    maxRooms: isRemote ? 4 : 1,
                 }
             );
 
