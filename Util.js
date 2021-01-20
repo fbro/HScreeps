@@ -357,7 +357,7 @@ const Util = {
     },
 
     GetAllies: function () {
-        return ['SystemParadox'];
+        return ['SystemParadox', 'Murphlaw'];
     },
 
     /**@return {array}*/
