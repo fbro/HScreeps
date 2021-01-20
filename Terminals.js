@@ -521,7 +521,7 @@ const Terminals = {
 
         /**@return {boolean}*/
         function TrySendResource(amount, resourceType, fromTerminal, toTerminal) {
-            if (!fromTerminal.cooldown && !fromTerminal.used && fromTerminal.id !== toTerminal.id && fromTerminal.store.getUsedCapacity(resourceType)) {
+            if (!fromTerminal.cooldown && !fromTerminal.used && fromTerminal.id !== toTerminal.id && fromTerminal.store.getUsedCapacity(resourceType) && fromTerminal.store.getUsedCapacity(RESOURCE_ENERGY) >= Util.TERMINAL_LOW_ENERGY) {
                 if (amount > fromTerminal.store.getUsedCapacity(resourceType)) {
                     amount = fromTerminal.store.getUsedCapacity(resourceType);  // cannot send more resources than this
                 }
