@@ -169,7 +169,7 @@ const Util = {
                     const isHighway = useHighwayPreference ? Util.IsHighway(roomName) : false;
                     let isMyRoom = false;
                     if (Game.rooms[roomName] && Game.rooms[roomName].controller) {
-                        if (Game.rooms[roomName].controller.my || Game.rooms[roomName].controller.reservation.username === Memory.Username) {
+                        if (Game.rooms[roomName].controller.my || Game.rooms[roomName].controller.reservation && Game.rooms[roomName].controller.reservation.username === Memory.Username) {
                             isMyRoom = true;
                         }
                     }
