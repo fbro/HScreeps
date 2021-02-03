@@ -110,7 +110,7 @@ const RoomDefences = {
                             Util.InfoLog('RoomDefences', 'ActivateSafemode', gameRoom.name + ' ' + result + ' attacked from ' + hostileTarget.owner.username + ' towers ' + towers.length);
                             Game.notify('safemode have been activated for room ' + gameRoom.name + ' activateSafeMode result ' + result + ' shard ' + Game.shard.name + ' attacked from ' + hostileTarget.owner.username + ' time ' + Game.time, 0);
                         } else {
-                            Util.InfoLog('RoomDefences', 'ActivateSafemode', gameRoom.name + ' cannot activate safemode! controller.safeMode ' + gameRoom.controller.safeMode + ' controller.safeModeCooldown ' + gameRoom.controller.safeModeCooldown + ' controller.safeModeAvailable ' + gameRoom.controller.safeModeAvailable);
+                            Util.InfoLog('RoomDefences', 'ActivateSafemode', gameRoom.name + ' cannot activate safemode! controller.safeModeAvailable ' + gameRoom.controller.safeModeAvailable);
                         }
                     }
                     numOfDefendersToSpawn++;
