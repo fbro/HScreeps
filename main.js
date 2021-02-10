@@ -63,6 +63,7 @@ module.exports.loop = function () {
             const memRoom = Memory.MemRooms[memRoomKey];
             delete memRoom.Links; // remove links - maybe the buildings have been deleted ect.
             delete memRoom.FctrId; // remove FctrId - maybe the buildings have been deleted ect.
+            delete memRoom.FctrLvl; // remove FctrLvl - maybe the buildings have been deleted ect.
             delete memRoom.PowerSpawnId; // remove PowerSpawnId - maybe the buildings have been deleted ect.
             delete memRoom.TowerIds; // remove TowerIds - maybe a tower have been deleted ect.
             delete memRoom.ObserverId; // remove ObserverId - maybe an observer have been deleted ect.
@@ -214,6 +215,22 @@ module.exports.loop = function () {
                             const color = Util.GetColorCodeFromResource(mineral);
                             Game.map.visual.text(mineral, new RoomPosition(46, 5, memRoomKey), {
                                 color: color,
+                                fontSize: 7,
+                                opacity: 1
+                            });
+                        }
+
+                        // show factory level
+                        if(!memRoom.FctrLvl){
+                            if(memRoom.FctrId && memRoom.FctrId !== "-"){
+                                const factory = Game.getObjectById(memRoom.FctrId);
+                                if(factory){
+                                    memRoom.FctrLvl = factory.level ? factory.level : 0;
+                                }
+                            }
+                        }else{
+                            Game.map.visual.text(memRoom.FctrLvl, new RoomPosition(5, 46, memRoomKey), {
+                                color: '#ffffff',
                                 fontSize: 7,
                                 opacity: 1
                             });

@@ -22,6 +22,8 @@ const Factories = {
                 if (factory.cooldown === 0) {
                     let result;
                     const hasOperateFactoryEffect = factory.effects && factory.effects[0] && factory.effects[0].effect === PWR_OPERATE_FACTORY;
+
+                    // factory level specific commodities
                     if (factory.level === 1 && hasOperateFactoryEffect) {
                         result = Produce(factory, RESOURCE_COMPOSITE, Util.FACTORY_TARGET_RESOURCE);
                         if (result === OK) return;
@@ -74,6 +76,8 @@ const Factories = {
                         result = Produce(factory, RESOURCE_ESSENCE, Util.FACTORY_TARGET_RESOURCE);
                         if (result === OK) return;
                     }
+
+                    // compressed commodities
                     result = Produce(factory, RESOURCE_LEMERGIUM_BAR, Util.FACTORY_TARGET_RESOURCE);
                     if (result === OK) return;
                     result = Produce(factory, RESOURCE_ZYNTHIUM_BAR, Util.FACTORY_TARGET_RESOURCE);
@@ -86,7 +90,12 @@ const Factories = {
                     if (result === OK) return;
                     result = Produce(factory, RESOURCE_REDUCTANT, Util.FACTORY_TARGET_RESOURCE);
                     if (result === OK) return;
+                    result = Produce(factory, RESOURCE_PURIFIER, Util.FACTORY_TARGET_RESOURCE);
+                    if (result === OK) return;
+                    result = Produce(factory, RESOURCE_GHODIUM_MELT, Util.FACTORY_TARGET_RESOURCE / 2);
+                    if (result === OK) return;
 
+                    // basic regional commodities
                     result = Produce(factory, RESOURCE_WIRE, Util.FACTORY_TARGET_RESOURCE);
                     if (result === OK) return;
                     result = Produce(factory, RESOURCE_CELL, Util.FACTORY_TARGET_RESOURCE);
@@ -95,6 +104,7 @@ const Factories = {
                     if (result === OK) return;
                     result = Produce(factory, RESOURCE_CONDENSATE, Util.FACTORY_TARGET_RESOURCE);
                     if (result === OK) return;
+
                     if (factory.room.storage.store.getUsedCapacity(RESOURCE_ENERGY) >= Util.STORAGE_ENERGY_MEDIUM) {
                         result = Produce(factory, RESOURCE_BATTERY, Util.FACTORY_TARGET_RESOURCE);
                         if (result === OK) return;
