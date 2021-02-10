@@ -225,7 +225,7 @@ module.exports.loop = function () {
                             if(memRoom.FctrId && memRoom.FctrId !== "-"){
                                 const factory = Game.getObjectById(memRoom.FctrId);
                                 if(factory){
-                                    memRoom.FctrLvl = factory.level ? factory.level : 0;
+                                    memRoom.FctrLvl = factory.level ? factory.level : '0';
                                 }
                             }
                         }else{
