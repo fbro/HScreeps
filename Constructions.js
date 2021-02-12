@@ -2,17 +2,23 @@ let Util = require('Util');
 const Constructions = {
     run: function () {
 
-        for (const memRoomKey in Memory.MemRooms) {
-            const gameRoom = Game.rooms[memRoomKey];
+        ConstructControl();
 
-            if (gameRoom && gameRoom.controller && gameRoom.controller.my) {
-                const roomTerrain = gameRoom.getTerrain();
-                //const startCpu = Game.cpu.getUsed();
-                Build(gameRoom, roomTerrain);
-                //const elapsed = Game.cpu.getUsed() - startCpu;
-                //Util.Info('Constructions', '', elapsed + ' ' + gameRoom.name + ' ' + gameRoom.controller.level);
-            } else if (Memory.MemRooms[memRoomKey].IsReserved) {
-                ReservedRoomBuild(gameRoom, memRoomKey);
+        //region construct controller
+
+        function ConstructControl() {
+            for (const memRoomKey in Memory.MemRooms) {
+                const gameRoom = Game.rooms[memRoomKey];
+
+                if (gameRoom && gameRoom.controller && gameRoom.controller.my) {
+                    const roomTerrain = gameRoom.getTerrain();
+                    //const startCpu = Game.cpu.getUsed();
+                    Build(gameRoom, roomTerrain);
+                    //const elapsed = Game.cpu.getUsed() - startCpu;
+                    //Util.Info('Constructions', '', elapsed + ' ' + gameRoom.name + ' ' + gameRoom.controller.level);
+                } else if (Memory.MemRooms[memRoomKey].IsReserved) {
+                    ReservedRoomBuild(gameRoom, memRoomKey);
+                }
             }
         }
 
@@ -156,6 +162,8 @@ const Constructions = {
                 Util.InfoLog('Constructions', 'ReservedRoomBuild', 'bestMainRoom not found! room ' + gameRoomKey);
             }
         }
+
+        //endregion
 
         //region construct functions
 
@@ -494,7 +502,7 @@ const Constructions = {
                     if (map[i][e] !== 0 && map[i][e] < 5) {
                         const structures = gameRoom.lookForAt(LOOK_STRUCTURES, i, e);
                         if (!structures.length || !_.find(structures, function (structure) {
-                            return structure.structureType !== STRUCTURE_ROAD;
+                            return structure.structureType === STRUCTURE_WALL;
                         })) {
                             const buildPos = new RoomPosition(i, e, gameRoom.name);
                             buildPos.createConstructionSite(STRUCTURE_RAMPART);

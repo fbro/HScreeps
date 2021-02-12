@@ -25,8 +25,6 @@ const Factories = {
 
                     // factory level specific commodities
                     if (factory.level === 1 && hasOperateFactoryEffect) {
-                        result = Produce(factory, RESOURCE_COMPOSITE, Util.FACTORY_TARGET_RESOURCE);
-                        if (result === OK) return;
                         result = Produce(factory, RESOURCE_TUBE, Util.FACTORY_TARGET_RESOURCE);
                         if (result === OK) return;
                         result = Produce(factory, RESOURCE_PHLEGM, Util.FACTORY_TARGET_RESOURCE);
@@ -35,9 +33,9 @@ const Factories = {
                         if (result === OK) return;
                         result = Produce(factory, RESOURCE_CONCENTRATE, Util.FACTORY_TARGET_RESOURCE);
                         if (result === OK) return;
-                    } else if (factory.level === 2 && hasOperateFactoryEffect) {
-                        result = Produce(factory, RESOURCE_CRYSTAL, Util.FACTORY_TARGET_RESOURCE);
+                        result = Produce(factory, RESOURCE_COMPOSITE, Util.FACTORY_TARGET_RESOURCE);
                         if (result === OK) return;
+                    } else if (factory.level === 2 && hasOperateFactoryEffect) {
                         result = Produce(factory, RESOURCE_FIXTURES, Util.FACTORY_TARGET_RESOURCE);
                         if (result === OK) return;
                         result = Produce(factory, RESOURCE_TISSUE, Util.FACTORY_TARGET_RESOURCE);
@@ -46,9 +44,9 @@ const Factories = {
                         if (result === OK) return;
                         result = Produce(factory, RESOURCE_EXTRACT, Util.FACTORY_TARGET_RESOURCE);
                         if (result === OK) return;
-                    } else if (factory.level === 3 && hasOperateFactoryEffect) {
-                        result = Produce(factory, RESOURCE_LIQUID, Util.FACTORY_TARGET_RESOURCE);
+                        result = Produce(factory, RESOURCE_CRYSTAL, Util.FACTORY_TARGET_RESOURCE);
                         if (result === OK) return;
+                    } else if (factory.level === 3 && hasOperateFactoryEffect) {
                         result = Produce(factory, RESOURCE_FRAME, Util.FACTORY_TARGET_RESOURCE);
                         if (result === OK) return;
                         result = Produce(factory, RESOURCE_MUSCLE, Util.FACTORY_TARGET_RESOURCE);
@@ -56,6 +54,8 @@ const Factories = {
                         result = Produce(factory, RESOURCE_MICROCHIP, Util.FACTORY_TARGET_RESOURCE);
                         if (result === OK) return;
                         result = Produce(factory, RESOURCE_SPIRIT, Util.FACTORY_TARGET_RESOURCE);
+                        if (result === OK) return;
+                        result = Produce(factory, RESOURCE_LIQUID, Util.FACTORY_TARGET_RESOURCE);
                         if (result === OK) return;
                     } else if (factory.level === 4 && hasOperateFactoryEffect) {
                         result = Produce(factory, RESOURCE_HYDRAULICS, Util.FACTORY_TARGET_RESOURCE);
@@ -77,6 +77,16 @@ const Factories = {
                         if (result === OK) return;
                     }
 
+                    // basic regional commodities
+                    result = Produce(factory, RESOURCE_WIRE, Util.FACTORY_TARGET_RESOURCE);
+                    if (result === OK) return;
+                    result = Produce(factory, RESOURCE_CELL, Util.FACTORY_TARGET_RESOURCE);
+                    if (result === OK) return;
+                    result = Produce(factory, RESOURCE_ALLOY, Util.FACTORY_TARGET_RESOURCE);
+                    if (result === OK) return;
+                    result = Produce(factory, RESOURCE_CONDENSATE, Util.FACTORY_TARGET_RESOURCE);
+                    if (result === OK) return;
+
                     // compressed commodities
                     result = Produce(factory, RESOURCE_LEMERGIUM_BAR, Util.FACTORY_TARGET_RESOURCE);
                     if (result === OK) return;
@@ -93,16 +103,6 @@ const Factories = {
                     result = Produce(factory, RESOURCE_PURIFIER, Util.FACTORY_TARGET_RESOURCE);
                     if (result === OK) return;
                     result = Produce(factory, RESOURCE_GHODIUM_MELT, Util.FACTORY_TARGET_RESOURCE / 2);
-                    if (result === OK) return;
-
-                    // basic regional commodities
-                    result = Produce(factory, RESOURCE_WIRE, Util.FACTORY_TARGET_RESOURCE);
-                    if (result === OK) return;
-                    result = Produce(factory, RESOURCE_CELL, Util.FACTORY_TARGET_RESOURCE);
-                    if (result === OK) return;
-                    result = Produce(factory, RESOURCE_ALLOY, Util.FACTORY_TARGET_RESOURCE);
-                    if (result === OK) return;
-                    result = Produce(factory, RESOURCE_CONDENSATE, Util.FACTORY_TARGET_RESOURCE);
                     if (result === OK) return;
 
                     if (factory.room.storage.store.getUsedCapacity(RESOURCE_ENERGY) >= Util.STORAGE_ENERGY_MEDIUM) {
@@ -122,6 +122,7 @@ const Factories = {
             }
         }
 
+        /**@return {number}*/
         function Produce(factory, resToProduce, resToProduceMaxAmount) {
             if (factory.store.getUsedCapacity(resToProduce) < resToProduceMaxAmount) {
                 const commodity = COMMODITIES[resToProduce];
