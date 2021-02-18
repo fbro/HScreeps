@@ -132,7 +132,7 @@ const ExecuteJobs = {
                 }
                 if (result === ERR_NO_RESULT_FOUND && (!gameCreep.room.controller
                     || !gameCreep.room.controller.my
-                    || gameCreep.memory.MoveHome
+                    || Memory.creeps[gameCreep.name].MoveHome
                     || Memory.MemRooms[gameCreep.pos.roomName]
                     && Memory.MemRooms[gameCreep.pos.roomName].MaxCreeps[creepName.substring(0, 1)]
                     && !Memory.MemRooms[gameCreep.pos.roomName].MaxCreeps[creepName.substring(0, 1)][creepName])) { // I do not own the room the idle creep is in - move it to an owned room!
@@ -201,7 +201,7 @@ const ExecuteJobs = {
         function IdleCreepMoveHome(creepName, gameCreep, jobRoomName) {
             let result = ERR_NO_RESULT_FOUND;
             let closestOwnedRoom;
-            if (!gameCreep.memory.MoveHome) {
+            if (!Memory.creeps[gameCreep.name].MoveHome) {
                 let bestDistance = Number.MAX_SAFE_INTEGER;
                 for (const memRoomKey in Memory.MemRooms) {
                     if (Game.rooms[memRoomKey] && Game.rooms[memRoomKey].controller && Game.rooms[memRoomKey].controller.my) { // exist and has room
@@ -218,20 +218,20 @@ const ExecuteJobs = {
                         Memory.MemRooms[closestOwnedRoom].MaxCreeps[creepName.substring(0, 1)] = {};
                     }
                     Memory.MemRooms[closestOwnedRoom].MaxCreeps[creepName.substring(0, 1)][creepName] = creepName; // add to the new home room
-                    gameCreep.memory.MoveHome = closestOwnedRoom;
+                    Memory.creeps[gameCreep.name].MoveHome = closestOwnedRoom;
                     Util.Info('ExecuteJobs', 'ExecuteRoomJobs', 'idle ' + creepName + ' in ' + gameCreep.pos.roomName + ' moving to ' + closestOwnedRoom);
                 } else {
                     Util.ErrorLog('ExecuteJobs', 'ExecuteRoomJobs', 'idle ' + creepName + ' in ' + gameCreep.pos.roomName + ' cannot find a new home!');
                 }
             } else {
-                closestOwnedRoom = gameCreep.memory.MoveHome;
+                closestOwnedRoom = Memory.creeps[gameCreep.name].MoveHome;
             }
 
             if (Game.rooms[closestOwnedRoom] && closestOwnedRoom && (closestOwnedRoom !== gameCreep.pos.roomName || gameCreep.pos.getRangeTo(Game.rooms[closestOwnedRoom].controller) > 4)) {
                 result = Move(gameCreep, Game.rooms[closestOwnedRoom].controller);
                 gameCreep.say('🏠🏃');
             } else {
-                gameCreep.memory.MoveHome = undefined;
+                Memory.creeps[gameCreep.name].MoveHome = undefined;
                 gameCreep.say('🏠🏃✔');
             }
             return result;
@@ -341,7 +341,7 @@ const ExecuteJobs = {
 
         /**@return {number}*/
         function JobAction(creep, roomJob) {
-            const jobKey = creep.memory.JobName;
+            const jobKey = Memory.creeps[creep.name].JobName;
             let result = ERR_NO_RESULT_FOUND;
             if (roomJob.JobType === Util.OBJECT_JOB) {
                 switch (true) {
@@ -502,7 +502,7 @@ const ExecuteJobs = {
             let result = GenericJobAction(creep, roomJob, {
                 /**@return {int}*/
                 JobStatus: function (jobObject) {
-                    if (creep.store.getFreeCapacity() === 0 || creep.memory.FetchObjectId) {
+                    if (creep.store.getFreeCapacity() === 0 || Memory.creeps[creep.name].FetchObjectId) {
                         return SHOULD_FETCH;
                     } else {
                         return SHOULD_ACT;
@@ -518,14 +518,14 @@ const ExecuteJobs = {
                     if (creep.store.getFreeCapacity() <= creep.getActiveBodyparts(WORK) * HARVEST_POWER) { // predict that creep will be full and make a transfer that wont stop the harvesting flow
                         let fetchObject;
                         let result = ERR_NO_RESULT_FOUND;
-                        if (creep.memory.LinkId) {
-                            fetchObject = Game.getObjectById(creep.memory.LinkId);
+                        if (Memory.creeps[creep.name].LinkId) {
+                            fetchObject = Game.getObjectById(Memory.creeps[creep.name].LinkId);
                             if (fetchObject) {
                                 result = creep.transfer(fetchObject, RESOURCE_ENERGY);
                             }
                         }
                         if (result !== OK) {
-                            fetchObject = Game.getObjectById(creep.memory.ClosestFreeStoreId);
+                            fetchObject = Game.getObjectById(Memory.creeps[creep.name].ClosestFreeStoreId);
                             if (fetchObject) {
                                 result = creep.transfer(fetchObject, RESOURCE_ENERGY);
                                 if (result === OK && (fetchObject.pos.x !== creep.pos.x || fetchObject.pos.y !== creep.pos.y)) {
@@ -534,7 +534,7 @@ const ExecuteJobs = {
                             }
                         }
                         if (result === OK) {
-                            creep.memory.FetchObjectId = undefined;
+                            Memory.creeps[creep.name].FetchObjectId = undefined;
                             return SHOULD_ACT;
                         }
                     }
@@ -568,13 +568,13 @@ const ExecuteJobs = {
                     }
                     if (!fetchObject) { // nothing can be found then drop
                         fetchObject = 'DROP';
-                    } else if (!creep.memory.LinkId && fetchObject.structureType === STRUCTURE_LINK && creep.pos.getRangeTo(fetchObject.pos) < 2) { // if fetchObject is link then save in memory
-                        creep.memory.LinkId = fetchObject.id
-                    } else if (creep.memory.LinkId && fetchObject.structureType !== STRUCTURE_LINK) { // if fetchObject is not link and a link is saved in memory then take that instead
-                        const link = Game.getObjectById(creep.memory.LinkId);
+                    } else if (!Memory.creeps[creep.name].LinkId && fetchObject.structureType === STRUCTURE_LINK && creep.pos.getRangeTo(fetchObject.pos) < 2) { // if fetchObject is link then save in memory
+                        Memory.creeps[creep.name].LinkId = fetchObject.id
+                    } else if (Memory.creeps[creep.name].LinkId && fetchObject.structureType !== STRUCTURE_LINK) { // if fetchObject is not link and a link is saved in memory then take that instead
+                        const link = Game.getObjectById(Memory.creeps[creep.name].LinkId);
                         if (link && link.store && link.store.getFreeCapacity(RESOURCE_ENERGY) > 200 && isOnlyEnergy) {
                             fetchObject = link;
-                            creep.memory.ClosestFreeStoreId = fetchObject.id;
+                            Memory.creeps[creep.name].ClosestFreeStoreId = fetchObject.id;
                         }
                     }
                     return fetchObject;
@@ -608,7 +608,7 @@ const ExecuteJobs = {
             });
             if (result === ERR_NOT_ENOUGH_RESOURCES) { // repair when source is empty
                 if (!creep.store.getUsedCapacity(RESOURCE_ENERGY)) {
-                    const energyDeposit = Game.getObjectById(creep.memory.ClosestFreeStoreId);
+                    const energyDeposit = Game.getObjectById(Memory.creeps[creep.name].ClosestFreeStoreId);
                     if (energyDeposit && energyDeposit.store.getUsedCapacity(RESOURCE_ENERGY)) {
                         result = creep.withdraw(energyDeposit, RESOURCE_ENERGY);
                     }
@@ -632,7 +632,7 @@ const ExecuteJobs = {
             const result = GenericJobAction(creep, roomJob, {
                 /**@return {int}*/
                 JobStatus: function (jobObject) {
-                    if (!creep.store.getUsedCapacity(RESOURCE_ENERGY) || creep.memory.FetchObjectId) { // fetch
+                    if (!creep.store.getUsedCapacity(RESOURCE_ENERGY) || Memory.creeps[creep.name].FetchObjectId) { // fetch
                         return SHOULD_FETCH;
                     } else { // action not done yet
                         return SHOULD_ACT;
@@ -773,7 +773,7 @@ const ExecuteJobs = {
             const result = GenericJobAction(creep, roomJob, {
                 /**@return {int}*/
                 JobStatus: function (jobObject) {
-                    if (!creep.store.getUsedCapacity(RESOURCE_ENERGY) || creep.memory.FetchObjectId) { // fetch
+                    if (!creep.store.getUsedCapacity(RESOURCE_ENERGY) || Memory.creeps[creep.name].FetchObjectId) { // fetch
                         return SHOULD_FETCH;
                     } else { // action not done yet
                         return SHOULD_ACT;
@@ -897,12 +897,12 @@ const ExecuteJobs = {
 
         /**@return {int}*/
         function JobFillStorage(creep, roomJob) {
-            let resourceType = creep.memory.resourceType;
+            let resourceType = Memory.creeps[creep.name].resourceType;
             if (!resourceType) {
-                resourceType = creep.memory.JobName.split(/[(,)]+/).filter(function (e) {
+                resourceType = Memory.creeps[creep.name].JobName.split(/[(,)]+/).filter(function (e) {
                     return e;
                 })[3];
-                creep.memory.resourceType = resourceType;
+                Memory.creeps[creep.name].resourceType = resourceType;
             }
             const result = GenericJobAction(creep, roomJob, {
                 /**@return {int}*/
@@ -1040,7 +1040,7 @@ const ExecuteJobs = {
                 FindFetchObject: function (jobObject) {
                     let fetchObject = FindClosestFreeStore(creep, 2);
                     if (!fetchObject) {
-                        Util.Warning('ExecuteJobs', 'JobExtractMineral', 'no nearby store ' + creep.name + ' ' + creep.memory.JobName);
+                        Util.Warning('ExecuteJobs', 'JobExtractMineral', 'no nearby store ' + creep.name + ' ' + Memory.creeps[creep.name].JobName);
                         fetchObject = jobObject.room.storage;
                     }
                     return fetchObject;
@@ -1055,12 +1055,12 @@ const ExecuteJobs = {
 
         /**@return {int}*/
         function JobFillTerminal(creep, roomJob) {
-            let resourceType = creep.memory.resourceType;
+            let resourceType = Memory.creeps[creep.name].resourceType;
             if (!resourceType) {
-                resourceType = creep.memory.JobName.split(/[()]+/).filter(function (e) {
+                resourceType = Memory.creeps[creep.name].JobName.split(/[()]+/).filter(function (e) {
                     return e;
                 })[1];
-                creep.memory.resourceType = resourceType;
+                Memory.creeps[creep.name].resourceType = resourceType;
             }
             const creepCarry = creep.store.getCapacity(); // when a creep withdraws from storage then the amount is diminished - the job might end because of that diminish - it should not
             let storageResourceAmount = 0;
@@ -1150,12 +1150,12 @@ const ExecuteJobs = {
 
         /**@return {int}*/
         function JobFillFactory(creep, roomJob) {
-            let resourceType = creep.memory.resourceType;
+            let resourceType = Memory.creeps[creep.name].resourceType;
             if (!resourceType) {
-                resourceType = creep.memory.JobName.split(/[()]+/).filter(function (e) {
+                resourceType = Memory.creeps[creep.name].JobName.split(/[()]+/).filter(function (e) {
                     return e;
                 })[1];
-                creep.memory.resourceType = resourceType;
+                Memory.creeps[creep.name].resourceType = resourceType;
             }
             const result = GenericJobAction(creep, roomJob, {
                 /**@return {int}*/
@@ -1683,14 +1683,14 @@ const ExecuteJobs = {
         /**@return {int}*/
         function JobFillLabMineral(creep, roomJob) {
             let lab;
-            if (creep.memory.LabId) {
-                lab = Game.getObjectById(creep.memory.LabId);
+            if (Memory.creeps[creep.name].LabId) {
+                lab = Game.getObjectById(Memory.creeps[creep.name].LabId);
             }
             const result = GenericFlagAction(creep, roomJob, {
                 /**@return {int}*/
                 JobStatus: function (jobObject) {
-                    if (!creep.memory.Mineral) {
-                        creep.memory.Mineral = jobObject.name.split(/[-]+/).filter(function (e) {
+                    if (!Memory.creeps[creep.name].Mineral) {
+                        Memory.creeps[creep.name].Mineral = jobObject.name.split(/[-]+/).filter(function (e) {
                             return e;
                         })[1];
                         if (!lab) {
@@ -1704,12 +1704,12 @@ const ExecuteJobs = {
                                 Util.ErrorLog('ExecuteJobs', 'JobFillLabMineral', 'lab gone ' + jobObject.pos.roomName + ' ' + creep.name);
                                 return ERR_NO_RESULT_FOUND;
                             }
-                            creep.memory.LabId = lab.id;
+                            Memory.creeps[creep.name].LabId = lab.id;
                         }
                     }
-                    if (lab.store.getFreeCapacity(creep.memory.Mineral) < 500) {
+                    if (lab.store.getFreeCapacity(Memory.creeps[creep.name].Mineral) < 500) {
                         return JOB_IS_DONE; // lab is full with said mineral - job is done
-                    } else if (creep.store.getUsedCapacity(creep.memory.Mineral) > 0) {
+                    } else if (creep.store.getUsedCapacity(Memory.creeps[creep.name].Mineral) > 0) {
                         return SHOULD_ACT; // transfer to lab
                     } else {
                         return SHOULD_FETCH // withdraw desired resource nearby
@@ -1717,11 +1717,11 @@ const ExecuteJobs = {
                 },
                 /**@return {int}*/
                 Act: function (jobObject) {
-                    return creep.transfer(lab, creep.memory.Mineral);
+                    return creep.transfer(lab, Memory.creeps[creep.name].Mineral);
                 },
                 /**@return {int}*/
                 IsJobDone: function (jobObject) {
-                    if (lab.store.getFreeCapacity(creep.memory.Mineral) - creep.store.getUsedCapacity(creep.memory.Mineral) <= 0) { // predict
+                    if (lab.store.getFreeCapacity(Memory.creeps[creep.name].Mineral) - creep.store.getUsedCapacity(Memory.creeps[creep.name].Mineral) <= 0) { // predict
                         return JOB_IS_DONE
                     } else {
                         return this.JobStatus(jobObject);
@@ -1732,14 +1732,14 @@ const ExecuteJobs = {
                     return jobObject.room.find(FIND_STRUCTURES, {
                         filter: function (s) {
                             return ((s.structureType === STRUCTURE_STORAGE || s.structureType === STRUCTURE_CONTAINER || s.structureType === STRUCTURE_TERMINAL)
-                                && s.store.getUsedCapacity(creep.memory.Mineral) > 0);
+                                && s.store.getUsedCapacity(Memory.creeps[creep.name].Mineral) > 0);
                         }
                     })[0];
                 },
                 /**@return {int}*/
                 Fetch: function (fetchObject, jobObject) {
                     const lab = jobObject.pos.lookFor(LOOK_STRUCTURES)[0];
-                    return FetchResource(creep, fetchObject, creep.memory.Mineral, lab.store.getFreeCapacity(creep.memory.Mineral));
+                    return FetchResource(creep, fetchObject, Memory.creeps[creep.name].Mineral, lab.store.getFreeCapacity(Memory.creeps[creep.name].Mineral));
                 },
             });
             return result;
@@ -1748,16 +1748,16 @@ const ExecuteJobs = {
         /**@return {int}*/
         function JobEmptyLabMineral(creep, roomJob) {
             let lab;
-            if (creep.memory.LabId) {
-                lab = Game.getObjectById(creep.memory.LabId);
+            if (Memory.creeps[creep.name].LabId) {
+                lab = Game.getObjectById(Memory.creeps[creep.name].LabId);
             }
             const result = GenericFlagAction(creep, roomJob, {
                 /**@return {int}*/
                 JobStatus: function (jobObject) {
-                    let mineral = creep.memory.Mineral;
+                    let mineral = Memory.creeps[creep.name].Mineral;
                     if (!mineral) {
                         mineral = jobObject.name.split('-')[1];
-                        creep.memory.Mineral = mineral;
+                        Memory.creeps[creep.name].Mineral = mineral;
                         if (!lab) {
                             lab = jobObject.pos.findInRange(FIND_MY_STRUCTURES, 0, {
                                 filter: function (lab) {
@@ -1769,7 +1769,7 @@ const ExecuteJobs = {
                                 Util.ErrorLog('ExecuteJobs', 'JobEmptyLabMineral', 'lab gone ' + jobObject.pos.roomName + ' ' + creep.name);
                                 return ERR_NO_RESULT_FOUND;
                             }
-                            creep.memory.LabId = lab.id;
+                            Memory.creeps[creep.name].LabId = lab.id;
                         }
                     }
                     if (lab.store.getUsedCapacity(mineral) < 500) {
@@ -1783,7 +1783,7 @@ const ExecuteJobs = {
                 },
                 /**@return {int}*/
                 Act: function (jobObject) {
-                    return creep.withdraw(lab, creep.memory.Mineral);
+                    return creep.withdraw(lab, Memory.creeps[creep.name].Mineral);
                 },
                 /**@return {int}*/
                 IsJobDone: function (jobObject) {
@@ -1795,7 +1795,7 @@ const ExecuteJobs = {
                 },
                 /**@return {int}*/
                 Fetch: function (fetchObject, jobObject) {
-                    return creep.transfer(fetchObject, creep.memory.Mineral);
+                    return creep.transfer(fetchObject, Memory.creeps[creep.name].Mineral);
                 },
             });
             return result;
@@ -1814,13 +1814,13 @@ const ExecuteJobs = {
                         return ERR_NOT_IN_RANGE;
                     }
                     let powerBank;
-                    if (creep.memory.PowerBankId) {
-                        powerBank = Game.getObjectById(creep.memory.PowerBankId);
+                    if (Memory.creeps[creep.name].PowerBankId) {
+                        powerBank = Game.getObjectById(Memory.creeps[creep.name].PowerBankId);
                     }
                     if (!powerBank) {
                         powerBank = jobObject.pos.lookFor(LOOK_STRUCTURES)[0];
                         if (powerBank) {
-                            creep.memory.PowerBankId = powerBank.id;
+                            Memory.creeps[creep.name].PowerBankId = powerBank.id;
                         }
                     }
                     let result = ERR_NO_RESULT_FOUND;
@@ -1882,13 +1882,13 @@ const ExecuteJobs = {
                         return SHOULD_ACT;
                     } else {
                         let powerBank;
-                        if (creep.memory.PowerBankId) {
-                            powerBank = Game.getObjectById(creep.memory.PowerBankId);
+                        if (Memory.creeps[creep.name].PowerBankId) {
+                            powerBank = Game.getObjectById(Memory.creeps[creep.name].PowerBankId);
                         }
                         if (!powerBank) {
                             powerBank = jobObject.pos.lookFor(LOOK_STRUCTURES)[0];
                             if (powerBank) {
-                                creep.memory.PowerBankId = powerBank.id;
+                                Memory.creeps[creep.name].PowerBankId = powerBank.id;
                             }
                         }
                         if (!powerBank) {
@@ -1912,8 +1912,8 @@ const ExecuteJobs = {
                 },
                 /**@return {object} @return {undefined}*/
                 FindFetchObject: function (jobObject) {
-                    if (creep.memory.PrimaryHealerTarget && Game.creeps[creep.memory.PrimaryHealerTarget] && Game.creeps[creep.memory.PrimaryHealerTarget].hits < Game.creeps[creep.memory.PrimaryHealerTarget].hitsMax) {
-                        return Game.creeps[creep.memory.PrimaryHealerTarget];
+                    if (Memory.creeps[creep.name].PrimaryHealerTarget && Game.creeps[Memory.creeps[creep.name].PrimaryHealerTarget] && Game.creeps[Memory.creeps[creep.name].PrimaryHealerTarget].hits < Game.creeps[Memory.creeps[creep.name].PrimaryHealerTarget].hitsMax) {
+                        return Game.creeps[Memory.creeps[creep.name].PrimaryHealerTarget];
                     } else {
                         let selectedWoundedCreep;
                         let mostWoundedCreep;
@@ -1932,13 +1932,13 @@ const ExecuteJobs = {
                             let isAnyoneHealingWoundedCreep = false;
                             for (const healerCreepKey in healerCreeps) {
                                 const healerCreep = healerCreeps[healerCreepKey];
-                                if (healerCreep.memory.PrimaryHealerTarget === woundedCreep.name) {
+                                if (healerMemory.creeps[creep.name].PrimaryHealerTarget === woundedCreep.name) {
                                     isAnyoneHealingWoundedCreep = true;
                                     break;
                                 }
                             }
                             if (!isAnyoneHealingWoundedCreep) {
-                                creep.memory.PrimaryHealerTarget = woundedCreep.name;
+                                Memory.creeps[creep.name].PrimaryHealerTarget = woundedCreep.name;
                                 selectedWoundedCreep = woundedCreep;
                                 break;
                             }
@@ -2037,7 +2037,7 @@ const ExecuteJobs = {
                     if (result === ERR_NOT_IN_RANGE) {
                         result = Move(creep, powerTarget);
                     } else if (result === OK) {
-                        creep.memory._move = undefined;
+                        Memory.creeps[creep.name]._move = undefined;
                     } else {
                         Util.Info('ExecuteJobs', 'JobTransportPowerBank', 'removing powerbank flag because last power has been picked up! ' + jobObject.pos.roomName);
                         jobObject.remove();
@@ -2078,7 +2078,7 @@ const ExecuteJobs = {
                         //Util.Info('ExecuteJobs', 'JobHarvestDeposit', creep.name + ' committed suicide creep.ticksToLive ' + creep.ticksToLive + ' JOB_IS_DONE');
                         creep.suicide();
                         return JOB_IS_DONE;
-                    } else if (creep.store.getFreeCapacity() === 0 || creep.memory.FetchObjectId && creep.store.getUsedCapacity() > 0 || creep.ticksToLive < 400) {
+                    } else if (creep.store.getFreeCapacity() === 0 || Memory.creeps[creep.name].FetchObjectId && creep.store.getUsedCapacity() > 0 || creep.ticksToLive < 400) {
                         return SHOULD_FETCH;
                     } else {
                         return SHOULD_ACT;
@@ -2090,13 +2090,13 @@ const ExecuteJobs = {
                         return ERR_NOT_IN_RANGE;
                     } else {
                         let deposit;
-                        if (creep.memory.DepositId) {
-                            deposit = Game.getObjectById(creep.memory.DepositId);
+                        if (Memory.creeps[creep.name].DepositId) {
+                            deposit = Game.getObjectById(Memory.creeps[creep.name].DepositId);
                         }
                         if (!deposit) {
                             deposit = jobObject.pos.lookFor(LOOK_DEPOSITS)[0];
                             if (deposit) {
-                                creep.memory.DepositId = deposit.id;
+                                Memory.creeps[creep.name].DepositId = deposit.id;
                             } else {
                                 Util.ErrorLog('ExecuteJobs', 'JobHarvestDeposit', creep.name + ' no deposit found removed deposit flag in ' + jobObject.pos.roomName);
                                 jobObject.remove();
@@ -2358,7 +2358,7 @@ const ExecuteJobs = {
                     return creep.withdraw(fetchObject, jobObject.memory.ResourceType);
                 },
             });
-            if (creep.memory.JobName && creep.memory.JobName.startsWith('GetRes')) {
+            if (Memory.creeps[creep.name].JobName && Memory.creeps[creep.name].JobName.startsWith('GetRes')) {
             }
             return result;
         }
@@ -2366,7 +2366,7 @@ const ExecuteJobs = {
         /**@return {int}*/
         function JobFetchDroppedResource(creep, roomJob) {
             // get resource from a room until no more dropped resources are found in that room
-            let droppedResource = creep.memory.DroppedResId ? Game.getObjectById(creep.memory.DroppedResId) : undefined;
+            let droppedResource = Memory.creeps[creep.name].DroppedResId ? Game.getObjectById(Memory.creeps[creep.name].DroppedResId) : undefined;
             let result = GenericFlagAction(creep, roomJob, {
                 /**@return {int}*/
                 JobStatus: function (jobObject) {
@@ -2380,7 +2380,7 @@ const ExecuteJobs = {
                             if (!droppedResource) {
                                 droppedResource = creep.pos.findClosestByPath(FIND_DROPPED_RESOURCES);
                                 if (droppedResource) {
-                                    creep.memory.DroppedResId = droppedResource.id;
+                                    Memory.creeps[creep.name].DroppedResId = droppedResource.id;
                                 }
                             }
                             if (!droppedResource) {
@@ -2426,9 +2426,9 @@ const ExecuteJobs = {
 
         /**@return {boolean}*/
         function HealthCheck(creep) {
-            if (!creep.memory.HealthCheck) {
+            if (!Memory.creeps[creep.name].HealthCheck) {
                 if (creep.ticksToLive > 1000 || (creep.name.startsWith('C') || creep.name.startsWith('R')) && creep.ticksToLive > 550) {
-                    creep.memory.HealthCheck = true;
+                    Memory.creeps[creep.name].HealthCheck = true;
                     return true;
                 } else {
                     Util.Info('ExecuteJobs', 'HealthCheck', creep.name + ' committed suicide ticksToLive ' + creep.ticksToLive);
@@ -2508,22 +2508,22 @@ const ExecuteJobs = {
 
                 if (jobStatus === SHOULD_FETCH) { // fetch immediately after maybe a successful Act that is not done
                     let fetchObject; // get fetch object
-                    if (creep.memory.FetchObjectId) {
-                        fetchObject = Game.getObjectById(creep.memory.FetchObjectId);
+                    if (Memory.creeps[creep.name].FetchObjectId) {
+                        fetchObject = Game.getObjectById(Memory.creeps[creep.name].FetchObjectId);
                     }
                     if (!fetchObject) {
                         fetchObject = actionFunctions.FindFetchObject(targetObj);
                         if (!fetchObject) {
                             result = NO_FETCH_FOUND;
                         } else {
-                            creep.memory.FetchObjectId = fetchObject.id;
+                            Memory.creeps[creep.name].FetchObjectId = fetchObject.id;
                         }
                     }
                     if (result !== NO_FETCH_FOUND) {
                         if (!didAct) {
                             result = actionFunctions.Fetch(fetchObject, targetObj);
                             if (result === OK) {
-                                creep.memory.FetchObjectId = undefined;
+                                Memory.creeps[creep.name].FetchObjectId = undefined;
                             }
                         }
                         if (result === ERR_NOT_IN_RANGE) {
@@ -2536,7 +2536,7 @@ const ExecuteJobs = {
             }
 
             if (result !== OK && result !== ERR_TIRED && result !== JOB_MOVING && result !== ERR_BUSY) { // job is ending
-                creep.memory.FetchObjectId = undefined;
+                Memory.creeps[creep.name].FetchObjectId = undefined;
             }
             return result;
         }
@@ -2557,14 +2557,14 @@ const ExecuteJobs = {
             if (!room) {
                 return;
             }
-            if (creep.memory.ResourceSupply) {
-                resourceSupply = Game.getObjectById(creep.memory.ResourceSupply);// closest link then container then droppedRes then storage
+            if (Memory.creeps[creep.name].ResourceSupply) {
+                resourceSupply = Game.getObjectById(Memory.creeps[creep.name].ResourceSupply);// closest link then container then droppedRes then storage
                 // if the saved resourceSupply does not have any energy then remove it to make way for a new search
                 if (!resourceSupply || !resourceSupply.store || !resourceSupply.store.getUsedCapacity(resourceToFetch)) {
                     resourceSupply = undefined;
-                    creep.memory.ResourceSupply = undefined;
+                    Memory.creeps[creep.name].ResourceSupply = undefined;
                 } else if (resourceSupply && resourceSupply.structureType === STRUCTURE_STORAGE && creep.pos.roomName === jobObject.pos.roomName && creep.pos.getRangeTo(jobObject.pos) > 2) { // creep should have a chance at finding stores that are closer
-                    creep.memory.ResourceSupply = undefined;
+                    Memory.creeps[creep.name].ResourceSupply = undefined;
                 }
             }
             if (!resourceSupply) { // creep memory had nothing stored
@@ -2616,25 +2616,25 @@ const ExecuteJobs = {
                     }
                 }
                 if (resourceSupply) {
-                    creep.memory.ResourceSupply = resourceSupply.id;
+                    Memory.creeps[creep.name].ResourceSupply = resourceSupply.id;
                 }
             }
             return resourceSupply;
         }
 
         function HandleCreepBoost(creep, jobObject, boostingMineral, bodyPartToBoost, ticksToLiveToBoost = 1300, ticksToLiveToUnBoost = 100) {
-            if (!creep.memory.Boost || creep.memory.Boost[bodyPartToBoost] !== "-") { // only look once - after that it is too late
-                if (creep.ticksToLive > ticksToLiveToBoost && (!creep.memory.Boost || creep.memory.Boost && !creep.memory.Boost[bodyPartToBoost])) {
+            if (!Memory.creeps[creep.name].Boost || Memory.creeps[creep.name].Boost[bodyPartToBoost] !== "-") { // only look once - after that it is too late
+                if (creep.ticksToLive > ticksToLiveToBoost && (!Memory.creeps[creep.name].Boost || Memory.creeps[creep.name].Boost && !Memory.creeps[creep.name].Boost[bodyPartToBoost])) {
                     const labThatCanBoost = FindLabThatCanBoost(creep, jobObject, boostingMineral, bodyPartToBoost);
                     if (labThatCanBoost) {
                         return labThatCanBoost;
                     } else {
-                        if (!creep.memory.Boost) {
-                            creep.memory.Boost = {};
+                        if (!Memory.creeps[creep.name].Boost) {
+                            Memory.creeps[creep.name].Boost = {};
                         }
-                        creep.memory.Boost[bodyPartToBoost] = "-";
+                        Memory.creeps[creep.name].Boost[bodyPartToBoost] = "-";
                     }
-                } else if (creep.memory.Boost && creep.memory.Boost[bodyPartToBoost] && creep.ticksToLive < ticksToLiveToUnBoost) { // unboost the creep before the mineral is lost
+                } else if (Memory.creeps[creep.name].Boost && Memory.creeps[creep.name].Boost[bodyPartToBoost] && creep.ticksToLive < ticksToLiveToUnBoost) { // unboost the creep before the mineral is lost
                     const labThatCanUnBoost = FindLabThatCanUnBoost(jobObject);
                     if (labThatCanUnBoost) {
                         return labThatCanUnBoost;
@@ -2646,7 +2646,7 @@ const ExecuteJobs = {
         /**@return {object}
          * @return {undefined}*/
         function FindLabThatCanBoost(creep, jobObject, mineral, bodyTypeToBoost) {
-            if (!creep.memory.Boost || !creep.memory.Boost[bodyTypeToBoost]) {
+            if (!Memory.creeps[creep.name].Boost || !Memory.creeps[creep.name].Boost[bodyTypeToBoost]) {
                 const activeBodyPartsToBoost = creep.getActiveBodyparts(bodyTypeToBoost);
                 const labThatCanBoost = jobObject.room.find(FIND_MY_STRUCTURES, {
                     filter: function (lab) {
@@ -2671,15 +2671,15 @@ const ExecuteJobs = {
         /**@return {number}*/
         function BoostCreep(creep, labThatCanBoost, mineral, bodyTypeToBoost) {
             let result = ERR_NO_RESULT_FOUND;
-            if (!creep.memory.Boost || !creep.memory.Boost[bodyTypeToBoost]) {
+            if (!Memory.creeps[creep.name].Boost || !Memory.creeps[creep.name].Boost[bodyTypeToBoost]) {
                 if (labThatCanBoost) {
                     result = labThatCanBoost.boostCreep(creep);
                     if (result === OK) {
                         Util.Info('ExecuteJobs', 'BoostCreep', creep.pos.roomName + ' ' + creep.name + ' body ' + bodyTypeToBoost + ' mineral ' + mineral);
-                        if (!creep.memory.Boost) {
-                            creep.memory.Boost = {};
+                        if (!Memory.creeps[creep.name].Boost) {
+                            Memory.creeps[creep.name].Boost = {};
                         }
-                        creep.memory.Boost[bodyTypeToBoost] = mineral;
+                        Memory.creeps[creep.name].Boost[bodyTypeToBoost] = mineral;
                     }
                 }
             } else {
@@ -2691,7 +2691,7 @@ const ExecuteJobs = {
         /**@return {number}*/
         function UnBoostCreep(creep, labThatCanUnBoost, mineral, bodyTypeToUnBoost) {
             let result = ERR_NO_RESULT_FOUND;
-            if (creep.memory.Boost && creep.memory.Boost[bodyTypeToUnBoost]) {
+            if (Memory.creeps[creep.name].Boost && Memory.creeps[creep.name].Boost[bodyTypeToUnBoost]) {
                 if (labThatCanUnBoost) {
                     result = labThatCanUnBoost.unboostCreep(creep);
                     if (result === OK) {
@@ -2699,7 +2699,7 @@ const ExecuteJobs = {
                             creep.pickup(creep.pos.lookFor(LOOK_RESOURCES)[0]);
                         }
                         Util.Info('ExecuteJobs', 'UnBoostCreep', creep.pos.roomName + ' ' + creep.name + ' body ' + bodyTypeToUnBoost + ' mineral ' + mineral);
-                        creep.memory.Boost[bodyTypeToUnBoost] = undefined;
+                        Memory.creeps[creep.name].Boost[bodyTypeToUnBoost] = undefined;
                     }
                 }
             } else {
@@ -2749,7 +2749,7 @@ const ExecuteJobs = {
                 }
                 if (result === OK && creep.store.getFreeCapacity() >= fetchObject.store.getUsedCapacity(resourceToFetch)) {
                     //Util.Info('ExecuteJobs', 'FetchResource', creep.name + ' creep freeCapacity ' + creep.store.getFreeCapacity() + ' fetchObject.store ' + fetchObject.store.getUsedCapacity(resourceToFetch));
-                    creep.memory.ResourceSupply = undefined;
+                    Memory.creeps[creep.name].ResourceSupply = undefined;
                 }
             }
             if (result === ERR_FULL) { // creep store is full with anything other than resourceToFetch - get rid of it asap
@@ -2820,11 +2820,11 @@ const ExecuteJobs = {
         }
 
         function FindClosestFreeStore(creep, maxMoveRange = 0, resourceAmountToStore = 1/*filters stores that are not large enough*/, resourceTypeToStore = undefined/*if energy then take link*/) {
-            let closestFreeStore = Game.getObjectById(creep.memory.ClosestFreeStoreId);
+            let closestFreeStore = Game.getObjectById(Memory.creeps[creep.name].ClosestFreeStoreId);
             if (closestFreeStore) {
                 if (closestFreeStore.store.getFreeCapacity() < resourceAmountToStore || maxMoveRange > 0 && creep.pos.getRangeTo(closestFreeStore) > maxMoveRange) {
                     closestFreeStore = undefined;
-                    creep.memory.ClosestFreeStoreId = undefined;
+                    Memory.creeps[creep.name].ClosestFreeStoreId = undefined;
                 }
             }
             if (!closestFreeStore) {
@@ -2879,11 +2879,11 @@ const ExecuteJobs = {
                     }
                     if (closestRoom) {
                         closestFreeStore = closestRoom.storage;
-                        creep.memory.ClosestFreeStoreId = closestFreeStore.id;
+                        Memory.creeps[creep.name].ClosestFreeStoreId = closestFreeStore.id;
                         Util.Info('ExecuteJobs', 'FindClosestFreeStore', creep.name + ' in ' + creep.pos.roomName + ' found closest available storage in ' + closestFreeStore.pos.roomName);
                     }
                 } else if (closestFreeStore) {
-                    creep.memory.ClosestFreeStoreId = closestFreeStore.id;
+                    Memory.creeps[creep.name].ClosestFreeStoreId = closestFreeStore.id;
                 }
             }
             return closestFreeStore;
@@ -3048,7 +3048,7 @@ const ExecuteJobs = {
             let result = ERR_NO_RESULT_FOUND;
             const from = creep.pos;
             const to = obj.pos;
-            if (from.roomName === to.roomName || creep.memory.onlyMoveTo) {
+            if (from.roomName === to.roomName || Memory.creeps[creep.name].onlyMoveTo) {
                 const opts = {
                     //reusePath: 5, // default
                     //serializeMemory: true,  // default
@@ -3063,21 +3063,21 @@ const ExecuteJobs = {
                 };
                 result = creep.moveTo(to, opts);
             } else { // not in the same room - make a map in mem
-                if (creep.memory.ExitPosition && creep.memory.ExitPosition.roomName === creep.pos.roomName) { // movement between rooms should reuse path more
-                    result = creep.moveByPath(creep.memory.CachedPath);
+                if (Memory.creeps[creep.name].ExitPosition && Memory.creeps[creep.name].ExitPosition.roomName === creep.pos.roomName) { // movement between rooms should reuse path more
+                    result = creep.moveByPath(Memory.creeps[creep.name].CachedPath);
                     if (result !== OK && result !== ERR_TIRED) {
-                        Util.Warning('ExecuteJobs', 'Move', 'using cached path failed ' + creep.name + ' ' + creep.pos.roomName + ' ' + result + " cached Path: " + JSON.stringify(creep.memory.CachedPath));
-                        delete creep.memory.CachedPath;
-                        delete creep.memory.ExitPosition;
+                        Util.Warning('ExecuteJobs', 'Move', 'using cached path failed ' + creep.name + ' ' + creep.pos.roomName + ' ' + result + " cached Path: " + JSON.stringify(Memory.creeps[creep.name].CachedPath));
+                        delete Memory.creeps[creep.name].CachedPath;
+                        delete Memory.creeps[creep.name].ExitPosition;
                         result = ERR_NO_RESULT_FOUND;
-                        creep.memory.onlyMoveTo = true; // if pathing fails then resort to exclusively using the more expensive moveTo function
+                        Memory.creeps[creep.name].onlyMoveTo = true; // if pathing fails then resort to exclusively using the more expensive moveTo function
                     }
                 }
                 if (result === ERR_NO_RESULT_FOUND) { // calculate path
                     const length = Util.GenerateOuterRoomPath(to.roomName, from.roomName); // saves result in Memory.Paths
                     if (length !== -1) {
                         getInnerRoomPath(to, creep);
-                        result = creep.moveByPath(creep.memory.CachedPath);
+                        result = creep.moveByPath(Memory.creeps[creep.name].CachedPath);
                     }
                 }
             }
@@ -3098,8 +3098,8 @@ const ExecuteJobs = {
                 Util.ErrorLog('ExecuteJobs', 'getInnerRoomPath', 'exitPosition not found ' + creep.pos.roomName + ' exitDirection ' + exitDirection + ' nextRoom ' + nextRoom);
                 return;
             }
-            creep.memory.CachedPath = creep.room.findPath(creep.pos, exitPosition);
-            creep.memory.ExitPosition = exitPosition;
+            Memory.creeps[creep.name].CachedPath = creep.room.findPath(creep.pos, exitPosition);
+            Memory.creeps[creep.name].ExitPosition = exitPosition;
         }
 
         /**@return {number}*/
@@ -3117,24 +3117,24 @@ const ExecuteJobs = {
                 } else if (creep.pos.y === 49) {
                     result = TryMoveInDirection(creep, TOP_LEFT, TOP, TOP_RIGHT);
                 } else { // not on room edges
-                    if (!creep.memory.MoveErrWait) { // maybe wait a couple of ticks to see if the obstacle has disappeared
-                        creep.memory.MoveErrWait = 1;
-                        creep.memory.MoveErrLastWait = Game.time;
+                    if (!Memory.creeps[creep.name].MoveErrWait) { // maybe wait a couple of ticks to see if the obstacle has disappeared
+                        Memory.creeps[creep.name].MoveErrWait = 1;
+                        Memory.creeps[creep.name].MoveErrLastWait = Game.time;
                         result = JOB_MOVING;
-                    } else if (creep.memory.MoveErrWait < 10) {
-                        const ticksSinceWaitingStart = Game.time - creep.memory.MoveErrLastWait;
-                        if (creep.memory.MoveErrLastWait && ticksSinceWaitingStart > 30) { // if the start of the wait time is more than 30 ticks away then reset it
-                            Util.Info('ExecuteJobs', 'Move', 'move error reset time MoveErrWait ' + creep.memory.MoveErrWait + ' waited ' + ticksSinceWaitingStart + ' ticks ' + result + ' ' + creep.name + ' (' + from.x + ',' + from.y + ',' + from.roomName + ') to ' + obj + '(' + to.x + ',' + to.y + ',' + to.roomName + ')');
-                            creep.memory.MoveErrLastWait = Game.time;
-                            creep.memory.MoveErrWait = 0;
+                    } else if (Memory.creeps[creep.name].MoveErrWait < 10) {
+                        const ticksSinceWaitingStart = Game.time - Memory.creeps[creep.name].MoveErrLastWait;
+                        if (Memory.creeps[creep.name].MoveErrLastWait && ticksSinceWaitingStart > 30) { // if the start of the wait time is more than 30 ticks away then reset it
+                            Util.Info('ExecuteJobs', 'Move', 'move error reset time MoveErrWait ' + Memory.creeps[creep.name].MoveErrWait + ' waited ' + ticksSinceWaitingStart + ' ticks ' + result + ' ' + creep.name + ' (' + from.x + ',' + from.y + ',' + from.roomName + ') to ' + obj + '(' + to.x + ',' + to.y + ',' + to.roomName + ')');
+                            Memory.creeps[creep.name].MoveErrLastWait = Game.time;
+                            Memory.creeps[creep.name].MoveErrWait = 0;
                         }
-                        creep.memory.MoveErrWait++;
+                        Memory.creeps[creep.name].MoveErrWait++;
                         result = JOB_MOVING;
                     } else {
                         if (from.roomName === to.roomName) {
-                            Util.Warning('ExecuteJobs', 'Move', 'move error MoveErrWait ' + creep.memory.MoveErrWait + ' ' + result + ' ' + creep.name + ' (' + from.x + ',' + from.y + ',' + from.roomName + ') to ' + obj + '(' + to.x + ',' + to.y + ',' + to.roomName + ') ending move!');
+                            Util.Warning('ExecuteJobs', 'Move', 'move error MoveErrWait ' + Memory.creeps[creep.name].MoveErrWait + ' ' + result + ' ' + creep.name + ' (' + from.x + ',' + from.y + ',' + from.roomName + ') to ' + obj + '(' + to.x + ',' + to.y + ',' + to.roomName + ') ending move!');
                         } else {
-                            Util.Warning('ExecuteJobs', 'Move', 'move error multiple room MoveErrWait ' + creep.memory.MoveErrWait + ' ' + result + ' ' + creep.name + ' (' + from.x + ',' + from.y + ',' + from.roomName + ') to ' + obj + '(' + to.x + ',' + to.y + ',' + to.roomName + ') ending move!');
+                            Util.Warning('ExecuteJobs', 'Move', 'move error multiple room MoveErrWait ' + Memory.creeps[creep.name].MoveErrWait + ' ' + result + ' ' + creep.name + ' (' + from.x + ',' + from.y + ',' + from.roomName + ') to ' + obj + '(' + to.x + ',' + to.y + ',' + to.roomName + ') ending move!');
                         }
                         if (result === ERR_NO_BODYPART) { // no MOVE bodypart
                             Util.InfoLog('ExecuteJobs', 'Move', creep.name + ' ERR_NO_BODYPART ' + creep.pos.roomName + ' committing suicide');
@@ -3143,7 +3143,7 @@ const ExecuteJobs = {
                         if (result === ERR_INVALID_TARGET) {
                             Util.ErrorLog('ExecuteJobs', 'Move', creep.name + ' ERR_INVALID_TARGET when moving ' + creep.pos.roomName);
                         }
-                        creep.memory.MoveErrWait = undefined;
+                        Memory.creeps[creep.name].MoveErrWait = undefined;
                         result = JOB_IS_DONE;
                     }
                 }

@@ -28,8 +28,8 @@ const AssignJobs = {
         // loop through vacant jobs per room and see if an idle creep could be assigned or a new creep should be spawned
         function AssignOrSpawnCreeps() {
             const idleCreeps = _.filter(Game.creeps, function (creep) {
-                if (creep.memory.JobName) {
-                    return creep.memory.JobName.startsWith('idle');
+                if (Memory.creeps[creep.name].JobName) {
+                    return Memory.creeps[creep.name].JobName.startsWith('idle');
                 } else {
                     return false;
                 }
@@ -65,10 +65,10 @@ const AssignJobs = {
             for (const idleCreepCounter in idleCreeps) {
                 const idleCreep = idleCreeps[idleCreepCounter];
                 if (idleCreep.pos.roomName === memRoomKey && idleCreep.name.startsWith(roomJob.CreepType)) { // idle creep is in memory room with vacant job and matching job type
-                    idleCreep.memory.JobName = roomJobKey;
-                    for (const memoryElementKey in idleCreep.memory) {
-                        if (memoryElementKey !== 'JobName' && memoryElementKey !== 'Boost') { // creep.memory that should not be deleted
-                            idleCreep.memory[memoryElementKey] = undefined;
+                    Memory.creeps[idleCreep.name].JobName = roomJobKey;
+                    for (const memoryElementKey in Memory.creeps[idleCreep.name]) {
+                        if (memoryElementKey !== 'JobName' && memoryElementKey !== 'Boost') { // Memory.creeps[creep.name] that should not be deleted
+                            Memory.creeps[idleCreep.name][memoryElementKey] = undefined;
                         }
                     }
                     roomJob.Creep = idleCreep.name;
@@ -110,7 +110,7 @@ const AssignJobs = {
                     }
                 }
                 if (nearestCreep) {
-                    nearestCreep.memory.JobName = roomJobKey;
+                    Memory.creeps[nearestCreep.name].JobName = roomJobKey;
                     roomJob.Creep = nearestCreep.name;
                     delete idleCreeps[bestIdleCreepCounter];
                     return true;

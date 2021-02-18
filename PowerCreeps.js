@@ -32,7 +32,7 @@ const PowerCreeps = {
                             flagWithCreepName.remove();
                         }
                     } else if (powerCreep.shard) { // flag is found and the creep is spawned - do something
-                        if (powerCreep.memory.JobName && !powerCreep.memory.JobName.startsWith('Unemployed')) {
+                        if (Memory.powerCreeps[powerCreep.name].JobName && !Memory.powerCreeps[powerCreep.name].JobName.startsWith('Unemployed')) {
                             result = PowerCreepsActions(powerCreep);
                         } else {
                             result = FindPowerCreepsActions(powerCreep);
@@ -44,7 +44,7 @@ const PowerCreeps = {
 
         function PowerCreepsActions(powerCreep) {
             let result = NO_RESULT_FOUND;
-            const jobName = powerCreep.memory.JobName;
+            const jobName = Memory.powerCreeps[powerCreep.name].JobName;
             switch (true) {
                 case jobName.startsWith('RenewPowerCreep'):
                     result = RenewPowerCreep(powerCreep);
@@ -85,47 +85,47 @@ const PowerCreeps = {
         function FindPowerCreepsActions(powerCreep) {
             let result = NO_RESULT_FOUND;
             if (powerCreep.ticksToLive < 500) { // power creep needs to be renewed
-                powerCreep.memory.JobName = 'RenewPowerCreep';
+                Memory.powerCreeps[powerCreep.name].JobName = 'RenewPowerCreep';
                 result = RenewPowerCreep(powerCreep);
                 //Util.Info('PowerCreeps', 'PowerCreepsActions', 'trying to renew ' + powerCreep.name + ' result ' + result + ' ticksToLive ' + powerCreep.ticksToLive);
             } else if (powerCreep.room.controller && powerCreep.room.controller.my && !powerCreep.room.controller.isPowerEnabled) { // my room is not power enabled
-                powerCreep.memory.JobName = 'EnablePowerInRoom';
+                Memory.powerCreeps[powerCreep.name].JobName = 'EnablePowerInRoom';
                 result = EnablePowerInRoom(powerCreep);
                 Util.Info('PowerCreeps', 'PowerCreepsActions', 'trying to EnablePowerInRoom ' + powerCreep.name + ' ' + powerCreep.pos.roomName);
             } else if (powerCreep.className === POWER_CLASS.OPERATOR) { // power creep is not too old and power is enabled in the room
-                if (!powerCreep.memory.OperateTerminalCooldown || !powerCreep.memory.RegenSource1Cooldown || !powerCreep.memory.RegenSource2Cooldown || !powerCreep.memory.OperateFactoryCooldown || !powerCreep.memory.RegenMineralCooldown) {
-                    powerCreep.memory.OperateTerminalCooldown = 1;
-                    powerCreep.memory.RegenSource1Cooldown = 1;
-                    powerCreep.memory.RegenSource2Cooldown = 1;
-                    powerCreep.memory.OperateFactoryCooldown = 1;
-                    powerCreep.memory.RegenMineralCooldown = 1;
+                if (!Memory.powerCreeps[powerCreep.name].OperateTerminalCooldown || !Memory.powerCreeps[powerCreep.name].RegenSource1Cooldown || !Memory.powerCreeps[powerCreep.name].RegenSource2Cooldown || !Memory.powerCreeps[powerCreep.name].OperateFactoryCooldown || !Memory.powerCreeps[powerCreep.name].RegenMineralCooldown) {
+                    Memory.powerCreeps[powerCreep.name].OperateTerminalCooldown = 1;
+                    Memory.powerCreeps[powerCreep.name].RegenSource1Cooldown = 1;
+                    Memory.powerCreeps[powerCreep.name].RegenSource2Cooldown = 1;
+                    Memory.powerCreeps[powerCreep.name].OperateFactoryCooldown = 1;
+                    Memory.powerCreeps[powerCreep.name].RegenMineralCooldown = 1;
                 }
 
                 if (powerCreep.powers[PWR_GENERATE_OPS] && powerCreep.powers[PWR_GENERATE_OPS].cooldown === 0 && powerCreep.store.getFreeCapacity() > 0) {
-                    powerCreep.memory.JobName = 'GenerateOps';
+                    Memory.powerCreeps[powerCreep.name].JobName = 'GenerateOps';
                     result = GenerateOps(powerCreep);
-                } else if (powerCreep.memory.OperateFactoryCooldown < Game.time && powerCreep.powers[PWR_OPERATE_FACTORY] && powerCreep.powers[PWR_OPERATE_FACTORY].cooldown === 0 && powerCreep.store.getUsedCapacity(RESOURCE_OPS) >= 100) {
-                    powerCreep.memory.JobName = 'OperateFactory';
+                } else if (Memory.powerCreeps[powerCreep.name].OperateFactoryCooldown < Game.time && powerCreep.powers[PWR_OPERATE_FACTORY] && powerCreep.powers[PWR_OPERATE_FACTORY].cooldown === 0 && powerCreep.store.getUsedCapacity(RESOURCE_OPS) >= 100) {
+                    Memory.powerCreeps[powerCreep.name].JobName = 'OperateFactory';
                     result = OperateFactory(powerCreep);
-                } else if ((powerCreep.memory.RegenSource1Cooldown < Game.time || powerCreep.memory.RegenSource2Cooldown < Game.time) && powerCreep.powers[PWR_REGEN_SOURCE] && powerCreep.powers[PWR_REGEN_SOURCE].cooldown === 0) {
-                    powerCreep.memory.JobName = 'RegenSource';
+                } else if ((Memory.powerCreeps[powerCreep.name].RegenSource1Cooldown < Game.time || Memory.powerCreeps[powerCreep.name].RegenSource2Cooldown < Game.time) && powerCreep.powers[PWR_REGEN_SOURCE] && powerCreep.powers[PWR_REGEN_SOURCE].cooldown === 0) {
+                    Memory.powerCreeps[powerCreep.name].JobName = 'RegenSource';
                     result = RegenSource(powerCreep);
-                } else if (powerCreep.memory.RegenMineralCooldown < Game.time && powerCreep.powers[PWR_REGEN_MINERAL] && powerCreep.powers[PWR_REGEN_MINERAL].cooldown === 0) {
-                    powerCreep.memory.JobName = 'RegenMineral';
+                } else if (Memory.powerCreeps[powerCreep.name].RegenMineralCooldown < Game.time && powerCreep.powers[PWR_REGEN_MINERAL] && powerCreep.powers[PWR_REGEN_MINERAL].cooldown === 0) {
+                    Memory.powerCreeps[powerCreep.name].JobName = 'RegenMineral';
                     result = RegenMineral(powerCreep);
                 } else if (powerCreep.store.getUsedCapacity(RESOURCE_OPS) > 500 || powerCreep.store.getUsedCapacity(RESOURCE_OPS) === powerCreep.store.getCapacity()) {
-                    powerCreep.memory.JobName = 'DepositOps';
+                    Memory.powerCreeps[powerCreep.name].JobName = 'DepositOps';
                     result = DepositOps(powerCreep);
                 } else if (powerCreep.store.getUsedCapacity(RESOURCE_OPS) < 100) {
-                    powerCreep.memory.JobName = 'WithdrawOps';
+                    Memory.powerCreeps[powerCreep.name].JobName = 'WithdrawOps';
                     result = WithdrawOps(powerCreep);
-                } /*else if (powerCreep.memory.OperateTerminalCooldown < Game.time && powerCreep.store.getUsedCapacity(RESOURCE_OPS) >= 100 && powerCreep.powers[PWR_OPERATE_TERMINAL] && powerCreep.powers[PWR_OPERATE_TERMINAL].cooldown === 0 && powerCreep.room.terminal && powerCreep.room.terminal.my) {
+                } /*else if (Memory.powerCreeps[powerCreep.name].OperateTerminalCooldown < Game.time && powerCreep.store.getUsedCapacity(RESOURCE_OPS) >= 100 && powerCreep.powers[PWR_OPERATE_TERMINAL] && powerCreep.powers[PWR_OPERATE_TERMINAL].cooldown === 0 && powerCreep.room.terminal && powerCreep.room.terminal.my) {
                     result = OperateTerminal(powerCreep);
-                }*/ /*else if ((!powerCreep.memory.spawns || _.filter(powerCreep.memory.spawns, function (s) {return s < Game.time;}).length > 0) && powerCreep.store.getUsedCapacity(RESOURCE_OPS) >= 100 && powerCreep.powers[PWR_OPERATE_SPAWN] && powerCreep.powers[PWR_OPERATE_SPAWN].cooldown === 0) {
+                }*/ /*else if ((!Memory.powerCreeps[powerCreep.name].spawns || _.filter(Memory.powerCreeps[powerCreep.name].spawns, function (s) {return s < Game.time;}).length > 0) && powerCreep.store.getUsedCapacity(RESOURCE_OPS) >= 100 && powerCreep.powers[PWR_OPERATE_SPAWN] && powerCreep.powers[PWR_OPERATE_SPAWN].cooldown === 0) {
                     result = OperateSpawn(powerCreep);
                 }*/
                 else {
-                    powerCreep.memory.JobName = 'Unemployed';
+                    Memory.powerCreeps[powerCreep.name].JobName = 'Unemployed';
                 }
             }
             return result;
@@ -134,8 +134,8 @@ const PowerCreeps = {
         /**@return {number}*/
         function RenewPowerCreep(powerCreep) {
             let powerSpawnOrBank;
-            if (powerCreep.memory.PowerSpawnOrBankId) {
-                powerSpawnOrBank = Game.getObjectById(powerCreep.memory.PowerSpawnOrBankId);
+            if (Memory.powerCreeps[powerCreep.name].PowerSpawnOrBankId) {
+                powerSpawnOrBank = Game.getObjectById(Memory.powerCreeps[powerCreep.name].PowerSpawnOrBankId);
                 if (powerSpawnOrBank && powerSpawnOrBank.pos.roomName !== powerCreep.pos.roomName) {
                     powerSpawnOrBank = undefined;
                 }
@@ -164,7 +164,7 @@ const PowerCreeps = {
                 }
                 if (powerSpawnOrBank) {
                     Util.Info('PowerCreeps', 'RenewPowerCreep', powerCreep.name + ' in ' + powerCreep.pos.roomName + ' trying to renew at ' + JSON.stringify(powerSpawnOrBank.pos));
-                    powerCreep.memory.PowerSpawnOrBankId = powerSpawnOrBank.id;
+                    Memory.powerCreeps[powerCreep.name].PowerSpawnOrBankId = powerSpawnOrBank.id;
                 }
             }
             let result = ERR_INVALID_TARGET;
@@ -173,8 +173,8 @@ const PowerCreeps = {
                 if (result === ERR_NOT_IN_RANGE) {
                     result = powerCreep.moveTo(powerSpawnOrBank);
                 } else if (result === OK) {
-                    powerCreep.memory.JobName = 'Unemployed';
-                    powerCreep.memory.PowerSpawnOrBankId = undefined;
+                    Memory.powerCreeps[powerCreep.name].JobName = 'Unemployed';
+                    Memory.powerCreeps[powerCreep.name].PowerSpawnOrBankId = undefined;
                 }
             }
             return result;
@@ -185,22 +185,22 @@ const PowerCreeps = {
             if (result === ERR_NOT_IN_RANGE) {
                 result = powerCreep.moveTo(powerCreep.room.controller);
             } else {
-                powerCreep.memory.JobName = 'Unemployed';
+                Memory.powerCreeps[powerCreep.name].JobName = 'Unemployed';
             }
             return result;
         }
 
         function GenerateOps(powerCreep) {
             const result = powerCreep.usePower(PWR_GENERATE_OPS); // if power creep is an operator - always use this power when available
-            powerCreep.memory.JobName = 'Unemployed';
+            Memory.powerCreeps[powerCreep.name].JobName = 'Unemployed';
             return result;
         }
 
         function OperateFactory(powerCreep) { // PWR_OPERATE_FACTORY
             let result;
             let factory;
-            if (powerCreep.memory.FactoryId) {
-                factory = Game.getObjectById(powerCreep.memory.FactoryId);
+            if (Memory.powerCreeps[powerCreep.name].FactoryId) {
+                factory = Game.getObjectById(Memory.powerCreeps[powerCreep.name].FactoryId);
             }
             if (!factory) {
                 factory = powerCreep.room.find(FIND_MY_STRUCTURES, {
@@ -214,8 +214,8 @@ const PowerCreeps = {
                 if (result === ERR_NOT_IN_RANGE) {
                     result = powerCreep.moveTo(factory);
                 } else if (result === OK) {
-                    powerCreep.memory.JobName = 'Unemployed';
-                    powerCreep.memory.OperateFactoryCooldown = Game.time + 1000; // add duration
+                    Memory.powerCreeps[powerCreep.name].JobName = 'Unemployed';
+                    Memory.powerCreeps[powerCreep.name].OperateFactoryCooldown = Game.time + 1000; // add duration
                 }
             }
             return result;
@@ -226,19 +226,19 @@ const PowerCreeps = {
             let source1;
             let source2;
 
-            if (powerCreep.memory.Source1Id) {
-                source1 = Game.getObjectById(powerCreep.memory.Source1Id);
-                if (powerCreep.memory.Source2Id) {
-                    source2 = Game.getObjectById(powerCreep.memory.Source2Id);
+            if (Memory.powerCreeps[powerCreep.name].Source1Id) {
+                source1 = Game.getObjectById(Memory.powerCreeps[powerCreep.name].Source1Id);
+                if (Memory.powerCreeps[powerCreep.name].Source2Id) {
+                    source2 = Game.getObjectById(Memory.powerCreeps[powerCreep.name].Source2Id);
                 }
             } else {
                 const sources = powerCreep.room.find(FIND_SOURCES);
                 if (sources[0]) {
                     source1 = sources[0];
-                    powerCreep.memory.Source1Id = source1.id;
+                    Memory.powerCreeps[powerCreep.name].Source1Id = source1.id;
                     if (sources[1]) {
                         source2 = sources[1];
-                        powerCreep.memory.Source2Id = source2.id;
+                        Memory.powerCreeps[powerCreep.name].Source2Id = source2.id;
                     }
                 }
             }
@@ -272,11 +272,11 @@ const PowerCreeps = {
                 if (result === ERR_NOT_IN_RANGE) {
                     result = powerCreep.moveTo(selectedSource);
                 } else if (result === OK) {
-                    powerCreep.memory.JobName = 'Unemployed';
+                    Memory.powerCreeps[powerCreep.name].JobName = 'Unemployed';
                     if (selectedSource.id === source1.id) {
-                        powerCreep.memory.RegenSource1Cooldown = Game.time + 270; // add duration
+                        Memory.powerCreeps[powerCreep.name].RegenSource1Cooldown = Game.time + 270; // add duration
                     } else if (selectedSource.id === source2.id) {
-                        powerCreep.memory.RegenSource2Cooldown = Game.time + 270; // add duration
+                        Memory.powerCreeps[powerCreep.name].RegenSource2Cooldown = Game.time + 270; // add duration
                     }
                 }
             }
@@ -286,13 +286,13 @@ const PowerCreeps = {
         function RegenMineral(powerCreep) {
             let result;
             let mineral;
-            if (powerCreep.memory.MineralId) {
-                mineral = Game.getObjectById(powerCreep.memory.MineralId);
+            if (Memory.powerCreeps[powerCreep.name].MineralId) {
+                mineral = Game.getObjectById(Memory.powerCreeps[powerCreep.name].MineralId);
             }
             if (!mineral) {
                 mineral = powerCreep.room.find(FIND_MINERALS)[0];
                 if (mineral) {
-                    powerCreep.memory.MineralId = mineral.id;
+                    Memory.powerCreeps[powerCreep.name].MineralId = mineral.id;
                 }
             }
             if (mineral && mineral.mineralAmount > 0) {
@@ -300,14 +300,14 @@ const PowerCreeps = {
                 if (result === ERR_NOT_IN_RANGE) {
                     result = powerCreep.moveTo(mineral);
                 } else if (result === OK) {
-                    powerCreep.memory.JobName = 'Unemployed';
-                    powerCreep.memory.RegenMineralCooldown = Game.time + 100; // add duration
+                    Memory.powerCreeps[powerCreep.name].JobName = 'Unemployed';
+                    Memory.powerCreeps[powerCreep.name].RegenMineralCooldown = Game.time + 100; // add duration
                 }
             } else if (mineral && mineral.mineralAmount === 0) {
                 // mineral is in the regen period
                 result = OK;
-                powerCreep.memory.JobName = 'Unemployed';
-                powerCreep.memory.RegenMineralCooldown = Game.time + mineral.ticksToRegeneration;
+                Memory.powerCreeps[powerCreep.name].JobName = 'Unemployed';
+                Memory.powerCreeps[powerCreep.name].RegenMineralCooldown = Game.time + mineral.ticksToRegeneration;
                 Util.Info('PowerCreeps', 'RegenMineral', powerCreep.name + ' in ' + powerCreep.pos.roomName + ' mineral is empty waiting ' + mineral.ticksToRegeneration + ' ticks');
             }
             return result;
@@ -320,7 +320,7 @@ const PowerCreeps = {
             if (result === ERR_NOT_IN_RANGE) {
                 result = powerCreep.moveTo(powerCreep.room.storage);
             } else {
-                powerCreep.memory.JobName = 'Unemployed';
+                Memory.powerCreeps[powerCreep.name].JobName = 'Unemployed';
             }
             return result;
         }
@@ -347,7 +347,7 @@ const PowerCreeps = {
             if (result === ERR_NOT_IN_RANGE) {
                 result = powerCreep.moveTo(target);
             } else {
-                powerCreep.memory.JobName = 'Unemployed';
+                Memory.powerCreeps[powerCreep.name].JobName = 'Unemployed';
             }
             return result;
         }
@@ -370,8 +370,8 @@ const PowerCreeps = {
                 if (result === ERR_NOT_IN_RANGE) {
                     result = powerCreep.moveTo(powerCreep.room.terminal);
                 } else if (result === OK) {
-                    powerCreep.memory.JobName = 'Unemployed';
-                    powerCreep.memory.OperateTerminalCooldown = Game.time + 1000; // add duration
+                    Memory.powerCreeps[powerCreep.name].JobName = 'Unemployed';
+                    Memory.powerCreeps[powerCreep.name].OperateTerminalCooldown = Game.time + 1000; // add duration
                 }
             }
             return result;
@@ -379,16 +379,16 @@ const PowerCreeps = {
 
         function OperateSpawn(powerCreep) {
             let result;
-            if (!powerCreep.memory.spawns) {
+            if (!Memory.powerCreeps[powerCreep.name].spawns) {
                 const spawns = powerCreep.room.find(FIND_MY_SPAWNS);
                 const spawnIDs = {};
                 for (const spawnKey in spawns) {
                     const spawn = spawns[spawnKey];
                     spawnIDs[spawn.id] = 1;
                 }
-                powerCreep.memory.spawns = spawnIDs;
+                Memory.powerCreeps[powerCreep.name].spawns = spawnIDs;
             }
-            for (const spawnId in powerCreep.memory.spawns) {
+            for (const spawnId in Memory.powerCreeps[powerCreep.name].spawns) {
                 const spawn = Game.getObjectById(spawnId);
                 if (spawn) {
                     let spawnHasBuff = false;
@@ -405,8 +405,8 @@ const PowerCreeps = {
                         if (result === ERR_NOT_IN_RANGE) {
                             result = powerCreep.moveTo(spawn);
                         } else if (result === OK) {
-                            powerCreep.memory.JobName = 'Unemployed';
-                            powerCreep.memory.spawns[spawn.id] = Game.time + 1000; // add duration
+                            Memory.powerCreeps[powerCreep.name].JobName = 'Unemployed';
+                            Memory.powerCreeps[powerCreep.name].spawns[spawn.id] = Game.time + 1000; // add duration
                         }
                         break;
                     }
