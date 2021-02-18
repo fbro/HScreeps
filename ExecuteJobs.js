@@ -1931,8 +1931,7 @@ const ExecuteJobs = {
                             const woundedCreep = woundedCreeps[woundedCreepKey];
                             let isAnyoneHealingWoundedCreep = false;
                             for (const healerCreepKey in healerCreeps) {
-                                const healerCreep = healerCreeps[healerCreepKey];
-                                if (healerMemory.creeps[creep.name].PrimaryHealerTarget === woundedCreep.name) {
+                                if (Memory.creeps[healerCreepKey] && Memory.creeps[healerCreepKey].PrimaryHealerTarget === woundedCreep.name) {
                                     isAnyoneHealingWoundedCreep = true;
                                     break;
                                 }
