@@ -561,6 +561,7 @@ const CreateJobs = {
                     for (const resourceType in factory.store) {
                         const amount = factory.store.getUsedCapacity(resourceType);
                         if ( // only withdraw commodities that one should sell or other factories need
+                            gameRoom && gameRoom.storage && gameRoom.terminal &&
                             gameRoom.storage.store.getUsedCapacity(resourceType) < Util.STORAGE_MEDIUM &&
                             gameRoom.terminal.store.getUsedCapacity(resourceType) < Util.STORAGE_MEDIUM_TRANSFER &&
                             (
