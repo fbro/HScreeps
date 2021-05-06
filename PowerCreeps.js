@@ -316,7 +316,7 @@ const PowerCreeps = {
         function DepositOps(powerCreep) {
             let opsToDeposit = powerCreep.store.getUsedCapacity(RESOURCE_OPS) - 100;
             let result = powerCreep.transfer(powerCreep.room.storage, RESOURCE_OPS, opsToDeposit);
-            Util.Info('PowerCreeps', 'DepositOps', powerCreep.name + ' ' + result + ' amount ' + powerCreep.store.getUsedCapacity(RESOURCE_OPS));
+            //Util.Info('PowerCreeps', 'DepositOps', powerCreep.name + ' ' + result + ' amount ' + powerCreep.store.getUsedCapacity(RESOURCE_OPS));
             if (result === ERR_NOT_IN_RANGE) {
                 result = powerCreep.moveTo(powerCreep.room.storage);
             } else {

@@ -1,10 +1,10 @@
 let Util = require('Util');
 const Constructions = {
     run: function () {
-
+        // TODO it looks like
         ConstructControl();
 
-        //region construct controller
+        //region construct controller isBuildingCounter is not working properly, it still just save it to lvl 8 even though
 
         function ConstructControl() {
             for (const memRoomKey in Memory.MemRooms) {
@@ -25,64 +25,74 @@ const Constructions = {
         function Build(gameRoom, roomTerrain) {
             const level = gameRoom.controller.level;
             if (level >= 1) {
+                if (Memory.MemRooms[gameRoom.name].Built && Memory.MemRooms[gameRoom.name].Built === level) {
+                    Util.Info('Constructions', 'Build', 'skip ' + gameRoom.name + ' room level ' + level);
+                    return;
+                }
                 const flags = gameRoom.find(FIND_FLAGS, {
                     filter: function (flag) { // construction flags
                         return flag.color === COLOR_GREEN && flag.secondaryColor === COLOR_GREY; // construct first spawn
                     }
                 });
+                let isBuildingCounter = 0;
                 if (flags.length > 0) {
-                    ConstructFirstSpawnAtFlag(gameRoom, flags);
+                    isBuildingCounter += ConstructFirstSpawnAtFlag(gameRoom, flags);
                 }
                 const mainSpawn = FindMainSpawn(gameRoom);
-                ConstructContainerAt(gameRoom, roomTerrain, mainSpawn, FIND_SOURCES);
+
+                isBuildingCounter += ConstructContainerAt(gameRoom, roomTerrain, mainSpawn, FIND_SOURCES);
                 if (level >= 2) {
-                    ConstructCoreBuilding(gameRoom, roomTerrain, STRUCTURE_EXTENSION, mainSpawn, 5);
+                    isBuildingCounter += ConstructCoreBuilding(gameRoom, roomTerrain, STRUCTURE_EXTENSION, mainSpawn, 5);
                     if (Memory.MemRooms[gameRoom.name] && !Memory.MemRooms[gameRoom.name].CtrlConId) {
-                        ConstructContainerAt(gameRoom, roomTerrain, mainSpawn, FIND_STRUCTURES, STRUCTURE_CONTROLLER);
+                        isBuildingCounter += ConstructContainerAt(gameRoom, roomTerrain, mainSpawn, FIND_STRUCTURES, STRUCTURE_CONTROLLER);
                     }
                     if (level >= 3) {
                         if (Memory.MemRooms[gameRoom.name] && Util.FindNumberOfBuildableStructures(gameRoom, STRUCTURE_TOWER) > Memory.MemRooms[gameRoom.name].TowerIds.length) {
-                            ConstructCoreBuilding(gameRoom, roomTerrain, STRUCTURE_TOWER, mainSpawn, 4);
+                            isBuildingCounter += ConstructCoreBuilding(gameRoom, roomTerrain, STRUCTURE_TOWER, mainSpawn, 4);
                         }
                         if (level >= 4) {
                             if (!gameRoom.storage) {
-                                ConstructCoreBuilding(gameRoom, roomTerrain, STRUCTURE_STORAGE, mainSpawn, 0);
+                                isBuildingCounter += ConstructCoreBuilding(gameRoom, roomTerrain, STRUCTURE_STORAGE, mainSpawn, 0);
                             }
-                            ConstructRampartsOn(gameRoom, roomTerrain, STRUCTURE_SPAWN);
+                            isBuildingCounter += ConstructRampartsOn(gameRoom, roomTerrain, STRUCTURE_SPAWN);
                             if (level >= 5) {
-                                ConstructLinks(gameRoom, roomTerrain, mainSpawn);
-                                ConstructRampartsOn(gameRoom, roomTerrain, STRUCTURE_STORAGE);
-                                ConstructRampartsOn(gameRoom, roomTerrain, STRUCTURE_TOWER);
+                                isBuildingCounter += ConstructLinks(gameRoom, roomTerrain, mainSpawn);
+                                isBuildingCounter += ConstructRampartsOn(gameRoom, roomTerrain, STRUCTURE_STORAGE);
+                                isBuildingCounter += ConstructRampartsOn(gameRoom, roomTerrain, STRUCTURE_TOWER);
                                 if (level >= 6) {
-                                    ConstructCoreBuilding(gameRoom, roomTerrain, STRUCTURE_SPAWN, mainSpawn, 0);
-                                    ConstructExtractor(gameRoom, mainSpawn);
-                                    ConstructContainerAt(gameRoom, roomTerrain, mainSpawn, FIND_MINERALS);
+                                    isBuildingCounter += ConstructCoreBuilding(gameRoom, roomTerrain, STRUCTURE_SPAWN, mainSpawn, 0);
+                                    isBuildingCounter += ConstructExtractor(gameRoom, mainSpawn);
+                                    isBuildingCounter += ConstructContainerAt(gameRoom, roomTerrain, mainSpawn, FIND_MINERALS);
                                     if (!gameRoom.terminal) {
-                                        ConstructAtStorage(gameRoom, roomTerrain, STRUCTURE_TERMINAL, mainSpawn);
+                                        isBuildingCounter += ConstructAtStorage(gameRoom, roomTerrain, STRUCTURE_TERMINAL, mainSpawn);
                                     }
                                     if (level >= 7) {
-                                        ConstructAtStorage(gameRoom, roomTerrain, STRUCTURE_FACTORY, mainSpawn);
-                                        ConstructRampartsOn(gameRoom, roomTerrain, STRUCTURE_TERMINAL);
-                                        ConstructRampartsOn(gameRoom, roomTerrain, STRUCTURE_CONTAINER);
+                                        isBuildingCounter += ConstructAtStorage(gameRoom, roomTerrain, STRUCTURE_FACTORY, mainSpawn);
+                                        isBuildingCounter += ConstructRampartsOn(gameRoom, roomTerrain, STRUCTURE_TERMINAL);
+                                        isBuildingCounter += ConstructRampartsOn(gameRoom, roomTerrain, STRUCTURE_CONTAINER);
                                         if (level === 8) {
-                                            ConstructAtStorage(gameRoom, roomTerrain, STRUCTURE_POWER_SPAWN, mainSpawn);
-                                            ConstructCoreBuilding(gameRoom, roomTerrain, STRUCTURE_OBSERVER, mainSpawn, 8);
-                                            ConstructCoreBuilding(gameRoom, roomTerrain, STRUCTURE_NUKER, mainSpawn, 8);
-                                            ConstructRampartsOn(gameRoom, roomTerrain, STRUCTURE_FACTORY);
-                                            ConstructRampartsOn(gameRoom, roomTerrain, STRUCTURE_POWER_SPAWN);
-                                            ConstructRampartsOn(gameRoom, roomTerrain, STRUCTURE_OBSERVER);
-                                            ConstructRampartsOn(gameRoom, roomTerrain, STRUCTURE_NUKER);
-                                            ConstructPerimeter(gameRoom, mainSpawn);
-                                            ConstructLabs(gameRoom, roomTerrain); // TODO
+                                            isBuildingCounter += ConstructAtStorage(gameRoom, roomTerrain, STRUCTURE_POWER_SPAWN, mainSpawn);
+                                            isBuildingCounter += ConstructCoreBuilding(gameRoom, roomTerrain, STRUCTURE_OBSERVER, mainSpawn, 8);
+                                            isBuildingCounter += ConstructCoreBuilding(gameRoom, roomTerrain, STRUCTURE_NUKER, mainSpawn, 8);
+                                            isBuildingCounter += ConstructRampartsOn(gameRoom, roomTerrain, STRUCTURE_FACTORY);
+                                            isBuildingCounter += ConstructRampartsOn(gameRoom, roomTerrain, STRUCTURE_POWER_SPAWN);
+                                            isBuildingCounter += ConstructRampartsOn(gameRoom, roomTerrain, STRUCTURE_OBSERVER);
+                                            isBuildingCounter += ConstructRampartsOn(gameRoom, roomTerrain, STRUCTURE_NUKER);
+                                            isBuildingCounter += ConstructPerimeter(gameRoom, mainSpawn);
+                                            isBuildingCounter += ConstructLabs(gameRoom, roomTerrain); // TODO
                                         }
                                     }
                                 }
                             }
                         }
-                        ConstructRoads(gameRoom, roomTerrain);
+                        isBuildingCounter += ConstructRoads(gameRoom, roomTerrain);
                     }
                 }
-                Memory.MemRooms[gameRoom.name].Built = gameRoom.controller.level;
+                if(!isBuildingCounter){
+                    Memory.MemRooms[gameRoom.name].Built = gameRoom.controller.level;
+                }else{
+                    Util.Info('Constructions', 'Build', 'isBuildingCounter ' + isBuildingCounter);
+                }
             }
         }
 
@@ -167,6 +177,7 @@ const Constructions = {
 
         //region construct functions
 
+        /**@return {number}*/
         function ConstructFirstSpawnAtFlag(gameRoom, flags) {
             const constructSpawnFlag = _.filter(flags, function (flag) {
                 return flag.color === COLOR_GREEN && flag.secondaryColor === COLOR_GREY;
@@ -213,29 +224,14 @@ const Constructions = {
                         }
                     }
                 }
+                return 1;
             }
+            return 0;
         }
 
-        function FindMainSpawn(gameRoom) {
-            let mainSpawn = Game.getObjectById(Memory.MemRooms[gameRoom.name].MainSpawnId);
-            if (!mainSpawn) {
-                mainSpawn = gameRoom.find(FIND_MY_STRUCTURES, {
-                    filter: function (structure) {
-                        return structure.structureType === STRUCTURE_SPAWN;
-                    }
-                })[0];
-                if (mainSpawn) {
-                    Memory.MemRooms[gameRoom.name].MainSpawnId = mainSpawn.id;
-                }
-            }
-            return mainSpawn;
-        }
-
+        /**@return {number}*/
         function ConstructContainerAt(gameRoom, terrain, mainSpawn, findType, structureType = undefined) {
-            if (Memory.MemRooms[gameRoom.name].Built && Memory.MemRooms[gameRoom.name].Built === gameRoom.controller.level) {
-                return;
-            }
-
+            let isBuildingCounter = 0;
             const targets = gameRoom.find(findType, {
                 filter: function (target) {
                     return !structureType || target.structureType === structureType;
@@ -245,25 +241,28 @@ const Constructions = {
                 const target = targets[targetCount];
                 if (!FindExistingStructure(target.pos, STRUCTURE_CONTAINER, 1)) {
                     ConstructAroundPos(gameRoom, terrain, target.pos, STRUCTURE_CONTAINER, mainSpawn);
+                    isBuildingCounter++;
                 }
             }
-            Util.Info('Constructions', 'ConstructContainerAt', gameRoom.name + ' ' + findType + ' ' + (structureType ? structureType : ''));
+            Util.Info('Constructions', 'ConstructContainerAt', gameRoom.name + ' ' + findType + ' ' + (structureType ? structureType : '') + ' built ' + isBuildingCounter);
+            return isBuildingCounter;
         }
 
+        /**@return {number}*/
         function ConstructCoreBuilding(gameRoom, roomTerrain, structureType, mainSpawn, acceptedNumOfNearbyWalls) {
             let numberOfPossibleConstructions = GetNumberOfPossibleConstructions(gameRoom, structureType);
             if (!mainSpawn || !numberOfPossibleConstructions) {
-                return;
+                return 0;
             }
-            BuildCheckeredPattern(gameRoom, structureType, roomTerrain, numberOfPossibleConstructions, mainSpawn.pos, acceptedNumOfNearbyWalls);
+            const isBuildingCounter = BuildCheckeredPattern(gameRoom, structureType, roomTerrain, numberOfPossibleConstructions, mainSpawn.pos, acceptedNumOfNearbyWalls);
 
-            Util.Info('Constructions', 'ConstructCoreBuilding', gameRoom.name + ' ' + structureType + ' spawn used ' + mainSpawn);
+            Util.Info('Constructions', 'ConstructCoreBuilding', gameRoom.name + ' ' + structureType + ' spawn used ' + mainSpawn + ' built ' + isBuildingCounter);
+            return isBuildingCounter;
         }
 
+        /**@return {number}*/
         function ConstructRampartsOn(gameRoom, roomTerrain, structureType) {
-            if (Memory.MemRooms[gameRoom.name].Built && Memory.MemRooms[gameRoom.name].Built === gameRoom.controller.level) {
-                return;
-            }
+            let isBuildingCounter = 0;
             const structuresToPlaceRampartOn = gameRoom.find(FIND_STRUCTURES, {
                 filter: function (structure) {
                     return structure.structureType === structureType;
@@ -283,16 +282,17 @@ const Constructions = {
                 }
                 if (!foundRampart) {
                     const result = gameRoom.createConstructionSite(structure.pos.x, structure.pos.y, STRUCTURE_RAMPART);
-                    Util.InfoLog('Constructions', 'ConstructRampartsOn', structure.pos + ' to protect ' + structureType + ' result ' + result);
+                    isBuildingCounter++;
+                    Util.InfoLog('Constructions', 'ConstructRampartsOn', structure.pos + ' to protect ' + structureType + ' result ' + result + ' built ' + isBuildingCounter);
                 }
             }
-            Util.Info('Constructions', 'ConstructRampartsOn', gameRoom.name + ' ' + structureType + ' structuresToPlaceRampartOn ' + structuresToPlaceRampartOn);
+            Util.Info('Constructions', 'ConstructRampartsOn', gameRoom.name + ' ' + structureType + ' structuresToPlaceRampartOn ' + structuresToPlaceRampartOn + ' built ' + isBuildingCounter);
+            return isBuildingCounter;
         }
 
+        /**@return {number}*/
         function ConstructRoads(gameRoom, roomTerrain) {
-            if (Memory.MemRooms[gameRoom.name].Built && Memory.MemRooms[gameRoom.name].Built === gameRoom.controller.level) {
-                return;
-            }
+            let isBuildingCounter = 0;
             let structures = gameRoom.find(FIND_MY_STRUCTURES, {
                 filter: function (structure) {
                     return structure.structureType === STRUCTURE_SPAWN
@@ -321,10 +321,10 @@ const Constructions = {
             const spawns = [];
             for (const structureCount in structures) {
                 const structure = structures[structureCount];
-                ConstructRoad(gameRoom, roomTerrain, structure, 1, 0);
-                ConstructRoad(gameRoom, roomTerrain, structure, -1, 0);
-                ConstructRoad(gameRoom, roomTerrain, structure, 0, 1);
-                ConstructRoad(gameRoom, roomTerrain, structure, 0, -1);
+                isBuildingCounter += ConstructRoad(gameRoom, roomTerrain, structure, 1, 0);
+                isBuildingCounter += ConstructRoad(gameRoom, roomTerrain, structure, -1, 0);
+                isBuildingCounter += ConstructRoad(gameRoom, roomTerrain, structure, 0, 1);
+                isBuildingCounter += ConstructRoad(gameRoom, roomTerrain, structure, 0, -1);
                 if (structure.structureType === STRUCTURE_SPAWN) {
                     spawns.push(structure);
                 }
@@ -332,14 +332,14 @@ const Constructions = {
             // build roads from main spawn to controller, storage, terminal, extractor and sources
             const spawn = spawns[0];
             if (!spawn) {
-                return;
+                return isBuildingCounter;
             }
-            BuildRoadTo(spawn.pos, gameRoom.controller.pos);
+            isBuildingCounter += BuildRoadTo(spawn.pos, gameRoom.controller.pos);
             if (gameRoom.storage) {
-                BuildRoadTo(spawn.pos, gameRoom.storage.pos);
+                isBuildingCounter += BuildRoadTo(spawn.pos, gameRoom.storage.pos);
             }
             if (gameRoom.terminal) {
-                BuildRoadTo(spawn.pos, gameRoom.terminal.pos);
+                isBuildingCounter += BuildRoadTo(spawn.pos, gameRoom.terminal.pos);
             }
             const extractor = gameRoom.find(FIND_MY_STRUCTURES, {
                 filter: function (structure) {
@@ -347,35 +347,39 @@ const Constructions = {
                 }
             })[0];
             if (extractor) {
-                BuildRoadTo(spawn.pos, extractor.pos);
+                isBuildingCounter += BuildRoadTo(spawn.pos, extractor.pos);
             }
             const sources = gameRoom.find(FIND_SOURCES);
             for (const sourceCount in sources) {
                 const source = sources[sourceCount];
-                BuildRoadTo(spawn.pos, source.pos);
+                isBuildingCounter += BuildRoadTo(spawn.pos, source.pos);
             }
-            Util.Info('Constructions', 'ConstructRoads', gameRoom.name);
+            Util.Info('Constructions', 'ConstructRoads', gameRoom.name + ' built ' + isBuildingCounter);
+            return isBuildingCounter;
         }
 
+        /**@return {number}*/
         function ConstructLinks(gameRoom, terrain, mainSpawn) {
             if (!mainSpawn || Memory.MemRooms[gameRoom.name]
                 && Memory.MemRooms[gameRoom.name].Links
                 && Memory.MemRooms[gameRoom.name].Links.StorageLinkId
                 && Memory.MemRooms[gameRoom.name].Links.ControllerLinkId
                 && Memory.MemRooms[gameRoom.name].Links.HarvesterLinksId.length >= 2) {
-                return;
+                return 0;
             }
             let numberOfPossibleConstructions = GetNumberOfPossibleConstructions(gameRoom, STRUCTURE_LINK);
             if (!numberOfPossibleConstructions) {
-                return;
+                return 0;
             }
+            let isBuildingCounter = 0;
             const container = FindExistingStructure(gameRoom.controller.pos, STRUCTURE_CONTAINER, 1);
             if (container && !FindExistingStructure(container.pos, STRUCTURE_LINK, 1)) {
                 const result = ConstructAroundPos(gameRoom, terrain, container.pos, STRUCTURE_LINK, mainSpawn);
+                isBuildingCounter++;
                 if (result === OK) {
                     numberOfPossibleConstructions--;
                     if (numberOfPossibleConstructions <= 0) {
-                        return;
+                        return isBuildingCounter;
                     }
                 }
             }
@@ -385,31 +389,36 @@ const Constructions = {
                 const container = FindExistingStructure(source.pos, STRUCTURE_CONTAINER, 1);
                 if (container && !FindExistingStructure(container.pos, STRUCTURE_LINK, 1)) {
                     const result = ConstructAroundPos(gameRoom, terrain, container.pos, STRUCTURE_LINK, mainSpawn);
+                    isBuildingCounter++;
                     if (result === OK) {
                         numberOfPossibleConstructions--;
                         if (numberOfPossibleConstructions <= 0) {
-                            return;
+                            return isBuildingCounter;
                         }
                     }
                 }
             }
             if (gameRoom.storage && !FindExistingStructure(gameRoom.storage.pos, STRUCTURE_LINK, 1)) {
                 const result = ConstructAroundPos(gameRoom, terrain, gameRoom.storage.pos, STRUCTURE_LINK, mainSpawn, 1, true);
+                isBuildingCounter++;
                 if (result === OK) {
                     numberOfPossibleConstructions--;
                     if (numberOfPossibleConstructions <= 0) {
-                        return;
+                        return isBuildingCounter;
                     }
                 }
             }
-            Util.Info('Constructions', 'ConstructLinks', gameRoom.name);
+            Util.Info('Constructions', 'ConstructLinks', gameRoom.name + ' built ' + isBuildingCounter);
+            return isBuildingCounter;
         }
 
+        /**@return {number}*/
         function ConstructExtractor(gameRoom, mainSpawn) {
             let numberOfPossibleConstructions = GetNumberOfPossibleConstructions(gameRoom, STRUCTURE_EXTRACTOR);
             if (!mainSpawn || !numberOfPossibleConstructions) {
-                return;
+                return 0;
             }
+            let isBuildingCounter = 0;
             const mineral = gameRoom.find(FIND_MINERALS)[0];
             if (mineral) {
                 const look = mineral.pos.look();
@@ -418,21 +427,26 @@ const Constructions = {
                 }); // can only be extractor or the construction of extractor
                 if (!extractor) {
                     const result = gameRoom.createConstructionSite(mineral.pos.x, mineral.pos.y, STRUCTURE_EXTRACTOR);
+                    isBuildingCounter++;
                     if (result === OK) {
                         Util.InfoLog('Constructions', 'ConstructExtractor', mineral.pos);
                     }
                 }
             }
-            Util.Info('Constructions', 'ConstructExtractor', gameRoom.name + ' mineral ' + mineral);
+            Util.Info('Constructions', 'ConstructExtractor', gameRoom.name + ' mineral ' + mineral + ' built ' + isBuildingCounter);
+            return isBuildingCounter;
         }
 
+        /**@return {number}*/
         function ConstructAtStorage(gameRoom, roomTerrain, structureType, mainSpawn) {
             let numberOfPossibleConstructions = GetNumberOfPossibleConstructions(gameRoom, structureType);
             if (!mainSpawn || !numberOfPossibleConstructions) {
-                return;
+                return 0;
             }
+            let isBuildingCounter = 0;
             if (gameRoom.storage && !FindExistingStructure(gameRoom.storage.pos, structureType, 1)) {
                 ConstructAroundPos(gameRoom, roomTerrain, gameRoom.storage.pos, structureType, mainSpawn, 1, true);
+                isBuildingCounter++;
                 const extensionsAtStorage = gameRoom.storage.pos.findInRange(FIND_MY_STRUCTURES, 1, {
                     filter: (s) => s.structureType === STRUCTURE_EXTENSION
                 });
@@ -442,12 +456,14 @@ const Constructions = {
                     Util.InfoLog('Constructions', 'ConstructAtStorage', 'destroyed extension near storage ' + gameRoom.storage.pos + ' result ' + result);
                 }
             }
-            Util.Info('Constructions', 'ConstructAtStorage', gameRoom.name + ' structureType ' + structureType);
+            Util.Info('Constructions', 'ConstructAtStorage', gameRoom.name + ' structureType ' + structureType + ' built ' + isBuildingCounter);
+            return isBuildingCounter;
         }
 
+        /**@return {number}*/
         function ConstructPerimeter(gameRoom, mainSpawn) {
             if (!mainSpawn || Memory.MemRooms[gameRoom.name].Built/*only build perimiter when a reset occurs*/) {
-                return;
+                return 0;
             }
             let coreStructures = gameRoom.find(FIND_MY_STRUCTURES, {
                 filter: function (structure) {
@@ -493,7 +509,7 @@ const Constructions = {
                     }
                 }
             }
-
+            let isBuildingCounter = 0;
             console.log("     0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 11 12 13 14 15 16 17 18 19 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49");
             for (let i = 0; i < 50; i++) {
                 let row = (i < 10 ? " " + i : i) + ":";
@@ -506,29 +522,53 @@ const Constructions = {
                         })) {
                             const buildPos = new RoomPosition(i, e, gameRoom.name);
                             buildPos.createConstructionSite(STRUCTURE_RAMPART);
+                            isBuildingCounter++;
                         }
                     }
                 }
                 console.log(row);
             }
+            return isBuildingCounter;
         }
 
+        /**@return {number}*/
         function ConstructLabs(gameRoom, roomTerrain) {
             // TODO construct labs
-            Util.Info('Constructions', 'ConstructLabs', gameRoom.name + ' TODO!')
+            let isBuildingCounter = 0;
+            Util.Info('Constructions', 'ConstructLabs', gameRoom.name + ' TODO!' + ' built ' + isBuildingCounter);
+            return isBuildingCounter;
         }
 
         //endregion
 
         //region helper functions
 
+        function FindMainSpawn(gameRoom) {
+            let mainSpawn = Game.getObjectById(Memory.MemRooms[gameRoom.name].MainSpawnId);
+            if (!mainSpawn) {
+                mainSpawn = gameRoom.find(FIND_MY_STRUCTURES, {
+                    filter: function (structure) {
+                        return structure.structureType === STRUCTURE_SPAWN;
+                    }
+                })[0];
+                if (mainSpawn) {
+                    Memory.MemRooms[gameRoom.name].MainSpawnId = mainSpawn.id;
+                }
+            }
+            return mainSpawn;
+        }
+
+        /**@return {number}*/
         function ConstructRoad(gameRoom, roomTerrain, structure, modX, modY) {
             const x = structure.pos.x + modX;
             const y = structure.pos.y + modY;
+            let isBuildingCounter = 0;
             if (roomTerrain.get(x, y) !== TERRAIN_MASK_WALL
                 && !gameRoom.lookForAt(LOOK_STRUCTURES, x, y).length) {
                 gameRoom.createConstructionSite(x, y, STRUCTURE_ROAD);
+                isBuildingCounter++;
             }
+            return isBuildingCounter;
         }
 
         function FindExistingStructure(targetPos, structureType, radius) {
@@ -543,9 +583,8 @@ const Constructions = {
             return structure;
         }
 
-        /**@return {Boolean}*/
+        /**@return {number}*/
         function BuildRoadTo(fromPos, toPos, isRemote = false) {
-            let placedRoads = false;
             let pathFinder = PathFinder.search(
                 fromPos, {'pos': toPos, 'range': 1},
                 {
@@ -573,17 +612,16 @@ const Constructions = {
             );
 
             // create roads
+            let isBuildingCounter = 0;
             for (const pathStepCount in pathFinder.path) {
                 const pathStep = pathFinder.path[pathStepCount];
                 if(Game.rooms[pathStep.roomName]){
-                    const result = Game.rooms[pathStep.roomName].createConstructionSite(pathStep.x, pathStep.y, STRUCTURE_ROAD);
-                    if (result === OK) {
-                        placedRoads = true;
-                    }
+                    Game.rooms[pathStep.roomName].createConstructionSite(pathStep.x, pathStep.y, STRUCTURE_ROAD);
+                    isBuildingCounter++;
                 }
             }
-            Util.InfoLog('Constructions', 'BuildRoadTo', 'placedRoads ' + placedRoads + ' fromPos ' + fromPos + ' toPos ' + toPos);
-            return placedRoads;
+            Util.InfoLog('Constructions', 'BuildRoadTo', 'fromPos ' + fromPos + ' toPos ' + toPos + ' built ' + isBuildingCounter);
+            return isBuildingCounter;
         }
 
         function ConstructAroundPos(gameRoom, terrain, centerPos, structureType, mainStructure, radius = 1, isCheckered = false) {
@@ -639,9 +677,11 @@ const Constructions = {
             }
         }
 
+        /**@return {number}*/
         function BuildCheckeredPattern(gameRoom, structureType, roomTerrain, numberOfPossibleConstructions, buildPosition, acceptedNumOfNearbyWalls) {
             let shiftPointer = -1;
             let scanWidth = 3;
+            let isBuildingCounter = 0;
             while (numberOfPossibleConstructions) { // try adding constructionSites in a larger pattern
                 for (let swy = shiftPointer; swy < scanWidth; swy++) { // scan width pointer for y plane
                     const yp = buildPosition.y + swy;
@@ -679,15 +719,16 @@ const Constructions = {
                                                 const nearbyMineral = newBuildPos.findInRange(FIND_MINERALS, 1);
                                                 if (nearbyMineral.length === 0) {
                                                     const result = gameRoom.createConstructionSite(newBuildPos.x, newBuildPos.y, structureType);
+                                                    isBuildingCounter++;
                                                     if (result === OK) {
                                                         Util.InfoLog('Constructions', 'buildExtensions', gameRoom.name + ' at (' + newBuildPos.x + ',' + newBuildPos.y + ')');
                                                         numberOfPossibleConstructions--;
                                                         if (numberOfPossibleConstructions <= 0) {
-                                                            return;
+                                                            return isBuildingCounter;
                                                         }
                                                     } else {
                                                         Util.Warning('Constructions', 'buildExtensions', gameRoom.name + ' at (' + newBuildPos.x + ',' + newBuildPos.y + ') result ' + result);
-                                                        return;
+                                                        return isBuildingCounter;
                                                     }
                                                 }
                                             }
@@ -697,13 +738,14 @@ const Constructions = {
                             }
                         } else if ((xp >= 100 || xp < -50) && (yp >= 100 || yp < -50)) {
                             Util.ErrorLog('Constructions', 'buildExtensions', 'looped too far out! ' + xp + ',' + yp + ',' + gameRoom.name);
-                            return;
+                            return 1;
                         }
                     }
                 }
                 shiftPointer--; //move the placement pattern further out
                 scanWidth = scanWidth + 2;
             }
+            return isBuildingCounter;
         }
 
         /**@return {Number}*/
