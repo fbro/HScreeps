@@ -1,10 +1,9 @@
 let Util = require('Util');
 const Constructions = {
     run: function () {
-        // TODO it looks like
         ConstructControl();
 
-        //region construct controller isBuildingCounter is not working properly, it still just save it to lvl 8 even though
+        //region construct controller
 
         function ConstructControl() {
             for (const memRoomKey in Memory.MemRooms) {
@@ -88,10 +87,11 @@ const Constructions = {
                         isBuildingCounter += ConstructRoads(gameRoom, roomTerrain);
                     }
                 }
-                if(!isBuildingCounter){
-                    Memory.MemRooms[gameRoom.name].Built = gameRoom.controller.level;
-                }else{
-                    Util.Info('Constructions', 'Build', 'isBuildingCounter ' + isBuildingCounter);
+                if (!isBuildingCounter) {
+                    Memory.MemRooms[gameRoom.name].Built = level;
+                    Util.Info('Constructions', 'Build', 'closing constructions in ' + gameRoom.name + ' at lvl ' + level);
+                } else {
+                    Util.Info('Constructions', 'Build', gameRoom.name + ' lvl ' + level + ' isBuildingCounter ' + isBuildingCounter);
                 }
             }
         }
@@ -168,7 +168,7 @@ const Constructions = {
                 if (builtSuccess === sources.length * 2) {
                     Memory.MemRooms[gameRoomKey].Built = 0;
                 }
-            }else{
+            } else {
                 Util.InfoLog('Constructions', 'ReservedRoomBuild', 'bestMainRoom not found! room ' + gameRoomKey);
             }
         }
@@ -200,7 +200,7 @@ const Constructions = {
                 for (const constructionKey in constructions) {
                     constructions[constructionKey].remove();
                 }
-                const defenderFlagName = "Defend build site " + gameRoom.name;
+                const defenderFlagName = 'Defend build site ' + gameRoom.name;
                 const defenderFlag = constructSpawnFlag.pos.findInRange(FIND_FLAGS, 1, {
                     filter: function (flag) {
                         return flag.name === defenderFlagName && flag.color === COLOR_RED && flag.secondaryColor === COLOR_RED;
@@ -454,6 +454,7 @@ const Constructions = {
                     const extensionAtStorage = extensionsAtStorage[extensionAtStorageCount];
                     const result = extensionAtStorage.destroy();
                     Util.InfoLog('Constructions', 'ConstructAtStorage', 'destroyed extension near storage ' + gameRoom.storage.pos + ' result ' + result);
+                    isBuildingCounter++;
                 }
             }
             Util.Info('Constructions', 'ConstructAtStorage', gameRoom.name + ' structureType ' + structureType + ' built ' + isBuildingCounter);
@@ -462,7 +463,7 @@ const Constructions = {
 
         /**@return {number}*/
         function ConstructPerimeter(gameRoom, mainSpawn) {
-            if (!mainSpawn || Memory.MemRooms[gameRoom.name].Built/*only build perimiter when a reset occurs*/) {
+            if (!mainSpawn || Memory.MemRooms[gameRoom.name].Built/*only build perimeter when a reset occurs*/) {
                 return 0;
             }
             let coreStructures = gameRoom.find(FIND_MY_STRUCTURES, {
@@ -510,23 +511,26 @@ const Constructions = {
                 }
             }
             let isBuildingCounter = 0;
-            console.log("     0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 11 12 13 14 15 16 17 18 19 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49");
+            //Util.Info('', '', '     0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 11 12 13 14 15 16 17 18 19 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49');
             for (let i = 0; i < 50; i++) {
-                let row = (i < 10 ? " " + i : i) + ":";
+                //let row = (i < 10 ? ' ' + i : i) + ':';
                 for (let e = 0; e < 50; e++) {
-                    row = row + " " + (map[i][e] < 10 ? "0" + map[i][e] : map[i][e]);
+                    //row = row + ' ' + (map[i][e] < 10 ? '0' + map[i][e] : map[i][e]);
                     if (map[i][e] !== 0 && map[i][e] < 5) {
                         const structures = gameRoom.lookForAt(LOOK_STRUCTURES, i, e);
                         if (!structures.length || !_.find(structures, function (structure) {
-                            return structure.structureType === STRUCTURE_WALL;
+                            return structure.structureType === STRUCTURE_WALL || structure.structureType === STRUCTURE_RAMPART;
                         })) {
                             const buildPos = new RoomPosition(i, e, gameRoom.name);
-                            buildPos.createConstructionSite(STRUCTURE_RAMPART);
-                            isBuildingCounter++;
+                            let result = buildPos.createConstructionSite(STRUCTURE_RAMPART);
+                            if (result === OK) {
+                                isBuildingCounter++;
+                                Util.Info('Constructions', 'ConstructPerimeter', gameRoom.name + ' (' + i + ',' + e + ') built ' + isBuildingCounter);
+                            }
                         }
                     }
                 }
-                console.log(row);
+                //Util.Info('', '', row);
             }
             return isBuildingCounter;
         }
@@ -565,8 +569,10 @@ const Constructions = {
             let isBuildingCounter = 0;
             if (roomTerrain.get(x, y) !== TERRAIN_MASK_WALL
                 && !gameRoom.lookForAt(LOOK_STRUCTURES, x, y).length) {
-                gameRoom.createConstructionSite(x, y, STRUCTURE_ROAD);
-                isBuildingCounter++;
+                let result = gameRoom.createConstructionSite(x, y, STRUCTURE_ROAD);
+                if (result === OK) {
+                    isBuildingCounter++;
+                }
             }
             return isBuildingCounter;
         }
@@ -615,9 +621,11 @@ const Constructions = {
             let isBuildingCounter = 0;
             for (const pathStepCount in pathFinder.path) {
                 const pathStep = pathFinder.path[pathStepCount];
-                if(Game.rooms[pathStep.roomName]){
-                    Game.rooms[pathStep.roomName].createConstructionSite(pathStep.x, pathStep.y, STRUCTURE_ROAD);
-                    isBuildingCounter++;
+                if (Game.rooms[pathStep.roomName]) {
+                    let result = Game.rooms[pathStep.roomName].createConstructionSite(pathStep.x, pathStep.y, STRUCTURE_ROAD);
+                    if(result === OK){
+                        isBuildingCounter++;
+                    }
                 }
             }
             Util.InfoLog('Constructions', 'BuildRoadTo', 'fromPos ' + fromPos + ' toPos ' + toPos + ' built ' + isBuildingCounter);
@@ -738,7 +746,7 @@ const Constructions = {
                             }
                         } else if ((xp >= 100 || xp < -50) && (yp >= 100 || yp < -50)) {
                             Util.ErrorLog('Constructions', 'buildExtensions', 'looped too far out! ' + xp + ',' + yp + ',' + gameRoom.name);
-                            return 1;
+                            return isBuildingCounter;
                         }
                     }
                 }
