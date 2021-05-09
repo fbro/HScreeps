@@ -53,7 +53,7 @@ const Terminals = {
                                 if (didBuy) {
                                     break; // when buying on the market one can only buy once per terminal
                                 }
-                            }else if(didSend){
+                            } else if (didSend) {
                                 Util.Info('Terminals', 'GetFactoryResources', 'didSend ' + didSend + ' ' + resourceTypeNeeded + ' amountNeeded ' + amountNeeded + ' toTerminal ' + toTerminal.pos.roomName + ' GetNeededFactoryLeftoverResource ' + GetNeededFactoryLeftoverResource(resourceTypeNeeded));
                             }
                         }
@@ -87,7 +87,7 @@ const Terminals = {
                             if (didBuy) {
                                 break; // when buying on the market one can only buy once per terminal
                             }
-                        }else if(didSend){
+                        } else if (didSend) {
                             Util.Info('Terminals', 'GetLabResources', 'didSend ' + didSend + ' ' + resourceTypeNeeded + ' amountNeeded ' + amountNeeded + ' toTerminal ' + toTerminal.pos.roomName);
                         }
                     }
@@ -108,7 +108,7 @@ const Terminals = {
                     didSend = GetFromTerminal(Util.STORAGE_ENERGY_LOW, resource, toTerminal, terminals, Util.TERMINAL_TARGET_ENERGY);
                 }
 
-                if(didSend){
+                if (didSend) {
                     Util.Info('Terminals', 'GetEnergy', 'didSend ' + didSend + ' ' + resource + ' toTerminal ' + toTerminal.pos.roomName);
                 }
             }
@@ -144,14 +144,14 @@ const Terminals = {
                 }
 
                 const max = GetMaxResourceToSell(resourceType, fromTerminal);
-                if (!didSend && fromTerminal.store.getUsedCapacity(resourceType) > (max === 0 ? 0 : (max + Util.TERMINAL_BUFFER))) {
+                if (!didSend && fromTerminal.store.getUsedCapacity(resourceType) > (max <= 100 ? 0 : (max + Util.TERMINAL_BUFFER))) {
                     const amount = fromTerminal.store.getUsedCapacity(resourceType) - max;
                     const didSell = TrySellResource(fromTerminal, resourceType, amount);
                     if (didSell) {
                         Util.Info('Terminals', 'SendExcess', 'didSell ' + didSell + ' ' + resourceType + ' amount ' + amount + ' fromTerminal ' + fromTerminal.pos.roomName);
                         break; // when selling on the market one can only sell once per terminal
                     }
-                }else if(didSend){
+                } else if (didSend) {
                     Util.Info('Terminals', 'SendExcess', 'didSend ' + didSend + ' ' + resourceType + ' fromTerminal ' + fromTerminal.pos.roomName);
                 }
             }
@@ -168,7 +168,7 @@ const Terminals = {
                 const fromTerminal = terminals[fromTerminalKey];
                 if (fromTerminal.store.getUsedCapacity(resourceTypeNeeded) > minFromTerminalAmount) {
                     const avalableToSend = fromTerminal.store.getUsedCapacity(resourceTypeNeeded) - minFromTerminalAmount;
-                    if(avalableToSend < amountNeeded){
+                    if (avalableToSend < amountNeeded) {
                         amountNeeded = avalableToSend;
                     }
                     didSend = TrySendResource(amountNeeded, resourceTypeNeeded, fromTerminal, toTerminal);
@@ -450,6 +450,11 @@ const Terminals = {
 
                 // sell this resource
 
+                case RESOURCE_MACHINE: // factory lvl 5
+                case RESOURCE_ORGANISM: // factory lvl 5
+                case RESOURCE_DEVICE: // factory lvl 5
+                case RESOURCE_ESSENCE: // factory lvl 5
+                    return 100;
                 //return 0;
 
                 default :

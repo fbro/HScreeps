@@ -25,7 +25,7 @@ const Constructions = {
             const level = gameRoom.controller.level;
             if (level >= 1) {
                 if (Memory.MemRooms[gameRoom.name].Built && Memory.MemRooms[gameRoom.name].Built === level) {
-                    Util.Info('Constructions', 'Build', 'skip ' + gameRoom.name + ' room level ' + level);
+                    //Util.Info('Constructions', 'Build', 'skip ' + gameRoom.name + ' room level ' + level);
                     return;
                 }
                 const flags = gameRoom.find(FIND_FLAGS, {
@@ -448,7 +448,7 @@ const Constructions = {
                 ConstructAroundPos(gameRoom, roomTerrain, gameRoom.storage.pos, structureType, mainSpawn, 1, true);
                 isBuildingCounter++;
                 const extensionsAtStorage = gameRoom.storage.pos.findInRange(FIND_MY_STRUCTURES, 1, {
-                    filter: (s) => s.structureType === STRUCTURE_EXTENSION
+                    filter: (s) => s.structureType === STRUCTURE_EXTENSION || s.structureType === STRUCTURE_TOWER
                 });
                 for (const extensionAtStorageCount in extensionsAtStorage) {
                     const extensionAtStorage = extensionsAtStorage[extensionAtStorageCount];
