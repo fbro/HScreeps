@@ -35,6 +35,7 @@ module.exports.loop = function () {
                 AssignJobs.run();
             }
             Labs.run();
+        } else { // generate pixel when nothing else happens
             GeneratePixel();
         }
         ExecuteJobs.run();
@@ -221,14 +222,14 @@ module.exports.loop = function () {
                         }
 
                         // show factory level
-                        if(!memRoom.FctrLvl){
-                            if(memRoom.FctrId && memRoom.FctrId !== "-"){
+                        if (!memRoom.FctrLvl) {
+                            if (memRoom.FctrId && memRoom.FctrId !== "-") {
                                 const factory = Game.getObjectById(memRoom.FctrId);
-                                if(factory){
+                                if (factory) {
                                     memRoom.FctrLvl = factory.level ? factory.level : '0';
                                 }
                             }
-                        }else{
+                        } else {
                             Game.map.visual.text(memRoom.FctrLvl, new RoomPosition(5, 46, memRoomKey), {
                                 color: '#ffffff',
                                 fontSize: 7,
@@ -271,7 +272,7 @@ module.exports.loop = function () {
         }
     }
 
-    function GeneratePixel(){
+    function GeneratePixel() {
         if (Game.cpu.bucket === 10000 && Game.shard.name !== 'shardSeason' && Game.shard.name !== 'shard3') {
             const result = Game.cpu.generatePixel();
             Util.Info('Main', 'GeneratePixel', 'result ' + result + ' Game.cpu.bucket ' + Game.cpu.bucket + ' generating 1 pixel on ' + Game.shard.name);
