@@ -67,7 +67,7 @@ for (const structureKey in structures) {
 // destroy all constructions
 
 for(const roomName in Memory.MemRooms){
-    const constructions = Game.rooms[/*roomName*/'W51N31'].find(FIND_CONSTRUCTION_SITES);
+    const constructions = Game.rooms[/*roomName*/'E9N4'].find(FIND_CONSTRUCTION_SITES);
     for (const key in constructions) {
         console.log('removed ' + constructions[key].structureType + ' ' + constructions[key].pos);
         constructions[key].remove();
