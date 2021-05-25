@@ -24,7 +24,6 @@ const Constructions = {
         function Build(gameRoom, roomTerrain) {
             const level = gameRoom.controller.level;
             if (level >= 1) {
-                //delete Memory.MemRooms[gameRoom.name].Built;
                 if (Memory.MemRooms[gameRoom.name].Built && Memory.MemRooms[gameRoom.name].Built === level) {
                     //Util.Info('Constructions', 'Build', 'skip ' + gameRoom.name + ' room level ' + level);
                     return;
@@ -79,7 +78,7 @@ const Constructions = {
                                             isBuildingCounter += ConstructRampartsOn(gameRoom, roomTerrain, STRUCTURE_OBSERVER);
                                             isBuildingCounter += ConstructRampartsOn(gameRoom, roomTerrain, STRUCTURE_NUKER);
                                             isBuildingCounter += ConstructPerimeter(gameRoom, mainSpawn);
-                                            isBuildingCounter += ConstructLabs(gameRoom, roomTerrain, mainSpawn); // TODO
+                                            isBuildingCounter += ConstructLabs(gameRoom, roomTerrain, mainSpawn);
                                         }
                                     }
                                 }
@@ -577,7 +576,11 @@ const Constructions = {
                 }
             } else {
                 mainLab = Game.getObjectById(Memory.MemRooms[gameRoom.name].MainLabId);
-                isBuildingCounter = BuildCheckeredPattern(gameRoom, STRUCTURE_LAB, roomTerrain, numberOfPossibleConstructions, mainLab.pos, 7);
+                if(mainLab){
+                    isBuildingCounter = BuildCheckeredPattern(gameRoom, STRUCTURE_LAB, roomTerrain, numberOfPossibleConstructions, mainLab.pos, 7);
+                }else{
+                    delete Memory.MemRooms[gameRoom.name].MainLabId; // when it goes from a construction to a structure it changes id
+                }
             }
             if(isBuildingCounter) {
                 Util.Info('Constructions', 'ConstructLabs', gameRoom.name + ' built ' + isBuildingCounter);
@@ -745,7 +748,7 @@ const Constructions = {
                             if ((!terrain || terrain === 2)) { // plan and swamp is buildable
                                 const lookAtObjects = gameRoom.lookAt(newBuildPos.x, newBuildPos.y);
                                 const hasStructure = _.find(lookAtObjects, function (lookObject) {
-                                    return lookObject.type === LOOK_STRUCTURES || lookObject.type === LOOK_CONSTRUCTION_SITES;
+                                    return (lookObject.type === LOOK_STRUCTURES && lookObject.structure.structureType !== STRUCTURE_RAMPART || lookObject.type === LOOK_CONSTRUCTION_SITES);
                                 });
                                 if (!hasStructure) {
                                     let numOfNearbyWalls = NumOfNearbyWalls(roomTerrain, newBuildPos);
