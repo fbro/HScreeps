@@ -302,6 +302,7 @@ const Constructions = {
                 filter: function (structure) {
                     return structure.structureType === STRUCTURE_SPAWN
                         || structure.structureType === STRUCTURE_EXTENSION
+                        || structure.structureType === STRUCTURE_LAB
                         || structure.structureType === STRUCTURE_TOWER
                         || structure.structureType === STRUCTURE_TERMINAL
                         || structure.structureType === STRUCTURE_STORAGE
@@ -314,6 +315,7 @@ const Constructions = {
                 filter: function (construction) {
                     return construction.structureType === STRUCTURE_SPAWN
                         || construction.structureType === STRUCTURE_EXTENSION
+                        || construction.structureType === STRUCTURE_LAB
                         || construction.structureType === STRUCTURE_TOWER
                         || construction.structureType === STRUCTURE_TERMINAL
                         || construction.structureType === STRUCTURE_STORAGE
@@ -483,6 +485,7 @@ const Constructions = {
                 filter: function (structure) {
                     return structure.structureType === STRUCTURE_SPAWN
                         || structure.structureType === STRUCTURE_EXTENSION
+                        || structure.structureType === STRUCTURE_LAB
                         || structure.structureType === STRUCTURE_TOWER
                         || structure.structureType === STRUCTURE_TERMINAL
                         || structure.structureType === STRUCTURE_FACTORY
@@ -495,6 +498,7 @@ const Constructions = {
                 filter: function (construction) {
                     return construction.structureType === STRUCTURE_SPAWN
                         || construction.structureType === STRUCTURE_EXTENSION
+                        || construction.structureType === STRUCTURE_LAB
                         || construction.structureType === STRUCTURE_TOWER
                         || construction.structureType === STRUCTURE_TERMINAL
                         || construction.structureType === STRUCTURE_FACTORY
@@ -612,8 +616,9 @@ const Constructions = {
             const x = structure.pos.x + modX;
             const y = structure.pos.y + modY;
             let isBuildingCounter = 0;
+            const structuresAtPos = gameRoom.lookForAt(LOOK_STRUCTURES, x, y);
             if (roomTerrain.get(x, y) !== TERRAIN_MASK_WALL
-                && !gameRoom.lookForAt(LOOK_STRUCTURES, x, y).length) {
+                && (!structuresAtPos.length || structuresAtPos.length < 2 && structuresAtPos[0].structureType === STRUCTURE_RAMPART)) {
                 let result = gameRoom.createConstructionSite(x, y, STRUCTURE_ROAD);
                 if (result === OK) {
                     isBuildingCounter++;
