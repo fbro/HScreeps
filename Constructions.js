@@ -519,10 +519,15 @@ const Constructions = {
                 const coreStructure = coreStructures[coreStructureKey];
                 for (let i = -3; i <= 3; i++) {
                     for (let e = -3; e <= 3; e++) {
-                        if (i === -3 || i === 3 || e === -3 || e === 3) {
-                            map[i + coreStructure.pos.x][e + coreStructure.pos.y]++;
-                        } else {
-                            map[i + coreStructure.pos.x][e + coreStructure.pos.y] = 10;
+                        const ixpos = i + coreStructure.pos.x;
+                        const eypos = e + coreStructure.pos.y;
+                        if(ixpos >= 0 && ixpos < 50
+                        && eypos >= 0 && eypos < 50){
+                            if (i === -3 || i === 3 || e === -3 || e === 3) {
+                                map[ixpos][eypos]++;
+                            } else {
+                                map[ixpos][eypos] = 10;
+                            }
                         }
                     }
                 }
